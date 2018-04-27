@@ -1,0 +1,7 @@
+animated_pointer0000.bmp
+animated_pointer0001.bmp
+animated_pointer0002.bmp
+animated_pointer0003.bmp
+animated_pointer0004.bmp
+animated_pointer0005.bmp
+animated_pointer0006.bmp

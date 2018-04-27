@@ -1,0 +1,14 @@
+FANCY
+gengui0000.bmp 2
+gengui0001.bmp 1
+gengui0002.bmp 1
+gengui0003.bmp 3
+gengui0004.bmp 1
+gengui0005.bmp 1
+gengui0006.bmp 1
+gengui0007.bmp 1
+gengui0008.bmp 1
+gengui0009.bmp 1
+gengui0010.bmp 1
+gengui0011.bmp 1
+gengui0012.bmp 8

@@ -1,0 +1,9 @@
+newpointer0000.bmp
+newpointer0001.bmp
+newpointer0002.bmp
+newpointer0003.bmp
+newpointer0004.bmp
+newpointer0005.bmp
+newpointer0006.bmp
+newpointer0007.bmp
+newpointer0009.bmp

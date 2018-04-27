@@ -1,0 +1,9 @@
+destroy_castle0000.bmp
+destroy_castle0001.bmp
+destroy_castle0002.bmp
+destroy_castle0003.bmp
+destroy_castle0004.bmp
+destroy_castle0005.bmp
+destroy_castle0006.bmp
+destroy_castle0007.bmp
+destroy_castle0008.bmp

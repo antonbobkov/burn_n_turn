@@ -1,0 +1,5 @@
+FANCY
+bonusspeed1.bmp 1
+bonusspeed2.bmp 1
+bonusspeed3.bmp 1
+bonusspeed4.bmp 1

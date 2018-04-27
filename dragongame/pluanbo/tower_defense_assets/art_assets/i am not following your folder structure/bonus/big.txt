@@ -1,0 +1,3 @@
+FANCY
+bonus4.bmp 5
+bonus4_2.bmp 1

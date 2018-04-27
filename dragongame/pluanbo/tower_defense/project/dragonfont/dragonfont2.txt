@@ -1,0 +1,5 @@
+dragonfont2.bmp
+255 255 255
+255 255 0
+7 20 1
+0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]{}()/\+-^`_'".,!:;~@#$?&*=<>

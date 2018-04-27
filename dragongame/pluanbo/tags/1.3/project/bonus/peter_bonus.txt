@@ -1,0 +1,10 @@
+fast_powerup010000.bmp
+triple_powerup010000.bmp
+laser_powerup010000.bmp
+big_powerup010000.bmp
+ammo_powerup010000.bmp
+explode_powerup010000.bmp
+split_powerup010000.bmp
+explode_powerup010000.bmp
+ring_powerup010000.bmp
+nuke_powerup010000.bmp

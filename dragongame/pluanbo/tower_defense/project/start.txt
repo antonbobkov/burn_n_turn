@@ -1,0 +1,3 @@
+FANCY
+start.bmp 4
+start2.bmp 1

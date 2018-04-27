@@ -1,0 +1,2 @@
+fly_cursor0000.bmp
+fly_cursor0001.bmp

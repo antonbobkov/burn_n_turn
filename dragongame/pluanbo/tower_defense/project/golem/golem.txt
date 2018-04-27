@@ -1,0 +1,7 @@
+golem_death0000.bmp
+golem_death0001.bmp
+golem_death0002.bmp
+golem_death0003.bmp
+golem_death0004.bmp
+golem_death0005.bmp
+golem_death0006.bmp

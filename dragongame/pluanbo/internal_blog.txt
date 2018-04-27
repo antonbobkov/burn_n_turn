@@ -1,0 +1,9 @@
+10-09-09 11:27am
+Future plans:
+"Tower Defense: Tower Defense "
+"Tower Defense in Space"
+"Tower Defense: RPG (Role Playing Game)" (interactive fiction with full color graphics and animations)
+
+10-12-09 10:49pm
+Other Ideas:
+-filesystem branching narrative (with possibility of multiplayer component listing other users who have been to similar locations) (most likely static, possibly dynamic) (create multiple variations) (just list of folders, series of files whose name tells a story) (possibly issues: maximum folder depth)

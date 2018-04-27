@@ -1,0 +1,3 @@
+FANCY
+bonusammo1.bmp 15
+bonusammo2.bmp 1

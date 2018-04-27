@@ -1,0 +1,10 @@
+bonus1.bmp
+bonus2.bmp
+bonus3.bmp
+bonus4.bmp
+bonus5.bmp
+bonus6.bmp
+bonus7.bmp
+bonus8.bmp
+bonus9.bmp
+bonus10.bmp

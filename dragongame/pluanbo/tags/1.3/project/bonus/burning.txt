@@ -1,0 +1,3 @@
+burning_powerup010000.bmp
+burning_powerup010001.bmp
+burning_powerup010002.bmp

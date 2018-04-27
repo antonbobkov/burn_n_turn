@@ -1,0 +1,16 @@
+FANCY
+bonusexplosion1.bmp 10
+bonusexplosion2.bmp 1
+bonusexplosion1.bmp 1
+bonusexplosion2.bmp 1
+bonusexplosion1.bmp 1
+bonusexplosion2.bmp 1
+bonusexplosion1.bmp 1
+bonusexplosion2.bmp 1
+bonusexplosion1.bmp 1
+bonusexplosion2.bmp 1
+bonusexplosion3.bmp 1
+bonusexplosion4.bmp 1
+bonusexplosion5.bmp 1
+bonusexplosion6.bmp 1
+bonusexplosion7.bmp 1

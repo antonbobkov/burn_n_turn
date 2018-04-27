@@ -1,0 +1,10 @@
+FANCY
+bonusbig1.bmp 10
+bonusbig2.bmp 1
+bonusbig3.bmp 1
+bonusbig4.bmp 1
+bonusbig5.bmp 1
+bonusbig6.bmp 1
+bonusbig7.bmp 1
+bonusbig8.bmp 1
+bonusbig9.bmp 1

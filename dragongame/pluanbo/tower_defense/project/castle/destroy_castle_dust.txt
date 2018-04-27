@@ -1,0 +1,9 @@
+castle_destructions_withdust0000.bmp
+castle_destructions_withdust0001.bmp
+castle_destructions_withdust0002.bmp
+castle_destructions_withdust0003.bmp
+castle_destructions_withdust0004.bmp
+castle_destructions_withdust0005.bmp
+castle_destructions_withdust0006.bmp
+castle_destructions_withdust0007.bmp
+castle_destructions_withdust0008.bmp

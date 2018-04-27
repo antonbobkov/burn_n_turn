@@ -1,0 +1,9 @@
+knight_die0000.bmp
+knight_die0001.bmp
+knight_die0002.bmp
+knight_die0003.bmp
+knight_die0004.bmp
+knight_die0005.bmp
+knight_die0006.bmp
+knight_die0007.bmp
+knight_die0008.bmp

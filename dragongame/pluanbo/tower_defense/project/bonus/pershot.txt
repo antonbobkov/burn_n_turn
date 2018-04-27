@@ -1,0 +1,9 @@
+FANCY
+bonusmulti1.bmp 10
+bonusmulti2.bmp 1
+bonusmulti3.bmp 1
+bonusmulti4.bmp 1
+bonusmulti5.bmp 1
+bonusmulti6.bmp 1
+bonusmulti7.bmp 1
+bonusmulti8.bmp 1

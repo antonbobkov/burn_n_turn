@@ -1,0 +1,4 @@
+knight_fire0000.bmp
+knight_fire0001.bmp
+knight_fire0002.bmp
+knight_fire0003.bmp

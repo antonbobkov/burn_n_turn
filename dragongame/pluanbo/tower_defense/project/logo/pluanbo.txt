@@ -1,0 +1,14 @@
+FANCY
+pluanbo0000.bmp 4
+pluanbo0001.bmp 1
+pluanbo0002.bmp 1
+pluanbo0003.bmp 1
+pluanbo0004.bmp 1
+pluanbo0005.bmp 1
+pluanbo0006.bmp 1
+pluanbo0007.bmp 1
+pluanbo0008.bmp 1
+pluanbo0009.bmp 1
+pluanbo0010.bmp 1
+pluanbo0011.bmp 1
+pluanbo0012.bmp 18

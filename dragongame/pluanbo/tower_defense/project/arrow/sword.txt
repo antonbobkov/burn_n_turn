@@ -1,0 +1,3 @@
+FANCY
+_sword.bmp 6
+_sword2.bmp 2

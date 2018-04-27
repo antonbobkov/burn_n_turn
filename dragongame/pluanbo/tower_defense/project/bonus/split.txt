@@ -1,0 +1,10 @@
+FANCY
+bonussplit1.bmp 10
+bonussplit2.bmp 1
+bonussplit3.bmp 1
+bonussplit4.bmp 1
+bonussplit5.bmp 1
+bonussplit6.bmp 1
+bonussplit7.bmp 1
+bonussplit8.bmp 1
+bonussplit9.bmp 1

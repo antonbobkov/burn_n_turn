@@ -1,0 +1,3 @@
+FANCY
+bonus8.bmp 5
+bonus8_2.bmp 1

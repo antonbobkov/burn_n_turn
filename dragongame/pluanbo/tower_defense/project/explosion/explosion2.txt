@@ -1,0 +1,6 @@
+explosion_big0000.bmp
+explosion_big0001.bmp
+explosion_big0002.bmp
+explosion_big0003.bmp
+explosion_big0004.bmp
+explosion_big0005.bmp

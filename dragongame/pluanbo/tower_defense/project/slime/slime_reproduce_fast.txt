@@ -1,0 +1,7 @@
+FANCY
+slime0018.bmp 4
+slime0019.bmp 2
+slime0020.bmp 2
+slime0021.bmp 2
+slime0022.bmp 2 
+slime0023.bmp 2

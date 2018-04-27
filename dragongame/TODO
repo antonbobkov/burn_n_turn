@@ -1,0 +1,58 @@
+::new TODO::
+-Pick up powerups automatically
+-princess head indicator on dragon and castle
+-consider new pick up system
+DONE-get to compile on linux
+DONE*-fix directory bug
+*-score system  
+    -high score system???
+    -score multiplier
+        -design
+            -each fireball has a kill count
+            -exponential (100,200,300,400,500, etc)
+-curve fireballs
+-slimes
+    -design
+    -implemet
+    -add to levels
+-wizards
+    -design
+    -implement
+    -add to levels
+-wizard features
+    -teleport away from fireballs
+    -curse to make teleporting fireballs
+*-add speed control to fballs
+*-redo roads
+    -fix road intersecting problem
+    -redraw
+-two player mode
+    -design, how does this change gameplay (if at all)
+        -maybe add two player mode difficulty setting to the level file
+*-music
+    DONE-title screen
+    -level
+-designs
+    -flyer
+    -cd
+    -poster
+    -website
+-balance game
+
+::potential features::
+-weather
+    -wizards can summon weather
+    -rain
+        -half fireball distance
+        -puts out nights on fire
+-environment
+    -trees that block fireballs (once)
+
+Sounds needed:
+[DONE]-dragon getting on/off the tower
+[DONE]-sound for one thing dropping on another and one for dropping on the ground (done)
+[IGNORED]-sound for dropping princess on tower
+[DONE]-sound for knights freeing princess
+[DONE]-slime poke
+[DONE]-casting spell sound
+

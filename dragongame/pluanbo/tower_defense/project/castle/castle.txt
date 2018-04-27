@@ -1,0 +1,7 @@
+castle0000.bmp
+castle0001.bmp
+castle0002.bmp
+castle0003.bmp
+castle0004.bmp
+destroyed_castle.bmp
+flagged_castle.bmp

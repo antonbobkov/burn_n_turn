@@ -1,0 +1,12 @@
+regen_powerup.bmp
+bonus0014.bmp
+bonus0011.bmp
+bonus0000.bmp
+bonus0016.bmp
+bonus0010.bmp
+bonus0013.bmp
+bonus0010.bmp
+bonus0012.bmp
+bonus0002.bmp
+bonus0015.bmp
+freq_powerup.bmp

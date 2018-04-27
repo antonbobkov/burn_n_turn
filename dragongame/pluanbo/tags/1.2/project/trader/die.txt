@@ -1,0 +1,7 @@
+merchant_die0000.bmp
+merchant_die0001.bmp
+merchant_die0002.bmp
+merchant_die0003.bmp
+merchant_die0004.bmp
+merchant_die0005.bmp
+merchant_die0006.bmp

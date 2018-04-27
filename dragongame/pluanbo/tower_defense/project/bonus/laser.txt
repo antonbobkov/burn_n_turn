@@ -1,0 +1,10 @@
+FANCY
+bonuslaser9.bmp 10
+bonuslaser1.bmp 1
+bonuslaser2.bmp 1
+bonuslaser3.bmp 1
+bonuslaser4.bmp 1
+bonuslaser5.bmp 1
+bonuslaser6.bmp 1
+bonuslaser7.bmp 1
+bonuslaser8.bmp 1

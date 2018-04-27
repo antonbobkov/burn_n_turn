@@ -1,0 +1,9 @@
+FANCY
+bonusnuke8.bmp 10
+bonusnuke1.bmp 1
+bonusnuke2.bmp 1
+bonusnuke3.bmp 1
+bonusnuke4.bmp 1
+bonusnuke5.bmp 1
+bonusnuke6.bmp 1
+bonusnuke7.bmp 1

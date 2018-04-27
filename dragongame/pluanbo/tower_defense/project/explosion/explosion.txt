@@ -1,0 +1,6 @@
+explosion0000.bmp
+explosion0001.bmp
+explosion0002.bmp
+explosion0003.bmp
+explosion0004.bmp
+explosion0005.bmp

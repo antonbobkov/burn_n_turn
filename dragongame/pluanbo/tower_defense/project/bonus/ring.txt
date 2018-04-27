@@ -1,0 +1,9 @@
+FANCY
+bonusring1.bmp 1
+bonusring2.bmp 1
+bonusring3.bmp 1
+bonusring4.bmp 1
+bonusring5.bmp 1
+bonusring6.bmp 1
+bonusring7.bmp 1
+bonusring8.bmp 1

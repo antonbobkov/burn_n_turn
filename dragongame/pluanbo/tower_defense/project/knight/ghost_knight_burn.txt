@@ -1,0 +1,11 @@
+FANCY
+ghost_night0001.bmp 1
+ghost_night0002.bmp 1
+ghost_night0003.bmp 1
+ghost_night0004.bmp 1
+ghost_night0005.bmp 1
+ghost_night0006.bmp 1
+ghost_night0007.bmp 1
+ghost_night0008.bmp 1
+ghost_night0009.bmp 1
+ghost_night0010.bmp 1

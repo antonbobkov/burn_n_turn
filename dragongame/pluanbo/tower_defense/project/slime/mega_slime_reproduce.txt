@@ -1,0 +1,6 @@
+FANCY
+megaslime0000.bmp 4
+megaslime0001.bmp 2
+megaslime0002.bmp 2
+megaslime0003.bmp 2
+megaslime0004.bmp 2 

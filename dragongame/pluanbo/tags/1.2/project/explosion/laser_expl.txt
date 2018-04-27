@@ -1,0 +1,6 @@
+laser_explosion0000.bmp
+laser_explosion0001.bmp
+laser_explosion0002.bmp
+laser_explosion0003.bmp
+laser_explosion0004.bmp
+laser_explosion0005.bmp
