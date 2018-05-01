@@ -336,4 +336,17 @@ namespace Gui
             throw gse;
         }
     }
+
+	void SdlGraphicalInterface::SetIcon(std::string sPath)
+	{
+      //SDL_WM_SetIcon(SDL_LoadBMP(sPath), NULL);
+		SDL_SetWindowIcon(pScreenWindow, SDL_LoadBMP(sPath.c_str()));
+		//SDL_WM_SetIcon(SDL_LoadBMP(sPath), NULL);
+
+	}
+	void SdlGraphicalInterface::SetTitle(std::string sName)
+	{
+		SDL_SetWindowTitle(pScreenWindow, sName.c_str());
+	}
+
 }

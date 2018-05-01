@@ -107,12 +107,12 @@ namespace Gui
     class SdlGraphicalInterface: public GraphicalInterface<SdlImage*>
     {
 	    SdlImage* pScreenImage;
-		SDL_Window* pScreenWindow;
 		SDL_Renderer* pScreenRenderer;
 
 		Rectangle rOffSet;
 		Size sz;
     public:
+		SDL_Window* pScreenWindow;
 
         SdlGraphicalInterface(Size sz_, bool bFullScreen = false, Rectangle rOffSet_ = Rectangle());
         ~SdlGraphicalInterface();
@@ -134,6 +134,9 @@ namespace Gui
         /*virtual*/ void RefreshAll();
 
         /*virtual*/ void ImageOnto(SdlImage* pImgDest, Point p, SdlImage* pImgSrc, Rectangle r);
+
+		void SetIcon(std::string sPath);
+		void SetTitle(std::string sName);
     };
 }
 
