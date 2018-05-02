@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <time.h>
 
 #include "Global.h"
@@ -13,10 +14,9 @@
 
 using namespace Gui;
 
-void SdlMapKeys(std::vector<GuiKeyType>& vSdlMapper)
+void SdlMapKeys(std::map<int, GuiKeyType>& vSdlMapper)
 {
-	vSdlMapper.resize(400);
-	for(unsigned i = 0; i < vSdlMapper.size(); ++i)
+	for(unsigned i = 0; i < 400; ++i)
 		vSdlMapper[i] = GuiKeyType(i);
 
 	vSdlMapper[SDLK_F1] = GUI_F1;
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 		SP< SoundInterface<Index> > pSndMng = new SimpleSoundInterface<Mix_Chunk*> (pSound);
 
 		//SDL_WM_SetIcon(SDL_LoadBMP("icon\\game_icon.bmp"), NULL);
-		pGraph->SetIcon("icon\\game_icon.bmp");
+		//pGraph->SetIcon("icon\\game_icon.bmp");
 		pGraph->SetTitle(inf.strTitle.c_str());
 
 		pGr->DrawRectangle(sBound, Color(0,0,0), true);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
 		SP<GlobalController> pGl = GetGlobalController(pe);
 
-		std::vector<GuiKeyType> vSdlMapper;
+		std::map<int, GuiKeyType> vSdlMapper;
 		SdlMapKeys(vSdlMapper);
 
 		Uint32 nTimer = SDL_GetTicks();

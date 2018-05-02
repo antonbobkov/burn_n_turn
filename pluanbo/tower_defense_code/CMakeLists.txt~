@@ -5,36 +5,48 @@ cmake_policy(SET CMP0015 NEW)
 
 project (Dragon)
 
-SET (SDL_DIR "${Total_SOURCE_DIR}/gui_stuff")
-SET (UTIL_DIR "${Total_SOURCE_DIR}/gui_stuff")
+SET (SDL_DIR "${Dragon_SOURCE_DIR}/sdl_library_windows")
+SET (MyUtilLibrary_DIR "${Dragon_SOURCE_DIR}/gui_src")
 
-${UTIL_DIR}
+SET (SDL_LIBRARY_LIST "SDL2 SDL2main SDL2_mixer SDL2_image")
 
-include_directories (${SDL_DIR}/include)
-link_directories (${SDL_DIR})
+include_directories (${SDL_DIR}/all_inc)
+link_directories (${SDL_DIR}/all_lib_64)
 
-include_directories(../sdl_library_windows/all_inc)
-link_directories(../sdl_library_windows/all_lib_64)
-
-add_library(UTIL
-	${UTIL_DIR}/SuiGen.cpp
-	${UTIL_DIR}/Preloader.cpp
-	${UTIL_DIR}/Preloader.h
-	${UTIL_DIR}/SmartPointer.h
-	${UTIL_DIR}/SmartPointer.cpp
-	${UTIL_DIR}/General.h
-	${UTIL_DIR}/General.cpp
-	${UTIL_DIR}/event.h
-	${UTIL_DIR}/event.cpp
-	${UTIL_DIR}/Global.h
-	${UTIL_DIR}/MessageWriter.h
-	${UTIL_DIR}/MessageWriter.cpp
-	${UTIL_DIR}/GuiSdl.h
-	${UTIL_DIR}/GuiSdl.cpp
-	${UTIL_DIR}/SuiSdl.h
-	${UTIL_DIR}/SuiSdl.cpp
+add_library(MyUtilLibrary
+	${MyUtilLibrary_DIR}/SuiGen.cpp
+	${MyUtilLibrary_DIR}/Preloader.cpp
+	${MyUtilLibrary_DIR}/Preloader.h
+	${MyUtilLibrary_DIR}/SmartPointer.h
+	${MyUtilLibrary_DIR}/SmartPointer.cpp
+	${MyUtilLibrary_DIR}/General.h
+	${MyUtilLibrary_DIR}/General.cpp
+	${MyUtilLibrary_DIR}/event.h
+	${MyUtilLibrary_DIR}/event.cpp
+	${MyUtilLibrary_DIR}/Global.h
+	${MyUtilLibrary_DIR}/MessageWriter.h
+	${MyUtilLibrary_DIR}/MessageWriter.cpp
+	${MyUtilLibrary_DIR}/GuiGen.h
+	${MyUtilLibrary_DIR}/GuiGenHdr.h
+	${MyUtilLibrary_DIR}/GuiGen.cpp
+	${MyUtilLibrary_DIR}/SuiGen.h
+	${MyUtilLibrary_DIR}/SuiGen.cpp
+	${MyUtilLibrary_DIR}/GuiSdl.h
+	${MyUtilLibrary_DIR}/GuiSdl.cpp
+	${MyUtilLibrary_DIR}/SuiSdl.h
+	${MyUtilLibrary_DIR}/SuiSdl.cpp
 	)
 	
-add_executable(sdl_sound 21_sound_effects_and_music.cpp)
+# target_link_libraries(MyUtilLibrary ${SDL_LIBRARY_LIST})
 
-target_link_libraries(sdl_sound SDL2.lib SDL2main.lib SDL2_mixer.lib SDL2_image.lib)
+include_directories (${MyUtilLibrary_DIR})
+add_library(Game
+	main.cpp
+	tower_defense.h
+	tower_defense.cpp
+	)
+	
+target_link_libraries(Game MyUtilLibrary)
+
+# add_executable(sdl_sound 21_sound_effects_and_music.cpp)
+

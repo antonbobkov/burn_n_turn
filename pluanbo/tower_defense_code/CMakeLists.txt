@@ -37,16 +37,14 @@ add_library(MyUtilLibrary
 	${MyUtilLibrary_DIR}/SuiSdl.cpp
 	)
 	
-# target_link_libraries(MyUtilLibrary ${SDL_LIBRARY_LIST})
-
 include_directories (${MyUtilLibrary_DIR})
-add_library(Game
+
+add_executable(Game
 	main.cpp
 	tower_defense.h
 	tower_defense.cpp
 	)
 	
-target_link_libraries(Game MyUtilLibrary)
-
-# add_executable(sdl_sound 21_sound_effects_and_music.cpp)
+target_link_libraries(Game MyUtilLibrary SDL2 SDL2main SDL2_mixer SDL2_image)
+#target_link_libraries(Game MyUtilLibrary ${SDL_LIBRARY_LIST})
 

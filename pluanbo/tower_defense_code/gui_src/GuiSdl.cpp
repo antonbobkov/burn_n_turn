@@ -44,7 +44,7 @@ namespace Gui
 
 
 
-		SDL_Window *pScreenWindow = SDL_CreateWindow("Dragon Game",
+		pScreenWindow = SDL_CreateWindow("Dragon Game",
 								  SDL_WINDOWPOS_UNDEFINED,
 								  SDL_WINDOWPOS_UNDEFINED,
 								  sz.x, sz.y,
