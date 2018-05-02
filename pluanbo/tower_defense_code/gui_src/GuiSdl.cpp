@@ -31,6 +31,13 @@ namespace Gui
         SDL_FreeSurface(pImg);
     }
 
+	void SdlGraphicalInterface::RefreshScreen()
+	{
+		//SDL_RenderPresent(pScreenRenderer);
+		SDL_UpdateWindowSurface(pScreenWindow);
+
+	}
+
     SdlGraphicalInterface::SdlGraphicalInterface(Size sz_, bool bFullScreen/* = false*/, Rectangle rOffSet_/* = Rectangle()*/)
 		:rOffSet(rOffSet_), sz(sz_)
     {
@@ -67,7 +74,8 @@ namespace Gui
 
         DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0,0,255));
         //SDL_Flip(pScreen->pImg);
-		SDL_RenderPresent(pScreenRenderer);
+
+		RefreshScreen();
     }
 
     SdlGraphicalInterface::~SdlGraphicalInterface()
@@ -219,7 +227,7 @@ namespace Gui
 
 	        Size sz = pImg->GetSize();
 	        if(bRefresh)
-				SDL_RenderPresent(pScreenRenderer);
+				RefreshScreen();
                 //SDL_UpdateRect(pScreen->pImg, p.x, p.y, r.sz.x, r.sz.y);
         }
         catch(ImageException& ex)
@@ -294,7 +302,7 @@ namespace Gui
 		
 		
 		pScreenImage->Unlock();
-		SDL_RenderPresent(pScreenRenderer);
+		RefreshScreen();
         //if(0 > SDL_Flip(pScreen->pImg))
         //    Refresh(Rectangle(pScreen->GetSize()));
     }

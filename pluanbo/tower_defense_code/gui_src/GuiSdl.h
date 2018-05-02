@@ -111,6 +111,8 @@ namespace Gui
 
 		Rectangle rOffSet;
 		Size sz;
+
+		void RefreshScreen();
     public:
 		SDL_Window* pScreenWindow;
 
