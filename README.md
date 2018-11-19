@@ -1,3 +1,5 @@
+# TOWER DEFENSE
+
 Arcade style video game released for multiple platforms: PC, mac, linux, blackberry as well as iOS and Android markets.
 
 Articles about the game:
@@ -10,15 +12,13 @@ Website: http://robotbear.org/
 
 TOUCHPAD OR TRACKBALL REQUIRED FOR PLAYING
 
-# TOWER DEFENSE
-
 ## Intro
 The princesses are loose!
 Bring them back while defending your tower before time runs out!
 
 ## Controls
-SPACE:	fly (while perched), capture (while flying), drop (after capturing)
-SWIPE: shoot fireball (while perched), turn (while flying)
+* SPACE:	fly (while perched), capture (while flying), drop (after capturing)
+* SWIPE: shoot fireball (while perched), turn (while flying)
 
 ## Goal
 * You're lust for damsels in distress only ends when four princesses are in each tower.
@@ -30,6 +30,6 @@ SWIPE: shoot fireball (while perched), turn (while flying)
 Capturing merchants gives longer lasting powerups
 
 # Credits
-Anton Bobkov  (programming)
-Peter Lu (art, sound)
-Alex Rickett (music)
+* Anton Bobkov  (programming)
+* Peter Lu (art, sound)
+* Alex Rickett (music)
