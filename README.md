@@ -10,6 +10,8 @@ Trailer: https://vimeo.com/32022226
 
 Website: http://robotbear.org/
 
+![game](http://robotbear.org/images/BurnandTurn/bnt920x540_1.png)
+
 TOUCHPAD OR TRACKBALL REQUIRED FOR PLAYING
 
 ## Intro
