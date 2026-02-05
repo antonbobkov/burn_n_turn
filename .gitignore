@@ -5,3 +5,5 @@ cmake_*/
 *.vcproj
 Thumbs.db
 bin_*/
+.cursor/
+*~
