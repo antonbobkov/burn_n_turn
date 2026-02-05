@@ -149,8 +149,8 @@ TwrGlobalController::TwrGlobalController(
   pr.LoadSeqTS("bonus\\ring.txt", "ring_bonus");       // 8 - ring
   pr.LoadSeqTS("bonus\\nuke.txt", "nuke_bonus");       // 9 - nuke
   pr.LoadSeqTS("bonus\\speed.txt", "speed_bonus");     // 10 - speed
-  // pr.LoadSeqTS("bonus\\frequency.txt", "frequency");		// 11 - frequency
-  // (not used)
+  // pr.LoadSeqTS("bonus\\frequency.txt", "frequency");		// 11 -
+  // frequency (not used)
 
   DrawStuff(rBound, pGraph, pSndRaw_, pr, 2);
   pr.LoadSeqTS("start.txt", "start");
