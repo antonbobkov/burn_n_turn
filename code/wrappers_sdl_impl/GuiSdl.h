@@ -1,125 +1,135 @@
 #ifndef GUISDL_ALREADY_INCLUDED_GUI_0316
 #define GUISDL_ALREADY_INCLUDED_GUI_0316
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
 #include "SDL.h"
 #include "SDL_image.h"
 
 #include "GuiGen.h"
 
-namespace Gui
-{
+namespace Gui {
 
-    class SdlGraphicalInterface;
+class SdlGraphicalInterface;
 
-    class SdlImageException: public ImageException
-    {
-    public:
-        SdlImageException(crefString strExcName_, crefString strClsName_, crefString strFnName_)
-            :ImageException(strExcName_, strClsName_, strFnName_){}
+class SdlImageException : public ImageException {
+public:
+  SdlImageException(crefString strExcName_, crefString strClsName_,
+                    crefString strFnName_)
+      : ImageException(strExcName_, strClsName_, strFnName_) {}
 
-        static std::string GetSdlError(){return std::string(" (SDL error: ") + SDL_GetError() + ")";}
-    };
+  static std::string GetSdlError() {
+    return std::string(" (SDL error: ") + SDL_GetError() + ")";
+  }
+};
 
-    class SimpleSdlImageException: public SdlImageException
-    {
-        std::string strProblem;
-    public:
-        SimpleSdlImageException(crefString strFnName_, crefString strProblem_)
-            :SdlImageException("SimpleSdlImageException", "SdlImage", strFnName_), strProblem(strProblem_){}
+class SimpleSdlImageException : public SdlImageException {
+  std::string strProblem;
 
-        /*virtual*/ std::string GetErrorMessage() const {return strProblem;}
-    };
+public:
+  SimpleSdlImageException(crefString strFnName_, crefString strProblem_)
+      : SdlImageException("SimpleSdlImageException", "SdlImage", strFnName_),
+        strProblem(strProblem_) {}
 
+  /*virtual*/ std::string GetErrorMessage() const { return strProblem; }
+};
 
-    class SdlImage: public Image
-    {
-        friend class SdlGraphicalInterface;
-        
-        SDL_Surface* pImg;
+class SdlImage : public Image {
+  friend class SdlGraphicalInterface;
 
-    public:
+  SDL_Surface *pImg;
 
-        SdlImage(SDL_Surface* pImg_);
-        SdlImage(Size sz_);
-        
-        ~SdlImage();
+public:
+  SdlImage(SDL_Surface *pImg_);
+  SdlImage(Size sz_);
 
-        void Lock() const;
-        void Unlock() const;
+  ~SdlImage();
 
-        /*virtual*/ void SetPixel(Point p, const Color& c);
-        /*virtual*/ Color GetPixel(Point p) const;
-    };
+  void Lock() const;
+  void Unlock() const;
 
-    class SdlGraphicalInterfaceException: public GraphicalInterfaceException
-    {
-    public:
-        SdlGraphicalInterfaceException(crefString strExcName_, crefString strClsName_, crefString strFnName_)
-            :GraphicalInterfaceException(strExcName_, strClsName_, strFnName_){}
+  /*virtual*/ void SetPixel(Point p, const Color &c);
+  /*virtual*/ Color GetPixel(Point p) const;
+};
 
-        static std::string GetSdlError(){return std::string(" (SDL error: ") + SDL_GetError() + ")";}
-    };
+class SdlGraphicalInterfaceException : public GraphicalInterfaceException {
+public:
+  SdlGraphicalInterfaceException(crefString strExcName_, crefString strClsName_,
+                                 crefString strFnName_)
+      : GraphicalInterfaceException(strExcName_, strClsName_, strFnName_) {}
 
-    class SimpleSGIException: public SdlGraphicalInterfaceException
-    {
-        std::string strProblem;
-    public:
-        SimpleSGIException(crefString strFnName_, crefString strProblem_)
-            :SdlGraphicalInterfaceException("SimpleSGIException", "SdlGraphicalInterface", strFnName_), strProblem(strProblem_){}
+  static std::string GetSdlError() {
+    return std::string(" (SDL error: ") + SDL_GetError() + ")";
+  }
+};
 
-        /*virtual*/ std::string GetErrorMessage() const {return strProblem;}
-    };
+class SimpleSGIException : public SdlGraphicalInterfaceException {
+  std::string strProblem;
 
-    class NullPointerSGIException: public SdlGraphicalInterfaceException
-    {
-    public:
-        std::string strPntName;
+public:
+  SimpleSGIException(crefString strFnName_, crefString strProblem_)
+      : SdlGraphicalInterfaceException("SimpleSGIException",
+                                       "SdlGraphicalInterface", strFnName_),
+        strProblem(strProblem_) {}
 
-        NullPointerSGIException(crefString strClsName_, crefString strFnName_, crefString strPntName_)
-            :SdlGraphicalInterfaceException("NullPointerSGIException", strClsName_, strFnName_), strPntName(strPntName_){}
+  /*virtual*/ std::string GetErrorMessage() const { return strProblem; }
+};
 
-        /*virtual*/ std::string GetErrorMessage() const {return "Null pointer passed for " + strPntName;}
-    };
+class NullPointerSGIException : public SdlGraphicalInterfaceException {
+public:
+  std::string strPntName;
 
-    class SdlGraphicalInterface: public GraphicalInterface<SdlImage*>
-    {
-	    SdlImage* pScreenImage;
-		SDL_Renderer* pScreenRenderer;
+  NullPointerSGIException(crefString strClsName_, crefString strFnName_,
+                          crefString strPntName_)
+      : SdlGraphicalInterfaceException("NullPointerSGIException", strClsName_,
+                                       strFnName_),
+        strPntName(strPntName_) {}
 
-		Rectangle rOffSet;
-		Size sz;
+  /*virtual*/ std::string GetErrorMessage() const {
+    return "Null pointer passed for " + strPntName;
+  }
+};
 
-		void RefreshScreen();
-    public:
-		SDL_Window* pScreenWindow;
+class SdlGraphicalInterface : public GraphicalInterface<SdlImage *> {
+  SdlImage *pScreenImage;
+  SDL_Renderer *pScreenRenderer;
 
-        SdlGraphicalInterface(Size sz_, bool bFullScreen = false, Rectangle rOffSet_ = Rectangle());
-        ~SdlGraphicalInterface();
-        
-        /*virtual*/ void DeleteImage(SdlImage* pImg);
-        /*virtual*/ Image* GetImage(SdlImage* pImg) const;
-        //*virtual*/ SdlImage* CopyImage(SdlImage* pImg);
+  Rectangle rOffSet;
+  Size sz;
 
-        /*virtual*/ SdlImage* GetBlankImage(Size sz);
-        /*virtual*/ SdlImage* LoadImage(std::string sFileName);
-        /*virtual*/ void SaveImage(std::string sFileName, SdlImage* pImg);
-        
-        /*virtual*/ void DrawImage(Point p, SdlImage* pImg, Rectangle r, bool bRefresh = true);
-        
-        /*virtual*/ void DrawRectangle(Rectangle p, Color c, bool bRedraw = true);
-        /*virtual*/ void RectangleOnto(SdlImage* pImg, Rectangle p, Color c);
+  void RefreshScreen();
 
-        //*virtual*/ void Refresh(Rectangle r);
-        /*virtual*/ void RefreshAll();
+public:
+  SDL_Window *pScreenWindow;
 
-        /*virtual*/ void ImageOnto(SdlImage* pImgDest, Point p, SdlImage* pImgSrc, Rectangle r);
+  SdlGraphicalInterface(Size sz_, bool bFullScreen = false,
+                        Rectangle rOffSet_ = Rectangle());
+  ~SdlGraphicalInterface();
 
-		void SetIcon(std::string sPath);
-		void SetTitle(std::string sName);
-    };
-}
+  /*virtual*/ void DeleteImage(SdlImage *pImg);
+  /*virtual*/ Image *GetImage(SdlImage *pImg) const;
+  //*virtual*/ SdlImage* CopyImage(SdlImage* pImg);
 
-#endif //GUISDL_ALREADY_INCLUDED_GUI_0316
+  /*virtual*/ SdlImage *GetBlankImage(Size sz);
+  /*virtual*/ SdlImage *LoadImage(std::string sFileName);
+  /*virtual*/ void SaveImage(std::string sFileName, SdlImage *pImg);
+
+  /*virtual*/ void DrawImage(Point p, SdlImage *pImg, Rectangle r,
+                             bool bRefresh = true);
+
+  /*virtual*/ void DrawRectangle(Rectangle p, Color c, bool bRedraw = true);
+  /*virtual*/ void RectangleOnto(SdlImage *pImg, Rectangle p, Color c);
+
+  //*virtual*/ void Refresh(Rectangle r);
+  /*virtual*/ void RefreshAll();
+
+  /*virtual*/ void ImageOnto(SdlImage *pImgDest, Point p, SdlImage *pImgSrc,
+                             Rectangle r);
+
+  void SetIcon(std::string sPath);
+  void SetTitle(std::string sName);
+};
+} // namespace Gui
+
+#endif // GUISDL_ALREADY_INCLUDED_GUI_0316
