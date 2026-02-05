@@ -119,6 +119,8 @@ struct TwrGlobalController;
 
 extern MessageWriter *pWr;
 
+/** Polar coordinates (radius r, angle a); converts to/from fPoint, supports
+ * multiply for rotation. */
 struct Polar {
   float r, a;
   Polar() : r(0), a(0) {}
@@ -134,6 +136,8 @@ struct Polar {
   fPoint TofPoint() { return fPoint(r * cos(a), r * sin(a)); }
 };
 
+/** Combine two direction codes (1–4: left/right/down/up) into a normalized
+ * fPoint. */
 inline fPoint ComposeDirection(int dir1, int dir2) {
   fPoint r(0, 0);
   switch (dir1) {
@@ -172,6 +176,8 @@ inline fPoint ComposeDirection(int dir1, int dir2) {
   return r;
 }
 
+/** Angle within a wedge: fDir = center, dWidth = half-width, nWhich/nHowMany =
+ * segment. */
 inline fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
                             unsigned nHowMany) {
   if (nHowMany == 1)
@@ -182,12 +188,15 @@ inline fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
   return (Polar(fDir) * Polar(d - 3.1415F * dWidth, 1)).TofPoint();
 }
 
+/** Random direction near fDir within fRange * 2π. */
 inline fPoint RandomAngle(fPoint fDir = fPoint(1, 0), float fRange = 1.F) {
   return (Polar(fDir) *
           Polar((float(rand()) / RAND_MAX - .5F) * fRange * 2 * 3.1415F, 1))
       .TofPoint();
 }
 
+/** Base for drawing an image at a point; ScalingDrawer adds scale and color
+ * key. */
 struct Drawer : virtual public SP_Info {
   SSP<Graphic> pGr;
 
@@ -196,6 +205,7 @@ struct Drawer : virtual public SP_Info {
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
 
+/** Drawer that scales images by nFactor and uses cTr as transparency key. */
 struct ScalingDrawer : public Drawer {
   unsigned nFactor;
   Color cTr;
@@ -245,6 +255,7 @@ struct ScalingDrawer : public Drawer {
   }
 };
 
+/** Remove from list any element for which bExist is false. */
 template <class T> void CleanUp(std::list<T> &ar) {
   for (typename std::list<T>::iterator itr = ar.begin(), etr = ar.end();
        itr != etr;) {
@@ -255,6 +266,8 @@ template <class T> void CleanUp(std::list<T> &ar) {
   }
 }
 
+/** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
+ * Fire, etc.). */
 struct GameController : virtual public SP_Info {
   SSP<TwrGlobalController> pGl;
 
@@ -275,6 +288,8 @@ struct GameController : virtual public SP_Info {
   virtual void Fire() {}
 };
 
+/** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for
+ * recolored text. */
 struct NumberDrawer : virtual public SP_Info {
   SSP<ScalingDrawer> pDr;
   std::vector<int> vImgIndx;
@@ -422,10 +437,12 @@ Point(p.x + 4 * i, p.y), false);
   }
 };
 
+/** Copy ASSP so the new pointer is owned by pInf. */
 template <class T> ASSP<T> CopyASSP(SP_Info *pInf, ASSP<T> pAsp) {
   return ASSP<T>(pInf, pAsp);
 }
 
+/** Copy each ASSP from from into to, rebinding each to pInf. */
 template <class T> void CopyArrayASSP(SP_Info *pInf, const T &from, T &to) {
   for (typename T::const_iterator itr = from.begin(), etr = from.end();
        itr != etr; ++itr)
@@ -435,6 +452,8 @@ template <class T> void CopyArrayASSP(SP_Info *pInf, const T &from, T &to) {
 struct LevelLayout;
 typedef std::vector<LevelLayout> LevelStorage;
 
+/** Plays level music from vThemes; SwitchTheme/StopMusic/ToggleOff control
+ * playback. */
 struct BackgroundMusicPlayer {
   int nCurrTheme;
   std::vector<Index> vThemes;
@@ -474,6 +493,8 @@ struct TimedFireballBonus;
 
 struct TowerDataWrap;
 
+/** Persists a value in a file; Get/Set, optional load on construction and save
+ * on set. */
 template <class T> class SavableVariable {
   T var;
   std::string sFileName;
@@ -508,8 +529,10 @@ public:
   const T *GetConstPointer() { return &var; }
 };
 
+/** Flip the boolean in sv and persist it. */
 void BoolToggle(SavableVariable<bool> &sv) { sv.Set(!sv.Get()); }
 
+/** Wraps Soundic and gates playback on bSoundOn (Toggle/Get). */
 class SoundInterfaceProxy : virtual public SP_Info {
   bool bSoundOn;
   SSP<Soundic> pSndRaw;
@@ -529,6 +552,8 @@ public:
 
 struct MenuController;
 
+/** Global game state: level storage, active controller, graphics/sound, score,
+ * savable options, music. */
 struct TwrGlobalController : virtual public SP_Info {
   std::vector<ASSP<GameController>> vCnt;
   unsigned nActive;
@@ -588,6 +613,7 @@ struct TwrGlobalController : virtual public SP_Info {
   // void fPos(Point pPos);
 };
 
+/** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {
   Index nImage;
 
@@ -610,6 +636,7 @@ struct SimpleController : public GameController {
   }
 };
 
+/** Controller that draws background + text that flashes every second. */
 struct FlashingController : public GameController {
   Index nImage, nText;
   unsigned nTimer;
@@ -649,17 +676,20 @@ struct FlashingController : public GameController {
   }
 };
 
+/** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {
   bool bExist;
   Entity() : bExist(true) {}
   virtual ~Entity() {}
 };
 
+/** Entity that can Move and Update each frame. */
 struct EventEntity : virtual public Entity {
   virtual void Move() {}
   virtual void Update() {}
 };
 
+/** Entity with a screen position (GetPosition). */
 struct ScreenEntity : virtual public Entity {
   virtual Point GetPosition() { return Point(0, 0); }
 };
@@ -675,6 +705,7 @@ struct VisualEntity : virtual public ScreenEntity {
   VisualEntity &operator=(VisualEntity &&) = delete;
 };
 
+/** Split string on newlines into a vector of lines (appends \\n to s). */
 std::vector<std::string> BreakUpString(std::string s) {
   s += '\n';
 
@@ -692,6 +723,7 @@ std::vector<std::string> BreakUpString(std::string s) {
   return vRet;
 }
 
+/** VisualEntity that draws multi-line text via NumberDrawer at a position. */
 struct TextDrawEntity : virtual public VisualEntity {
   float dPriority;
   Point pos;
@@ -718,6 +750,8 @@ struct TextDrawEntity : virtual public VisualEntity {
   /*virtual*/ float GetPriority() { return dPriority; }
 };
 
+/** Scrolling tutorial text; SetText queues sNewText and Update scrolls between
+ * sText and sNewText. */
 struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   float dPriority;
   Point pos;
@@ -807,6 +841,8 @@ const std::string sTakeOffMessage =
     "press space or click the tower to take off"; // press button to take off
 #endif
 
+/** First tutorial: tracks knight kill, flying, princess spawn/capture;
+ * GetText/Update drive TutorialTextEntity. */
 struct TutorialLevelOne {
   bool bKilledKnight;
   bool bFlying;
@@ -901,6 +937,8 @@ struct TutorialLevelOne {
   }
 };
 
+/** Second tutorial: trader spawn/kill and bonus pickup; GetText/Update drive
+ * TutorialTextEntity. */
 struct TutorialLevelTwo {
   bool bTraderGenerated;
   bool bTraderKilled;
@@ -960,6 +998,8 @@ struct TutorialLevelTwo {
   }
 };
 
+/** VisualEntity with an ImageSequence: draws current frame, Update toggles by
+ * timer or on position change. */
 struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   float dPriority;
 
@@ -1010,6 +1050,8 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   }
 };
 
+/** EventEntity that plays a SoundSequence on a timer; sets bExist false when
+ * sequence ends. */
 struct SimpleSoundEntity : virtual public EventEntity {
   unsigned nPeriod;
   Timer t;
@@ -1037,6 +1079,7 @@ struct SimpleSoundEntity : virtual public EventEntity {
   }
 };
 
+/** SimpleVisualEntity with fixed position (no movement). */
 struct Animation : public SimpleVisualEntity {
   Point pos;
 
@@ -1047,6 +1090,7 @@ struct Animation : public SimpleVisualEntity {
   /*virtual*/ Point GetPosition() { return pos; }
 };
 
+/** Animation that runs once then sets bExist false (seq plays to end). */
 struct AnimationOnce : public SimpleVisualEntity {
   Point pos;
   bool bOnce;
@@ -1069,6 +1113,7 @@ struct AnimationOnce : public SimpleVisualEntity {
   }
 };
 
+/** VisualEntity that draws a single image at a fixed point. */
 struct StaticImage : public VisualEntity {
   Index img;
   float dPriority;
@@ -1088,6 +1133,7 @@ struct StaticImage : public VisualEntity {
   /*virtual*/ float GetPriority() { return dPriority; }
 };
 
+/** VisualEntity that draws a filled rectangle (no position). */
 struct StaticRectangle : public VisualEntity {
   float dPriority;
   Rectangle r;
@@ -1109,6 +1155,7 @@ struct MenuDisplay;
 
 typedef void (MenuDisplay::*EvntPntr)();
 
+/** One menu item: size, label, callback (EvntPntr), disabled flag. */
 struct MenuEntry : virtual public SP_Info {
   Size szSize;
   std::string sText;
@@ -1121,6 +1168,7 @@ struct MenuEntry : virtual public SP_Info {
         bDisabled(bDisabled_) {}
 };
 
+/** Return "on" or "off" for menu toggles. */
 std::string OnOffString(bool b) {
   if (b)
     return "on";
@@ -1133,6 +1181,7 @@ std::string MusicString() { return "music: "; }
 std::string TutorialString() { return "tutorial: "; }
 std::string FullTextString() { return "full screen: "; }
 
+/** Holds menu entries and current selection index (nMenuPosition). */
 struct MenuEntryManager {
   std::vector<MenuEntry> vEntries;
   int nMenuPosition;
@@ -1140,6 +1189,8 @@ struct MenuEntryManager {
   MenuEntryManager() : nMenuPosition(0) {}
 };
 
+/** In-game menu: draws entries, caret, handles mouse/key; submenus and option
+ * toggles. */
 struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   MenuEntryManager *pCurr;
 
@@ -1220,6 +1271,8 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   void Chapter3();
 };
 
+/** VisualEntity that draws a countdown number and sets bExist false when it
+ * reaches 0. */
 struct Countdown : public VisualEntity, public EventEntity {
   SSP<NumberDrawer> pNum;
   unsigned nTime, nCount;
@@ -1242,6 +1295,7 @@ struct Countdown : public VisualEntity, public EventEntity {
   /*virtual*/ Point GetPosition() { return Point(0, 0); }
 };
 
+/** ScreenEntity with radius for hit detection (HitDetection). */
 struct PhysicalEntity : virtual public ScreenEntity {
   virtual unsigned GetRadius() { return 0; }
 
@@ -1255,6 +1309,7 @@ struct PhysicalEntity : virtual public ScreenEntity {
 // extern std::ofstream ofs_move;
 // extern std::ofstream ofs_angl;
 
+/** Tracks mouse for trackball-style steering (angle and fire). */
 struct TrackballTracker {
   MouseTracker mtr;
 
@@ -1359,12 +1414,16 @@ int p = GetDerivative();
   }
 };
 
+/** PhysicalEntity that can be hit (OnHit), has type (GetType) and image
+ * (GetImage). */
 struct ConsumableEntity : virtual public PhysicalEntity {
   virtual char GetType() = 0;
   virtual void OnHit(char cWhat) = 0;
   virtual Index GetImage() = 0;
 };
 
+/** Moving unit: position, velocity, bounds, radius; Move() steps and clamps or
+ * kills on exit. */
 struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
   unsigned nRadius;
   fPoint fPos;
@@ -1406,6 +1465,7 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
         sUnderText("") {}
 };
 
+/** Critter that advances position and toggles frame on a timer (tm). */
 struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
   unsigned nRadius;
   fPoint fPos;
@@ -1445,6 +1505,7 @@ struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
         tm(nPeriod) {}
 };
 
+/** Sort key for draw order: priority and height (operator<). */
 struct ScreenPos {
   float fPriority;
   int nHeight;
@@ -1458,6 +1519,8 @@ struct ScreenPos {
   }
 };
 
+/** GameController with draw/update/consumable lists; Update runs Move, Update,
+ * then draws by priority. */
 struct BasicController : public GameController {
   std::list<ASSP<VisualEntity>> lsDraw;
   std::list<ASSP<EventEntity>> lsUpdate;
@@ -1556,6 +1619,7 @@ struct BasicController : public GameController {
   /*virtual*/ void OnMouseDown(Point pPos) { pGl->Next(); }
 };
 
+/** Cursor image and position; Draw/Update for rendering and click state. */
 struct MouseCursor {
   bool bPressed;
   ImageSequence imgCursor;
@@ -1571,6 +1635,7 @@ struct MouseCursor {
   void SetCursorPos(Point pPos);
 };
 
+/** Controller for pause/main menu: MenuDisplay, resume position. */
 struct MenuController : public BasicController {
   int nResumePosition;
   SSP<MenuDisplay> pMenuDisplay;
@@ -1629,6 +1694,7 @@ struct SlimeUpdater : public VisualEntity {
   /*virtual*/ float GetPriority() { return 0; }
 };
 
+/** Controller for buy-now screen: slime animations and timer. */
 struct BuyNowController : public BasicController {
   int t;
   std::vector<SP<Animation>> mSlimes;
@@ -1782,6 +1848,7 @@ void Union(std::map<std::string, T> &TarMap,
     TarMap[itr->first] += itr->second;
 }
 
+/** Merge srcMap into TarMap with OR (TarMap[k] |= srcMap[k]). */
 inline void Union(std::map<std::string, bool> &TarMap,
                   const std::map<std::string, bool> &srcMap) {
   for (std::map<std::string, bool>::const_iterator itr = srcMap.begin(),
@@ -1790,6 +1857,7 @@ inline void Union(std::map<std::string, bool> &TarMap,
     TarMap[itr->first] |= itr->second;
 }
 
+/** Write map as "key = value; " to ofs. */
 template <class T>
 std::ostream &Out(std::ostream &ofs, const std::map<std::string, T> &srcMap) {
   for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
@@ -1799,6 +1867,8 @@ std::ostream &Out(std::ostream &ofs, const std::map<std::string, T> &srcMap) {
   return ofs;
 }
 
+/** Power-up state: named float/unsigned/bool maps, nNum; += merges, Add
+ * accumulates. */
 struct FireballBonus : virtual public Entity {
   std::map<std::string, float> fMap;
   std::map<std::string, unsigned> uMap;
@@ -1841,6 +1911,8 @@ inline std::ostream &operator<<(std::ostream &ofs, FireballBonus b) {
   return ofs;
 }
 
+/** Chain reaction generation count or infinite; Evolve decrements, IsLast when
+ * 0. */
 struct Chain {
   bool bInfinite;
   unsigned nGeneration;
@@ -1865,6 +1937,8 @@ inline ImageSequence Reset(ImageSequence imgSeq) {
   return imgSeq;
 }
 
+/** Expanding explosion; hits ConsumableEntities and spawns child
+ * ChainExplosions via ch. */
 struct ChainExplosion : virtual public AnimationOnce,
                         virtual public PhysicalEntity {
   float r_in, r;
@@ -1917,6 +1991,7 @@ struct ChainExplosion : virtual public AnimationOnce,
   void Draw(SP<ScalingDrawer> pDr) { AnimationOnce::Draw(pDr); }
 };
 
+/** Map angle a to one of nDiv discrete directions. */
 inline unsigned DiscreetAngle(float a, unsigned nDiv) {
   return unsigned((-a / 2 / 3.1415 + 2 - 1.0 / 4 + 1.0 / 2 / nDiv) * nDiv) %
          nDiv;
@@ -1943,6 +2018,7 @@ struct KnightOnFire : public Critter //, public ConsumableEntity
   /*virtual*/ void Update();
 };
 
+/** Floating "+N" score text at a point; animates then removes. */
 struct BonusScore : public EventEntity, public VisualEntity {
   SSP<AdvancedController> pAc;
   std::string sText;
@@ -1991,6 +2067,7 @@ struct Road;
 struct Dragon;
 struct KnightGenerator;
 
+/** Tracks mouse position, last down, press state and counter for input. */
 struct PositionTracker {
   Point pMouse;
   Point pLastDownPosition;
@@ -2032,6 +2109,8 @@ struct Slime;
 struct Sliminess;
 struct MageGenerator;
 
+/** Main game controller: castles, roads, dragon, generators, bonuses, input
+ * (trackball/key). */
 struct AdvancedController : public BasicController {
   std::vector<ASSP<Castle>> vCs;
   std::vector<ASSP<Road>> vRd;
@@ -2124,6 +2203,7 @@ struct AdvancedController : public BasicController {
   void MegaGeneration(Point p);
 };
 
+/** Draws high score in a rectangle. */
 struct HighScoreShower : public VisualEntity {
   SSP<TwrGlobalController> pGl;
   Rectangle rBound;
@@ -2144,6 +2224,7 @@ struct IntroTextShower : public VisualEntity {
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
 };
 
+/** Controller that shows dragon score and exits on click or timer. */
 struct DragonScoreController : public BasicController {
   Timer t;
   bool bClickToExit;
@@ -2219,6 +2300,8 @@ float GetExplosionExpansionRate(FireballBonus &fb) {
   return 3.9F * fCf;
 }
 
+/** Player fireball Critter; bThrough for passthrough, hits ConsumableEntities.
+ */
 struct Fireball : public Critter {
   SSP<AdvancedController> pBc;
   bool bThrough;
@@ -2341,6 +2424,7 @@ struct Fireball : public Critter {
   }
 };
 
+/** FireballBonus that updates on a timer (e.g. temporary power-up). */
 struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   Timer t;
 
@@ -2353,6 +2437,7 @@ struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   }
 };
 
+/** Fireball that orbits at fRadius (circular motion). */
 struct CircularFireball : virtual public Fireball,
                           virtual public TimedFireballBonus {
   float fRadius;
@@ -2407,6 +2492,8 @@ inline Point Center(Size sz) { return Point(sz.x / 2, sz.y / 2); }
 struct KnightGenerator;
 struct Dragon;
 
+/** Level road segment: vertical/horizontal, coordinate, bounds; Draw renders
+ * gray bar. */
 struct Road : virtual public VisualEntity {
   bool bVertical;
   unsigned nCoord;
@@ -2498,6 +2585,7 @@ struct FancyRoad : public Road {
   }
 };
 
+/** Princess unit: Critter + ConsumableEntity, captured by dragon. */
 struct Princess : public Critter, public ConsumableEntity {
   SSP<AdvancedController> pAc;
 
@@ -2535,6 +2623,7 @@ struct Princess : public Critter, public ConsumableEntity {
   }
 };
 
+/** Spawns skeleton knights on a timer at a position. */
 struct SkellyGenerator : public EventEntity {
   Timer t;
   Point p;
@@ -2655,6 +2744,8 @@ ImageSequence GetBonusImage(int n, Preloader &pr) {
   return pr("void_bonus");
 }
 
+/** Pick-up animation with radius; overlaps ConsumableEntity trigger collection.
+ */
 struct FireballBonusAnimation : public Animation,
                                 virtual public PhysicalEntity {
   unsigned n;
@@ -2719,6 +2810,7 @@ struct FireballBonusAnimation : public Animation,
   }
 };
 
+/** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
 struct Trader : public Critter, public ConsumableEntity {
   SSP<AdvancedController> pAc;
   bool &bFirstBns;
@@ -2769,6 +2861,7 @@ struct Trader : public Critter, public ConsumableEntity {
   }
 };
 
+/** Knight unit: chases princess/castle, can become ghost (Ghostiness). */
 struct Knight : public Critter, public ConsumableEntity {
   SSP<AdvancedController> pAc;
 
@@ -2879,6 +2972,7 @@ struct Knight : public Critter, public ConsumableEntity {
   }
 };
 
+/** Large slime unit: splits or merges (MegaSlime logic). */
 struct MegaSlime : public Critter, public ConsumableEntity {
   SSP<AdvancedController> pAc;
 
@@ -2943,6 +3037,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
   /*virtual*/ char GetType() { return 'E'; }
 };
 
+/** Ghost knight effect: timed visual at a position. */
 struct Ghostiness : public EventEntity {
   Timer t;
   Point p;
@@ -2970,6 +3065,7 @@ struct Ghostiness : public EventEntity {
   /*virutal*/ void Update();
 };
 
+/** Slime unit: moves toward target, timer for behavior. */
 struct Slime : public Critter, public ConsumableEntity {
   SSP<AdvancedController> pAc;
   Timer t;
@@ -3010,6 +3106,7 @@ struct Slime : public Critter, public ConsumableEntity {
   }
 };
 
+/** Spawns slimes on a timer at a position. */
 struct Sliminess : public EventEntity {
   Timer t;
   Point p;
@@ -3061,6 +3158,7 @@ struct Sliminess : public EventEntity {
   }
 };
 
+/** Spawns MegaSlimes; holds position and controller. */
 struct MegaSliminess : public EventEntity {
   Point p;
   SSP<AdvancedController> pAdv;
@@ -3089,6 +3187,7 @@ struct MegaSliminess : public EventEntity {
   }
 };
 
+/** SimpleVisualEntity that moves with fPos/fVel (e.g. menu slime). */
 struct FloatingSlime : public SimpleVisualEntity {
   fPoint fPos;
   fPoint fVel;
@@ -3113,6 +3212,7 @@ struct FloatingSlime : public SimpleVisualEntity {
   }
 };
 
+/** Exception for BrokenLine segment errors (e.g. invalid/empty segment). */
 class SegmentSimpleException : public MyException {
   std::string strProblem;
 
@@ -3124,6 +3224,8 @@ public:
   /*virtual*/ std::string GetErrorMessage() const { return strProblem; }
 };
 
+/** Polyline(s): vEdges is list of point sequences; CloseLast, Add, AddLine,
+ * Join, stream I/O. */
 struct BrokenLine {
   typedef std::vector<fPoint> VecLine;
   typedef std::vector<VecLine> VecLines;
@@ -3279,6 +3381,8 @@ inline std::istream &operator>>(std::istream &ifs, BrokenLine &bl) {
   return ifs;
 }
 
+/** One level: bounds, knight spawn line, castle positions, roads, timer, spawn
+ * freqs; Convert scales coords. */
 struct LevelLayout {
   Rectangle sBound;
 
@@ -3406,6 +3510,7 @@ inline std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
   return ifs;
 }
 
+/** Spawns knights along a path on a timer. */
 struct KnightGenerator : virtual public EventEntity {
   bool bFirst;
 
@@ -3485,6 +3590,7 @@ struct KnightGenerator : virtual public EventEntity {
   }
 };
 
+/** Spawns princesses at a rate within bounds. */
 struct PrincessGenerator : virtual public EventEntity {
   float dRate;
   Rectangle rBound;
@@ -3585,6 +3691,7 @@ struct MageGenerator : virtual public EventEntity {
   }
 };
 
+/** Spawns traders at a rate within bounds. */
 struct TraderGenerator : virtual public EventEntity {
   float dRate;
   Rectangle rBound;
@@ -3685,6 +3792,7 @@ struct DragonLeash {
   }
 };
 
+/** Set of key/button codes for input (e.g. fire, steer). */
 struct ButtonSet {
   std::vector<int> vCodes;
 
@@ -3792,6 +3900,8 @@ unsigned GetFireballChainSplit(FireballBonus& fb)
 }
 */
 
+/** Player dragon: carries bonuses and fireballs, steer/shoot, collision with
+ * units. */
 struct Dragon : public Critter {
   std::list<ASSP<TimedFireballBonus>> lsBonuses;
   std::list<ASSP<Fireball>> lsBalls;
@@ -4352,6 +4462,8 @@ cCarry = ' ';
   }
 };
 
+/** BasicController that advances (Next) when only background is left or on
+ * input. */
 struct AlmostBasicController : public BasicController {
   AlmostBasicController(const BasicController &b) : BasicController(b) {}
 
@@ -4375,6 +4487,7 @@ struct AlmostBasicController : public BasicController {
   /*virtual*/ void OnMouseDown(Point pPos) { pGl->Next(); }
 };
 
+/** Holds exit event and graphics/sound interfaces for tower game setup. */
 struct TowerDataWrap {
   SP<Event> pExitProgram;
 
@@ -4396,6 +4509,7 @@ struct TowerDataWrap {
   Size szActualRez;
 };
 
+/** Top-level tower game: owns TowerDataWrap, builds and runs level flow. */
 class TowerGameGlobalController : public GlobalController {
   TowerDataWrap *pData;
 
