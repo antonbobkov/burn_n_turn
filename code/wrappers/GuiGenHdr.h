@@ -1,3 +1,10 @@
+/*
+ * GuiGenHdr.h - Gui namespace: graphics primitives and drawing abstraction.
+ * Declares: Color, Point, fPoint, Size, Rectangle; Matrix/Image/GraphicalInterface
+ * exceptions; Image and GraphicalInterface<ImageHndl>; SimpleGraphicalInterface,
+ * CameraControl, Scale; FontWriter, MouseTracker; helpers (InsideRectangle, etc.).
+ */
+
 #include <string>
 #include <vector>
 #include <list>
@@ -14,6 +21,7 @@ namespace Gui
     typedef int Crd;
     typedef unsigned char Byte;
 
+    /* RGBA-style color: B, G, R bytes and transparency (0 = fully transparent). */
     struct Color
     {
         Byte B,G,R;
@@ -58,6 +66,7 @@ namespace Gui
 	
 	std::string ColorToString(Color c); // for output
 
+    /* 2D integer point (Crd x, y) with +=, -=, *= and free operators +, -, *, ==, !=. */
     struct Point
     {
         Crd x, y;
@@ -81,6 +90,7 @@ namespace Gui
     inline std::ostream& operator << (std::ostream& ofs, Point f){return ofs << f.x << " " << f.y;}
     inline std::istream& operator >> (std::istream& ifs, Point& f){return ifs >> f.x >> f.y;}
 
+    /* 2D float point; Normalize(), Length(), conversion to/from Point. */
     struct fPoint
     {
         float x,y;
@@ -113,6 +123,7 @@ namespace Gui
     inline std::ostream& operator << (std::ostream& ofs, fPoint f){ofs << f.x << " " << f.y; return ofs;}
     inline std::istream& operator >> (std::istream& ifs, fPoint& f){ifs >> f.x >> f.y; return ifs;}
 
+    /* 2D extent (Crd x, y); Area() = x * y. */
     struct Size
     {
         Crd x, y;
@@ -129,7 +140,8 @@ namespace Gui
     inline std::ostream& operator << (std::ostream& ofs, Size s){return ofs << s.x << " " << s.y;}
     inline std::istream& operator >> (std::istream& ifs, Size& s){return ifs >> s.x >> s.y;}
 
-    struct Rectangle    // rectangle, cannot have negative size, zero rectangle has size (0,0)
+    /* Axis-aligned rectangle (Point p, Size sz); normalizes to non-negative size. */
+    struct Rectangle
     {
         Point p;
         Size sz;
@@ -175,7 +187,8 @@ namespace Gui
     Rectangle Intersect(const Rectangle& r1, const Rectangle& r2);    // return intersection of two rectangles
     std::string RectangleToString(Rectangle r); // for output
 
-    struct MatrixErrorInfo  // stores info for out of range exception
+    /* Size and Point used to describe matrix/rectangle out-of-range errors. */
+    struct MatrixErrorInfo
     {
         Size sz;
         Point p;
@@ -186,7 +199,8 @@ namespace Gui
         std::string GetErrorMessage() const;
     };
 
-    class MatrixException: public MyException   // out of range exception
+    /* MyException for matrix/rectangle out-of-range; message from MatrixErrorInfo. */
+    class MatrixException: public MyException
     {
     public:
         MatrixErrorInfo inf;
@@ -200,9 +214,7 @@ namespace Gui
         /*virtual*/ std::string GetErrorMessage() const {return inf.GetErrorMessage();}
     };
 
-
-    // helper class, describes transparency grid
-    // isn't used in general implementation
+    /* Per-pixel transparency grid (Size + vector<Byte>); Set/Get(Point), Safe variants throw. */
     struct TransparencyGrid
     {
         Size sz;
@@ -237,6 +249,7 @@ namespace Gui
         }
     };
 
+    /* Base exception for image-related errors (name, class, function). */
     class ImageException: public MyException
     {
     public:
@@ -244,6 +257,7 @@ namespace Gui
             :MyException(strExcName_, strClsName_, strFnName_){}
     };
 
+    /* ImageException for out-of-range access; message from MatrixErrorInfo. */
     class ImageMatrixException: public ImageException
     {
     public:
@@ -263,6 +277,7 @@ namespace Gui
         return pnt;
     }
 
+    /* ImageException for null pointer; message includes pointer name. */
     class ImageNullException: public ImageException
     {
     public:
@@ -299,7 +314,7 @@ namespace Gui
         virtual void ColorTransparent(const Color& c);                  // colors all transparent points to color c
     };
 
-
+    /* Base exception for graphical-interface errors (name, class, function). */
     class GraphicalInterfaceException: public MyException
     {
     public:
@@ -307,6 +322,7 @@ namespace Gui
             :MyException(strExcName_, strClsName_, strFnName_){}
     };
 
+    /* GraphicalInterfaceException with a single problem string as message. */
     class GraphicalInterfaceSimpleException: public GraphicalInterfaceException
     {
         std::string strProblem;
@@ -317,6 +333,7 @@ namespace Gui
         /*virtual*/ std::string GetErrorMessage() const {return strProblem;}
     };
 
+    /* GraphicalInterfaceException for null pointer; message includes pointer name. */
     class NullPointerGIException: public GraphicalInterfaceException
     {
     public:
@@ -328,7 +345,8 @@ namespace Gui
         /*virtual*/ std::string GetErrorMessage() const {return "Null pointer passed for " + strPntName;}
     };
 
-    // Graphical interface - handles all drawing
+    /* Abstract drawing API: create/load/save images, draw images/rectangles,
+     * refresh. ImageHndl is backend-specific (e.g. raw pointer or Index). */
     template<class ImageHndl>
     class GraphicalInterface: virtual public SP_Info
     {
@@ -360,7 +378,9 @@ namespace Gui
         // p or r.p can have negative values
         virtual void ImageOnto(ImageHndl pImgDest, Point p, ImageHndl pImgSrc, Rectangle r);  
     };
-    
+
+    /* GraphicalInterface<Index> wrapper: delegates to a real GI, uses IndexKeeper
+     * and IndexRemover so images are freed when Index is destroyed. */
     template<class ImageHndl>
     struct SimpleGraphicalInterface: public GraphicalInterface<Index>, public IndexRemover
     {
@@ -405,6 +425,7 @@ namespace Gui
         /*virtual*/ void ImageOnto(Index pImgDest, Point p, Index pImgSrc, Rectangle r);  
     };
 
+    /* View transform: offset, zoom factor, and box size for coordinate conversion. */
     struct Scale
     {
         Point pOffset;
@@ -414,7 +435,9 @@ namespace Gui
         Scale(float fZoom_ = 1.F, Point pOffset_ = Point(), Size szBox_ = Size()):pOffset(pOffset_), fZoom(fZoom_), szBox(szBox_){}
         Scale(float fZoom_, Rectangle r):pOffset(r.p), fZoom(fZoom_), szBox(r.sz){}
     };
-    
+
+    /* View/camera: stack of Scale (Push/Pop), translate/zoom/SetBox, and
+     * coordinate conversion (toR/fromR, toF/fromF). Draws through a GI with scaling. */
     template<class ImageHndl>
     class CameraControl
     {
@@ -468,8 +491,8 @@ namespace Gui
         Rectangle fromR(Rectangle r);
     };
 
-    // TODO: get exceptions going
-    // TODO: generalize to non-index images
+    /* Renders text using a font (FilePath + name), bitmap symbols, and a
+     * GraphicalInterface<Index>; GetSize, DrawWord/DrawColorWord, Recolor, SetGap. */
     struct FontWriter: virtual public SP_Info
     {
         std::vector<int> vImgIndx;
@@ -502,9 +525,10 @@ namespace Gui
     {
        T img = pGr->LoadImage(strImg + "." + strExtFrom);
        pGr->SaveImage(strImg + "." + strExtTo, img);
-       pGr->DeleteImage(img);
+        pGr->DeleteImage(img);
     }
 
+    /* Tracks mouse position and relative movement: OnMouse(Point), GetRelMovement(). */
     struct MouseTracker
     {
         Point pLastRead;

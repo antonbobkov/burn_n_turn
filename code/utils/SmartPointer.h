@@ -1,6 +1,13 @@
 #ifndef SMART_POINTER_HEADER_02_20_10_11_54
 #define SMART_POINTER_HEADER_02_20_10_11_54
 
+/*
+ * SmartPointer.h - Reference-counted and "permanent" smart pointers.
+ * SP: regular reference-counted pointer (increments SP_Info counter).
+ * SSP/ASSP: non-owning "permanent" pointers that keep pointee alive; SSP_Base
+ * tracks them. Inspector and CleanIslandSeeded support cycle/island cleanup.
+ */
+
 #include <string>
 #include <set>
 #include <list>
@@ -23,6 +30,8 @@ inline void DELETE_PERMANENT_POINTER(SP_Info*, SSP_Base*);
 
 extern int nGlobalSuperMegaCounter;
 
+/* Mix-in base for reference-counted objects: holds ref count, mark, and sets of
+ * SSP_Base pointers that reference this object. SP/SSP use it for lifetime. */
 class SP_Info
 {
     template<class T> friend class SP;
@@ -69,7 +78,8 @@ inline void DELETE_PERMANENT_POINTER(SP_Info* pThis, SSP_Base* pPermPnt)
     CHECK_DELETION(pThis);
 }
 
-
+/* Reference-counted smart pointer: copies increment the pointee's SP_Info
+ * counter; destruction decrements it and deletes when count and SSP set are 0. */
 template<class T>
 class SP
 {
@@ -149,6 +159,8 @@ public:
     }
 };
 
+/* Base for "permanent" (non-owning) smart pointers: registered in the pointee's
+ * SP_Info so the pointee stays alive while any SSP points to it. */
 class SSP_Base
 {
     friend struct Inspector;
@@ -177,6 +189,9 @@ public:
     }
 };
 
+/* Non-owning smart pointer that keeps the pointee alive via SP_Info's
+ * POINT_TO_ME set. Does not participate in ref count; pointee deleted when
+ * ref count is 0 and no SSPs point to it. */
 template<class T>
 class SSP: public SSP_Base
 {
@@ -272,8 +287,7 @@ template<class T> template <class N>
 SP<T>& SP<T>::operator = (const SSP<N>& pPrmPnt){return EQUAL(pPrmPnt.pPointTo);}
 
 
-// SSP that can be copied
-// used for storage in arrays
+/* Copyable SSP for use in containers (e.g. arrays); otherwise same as SSP. */
 template<class T>
 class ASSP: public SSP<T>
 {
@@ -296,6 +310,8 @@ public:
     }
 };
 
+/* Friend accessor for SP_Info/SSP_Base internals; used by CleanIslandSeeded
+ * to traverse and break cycles and delete unreachable objects. */
 struct Inspector
 {
     static int& GetMark(SP_Info* pHd){return pHd->_SP_INFO_MARK;}
@@ -309,6 +325,8 @@ struct Inspector
     static void Nullify(SSP_Base* pSmPnt){return pSmPnt->CleanNullify();}
 };
 
+/* Marks reachable SP_Info nodes from [itrBegin, itrEnd], then deletes
+ * unreachable nodes and nullifies SSPs pointing to them (breaks islands). */
 template<class Iter>
 void CleanIslandSeeded(Iter itrBegin, Iter itrEnd)
 {
@@ -421,8 +439,10 @@ void CleanIslandSeeded(Iter itrBegin, Iter itrEnd)
     }
 }
 
+/* Clean island starting from single node pHd. */
 void CleanIslandSeeded(SP_Info* pHd);
 
+/* Clean island (convenience overload). */
 void CleanIsland(SP_Info* pHd);
 
 #endif // SMART_POINTER_HEADER_02_20_10_11_54

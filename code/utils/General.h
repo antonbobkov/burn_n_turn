@@ -1,6 +1,13 @@
 #ifndef GENERAL_HEADER_ALREADY_DEFINED_08_25
 #define GENERAL_HEADER_ALREADY_DEFINED_08_25
 
+/*
+ * General.h - Gui namespace utilities and helpers.
+ * Provides: math min/max/abs; exception hierarchy (MyException, SimpleException);
+ * parsing helpers; Timer; stream/file handlers and FilePath; Record/RecordKeeper
+ * persistence; Index and IndexKeeper; GuiKeyType enum.
+ */
+
 #include <set>
 #include <map>
 #include <vector>
@@ -36,7 +43,8 @@ namespace Gui
     inline T Gabs(T a)
     {return a >= 0 ? a : -a;}
 
-    // MyException - error message + some information about error
+    /* Base exception: stores name, class, function stack, and inherited
+     * exception info; subclasses override GetErrorMessage() for the message. */
     class MyException
     {
         std::string strExcName;         // name of exception
@@ -60,7 +68,8 @@ namespace Gui
         std::string GetDescription(bool bDetailed = false) const;
     };
 
-    class SimpleException: public MyException // simple string exception
+    /* Exception that carries a single problem string as its error message. */
+    class SimpleException: public MyException
     {
         std::string strProblem;
     public:
@@ -90,6 +99,8 @@ namespace Gui
         return ostr.str();
     }
 
+    /* Period-based timer: Tick()/Check() advance or test, UntilTick()/NextTick()
+     * for countdown/advance to next period. */
     struct Timer
     {
         unsigned nTimer, nPeriod;
@@ -121,6 +132,7 @@ namespace Gui
 		}
     };
 
+	/* Owns an std::ostream* and deletes it in the destructor; exposes GetStream(). */
 	class OutStreamHandler: public SP_Info
 	{
 	protected:
@@ -135,6 +147,7 @@ namespace Gui
 		std::ostream& GetStream(){return *pStr;}
 	};
 
+	/* Owns an std::istream* and deletes it in the destructor; exposes GetStream(). */
 	class InStreamHandler: public SP_Info
 	{
 	protected:
@@ -150,6 +163,8 @@ namespace Gui
 
 	};
 
+	/* Abstract interface: open files for read or write, returning smart-pointer
+	 * stream handlers. */
 	class FileManager: public SP_Info
 	{
 	public:
@@ -157,6 +172,7 @@ namespace Gui
 		virtual SP<InStreamHandler> ReadFile(std::string s)=0;
 	};
 
+	/* FileManager implementation (concrete implementation for "funny" paths). */
 	class FunnyFileManager: public FileManager
 	{
 	public:
@@ -164,6 +180,7 @@ namespace Gui
 		/*virtual*/ SP<InStreamHandler> ReadFile(std::string s);
 	};
 
+	/* FileManager implementation using standard filesystem paths. */
 	class StdFileManager: public FileManager
 	{
 	public:
@@ -171,6 +188,8 @@ namespace Gui
 		/*virtual*/ SP<InStreamHandler> ReadFile(std::string s);
 	};
 
+	/* Path representation with slash/convention handling, allowed chars, and
+	 * pluggable FileManager for ReadFile/WriteFile. */
 	struct FilePath
     {
         std::set<char> stAllowed;
@@ -195,7 +214,8 @@ namespace Gui
     std::ostream& operator << (std::ostream& ofs, const FilePath& fp);
     std::istream& operator >> (std::istream& ifs, FilePath& fp);
 
-    //TODO: Get exceptions going
+    /* Abstract base for persistent key-value style records: Read/Write to
+     * streams and ReadDef/WriteDef using a default file path. */
     class RecordKeeper: public SP_Info
     {
         std::string sDefFile;
@@ -212,7 +232,8 @@ namespace Gui
         void ReadDef();
         void WriteDef();
     };
-    
+
+    /* RecordKeeper holding a map<A,B>; serializes/deserializes via Read/Write. */
     template<class A, class B>
     class Record: public RecordKeeper
     {
@@ -227,6 +248,8 @@ namespace Gui
         /*virtual*/ void Write(std::ostream& ofs);
     };
 
+    /* RecordKeeper that aggregates multiple RecordKeepers and forwards
+     * Read/Write to each. */
     class RecordCollection: public RecordKeeper
     {
         std::vector< SP<RecordKeeper> > vRecords;
@@ -244,11 +267,13 @@ namespace Gui
 
     class Index;
 
+    /* Interface for objects that need to be notified when an Index is destroyed. */
     struct IndexRemover
     {
         virtual void DeleteIndex(const Index& i)=0;
     };
 
+    /* Reference-counted index that notifies an IndexRemover on destruction. */
     class Index
     {
         unsigned nI;
@@ -272,6 +297,7 @@ namespace Gui
         bool operator ! () {return pCounter == 0;}
     };
 
+    /* Pool of T objects indexed by unsigned; reuses freed slots (free list). */
     template<class T>
     class IndexKeeper
     {
@@ -342,10 +368,11 @@ namespace Gui
             ofs << itr->first << " " << itr->second << "\n";
     }
 
-
+    /* Keyboard key identifiers: ASCII-like codes plus platform-mapped keys
+     * (F-keys, arrows, modifiers, etc.). */
     enum GuiKeyType
     {
-        // usually consistent around systems as ascii codes (listed here for convinience)
+        /* Usually consistent across systems (ASCII). */
 
         GUI_BACKSPACE = 8,
         GUI_TAB = 9,

@@ -1,2 +1,0 @@
-SYSTEM 0
-PATH ../../tower_defense/project/

@@ -1,6 +1,14 @@
 #ifndef GUIGEN_ALREADY_INCLUDED_GUI_0308
 #define GUIGEN_ALREADY_INCLUDED_GUI_0308
 
+/*
+ * GuiGen.h - Implementations for GuiGenHdr.h declarations.
+ * Defines: AdjustImageOverlap; default GraphicalInterface<ImageHndl> methods
+ * (CopyImage, FlipImage, ScaleImage, LoadImage, SaveImage, DrawImage, RectangleOnto,
+ * ImageOnto); GuiLoadImage/GuiSaveImage (BMP); SimpleGraphicalInterface and
+ * CameraControl method bodies; BMP file/info header structs for loading.
+ */
+
 #include "GuiGenHdr.h"
 
 namespace Gui

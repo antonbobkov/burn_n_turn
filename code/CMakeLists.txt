@@ -1,50 +1,51 @@
-# CMakeLists files in this project can refer to the root source directory of the project as ${<project_name>_SOURCE_DIR} and to the root binary directory of the project as ${<project_name>_BINARY_DIR}.
+# Configure and build all targets (from project root):
+#   mkdir build
+#   cd build
+#   cmake ../code -G "MinGW Makefiles"
+#   mingw32-make
+#
+# Builds Catch2 tests and SDL examples; example executables go into ../code/
+#
+cmake_minimum_required(VERSION 3.14)
+project(Dragongame LANGUAGES CXX)
 
-cmake_minimum_required (VERSION 2.6) 
-cmake_policy(SET CMP0015 NEW)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project (Dragon)
+# Catch2 v2 (FetchContent)
+include(FetchContent)
+FetchContent_Declare(
+  Catch2
+  URL https://github.com/catchorg/Catch2/archive/v2.13.10.zip
+)
+set(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(Catch2)
 
-SET (SDL_DIR "${Dragon_SOURCE_DIR}/sdl_library_windows")
-SET (MyUtilLibrary_DIR "${Dragon_SOURCE_DIR}/gui_src")
+# Absolute paths so subdirectories (sdl_examples) resolve includes correctly
+set(SDL_PATH
+    "${CMAKE_SOURCE_DIR}/../external_libraries/SDL2-2.32.10/i686-w64-mingw32"
+    CACHE PATH "Path to SDL2" FORCE)
+set(SDL_IMAGE_PATH
+    "${CMAKE_SOURCE_DIR}/../external_libraries/SDL2_image-2.8.8/i686-w64-mingw32"
+    CACHE PATH "Path to SDL2_image" FORCE)
+set(SDL_MIXER_PATH
+    "${CMAKE_SOURCE_DIR}/../external_libraries/SDL2_mixer-2.8.1/i686-w64-mingw32"
+    CACHE PATH "Path to SDL2_mixer" FORCE)
 
-SET (SDL_LIBRARY_LIST "SDL2 SDL2main SDL2_mixer SDL2_image")
+# Build all example executables into the code directory (../code from build dir)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin/")
 
-include_directories (${SDL_DIR}/all_inc)
-link_directories (${SDL_DIR}/all_lib_64)
+enable_testing()
 
-add_library(MyUtilLibrary
-	${MyUtilLibrary_DIR}/SuiGen.cpp
-	${MyUtilLibrary_DIR}/Preloader.cpp
-	${MyUtilLibrary_DIR}/Preloader.h
-	${MyUtilLibrary_DIR}/SmartPointer.h
-	${MyUtilLibrary_DIR}/SmartPointer.cpp
-	${MyUtilLibrary_DIR}/General.h
-	${MyUtilLibrary_DIR}/General.cpp
-	${MyUtilLibrary_DIR}/event.h
-	${MyUtilLibrary_DIR}/event.cpp
-	${MyUtilLibrary_DIR}/Global.h
-	${MyUtilLibrary_DIR}/MessageWriter.h
-	${MyUtilLibrary_DIR}/MessageWriter.cpp
-	${MyUtilLibrary_DIR}/GuiGen.h
-	${MyUtilLibrary_DIR}/GuiGenHdr.h
-	${MyUtilLibrary_DIR}/GuiGen.cpp
-	${MyUtilLibrary_DIR}/SuiGen.h
-	${MyUtilLibrary_DIR}/SuiGen.cpp
-	${MyUtilLibrary_DIR}/GuiSdl.h
-	${MyUtilLibrary_DIR}/GuiSdl.cpp
-	${MyUtilLibrary_DIR}/SuiSdl.h
-	${MyUtilLibrary_DIR}/SuiSdl.cpp
-	)
-	
-include_directories (${MyUtilLibrary_DIR})
+# SDL examples (uses SDL_PATH, SDL_IMAGE_PATH, SDL_MIXER_PATH from above)
+add_subdirectory(sdl_examples)
 
-add_executable(Game
-	main.cpp
-	tower_defense.h
-	tower_defense.cpp
-	)
-	
-target_link_libraries(Game MyUtilLibrary SDL2 SDL2main SDL2_mixer SDL2_image)
-#target_link_libraries(Game MyUtilLibrary ${SDL_LIBRARY_LIST})
+add_subdirectory(utils)
 
+add_subdirectory(wrappers)
+
+add_subdirectory(game_utils)
+
+add_subdirectory(wrappers_sdl_impl)
+
+add_subdirectory(game)

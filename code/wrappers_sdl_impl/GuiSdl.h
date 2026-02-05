@@ -46,32 +46,12 @@ namespace Gui
         SdlImage(Size sz_);
         
         ~SdlImage();
-            
-        void Lock() const
-        {
-            if(!pImg->locked && SDL_MUSTLOCK(pImg))
-			    SDL_LockSurface(pImg);
-        }
 
-        void Unlock() const
-        {
-            if(pImg->locked)
-			    SDL_UnlockSurface(pImg);
-        }
+        void Lock() const;
+        void Unlock() const;
 
-        /*virtual*/ void SetPixel(Point p, const Color& c)
-	    {
-            Lock();
-
-            ((Color *) pImg->pixels)[(p.y * pImg->w + p.x)] = c;
-	    }
-
-        /*virtual*/ Color GetPixel(Point p) const 
-	    {
-            Lock();
-
-            return ((Color *) pImg->pixels)[(p.y * pImg->w + p.x)];
-	    }
+        /*virtual*/ void SetPixel(Point p, const Color& c);
+        /*virtual*/ Color GetPixel(Point p) const;
     };
 
     class SdlGraphicalInterfaceException: public GraphicalInterfaceException

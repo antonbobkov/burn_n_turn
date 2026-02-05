@@ -31,6 +31,30 @@ namespace Gui
         SDL_FreeSurface(pImg);
     }
 
+    void SdlImage::Lock() const
+    {
+        if (!pImg->locked && SDL_MUSTLOCK(pImg))
+            SDL_LockSurface(pImg);
+    }
+
+    void SdlImage::Unlock() const
+    {
+        if (pImg->locked)
+            SDL_UnlockSurface(pImg);
+    }
+
+    void SdlImage::SetPixel(Point p, const Color& c)
+    {
+        Lock();
+        ((Color*)pImg->pixels)[(p.y * pImg->w + p.x)] = c;
+    }
+
+    Color SdlImage::GetPixel(Point p) const
+    {
+        Lock();
+        return ((Color*)pImg->pixels)[(p.y * pImg->w + p.x)];
+    }
+
 	void SdlGraphicalInterface::RefreshScreen()
 	{
 		//SDL_RenderPresent(pScreenRenderer);

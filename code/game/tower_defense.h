@@ -1,6 +1,7 @@
 #include "GuiGen.h"
 #include "SuiGen.h"
 
+#include <algorithm>
 #include <vector>
 #include <set>
 #include <map>
