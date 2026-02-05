@@ -1,0 +1,2 @@
+SYSTEM 0
+PATH ../assets/
