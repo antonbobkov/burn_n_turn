@@ -667,6 +667,12 @@ struct ScreenEntity : virtual public Entity {
 struct VisualEntity : virtual public ScreenEntity {
   virtual void Draw(SP<ScalingDrawer> pDr) {}
   virtual float GetPriority() { return 0; }
+  VisualEntity() = default;
+  VisualEntity(const VisualEntity &) = default;
+  VisualEntity &operator=(const VisualEntity &) = default;
+  /* Move assignment deleted to avoid -Wvirtual-move-assign: defaulted move
+   * with virtual bases is unsound; copy is used instead (e.g. in vector). */
+  VisualEntity &operator=(VisualEntity &&) = delete;
 };
 
 std::vector<std::string> BreakUpString(std::string s) {
@@ -2408,6 +2414,11 @@ struct Road : virtual public VisualEntity {
 
   Road(bool bVertical_, unsigned nCoord_, Rectangle rBound_)
       : bVertical(bVertical_), nCoord(nCoord_), rBound(rBound_) {}
+  Road(const Road &) = default;
+  Road &operator=(const Road &) = default;
+  /* Move assignment deleted to avoid -Wvirtual-move-assign (virtual base
+   * VisualEntity); copy is used instead (e.g. vector<Road>). */
+  Road &operator=(Road &&) = delete;
 
   /*virtual*/ float GetPriority() { return 0; }
   /*virtual*/ Point GetPosition() { return Point(); }
