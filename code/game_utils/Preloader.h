@@ -1,6 +1,25 @@
 #ifndef PRELOADER_HEADER_02_20_10_09_09
 #define PRELOADER_HEADER_02_20_10_09_09
 
+/*
+ * Preloader.h — Asset loading and caching for images, image sequences, and sounds.
+ *
+ * Preloader is the main type: it loads and caches images, image sequences, and
+ * sounds by string key. All paths are resolved through FilePath. You can add
+ * transparent colors (AddTransparent), set a default scale (SetScale), and load
+ * single assets or whole sequences from list files.
+ *
+ * Sequence files list filenames (one per line). The optional "FANCY" format
+ * adds per-frame timing: after a line "FANCY", each line is "filename N" where
+ * N is the frame duration. The same format is used for image sequences
+ * (LoadSeq, LoadSeqT, etc.) and sound sequences (LoadSndSeq).
+ *
+ * Supporting types: SoundSequence and ImageSequence hold indices and timing for
+ * multi-frame or multi-sound playback; ImageFlipper and ImagePainter are
+ * functors for transforming images; PreloaderException and its subclasses
+ * report missing keys or load failures.
+ */
+
 #include <map>
 #include <sstream>
 #include <string>
@@ -12,35 +31,23 @@
 
 namespace Gui {
 
+/** Sequence of sound indices with per-sound intervals; for multi-sound effects. */
 struct SoundSequence {
   std::vector<Index> vSounds;
   std::vector<unsigned> vIntervals;
   unsigned nActive;
 
-  bool Toggle() {
-    if (nActive == vSounds.size() - 1) {
-      nActive = 0;
-      return true;
-    } else
-      nActive++;
-    return false;
-  }
+  /** Advance to next sound; wraps to 0 at end. Returns true on wrap. */
+  bool Toggle();
+  Index GetSound();
+  /** Interval for current sound; 1 if none defined. */
+  unsigned GetTime() const;
+  void Add(Index iSnd, unsigned nTime = 1);
 
-  Index GetSound() { return vSounds[nActive]; }
-  unsigned GetTime() const {
-    if (vIntervals.empty())
-      return 1;
-    return vIntervals[nActive];
-  }
-
-  void Add(Index iSnd, unsigned nTime = 1) {
-    vSounds.push_back(iSnd);
-    vIntervals.push_back(nTime);
-  }
-
-  SoundSequence() : nActive(0) {}
+  SoundSequence();
 };
 
+/** Sequence of image indices with timing; Toggle / ToggleTimed for animation. */
 struct ImageSequence : virtual public SP_Info {
   std::vector<Index> vImage;
   std::vector<unsigned> vIntervals;
@@ -48,95 +55,60 @@ struct ImageSequence : virtual public SP_Info {
 
   Timer t;
 
+  /** Advance to next frame; wraps to 0 at end. Returns true on wrap. */
   bool Toggle();
+  /** Advance frame when timer expires; restarts timer for current interval. */
   bool ToggleTimed();
 
-  Index GetImage() { return vImage[nActive]; }
-  unsigned GetTime() const {
-    if (vIntervals.empty())
-      return 1;
-    return vIntervals[nActive];
-  }
-  unsigned GetTotalTime() const {
-    int nRet = 0;
-    for (unsigned i = 0; i < vIntervals.size(); ++i)
-      nRet += vIntervals[i];
-    if (nRet == 0)
-      return 1;
-    return nRet;
-  }
+  Index GetImage();
+  unsigned GetTime() const;
+  /** Sum of all frame intervals; 1 if empty. */
+  unsigned GetTotalTime() const;
 
-  void Add(Index nImg, unsigned nTime = 1) {
-    vImage.push_back(nImg);
-    vIntervals.push_back(nTime);
-  }
+  void Add(Index nImg, unsigned nTime = 1);
+  void INIT();
 
-  void INIT() {
-    nActive = 0;
-    t = Timer(0);
-  }
-
-  ImageSequence() { INIT(); }
-  ImageSequence(Index img1) {
-    INIT();
-    Add(img1);
-  }
-  ImageSequence(Index img1, Index img2) {
-    INIT();
-    Add(img1);
-    Add(img2);
-  }
-  ImageSequence(Index img1, Index img2, Index img3) {
-    INIT();
-    Add(img1);
-    Add(img2);
-    Add(img3);
-  }
+  ImageSequence();
+  ImageSequence(Index img1);
+  ImageSequence(Index img1, Index img2);
+  ImageSequence(Index img1, Index img2, Index img3);
 };
 
+/** Applies a functor to each image index in an ImageSequence. */
 template <class T> void ForEachImage(ImageSequence &img, T t) {
   for (unsigned i = 0; i < img.vImage.size(); ++i)
     t(img.vImage[i]);
 }
 
+/** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {
   SP<GraphicalInterface<Index>> pGr;
-  ImageFlipper(SP<GraphicalInterface<Index>> pGr_) : pGr(pGr_) {}
-  void operator()(Index &img) { img = pGr->FlipImage(img); }
+  ImageFlipper(SP<GraphicalInterface<Index>> pGr_);
+  void operator()(Index &img);
 };
 
+/** Functor that copies an image and applies a list of color replacements. */
 struct ImagePainter {
   typedef std::pair<Color, Color> ColorMap;
 
   SP<GraphicalInterface<Index>> pGr;
-
   std::vector<ColorMap> vTr;
 
-  ImagePainter(SP<GraphicalInterface<Index>> pGr_, Color cFrom, Color cTo)
-      : pGr(pGr_) {
-    vTr.push_back(ColorMap(cFrom, cTo));
-  }
-
+  ImagePainter(SP<GraphicalInterface<Index>> pGr_, Color cFrom, Color cTo);
   ImagePainter(SP<GraphicalInterface<Index>> pGr_,
-               const std::vector<ColorMap> &vTr_)
-      : pGr(pGr_), vTr(vTr_) {}
-
-  void operator()(Index &img) {
-    img = pGr->CopyImage(img);
-    Image *pImg = pGr->GetImage(img);
-
-    for (unsigned i = 0; i < vTr.size(); ++i)
-      pImg->ChangeColor(vTr[i].first, vTr[i].second);
-  }
+               const std::vector<ColorMap> &vTr_);
+  /** Copy image and apply all vTr color replacements (from -> to). */
+  void operator()(Index &img);
 };
 
+/** Base exception for Preloader-related errors. */
 class PreloaderException : public MyException {
 public:
   PreloaderException(crefString strExcName_, crefString strClsName_,
-                     crefString strFnName_)
-      : MyException(strExcName_, strClsName_, strFnName_) {}
+                     crefString strFnName_);
 };
 
+/** Thrown when accessing a missing image, image sequence, or sound by key. */
 class PreloaderExceptionAccess : public PreloaderException {
 public:
   std::string key;
@@ -144,47 +116,32 @@ public:
   bool bSnd;
 
   PreloaderExceptionAccess(crefString strFnName_, std::string key_, bool bSeq_,
-                           bool bSnd_ = false)
-      : PreloaderException("PreloaderException", "Preloader", strFnName_),
-        key(key_), bSeq(bSeq_), bSnd(bSnd_) {}
-
-  /*virtual*/ std::string GetErrorMessage() const {
-    if (bSeq && !bSnd)
-      return "No image sequence found with id " + S(key);
-    else if (!bSeq && !bSnd)
-      return "No image found with id " + S(key);
-    else if (bSeq && bSnd)
-      return "No sound sequence found with id " + S(key);
-    else
-      return "No sound found with id " + S(key);
-  }
+                           bool bSnd_ = false);
+  /** Message describing which resource (image/seq/sound) was missing. */
+  std::string GetErrorMessage() const override;
 };
 
+/** Thrown when loading an image or sound file fails. */
 class PreloaderExceptionLoad : public PreloaderException {
 public:
   std::string fName;
   bool bSound;
 
   PreloaderExceptionLoad(crefString strFnName_, crefString fName_,
-                         bool bSound_ = false)
-      : PreloaderException("PreloaderException", "Preloader", strFnName_),
-        fName(fName_), bSound(bSound_) {}
-
-  /*virtual*/ std::string GetErrorMessage() const {
-    if (!bSound)
-      return "Cannot load image from " + fName;
-    else
-      return "Cannot load sound from " + fName;
-  }
+                         bool bSound_ = false);
+  /** Message includes the file path that failed to load. */
+  std::string GetErrorMessage() const override;
 };
 
+/** Loads and caches images, sequences, and sounds by string key. */
 class Preloader : virtual public SP_Info {
 public:
   Preloader(SP<GraphicalInterface<Index>> pGr_, SP<SoundInterface<Index>> pSn_,
-            FilePath fp_ = FilePath())
-      : pGr(pGr_), pSn(pSn_), nScale(1), fp(fp_) {}
+            FilePath fp_ = FilePath());
 
+  /** Image index by key; throws if not found. */
   Index &operator[](std::string key);
+  /** Image sequence by key; throws if not found. */
   ImageSequence &operator()(std::string key);
 
   Index &GetSnd(std::string key);
@@ -193,25 +150,36 @@ public:
   void AddTransparent(Color c);
   void SetScale(unsigned nScale_);
 
+  /** Replace all vTr colors with transparent on the given image. */
   void ApplyTransparency(Index pImg);
 
   void AddImage(Index pImg, std::string key);
   void AddSequence(ImageSequence pImg, std::string key);
 
+  /** Load image from file and store under key (path via FilePath). */
   void Load(std::string fName, std::string key);
+  /** Load image and apply transparency (vTr or replace c with transparent). */
   void LoadT(std::string fName, std::string key, Color c = Color(0, 0, 0, 0));
+  /** Load image and scale; nScale 0 uses current SetScale. */
   void LoadS(std::string fName, std::string key, unsigned nScale = 0);
+  /** Load image, apply transparency, then scale. */
   void LoadTS(std::string fName, std::string key, Color c = Color(0, 0, 0, 0),
               unsigned nScale = 0);
 
+  /** Load image sequence from file and store under key. */
   void LoadSeq(std::string fName, std::string key);
+  /** Load sequence and apply transparency to each frame. */
   void LoadSeqT(std::string fName, std::string key,
                 Color c = Color(0, 0, 0, 0));
+  /** Load sequence and scale each frame; nScale 0 uses current SetScale. */
   void LoadSeqS(std::string fName, std::string key, unsigned nScale = 0);
+  /** Load sequence, apply transparency to each frame, then scale. */
   void LoadSeqTS(std::string fName, std::string key,
                  Color c = Color(0, 0, 0, 0), unsigned nScale_ = 0);
 
+  /** Load sound from file and store under key. */
   void LoadSnd(std::string fName, std::string key);
+  /** Load sound sequence from file (list of filenames, optional FANCY) under key. */
   void LoadSndSeq(std::string fName, std::string key);
 
 private:
@@ -220,7 +188,9 @@ private:
   typedef std::map<std::string, Index> SndMapType;
   typedef std::map<std::string, SoundSequence> SndSeqMapType;
 
+  /** Parse sequence file (optional FANCY); load images. */
   ImageSequence LoadSeq(std::string fName);
+  /** Load single sound file; throws PreloaderExceptionLoad on failure. */
   Index LoadSndRaw(std::string fName);
 
   RegMapType mpImg;
