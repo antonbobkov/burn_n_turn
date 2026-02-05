@@ -2,7 +2,8 @@
 #define PRELOADER_HEADER_02_20_10_09_09
 
 /*
- * Preloader.h — Asset loading and caching for images, image sequences, and sounds.
+ * Preloader.h — Asset loading and caching for images, image sequences, and
+ * sounds.
  *
  * Preloader is the main type: it loads and caches images, image sequences, and
  * sounds by string key. All paths are resolved through FilePath. You can add
@@ -31,7 +32,8 @@
 
 namespace Gui {
 
-/** Sequence of sound indices with per-sound intervals; for multi-sound effects. */
+/** Sequence of sound indices with per-sound intervals; for multi-sound effects.
+ */
 struct SoundSequence {
   std::vector<Index> vSounds;
   std::vector<unsigned> vIntervals;
@@ -47,7 +49,8 @@ struct SoundSequence {
   SoundSequence();
 };
 
-/** Sequence of image indices with timing; Toggle / ToggleTimed for animation. */
+/** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
+ */
 struct ImageSequence : virtual public SP_Info {
   std::vector<Index> vImage;
   std::vector<unsigned> vIntervals;
@@ -179,7 +182,8 @@ public:
 
   /** Load sound from file and store under key. */
   void LoadSnd(std::string fName, std::string key);
-  /** Load sound sequence from file (list of filenames, optional FANCY) under key. */
+  /** Load sound sequence from file (list of filenames, optional FANCY) under
+   * key. */
   void LoadSndSeq(std::string fName, std::string key);
 
 private:
