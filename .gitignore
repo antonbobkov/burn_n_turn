@@ -8,4 +8,5 @@ bin_*/
 *~
 build/
 *.exe
+bin/stuff.txt
 

@@ -28,7 +28,7 @@ void BackgroundMusicPlayer::StopMusic() {
 }
 
 void DrawStuff(Rectangle rBound, SP<Graphic> pGraph, SP<Soundic> pSnd,
-               MyPreloader &pr, int n) {
+               Preloader &pr, int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;

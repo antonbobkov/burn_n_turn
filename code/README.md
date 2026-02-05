@@ -1,5 +1,7 @@
 To build on windows:
 
+go to /build/ directory and then run:
+
 `cmake ../code -G "MinGW Makefiles" && mingw32-make`
 
 recursive clang

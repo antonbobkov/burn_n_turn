@@ -3,3 +3,6 @@ description: When modifying source code or CMake build files, run the project bu
 alwaysApply: false
 ---
 After modifying code, build the project to verify correctness. After modifying CMake files, run cmake and build. After modifying tests, run tests to make sure they pass.
+
+To build, go to /build/ directory and then run: `cmake ../code -G "MinGW Makefiles"; mingw32-make`
+

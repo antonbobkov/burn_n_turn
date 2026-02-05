@@ -548,7 +548,7 @@ struct TwrGlobalController : virtual public SP_Info {
 
   LevelStorage vLvl;
 
-  MyPreloader pr;
+  Preloader pr;
 
   int nScore;
   int nHighScore;
@@ -2617,7 +2617,7 @@ struct Mage : public Critter, public ConsumableEntity {
 
 unsigned RandomBonus(bool bInTower = true);
 
-ImageSequence GetBonusImage(int n, MyPreloader &pr) {
+ImageSequence GetBonusImage(int n, Preloader &pr) {
   if (n == 0)
     return pr("void_bonus");
   if (n == 1)

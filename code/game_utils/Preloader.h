@@ -137,27 +137,26 @@ public:
       : MyException(strExcName_, strClsName_, strFnName_) {}
 };
 
-template <class Key>
 class PreloaderExceptionAccess : public PreloaderException {
 public:
-  Key k;
+  std::string key;
   bool bSeq;
   bool bSnd;
 
-  PreloaderExceptionAccess(crefString strFnName_, Key k_, bool bSeq_,
+  PreloaderExceptionAccess(crefString strFnName_, std::string key_, bool bSeq_,
                            bool bSnd_ = false)
       : PreloaderException("PreloaderException", "Preloader", strFnName_),
-        k(k_), bSeq(bSeq_), bSnd(bSnd_) {}
+        key(key_), bSeq(bSeq_), bSnd(bSnd_) {}
 
   /*virtual*/ std::string GetErrorMessage() const {
     if (bSeq && !bSnd)
-      return "No image sequence found with id " + S(k);
+      return "No image sequence found with id " + S(key);
     else if (!bSeq && !bSnd)
-      return "No image found with id " + S(k);
+      return "No image found with id " + S(key);
     else if (bSeq && bSnd)
-      return "No sound sequence found with id " + S(k);
+      return "No sound sequence found with id " + S(key);
     else
-      return "No sound found with id " + S(k);
+      return "No sound found with id " + S(key);
   }
 };
 
@@ -179,11 +178,50 @@ public:
   }
 };
 
-template <class Key> class Preloader : virtual public SP_Info {
-  typedef std::map<Key, Index> RegMapType;
-  typedef std::map<Key, ImageSequence> SeqMapType;
-  typedef std::map<Key, Index> SndMapType;
-  typedef std::map<Key, SoundSequence> SndSeqMapType;
+class Preloader : virtual public SP_Info {
+public:
+  Preloader(SP<GraphicalInterface<Index>> pGr_, SP<SoundInterface<Index>> pSn_,
+            FilePath fp_ = FilePath())
+      : pGr(pGr_), pSn(pSn_), nScale(1), fp(fp_) {}
+
+  Index &operator[](std::string key);
+  ImageSequence &operator()(std::string key);
+
+  Index &GetSnd(std::string key);
+  SoundSequence &GetSndSeq(std::string key);
+
+  void AddTransparent(Color c);
+  void SetScale(unsigned nScale_);
+
+  void ApplyTransparency(Index pImg);
+
+  void AddImage(Index pImg, std::string key);
+  void AddSequence(ImageSequence pImg, std::string key);
+
+  void Load(std::string fName, std::string key);
+  void LoadT(std::string fName, std::string key, Color c = Color(0, 0, 0, 0));
+  void LoadS(std::string fName, std::string key, unsigned nScale = 0);
+  void LoadTS(std::string fName, std::string key, Color c = Color(0, 0, 0, 0),
+              unsigned nScale = 0);
+
+  void LoadSeq(std::string fName, std::string key);
+  void LoadSeqT(std::string fName, std::string key,
+                Color c = Color(0, 0, 0, 0));
+  void LoadSeqS(std::string fName, std::string key, unsigned nScale = 0);
+  void LoadSeqTS(std::string fName, std::string key,
+                 Color c = Color(0, 0, 0, 0), unsigned nScale_ = 0);
+
+  void LoadSnd(std::string fName, std::string key);
+  void LoadSndSeq(std::string fName, std::string key);
+
+private:
+  typedef std::map<std::string, Index> RegMapType;
+  typedef std::map<std::string, ImageSequence> SeqMapType;
+  typedef std::map<std::string, Index> SndMapType;
+  typedef std::map<std::string, SoundSequence> SndSeqMapType;
+
+  ImageSequence LoadSeq(std::string fName);
+  Index LoadSndRaw(std::string fName);
 
   RegMapType mpImg;
   SeqMapType mpSeq;
@@ -197,372 +235,8 @@ template <class Key> class Preloader : virtual public SP_Info {
 
   SP<GraphicalInterface<Index>> pGr;
   SP<SoundInterface<Index>> pSn;
-
-  ImageSequence LoadSeq(std::string fName);
-  Index LoadSndRaw(std::string fName);
-
-public:
-  Preloader(SP<GraphicalInterface<Index>> pGr_, SP<SoundInterface<Index>> pSn_,
-            FilePath fp_ = FilePath())
-      : pGr(pGr_), pSn(pSn_), nScale(1), fp(fp_) {}
-
-  Index &operator[](Key k);
-  ImageSequence &operator()(Key k);
-
-  Index &GetSnd(Key k);
-  SoundSequence &GetSndSeq(Key k);
-
-  void AddTransparent(Color c);
-  void SetScale(unsigned nScale_);
-
-  void ApplyTransparency(Index pImg);
-
-  void AddImage(Index pImg, Key k);
-  void AddSequence(ImageSequence pImg, Key k);
-
-  void Load(std::string fName, Key k);
-  void LoadT(std::string fName, Key k, Color c = Color(0, 0, 0, 0));
-  void LoadS(std::string fName, Key k, unsigned nScale = 0);
-  void LoadTS(std::string fName, Key k, Color c = Color(0, 0, 0, 0),
-              unsigned nScale = 0);
-
-  void LoadSeq(std::string fName, Key k);
-  void LoadSeqT(std::string fName, Key k, Color c = Color(0, 0, 0, 0));
-  void LoadSeqS(std::string fName, Key k, unsigned nScale = 0);
-  void LoadSeqTS(std::string fName, Key k, Color c = Color(0, 0, 0, 0),
-                 unsigned nScale_ = 0);
-
-  void LoadSnd(std::string fName, Key k);
-  void LoadSndSeq(std::string fName, Key k);
 };
 
-typedef Preloader<std::string> MyPreloader;
-
-template <class Key> void Preloader<Key>::AddTransparent(Color c) {
-  vTr.push_back(c);
-}
-
-template <class Key> void Preloader<Key>::SetScale(unsigned nScale_) {
-  nScale = nScale_;
-}
-
-template <class Key> void Preloader<Key>::ApplyTransparency(Index pImg) {
-  Image *img = pGr->GetImage(pImg);
-  for (size_t n = 0, sz = vTr.size(); n < sz; ++n)
-    img->ChangeColor(vTr[n], Color(0, 0, 0, 0));
-}
-
-template <class Key> Index &Preloader<Key>::operator[](Key k) {
-  typename RegMapType::iterator itr = mpImg.find(k);
-  if (itr == mpImg.end())
-    throw PreloaderExceptionAccess<Key>("[]", k, false);
-  return itr->second;
-}
-
-template <class Key> ImageSequence &Preloader<Key>::operator()(Key k) {
-  typename SeqMapType::iterator itr = mpSeq.find(k);
-  if (itr == mpSeq.end())
-    throw PreloaderExceptionAccess<Key>("()", k, true);
-  return itr->second;
-}
-
-template <class Key> Index &Preloader<Key>::GetSnd(Key k) {
-  typename SndMapType::iterator itr = mpSnd.find(k);
-  if (itr == mpSnd.end())
-    throw PreloaderExceptionAccess<Key>("GetSnd", k, false, true);
-  return itr->second;
-}
-
-template <class Key> SoundSequence &Preloader<Key>::GetSndSeq(Key k) {
-  typename SndSeqMapType::iterator itr = mpSndSeq.find(k);
-  if (itr == mpSndSeq.end())
-    throw PreloaderExceptionAccess<Key>("GetSndSeq", k, true, true);
-  return itr->second;
-}
-
-template <class Key> void Preloader<Key>::AddImage(Index pImg, Key k) {
-  mpImg[k] = pImg;
-}
-
-template <class Key>
-void Preloader<Key>::AddSequence(ImageSequence pImg, Key k) {
-  mpSeq[k] = pImg;
-}
-
-template <class Key> void Preloader<Key>::Load(std::string fName, Key k) {
-  fp.Parse(fName);
-  try {
-    Index pImg = pGr->LoadImage(fName);
-    // pGr->Image(fName);
-    mpImg[k] = pImg;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("Load", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("Load");
-    throw;
-  }
-}
-
-template <class Key>
-void Preloader<Key>::LoadT(std::string fName, Key k, Color c) {
-  fp.Parse(fName);
-  try {
-    Index pImg = pGr->LoadImage(fName);
-
-    if (c == Color(0, 0, 0, 0))
-      ApplyTransparency(pImg);
-    else
-      pGr->GetImage(pImg)->ChangeColor(c, Color(0, 0, 0, 0));
-
-    mpImg[k] = pImg;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadT", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadT");
-    throw;
-  }
-}
-template <class Key>
-void Preloader<Key>::LoadS(std::string fName, Key k, unsigned nScale_) {
-  fp.Parse(fName);
-  try {
-    Index pImg = pGr->LoadImage(fName);
-
-    if (nScale_ == 0)
-      pImg = pGr->ScaleImage(pImg, nScale);
-    else
-      pImg = pGr->ScaleImage(pImg, nScale_);
-
-    mpImg[k] = pImg;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadS", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadS");
-    throw;
-  }
-}
-
-template <class Key>
-void Preloader<Key>::LoadTS(std::string fName, Key k, Color c,
-                            unsigned nScale_) {
-  fp.Parse(fName);
-  try {
-    Index pImg = pGr->LoadImage(fName);
-
-    // Format converting
-    // pGr->SaveImage(fName, pImg);
-
-    if (c == Color(0, 0, 0, 0))
-      ApplyTransparency(pImg);
-    else
-      pGr->GetImage(pImg)->ChangeColor(c, Color(0, 0, 0, 0));
-
-    if (nScale_ == 0)
-      pImg = pGr->ScaleImage(pImg, nScale);
-    else
-      pImg = pGr->ScaleImage(pImg, nScale_);
-
-    mpImg[k] = pImg;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadTS", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadTS");
-    throw;
-  }
-}
-
-template <class Key> ImageSequence Preloader<Key>::LoadSeq(std::string fName) {
-  fp.Parse(fName);
-  ImageSequence imgSeq;
-
-  SP<InStreamHandler> pFl = fp.ReadFile(fName);
-  std::istream &ifs = pFl->GetStream();
-
-  std::string strFolder;
-  Separate(fName, strFolder);
-
-  bool bFancy = false;
-
-  for (int i = 0;; ++i) {
-    unsigned n = 1;
-    std::string s;
-    ifs >> s;
-    if (bFancy)
-      ifs >> n;
-
-    if (ifs.fail())
-      break;
-
-    if (i == 0 && s == "FANCY") {
-      bFancy = true;
-      continue;
-    }
-    fp.Format(s);
-
-    imgSeq.Add(pGr->LoadImage(strFolder + s), n);
-
-    // Format Converting
-    // pGr->SaveImage(strFolder + s, pGr->LoadImage(strFolder + s));
-  }
-
-  if (imgSeq.vImage.empty())
-    throw PreloaderExceptionLoad("LoadSeq", fName);
-
-  return imgSeq;
-}
-
-template <class Key> void Preloader<Key>::LoadSeq(std::string fName, Key k) {
-  try {
-    ImageSequence imgSeq = LoadSeq(fName);
-    mpSeq[k] = imgSeq;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadSeq", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadSeq");
-    throw;
-  }
-}
-
-template <class Key>
-void Preloader<Key>::LoadSeqT(std::string fName, Key k, Color c) {
-  try {
-    ImageSequence imgSeq = LoadSeq(fName);
-    for (unsigned i = 0, sz = imgSeq.vImage.size(); i < sz; ++i)
-      if (c == Color(0, 0, 0, 0))
-        ApplyTransparency(imgSeq.vImage[i]);
-      else
-        pGr->GetImage(imgSeq.vImage[i])->ChangeColor(c, Color(0, 0, 0, 0));
-
-    mpSeq[k] = imgSeq;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadSeqT", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadSeqT");
-    throw;
-  }
-}
-
-template <class Key>
-void Preloader<Key>::LoadSeqS(std::string fName, Key k, unsigned nScale_) {
-  try {
-    ImageSequence imgSeq = LoadSeq(fName);
-    for (unsigned i = 0, sz = imgSeq.vImage.size(); i < sz; ++i)
-      if (nScale_ == 0)
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale);
-      else
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale_);
-
-    mpSeq[k] = imgSeq;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadSeqS", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadSeqS");
-    throw;
-  }
-}
-
-template <class Key>
-void Preloader<Key>::LoadSeqTS(std::string fName, Key k, Color c,
-                               unsigned nScale_) {
-  try {
-    ImageSequence imgSeq = LoadSeq(fName);
-    for (size_t i = 0, sz = imgSeq.vImage.size(); i < sz; ++i) {
-      if (c == Color(0, 0, 0, 0))
-        ApplyTransparency(imgSeq.vImage[i]);
-      else
-        pGr->GetImage(imgSeq.vImage[i])->ChangeColor(c, Color(0, 0, 0, 0));
-      if (nScale_ == 0)
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale);
-      else
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale_);
-    }
-
-    mpSeq[k] = imgSeq;
-  } catch (GraphicalInterfaceException &exGr) {
-    PreloaderExceptionLoad ex("LoadSeqTS", fName);
-    ex.InheritException(exGr);
-    throw ex;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadSeqTS");
-    throw;
-  }
-}
-
-template <class Key> Index Preloader<Key>::LoadSndRaw(std::string fName) {
-  try {
-    return pSn->LoadSound(fName);
-  } catch (SimpleException &exSm) {
-    PreloaderExceptionLoad ex("LoadSndRaw", fName, true);
-    ex.InheritException(exSm);
-    throw ex;
-  }
-}
-
-template <class Key> void Preloader<Key>::LoadSnd(std::string fName, Key k) {
-  try {
-    fp.Parse(fName);
-    Index i = LoadSndRaw(fName);
-    mpSnd[k] = i;
-  } catch (PreloaderException &exPre) {
-    exPre.AddFnName("LoadSnd");
-    throw;
-  }
-}
-
-template <class Key> void Preloader<Key>::LoadSndSeq(std::string fName, Key k) {
-  fp.Parse(fName);
-  SoundSequence sndSeq;
-
-  SP<InStreamHandler> pFl = fp.ReadFile(fName);
-  std::istream &ifs = pFl->GetStream();
-
-  std::string strFolder;
-  Separate(fName, strFolder);
-
-  bool bFancy = false;
-
-  for (int i = 0;; ++i) {
-    unsigned n = 1;
-    std::string s;
-    ifs >> s;
-    if (bFancy)
-      ifs >> n;
-
-    if (ifs.fail())
-      break;
-
-    if (i == 0 && s == "FANCY") {
-      bFancy = true;
-      continue;
-    }
-
-    try {
-      sndSeq.Add(LoadSndRaw(strFolder + s), n);
-    } catch (PreloaderException &exPre) {
-      exPre.AddFnName("LoadSnd");
-      throw;
-    }
-  }
-
-  if (sndSeq.vSounds.empty())
-    throw PreloaderExceptionLoad("LoadSnd", fName, true);
-
-  mpSndSeq[k] = sndSeq;
-}
 } // namespace Gui
 
 #endif // PRELOADER_HEADER_02_20_10_09_09
