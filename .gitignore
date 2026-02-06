@@ -9,4 +9,7 @@ bin_*/
 build/
 *.exe
 bin/stuff.txt
+bin/musicon.txt
+bin/soundon.txt
+
 
