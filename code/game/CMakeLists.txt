@@ -3,6 +3,15 @@ project(TowerDefense LANGUAGES CXX)
 
 add_executable(tower_defense
   main.cpp
+  core.cpp
+  entities.cpp
+  level.cpp
+  tutorial.cpp
+  screen_controllers.cpp
+  fireball.cpp
+  critters.cpp
+  critter_generators.cpp
+  dragon.cpp
   tower_defense.cpp
   tower_defense.h
 )
