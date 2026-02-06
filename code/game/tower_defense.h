@@ -2676,6 +2676,7 @@ struct Mage : public Critter, public ConsumableEntity {
         tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
     fMvVel = Critter::fVel;
 
+    // meh
     bAngry = true;
     pAc->pGl->bAngry = true;
   }

@@ -1,5 +1,5 @@
 ---
-alwaysApply: false
+alwaysApply: true
 ---
 - Keep lines under 80 characters
 - Comments should use simple non-technical language
