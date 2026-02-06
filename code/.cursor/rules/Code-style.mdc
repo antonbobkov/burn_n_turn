@@ -1,4 +1,5 @@
 ---
 alwaysApply: false
 ---
-Keep lines under 80 characters
+- Keep lines under 80 characters
+- Comments should use simple non-technical language

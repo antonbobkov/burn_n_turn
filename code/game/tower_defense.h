@@ -136,8 +136,10 @@ struct Polar {
   fPoint TofPoint() { return fPoint(r * cos(a), r * sin(a)); }
 };
 
-/** Combine two direction codes (1–4: left/right/down/up) into a normalized
- * fPoint. */
+/**
+ * Turns two direction keys (e.g. left, up) into a single diagonal direction.
+ * Used for steering or aiming from keyboard or joystick.
+ */
 inline fPoint ComposeDirection(int dir1, int dir2) {
   fPoint r(0, 0);
   switch (dir1) {
@@ -176,8 +178,7 @@ inline fPoint ComposeDirection(int dir1, int dir2) {
   return r;
 }
 
-/** Angle within a wedge: fDir = center, dWidth = half-width, nWhich/nHowMany =
- * segment. */
+/** Picks one direction within a spread (for multi-shot fire). */
 inline fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
                             unsigned nHowMany) {
   if (nHowMany == 1)
@@ -309,6 +310,11 @@ struct NumberDrawer : virtual public SP_Info {
     mpCachedRecolorings[c] = vNewColors;
   }
 
+  /**
+   * Loads the font: reads which character is at which position in the image,
+   * loads the image and cuts it into small letter tiles, scales them, and
+   * discards the original full image.
+   */
   NumberDrawer(SP<ScalingDrawer> pDr_, std::string sFontPath,
                std::string sFontName)
       : pDr(this, pDr_), vImgIndx(256, -1) {
@@ -335,6 +341,30 @@ struct NumberDrawer : virtual public SP_Info {
 
     pDr->pGr->DeleteImage(nImg);
   }
+
+  /*
+  void DrawNumber(unsigned n, Point p, unsigned nDigits = 0)
+{
+  std::vector<unsigned> vDigits;
+  if(n == 0)
+      vDigits.push_back(0);
+  while(n != 0)
+  {
+      vDigits.push_back(n%10);
+      n /= 10;
+  }
+
+  unsigned i, sz = unsigned(vDigits.size());
+  for(i = 0; int(i) < int(nDigits) - int(sz); ++i)
+      vDigits.push_back(0);
+
+  for(i = 0; i < vDigits.size(); ++i)
+  {
+      pDr->Draw(vImg[ vImgIndx['0' + vDigits[vDigits.size() - i - 1]] ],
+Point(p.x + 4 * i, p.y), false);
+  }
+}
+  */
 
   /*
   void DrawNumber(unsigned n, Point p, unsigned nDigits = 0)
@@ -402,6 +432,11 @@ Point(p.x + 4 * i, p.y), false);
     }
   }
 
+  /**
+   * Draws text at a position in a given color. Optionally centers the text.
+   * Uses pre-made colored letters when available; otherwise colors each letter
+   * on the fly. Skips characters that are not in the font.
+   */
   void DrawColorWord(std::string s, Point p, Color c, bool bCenter = false) {
     if (bCenter) {
       p.x -= 2 * s.length();
@@ -739,6 +774,7 @@ struct TextDrawEntity : virtual public VisualEntity {
 
   void SetText(std::string sText) { vText = BreakUpString(sText); }
 
+  /** Draw vText lines at pos with pNum; advance p.y per line. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     Point p = pos;
     for (unsigned i = 0; i < vText.size(); ++i) {
@@ -774,6 +810,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
       : dPriority(dPriority_), pos(pos_), pNum(this, pNum_), t(1), nOffset(0),
         nTextVerticalSpacing(7), nDelta(1), pIsTutorialOn(pIsTutorialOn_) {}
 
+  /** Set content to v; scrolls from sText to v or sets sText if empty. */
   void SetText(std::vector<std::string> v) {
     if (sText == v && nDelta == 1)
       return;
@@ -791,6 +828,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
     }
   }
 
+  /** Draw sText lines with vertical offset nOffset; skip if tutorial off. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     if (pIsTutorialOn && (*pIsTutorialOn == false))
       return;
@@ -805,6 +843,8 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   /*virtual*/ float GetPriority() { return dPriority; }
 
+  /** Advances the scroll each tick; when scroll ends, the new text replaces the
+   * old. */
   /*virtual*/ void Update() {
     if (t.Tick()) {
       nOffset += nDelta;
@@ -856,6 +896,13 @@ struct TutorialLevelOne {
       : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
         bPrincessCaptured(false), pTexter(0) {}
 
+  /**
+   * Chooses which tutorial lines to show for level one. While flying: either
+   * "steer and fly back" or "steer, pick up princess, bring to tower". Before
+   * first knight kill: shoot and aim at knights. When princess appears: either
+   * "princess in sight, take off" or "capture four princesses". Otherwise
+   * returns no lines.
+   */
   std::vector<std::string> GetText() {
     std::vector<std::string> sText;
 
@@ -902,6 +949,7 @@ struct TutorialLevelOne {
     return sText;
   };
 
+  /** Pushes the current tutorial lines to the display. */
   void Update() {
     if (pTexter != 0)
       pTexter->SetText(GetText());
@@ -909,6 +957,7 @@ struct TutorialLevelOne {
 
   void ShotFired() {}
 
+  /** Set bKilledKnight and refresh tutorial text. */
   void KnightKilled() {
     if (bKilledKnight == false) {
       bKilledKnight = true;
@@ -916,21 +965,25 @@ struct TutorialLevelOne {
     }
   }
 
+  /** Set flying on and refresh text. */
   void FlyOn() {
     bFlying = true;
     Update();
   }
 
+  /** Set flying off and refresh text. */
   void FlyOff() {
     bFlying = false;
     Update();
   };
 
+  /** Mark princess spawned and refresh text. */
   void PrincessGenerate() {
     bPrincessGenerated = true;
     Update();
   };
 
+  /** Mark princess captured and refresh text. */
   void PrincessCaptured() {
     bPrincessCaptured = true;
     Update();
@@ -951,6 +1004,7 @@ struct TutorialLevelTwo {
       : bTraderGenerated(false), bTraderKilled(false), bBonusPickedUp(false),
         pTexter(0) {}
 
+  /** Build tutorial lines from trader/bonus state. */
   std::vector<std::string> GetText() {
     std::vector<std::string> sText;
 
@@ -975,11 +1029,13 @@ struct TutorialLevelTwo {
     return sText;
   };
 
+  /** Pushes the current tutorial lines to the display. */
   void Update() {
     if (pTexter != 0)
       pTexter->SetText(GetText());
   }
 
+  /** Set bTraderKilled and refresh text. */
   void TraderKilled() {
     if (bTraderKilled == false) {
       bTraderKilled = true;
@@ -987,11 +1043,13 @@ struct TutorialLevelTwo {
     }
   }
 
+  /** Mark trader spawned and refresh text. */
   void TraderGenerate() {
     bTraderGenerated = true;
     Update();
   };
 
+  /** Mark bonus picked up and refresh text. */
   void BonusPickUp() {
     bBonusPickedUp = true;
     Update();
@@ -1213,6 +1271,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
               SP<Animation> pMenuCaret_, SP<MenuController> pMenuController_,
               bool bCheatsUnlocked_);
 
+  /** Draws the menu entries and the caret at the current selection. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     Point p = pLeftTop;
     for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
@@ -1233,6 +1292,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 
   /*virtual*/ void Update() { pCurr->vEntries.at(0).bDisabled = false; }
 
+  /** Updates which menu item is highlighted from the mouse position. */
   void OnMouseMove(Point pMouse) {
     pMouse.x /= 4;
     pMouse.y /= 4;
@@ -1280,6 +1340,8 @@ struct Countdown : public VisualEntity, public EventEntity {
   Countdown(SP<NumberDrawer> pNum_, unsigned nTime_)
       : pNum(this, pNum_), nTime(nTime_), nCount(0) {}
 
+  /** Decrements the countdown every second; removes this when it reaches zero.
+   */
   /*virtual*/ void Update() {
     ++nCount;
     if (nCount % nFramesInSecond == 0)
@@ -1288,6 +1350,7 @@ struct Countdown : public VisualEntity, public EventEntity {
       bExist = false;
   }
 
+  /** Draws the remaining countdown at a fixed screen position. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     pNum->DrawNumber(nTime, Point(22, 2));
   }
@@ -1299,6 +1362,7 @@ struct Countdown : public VisualEntity, public EventEntity {
 struct PhysicalEntity : virtual public ScreenEntity {
   virtual unsigned GetRadius() { return 0; }
 
+  /** True if circles (GetPosition, GetRadius) overlap. */
   bool HitDetection(SP<PhysicalEntity> pPh) {
     Point d = GetPosition() - pPh->GetPosition();
     unsigned r1 = GetRadius(), r2 = pPh->GetRadius();
@@ -1325,6 +1389,7 @@ struct TrackballTracker {
     threshold = 25;
   }
 
+  /** Records the latest relative movement and drops the oldest sample. */
   void Update() {
     Point p = mtr.GetRelMovement();
 
@@ -1355,6 +1420,8 @@ struct TrackballTracker {
     lsMouse.pop_back();
   }
 
+  /** Returns true when the middle sample has the largest length (gesture peak).
+   */
   bool IsTrigger() {
     /*
 int p = GetDerivative();
@@ -1370,7 +1437,6 @@ int p = GetDerivative();
 
     return false;
 */
-
     std::vector<int> v;
     for (std::list<Point>::iterator itr = lsMouse.begin(); v.size() < 3; ++itr)
       v.push_back(int(fPoint(*itr).Length()));
@@ -1378,6 +1444,7 @@ int p = GetDerivative();
     return (v[1] > v[0]) && (v[1] > v[2]);
   }
 
+  /** Second element of lsMouse (recent movement). */
   Point GetMovement() {
     /*
     Point p1 = *(lsMouse.begin());
@@ -1392,6 +1459,7 @@ int p = GetDerivative();
     return *(++lsMouse.begin());
   }
 
+  /** Returns the average of recent movement samples. */
   fPoint GetAvMovement() {
     fPoint p;
     for (std::list<Point>::iterator itr = lsMouse.begin(), etr = lsMouse.end();
@@ -1406,6 +1474,8 @@ int p = GetDerivative();
 
   int GetLengthSq(Point p) { return p.x * p.x + p.y * p.y; }
 
+  /** Difference in squared length between first and second sample; 0 if only
+   * one sample. */
   int GetDerivative() {
     if (nMaxLength > 1)
       return GetLengthSq(lsMouse.front()) - GetLengthSq(*++lsMouse.begin());
@@ -1526,9 +1596,11 @@ struct BasicController : public GameController {
   std::list<ASSP<EventEntity>> lsUpdate;
   std::list<ASSP<ConsumableEntity>> lsPpl;
 
+  /** Add visual entity to lsDraw. */
   void AddV(SP<VisualEntity> pVs) {
     lsDraw.push_back(ASSP<VisualEntity>(this, pVs));
   }
+  /** Adds an event entity to the update list. */
   void AddE(SP<EventEntity> pEv) {
     lsUpdate.push_back(ASSP<EventEntity>(this, pEv));
   }
@@ -1538,6 +1610,7 @@ struct BasicController : public GameController {
     lsUpdate.push_back(ASSP<EventEntity>(this, t));
   }
 
+  /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
   void AddBackground(Color c) {
     // Index nBckImg = pGl->pDr->pGr->GetBlankImage(rBound.sz);
     // pGl->pDr->pGr->RectangleOnto(nBckImg, rBound.sz, c);
@@ -1566,6 +1639,11 @@ struct BasicController : public GameController {
     AddBackground(c);
   }
 
+  /**
+   * Each frame: remove dead things from the lists, move everything that can
+   * move, then update everyone. Draw everything in order from back to front.
+   * Refresh the screen unless refresh is disabled.
+   */
   /*virtual*/ void Update() {
     CleanUp(lsUpdate);
     CleanUp(lsDraw);
@@ -1665,6 +1743,7 @@ struct StartScreenController : public BasicController {
   StartScreenController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c)
       : BasicController(pGl_, rBound, c) {}
 
+  /** Advance to next screen and play start_game sound. */
   void Next() {
     pGl->Next();
     pGl->pSnd->PlaySound(pGl->pr.GetSnd("start_game"));
@@ -1718,6 +1797,7 @@ struct BuyNowController : public BasicController {
     bNoRefresh = true;
   }
 
+  /** Set fVel to random direction, sometimes toward center; scale by speed. */
   void RandomizeVelocity(fPoint &fVel, fPoint pPos) {
     fVel = RandomAngle();
 
@@ -1727,11 +1807,17 @@ struct BuyNowController : public BasicController {
     fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
   }
 
+  /** Draw all slime animations. */
   void DrawSlimes() {
     for (unsigned i = 0; i < mSlimes.size(); i++)
       mSlimes[i]->Draw(pGl->pDr);
   };
 
+  /**
+   * Runs the normal controller update. Every so often, some slimes get a new
+   * random direction. All slimes move and animate. Countdown runs. Screen
+   * refreshes.
+   */
   /*virtual*/ void Update() {
     BasicController::Update();
 
@@ -1776,6 +1862,11 @@ struct Cutscene : public BasicController {
 
   bool bRelease;
 
+  /**
+   * Sets up the chase: black screen, one character running and one waiting.
+   * Runner starts left or right depending on flip; when the runner reaches the
+   * middle, the chaser is released. Beep/boop timer for sound.
+   */
   Cutscene(SP<TwrGlobalController> pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false)
       : BasicController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
@@ -1954,6 +2045,12 @@ struct ChainExplosion : virtual public AnimationOnce,
         ch(ch_) {}
 
   /*virtual*/ unsigned GetRadius() { return unsigned(r); }
+  /**
+   * Each frame the explosion can grow. Remove dead units. For each unit inside
+   * the blast (except golems and mega slimes): apply fire damage and optionally
+   * spawn a new explosion on them for a chain reaction. Then advance the
+   * explosion animation.
+   */
   /*virtual*/ void Update() {
     if (SimpleVisualEntity::t.Check()) {
       r += delta;
@@ -2007,6 +2104,7 @@ struct KnightOnFire : public Critter //, public ConsumableEntity
   Timer t;
   Chain c;
 
+  /** Set fVel to random direction, scaled by fKnightFireSpeed. */
   void RandomizeVelocity() {
     fVel = RandomAngle();
     fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
@@ -2053,6 +2151,7 @@ struct SoundControls : public EventEntity {
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
       : plr(plr_), nTheme(nTheme_) {}
 
+  /** SwitchTheme(nTheme) or StopMusic() when nTheme == -1. */
   /*virtual*/ void Update() {
     if (nTheme != -1)
       plr.SwitchTheme(nTheme);
@@ -2076,24 +2175,29 @@ struct PositionTracker {
 
   PositionTracker() : bPressed(false) {}
 
+  /** Set pressed and reset counter. */
   void On() {
     bPressed = true;
     nCounter = 0;
   }
+  /** Clear pressed and return counter. */
   int Off() {
     bPressed = false;
     return nCounter;
   }
+  /** Increment nCounter while bPressed. */
   void Update() {
     if (bPressed)
       ++nCounter;
   }
 
+  /** Set pMouse (scaled by 2). */
   void UpdateMouse(Point pMouse_) {
     pMouse = pMouse_;
     pMouse.x /= 2;
     pMouse.y /= 2;
   }
+  /** Set pLastDownPosition (scaled by 2). */
   void UpdateLastDownPosition(Point pMouse_) {
     pLastDownPosition = pMouse_;
     pLastDownPosition.x /= 2;
@@ -2510,6 +2614,7 @@ struct Road : virtual public VisualEntity {
   /*virtual*/ float GetPriority() { return 0; }
   /*virtual*/ Point GetPosition() { return Point(); }
 
+  /** Draw gray bar along segment (vertical or horizontal). */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     unsigned n = pDr->nFactor;
     if (bVertical)
@@ -2522,6 +2627,7 @@ struct Road : virtual public VisualEntity {
                               Color(63, 63, 63), false);
   }
 
+  /** Pick random entry/exit point and direction; write to p and v. */
   void RoadMap(Point &p, Point &v) {
     if (rand() % 2) {
       if (!bVertical) {
@@ -2569,6 +2675,7 @@ struct FancyRoad : public Road {
       : Road(rd), pAd(this, pAd_) {}
   SSP<AdvancedController> pAd;
 
+  /** Draw tiled road image along segment. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     unsigned n = pDr->nFactor;
     Image *p = pDr->pGr->GetImage(pAd->pGl->pr["road"]);
@@ -2596,6 +2703,7 @@ struct Princess : public Critter, public ConsumableEntity {
 
   /*virtual*/ char GetType() { return 'P'; }
 
+  /** Spawn BonusScore, set bExist false. */
   /*virtual*/ void OnHit(char cWhat) {
     SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 250);
     pAc->AddBoth(pB);
@@ -2885,11 +2993,19 @@ struct Knight : public Critter, public ConsumableEntity {
 #endif // UNDERLINE_UNIT_TEXT
   }
 
+  /** Move position back one unit along current velocity. */
   void KnockBack() {
     if (fVel != fPoint(0, 0))
       fPos -= fVel / fVel.Length();
   }
 
+  /**
+   * Each frame: if the knight is on a castle, notify the castle and remove the
+   * knight. If it is a skeleton: remove dead units and bonuses, then damage or
+   * kill princesses and traders on hit, and collect bonus pickups. When the
+   * knight moves, advance the walk animation and play step sounds at the right
+   * moments.
+   */
   /*virtual*/ void Update() {
     for (unsigned i = 0; i < pAc->vCs.size(); ++i)
       if (this->HitDetection(pAc->vCs[i])) {
@@ -2996,6 +3112,11 @@ struct MegaSlime : public Critter, public ConsumableEntity {
     fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
   }
 
+  /**
+   * Remove collected bonuses. When the slime touches a bonus pickup, remove it
+   * and play a sound. On the timer: advance the animation; on jump and land
+   * frames, play sounds and either randomize movement or stop.
+   */
   /*virtual*/ void Update() {
     // if(t.Tick() && float(rand())/RAND_MAX < .25)
     //	RandomizeVelocity();
@@ -3145,6 +3266,7 @@ struct Sliminess : public EventEntity {
     }
   }
 
+  /** Cancels the spawn (this and the visual both removed). */
   void Kill() {
     bExist = false;
     pSlm->bExist = false;
@@ -3232,6 +3354,7 @@ struct BrokenLine {
 
   VecLines vEdges;
 
+  /** Close last segment by appending first point; throws if empty. */
   void CloseLast() {
     if (vEdges.empty() || vEdges.back().empty())
       throw SegmentSimpleException("CloseLast",
@@ -3241,6 +3364,7 @@ struct BrokenLine {
       vEdges.back().push_back(vEdges.back().front());
   }
 
+  /** Append p to last segment; push new segment if empty. */
   void Add(fPoint p) {
     if (vEdges.empty())
       vEdges.push_back(VecLine());
@@ -3249,6 +3373,7 @@ struct BrokenLine {
 
   void AddLine(const VecLine &vl) { vEdges.push_back(vl); }
 
+  /** Append all segments of b to vEdges. */
   void Join(const BrokenLine &b) {
     for (unsigned i = 0; i < b.vEdges.size(); ++i)
       vEdges.push_back(b.vEdges[i]);
@@ -3279,6 +3404,11 @@ struct BrokenLine {
     CloseLast();
   }
 
+  /**
+   * Picks a random spot along the path, with longer segments more likely to be
+   * chosen. If the path has no length, picks from a random segment instead.
+   * Fails if the path is empty.
+   */
   fPoint RandomByLength() {
     if (vEdges.empty())
       throw SegmentSimpleException("RandomByLength",
@@ -3318,6 +3448,7 @@ struct BrokenLine {
     return vEdges[0][0];
   }
 
+  /** Random point on a random segment. */
   fPoint RandomBySegment() {
     if (vEdges.empty())
       throw SegmentSimpleException("RandomBySegment",
@@ -3349,6 +3480,10 @@ inline std::ostream &operator<<(std::ostream &ofs, const BrokenLine &bl) {
   return ofs;
 }
 
+/**
+ * Reads a path from the stream: text up to '&' is split by '|' into segments;
+ * each segment is a list of points that form one part of the path.
+ */
 inline std::istream &operator>>(std::istream &ifs, BrokenLine &bl) {
   bl.vEdges.clear();
 
@@ -3397,6 +3532,8 @@ struct LevelLayout {
 
   std::vector<float> vFreq;
 
+  /** Scales the level's spawn path, castle positions, and roads to the given
+   * grid size. */
   void Convert(int n = 24) {
     float p1 = float(sBound.sz.x) / n;
     float p2 = float(sBound.sz.y) / n;
@@ -3448,7 +3585,11 @@ inline std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f) {
 
   return ofs;
 }
-
+/**
+ * Reads a level from the stream: level number, then spawn rates, spawn path,
+ * castle positions, roads, and timer. Numbers that represent time are
+ * converted to frame counts.
+ */
 inline std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
   f = LevelLayout(f.sBound);
 
@@ -3523,6 +3664,7 @@ struct KnightGenerator : virtual public EventEntity {
 
   BrokenLine bl;
 
+  /** Returns the current spawn rate (depends on completion and ghost mode). */
   float GetRate() {
     if (pBc->bGhostTime)
       return dRate / fIncreaseKnightRate2;
@@ -3547,6 +3689,7 @@ struct KnightGenerator : virtual public EventEntity {
 #endif
   }
 
+  /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
   void Generate(bool bGolem = false) {
     Point p = bl.RandomByLength().ToPnt();
 
@@ -3611,6 +3754,11 @@ struct PrincessGenerator : virtual public EventEntity {
 #endif
   }
 
+  /**
+   * When the timer fires: pick a random road and spawn a princess there, moving
+   * toward the castles. The first princess gets a "capture" hint. Add her to
+   * the game, play the arrival sound, and notify the tutorial.
+   */
   /*virtual*/ void Update() {
     // if(float(rand())/RAND_MAX < dRate || tm.Tick())
     if (tm.Tick()) {
@@ -3672,6 +3820,7 @@ struct MageGenerator : virtual public EventEntity {
     }
   }
 
+  /** Spawn one Mage on a random road; add to pBc. */
   void MageGenerate() {
     Point p, v;
 
@@ -3772,6 +3921,8 @@ struct DragonLeash {
     maxTilt = .40F / (float(nFramesInSecond) / 10);
   }
 
+  /** Smoothly adjusts steering tilt from trackball input and clamps to max
+   * turn rate. */
   void ModifyTilt(Point trackball) {
     tilt -= tilt * naturalScaleFactor;
     tilt += trackball.x * trackballScaleFactor;
@@ -3782,6 +3933,7 @@ struct DragonLeash {
       tilt = -maxTilt;
   }
 
+  /** Applies trackball to tilt and returns the new flying direction. */
   fPoint GetNewVelocity(Point trackball) {
     ModifyTilt(trackball);
     Polar p = Polar(lastVel);
@@ -3810,6 +3962,7 @@ struct ButtonSet {
 
   bool IsSpace(int nCode) { return nCode == vCodes[8]; }
 
+  /** Converts a key code to an 8-direction offset; (0,0) if no match. */
   Point GetPoint(int nCode) {
     Point p = Point();
 
@@ -3857,6 +4010,11 @@ inline unsigned GetRandFromDistribution(std::vector<float> vProb) {
   throw std::string("bad range");
 }
 
+/**
+ * Picks a random power-up type; some types are more likely than others. When
+ * in the tower, ring fireball can appear; when not, it cannot. Used for
+ * trader rewards and similar.
+ */
 inline unsigned RandomBonus(bool bInTower /* = true*/) {
   std::vector<float> v;
 
@@ -3908,6 +4066,12 @@ struct Dragon : public Critter {
 
   DragonLeash leash;
 
+  /**
+   * Creates a timed power-up of the given type. Higher levels shorten how long
+   * it lasts. Types include: fireball regen, multi-shot, laser, bigger shot,
+   * more ammo, explosion, chain, set-on-fire, ring (fires in a circle), nuke
+   * (hits many enemies at once), speed, and fire rate.
+   */
   SP<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime) {
     if (pAd->nLvl > 6)
       nTime = unsigned(nTime * fBonusTimeMutiplierTwo);
@@ -4009,6 +4173,7 @@ struct Dragon : public Critter {
     return pBonus;
   }
 
+  /** Saves all current power-ups so they can be restored on the next level. */
   void FlushBonuses() {
     for (std::list<ASSP<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
                                                        etr = lsBonuses.end();
@@ -4016,6 +4181,18 @@ struct Dragon : public Critter {
       pAd->pGl->lsBonusesToCarryOver.push_back(*itr);
   }
 
+  /** Restores power-ups that were saved when entering this level. */
+  void RecoverBonuses() {
+    for (std::list<SP<TimedFireballBonus>>::iterator
+             itr = pAd->pGl->lsBonusesToCarryOver.begin(),
+             etr = pAd->pGl->lsBonusesToCarryOver.end();
+         itr != etr; ++itr) {
+      AddBonus(*itr, true);
+    }
+  }
+
+  /** Merge all active lsBonuses into one FireballBonus; add nExtraFireballs to
+   * total. CleanUp lsBonuses first. */
   FireballBonus GetAllBonuses() {
     CleanUp(lsBonuses);
     FireballBonus fbRet(-1, true);
@@ -4057,6 +4234,12 @@ struct Dragon : public Critter {
 
   ButtonSet bt;
 
+  /**
+   * Sets up the dragon: how many fireballs it has (from last level if any). If
+   * a castle is given and free, the dragon starts perched there; otherwise
+   * starts in the air at the first castle. Uses perched sprite and clears any
+   * saved bonuses from the previous level.
+   */
   Dragon(SP<Castle> pCs_, SP<AdvancedController> pAd_, ImageSequence imgStable_,
          ImageSequence imgFly_, ButtonSet bt_)
       : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
@@ -4088,15 +4271,12 @@ struct Dragon : public Critter {
     pAd->pGl->lsBonusesToCarryOver.clear();
   }
 
-  void RecoverBonuses() {
-    for (std::list<SP<TimedFireballBonus>>::iterator
-             itr = pAd->pGl->lsBonusesToCarryOver.begin(),
-             etr = pAd->pGl->lsBonusesToCarryOver.end();
-         itr != etr; ++itr) {
-      AddBonus(*itr, true);
-    }
-  }
-
+  /**
+   * Each frame: when allowed, slowly refill fireballs toward the max. While
+   * flying: if over a castle, land (or clear "just took off"). While flying and
+   * able to carry: try to pick up a princess. While flying: collect any bonus
+   * pickups. Then run normal movement.
+   */
   /*vrtual*/ void Update() {
     // CleanUp(lsBonuses);
 
@@ -4190,12 +4370,17 @@ struct Dragon : public Critter {
     Critter::Update();
   }
 
+  /** When perched on a castle, returns a position slightly above the feet;
+   * otherwise the real position. */
   /*vrtual*/ Point GetPosition() {
     if (pCs != 0)
       return (fPos + fPoint(0, -1)).ToPnt();
     return fPos.ToPnt();
   }
 
+  /** Draws the carried unit if any. When perched, draws the dragon at the
+   * castle (two frames for animation). When flying, draws the flying dragon
+   * facing the right way. Also ticks down a short timer used for effects. */
   /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
     if (bCarry)
       pDr->Draw(imgCarry, GetPosition(), true);
@@ -4216,6 +4401,7 @@ struct Dragon : public Critter {
       --nTimer;
   }
 
+  /** Add pBonus to lsBonuses and AddE; play powerup sound unless bSilent. */
   void AddBonus(SP<TimedFireballBonus> pBonus, bool bSilent = false) {
     if (!bSilent)
       pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("powerup"));
@@ -4227,6 +4413,12 @@ struct Dragon : public Critter {
     pAd->AddE(pBonus);
   }
 
+  /**
+   * Shoots one or more fireballs in the given direction. Does nothing if out of
+   * ammo or direction is zero. Uses current power-ups for speed and number of
+   * shots. When on the tower, notifies the tutorial. Temporarily stops fireball
+   * refill. Plays laser or normal shoot sound.
+   */
   void Fire(fPoint fDir) {
     if (fDir == fPoint())
       return;
@@ -4304,6 +4496,14 @@ struct Dragon : public Critter {
       pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("shoot"));
   }
 
+  /**
+   * Switches between perched and flying. Taking off: play sound, switch to
+   * flying sprite, set speed from input (or straight up if none). Landing:
+   * find a castle underneath; if carrying a princess, deliver her (and maybe
+   * win the level); if carrying a trader, get a random power-up; otherwise
+   * just play landing sound. If not over a castle but over a trader, pick him
+   * up. Clears what is being carried when landing.
+   */
   void Toggle() {
     if (!bFly) {
       pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("leave_tower"));
