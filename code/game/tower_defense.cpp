@@ -4,6 +4,2735 @@ MessageWriter *pWr = 0;
 
 int nSlimeMax = 100;
 
+Polar::Polar(fPoint p) : r(p.Length()) {
+  if (p.y == 0 && p.x == 0)
+    a = 0;
+  else
+    a = atan2(p.y, p.x);
+}
+
+fPoint ComposeDirection(int dir1, int dir2) {
+  fPoint r(0, 0);
+  switch (dir1) {
+  case 1:
+    r += fPoint(-1, 0);
+    break;
+  case 2:
+    r += fPoint(1, 0);
+    break;
+  case 3:
+    r += fPoint(0, 1);
+    break;
+  case 4:
+    r += fPoint(0, -1);
+    break;
+  default:
+    break;
+  }
+  switch (dir2) {
+  case 1:
+    r += fPoint(-1, 0);
+    break;
+  case 2:
+    r += fPoint(1, 0);
+    break;
+  case 3:
+    r += fPoint(0, 1);
+    break;
+  case 4:
+    r += fPoint(0, -1);
+    break;
+  default:
+    break;
+  }
+  r.Normalize();
+  return r;
+}
+
+fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
+                     unsigned nHowMany) {
+  if (nHowMany == 1)
+    return fDir;
+
+  float d = 3.1415F * 2 * dWidth / (nHowMany - 1) * nWhich;
+
+  return (Polar(fDir) * Polar(d - 3.1415F * dWidth, 1)).TofPoint();
+}
+
+fPoint RandomAngle(fPoint fDir, float fRange) {
+  return (Polar(fDir) *
+          Polar((float(rand()) / RAND_MAX - .5F) * fRange * 2 * 3.1415F, 1))
+      .TofPoint();
+}
+
+void ScalingDrawer::Scale(Index &pImg, int nFactor_) {
+  if (nFactor_ < 0)
+    nFactor_ = nFactor;
+
+  Image *pOrig = pGr->GetImage(pImg);
+  Index pRet = pGr->GetBlankImage(
+      Size(pOrig->GetSize().x * nFactor_, pOrig->GetSize().y * nFactor_));
+  Image *pFin = pGr->GetImage(pRet);
+
+  Point p, s;
+  for (p.y = 0; p.y < pOrig->GetSize().y; ++p.y)
+    for (p.x = 0; p.x < pOrig->GetSize().x; ++p.x)
+      for (s.y = 0; s.y < nFactor_; ++s.y)
+        for (s.x = 0; s.x < nFactor_; ++s.x)
+          pFin->SetPixel(Point(p.x * nFactor_ + s.x, p.y * nFactor_ + s.y),
+                         pOrig->GetPixel(p));
+
+  pImg = pRet;
+}
+
+void ScalingDrawer::Draw(Index nImg, Point p, bool bCentered) {
+  p.x *= nFactor;
+  p.y *= nFactor;
+  if (bCentered) {
+    Size sz = pGr->GetImage(nImg)->GetSize();
+    p.x -= sz.x / 2;
+    p.y -= sz.y / 2;
+  }
+
+  pGr->DrawImage(p, nImg, false);
+}
+
+Index ScalingDrawer::LoadImage(std::string strFile) {
+  Index n = pGr->LoadImage(strFile);
+  pGr->GetImage(n)->ChangeColor(Color(0, 0, 0), Color(0, 0, 0, 0));
+  return n;
+}
+
+void NumberDrawer::CacheColor(Color c) {
+  std::vector<Index> vNewColors;
+
+  for (size_t i = 0, sz = vImg.size(); i < sz; ++i) {
+    Index vColImg = pDr->pGr->CopyImage(vImg[i]);
+    pDr->pGr->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
+    vNewColors.push_back(vColImg);
+  }
+
+  mpCachedRecolorings[c] = vNewColors;
+}
+
+NumberDrawer::NumberDrawer(SP<ScalingDrawer> pDr_, std::string sFontPath,
+                           std::string sFontName)
+    : pDr(this, pDr_), vImgIndx(256, -1) {
+  std::ifstream ifs((sFontPath + sFontName + ".txt").c_str());
+
+  unsigned n;
+  unsigned char c;
+  for (n = 0; c = ifs.get(), !ifs.fail(); ++n)
+    vImgIndx[c] = n;
+
+  Index nImg = pDr->LoadImage((sFontPath + sFontName + ".bmp").c_str());
+  Image *pImg = pDr->pGr->GetImage(nImg);
+  for (unsigned i = 0; i < n; ++i) {
+    Index nCurr = pDr->pGr->GetBlankImage(Size(3, 5));
+    Image *pCurr = pDr->pGr->GetImage(nCurr);
+
+    Point p;
+    for (p.y = 0; p.y < 5; ++p.y)
+      for (p.x = 0; p.x < 3; ++p.x)
+        pCurr->SetPixel(p, pImg->GetPixel(Point(i * 4 + p.x, p.y)));
+    pDr->Scale(nCurr);
+    vImg.push_back(nCurr);
+  }
+
+  pDr->pGr->DeleteImage(nImg);
+}
+
+std::string NumberDrawer::GetNumber(unsigned n, unsigned nDigits) {
+  std::string s;
+  if (n == 0)
+    s += '0';
+  while (n != 0) {
+    s += ('0' + n % 10);
+    n /= 10;
+  }
+
+  unsigned i, sz = unsigned(s.size());
+  for (i = 0; int(i) < int(nDigits) - int(sz); ++i)
+    s += '0';
+
+  std::reverse(s.begin(), s.end());
+
+  return s;
+}
+
+void NumberDrawer::DrawWord(std::string s, Point p, bool bCenter) {
+  if (bCenter) {
+    p.x -= 2 * s.length();
+    p.y -= 2;
+  }
+
+  for (unsigned i = 0; i < s.length(); ++i) {
+    int n = int(s[i]);
+
+    if (vImgIndx[n] == -1)
+      continue;
+
+    pDr->Draw(vImg[vImgIndx[n]], Point(p.x + 4 * i, p.y), false);
+  }
+}
+
+void NumberDrawer::DrawColorWord(std::string s, Point p, Color c,
+                                 bool bCenter) {
+  if (bCenter) {
+    p.x -= 2 * s.length();
+    p.y -= 2;
+  }
+
+  std::vector<Index> *pImageVector;
+
+  bool bManualRecolor = true;
+
+  std::map<Color, std::vector<Index>>::iterator itr =
+      mpCachedRecolorings.find(c);
+
+  if (itr != mpCachedRecolorings.end()) {
+    bManualRecolor = false;
+    pImageVector = &(itr->second);
+  }
+
+  for (unsigned i = 0; i < s.length(); ++i) {
+    int n = int(s[i]);
+
+    if (vImgIndx[n] == -1)
+      continue;
+
+    if (bManualRecolor) {
+      Index vColImg = pDr->pGr->CopyImage(vImg[vImgIndx[n]]);
+      pDr->pGr->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
+      pDr->Draw(vColImg, Point(p.x + 4 * i, p.y), false);
+    } else {
+      pDr->Draw((*pImageVector)[vImgIndx[n]], Point(p.x + 4 * i, p.y), false);
+    }
+  }
+}
+
+void BackgroundMusicPlayer::ToggleOff() {
+  if (!bOff) {
+    bOff = true;
+    StopMusic();
+  } else {
+    bOff = false;
+  }
+}
+
+void SoundInterfaceProxy::PlaySound(Index i, int nChannel, bool bLoop) {
+  if (bSoundOn)
+    pSndRaw->PlaySound(i, nChannel, bLoop);
+}
+
+SimpleController::SimpleController(SP<TwrGlobalController> pGraph,
+                                   std::string strFileName)
+    : GameController(pGraph) {
+  nImage = pGl->pGraph->LoadImage(strFileName);
+}
+
+SimpleController::~SimpleController() { pGl->pGraph->DeleteImage(nImage); }
+
+void SimpleController::Update() {
+  pGl->pGraph->DrawImage(Gui::Point(0, 0), nImage);
+}
+
+void SimpleController::OnKey(GuiKeyType c, bool bUp) {
+  if (bUp)
+    return;
+
+  pGl->Next();
+}
+
+FlashingController::FlashingController(SP<TwrGlobalController> pGraph,
+                                       std::string strFileName,
+                                       std::string strTextName)
+    : GameController(pGraph), nTimer(0), bShow(true) {
+  nImage = pGl->pGraph->LoadImage(strFileName);
+  nText = pGl->pGraph->LoadImage(strTextName);
+
+  pGl->pGraph->GetImage(nText)->ChangeColor(Color(255, 255, 255),
+                                            Color(0, 0, 0, 0));
+}
+
+FlashingController::~FlashingController() {
+  pGl->pGraph->DeleteImage(nImage);
+  pGl->pGraph->DeleteImage(nText);
+}
+
+void FlashingController::Update() {
+  ++nTimer;
+  if (nTimer % nFramesInSecond == 0)
+    bShow = !bShow;
+
+  pGl->pGraph->DrawImage(Point(0, 0), nImage, false);
+  if (bShow)
+    pGl->pGraph->DrawImage(Point(0, 0), nText, false);
+  pGl->pGraph->RefreshAll();
+}
+
+void FlashingController::OnKey(GuiKeyType c, bool bUp) {
+  if (bUp)
+    return;
+
+  pGl->Next();
+}
+
+std::vector<std::string> BreakUpString(std::string s) {
+  s += '\n';
+
+  std::vector<std::string> vRet;
+  std::string sCurr;
+
+  for (unsigned i = 0; i < s.size(); ++i) {
+    if (s[i] == '\n') {
+      vRet.push_back(sCurr);
+      sCurr = "";
+    } else
+      sCurr += s[i];
+  }
+
+  return vRet;
+}
+
+std::string OnOffString(bool b) {
+  if (b)
+    return "on";
+  else
+    return "off";
+}
+
+void TextDrawEntity::Draw(SP<ScalingDrawer> pDr) {
+  Point p = pos;
+  for (unsigned i = 0; i < vText.size(); ++i) {
+    pNum->DrawWord(vText[i], p, bCenter);
+    p.y += 7;
+  }
+}
+
+void TutorialTextEntity::SetText(std::vector<std::string> v) {
+  if (sText == v && nDelta == 1)
+    return;
+
+  if (sNewText == v && nDelta == -1)
+    return;
+
+  if (sText.empty()) {
+    nOffset = 0;
+    nDelta = 1;
+    sText = v;
+  } else {
+    sNewText = v;
+    nDelta = -1;
+  }
+}
+
+void TutorialTextEntity::Draw(SP<ScalingDrawer> pDr) {
+  if (pIsTutorialOn && (*pIsTutorialOn == false))
+    return;
+
+  for (unsigned i = 0; i < sText.size(); ++i) {
+    Point p = pos;
+    p.y -= nOffset;
+    p.y += nTextVerticalSpacing * i + nTextVerticalSpacing / 3;
+    pNum->DrawWord(sText[i], p, true);
+  }
+}
+
+void TutorialTextEntity::Update() {
+  if (t.Tick()) {
+    nOffset += nDelta;
+    int nMax = nTextVerticalSpacing * sText.size();
+
+    if (nOffset >= nMax)
+      nOffset = nMax;
+    if (nOffset < 0) {
+      nOffset = 0;
+      nDelta = 1;
+      sText = sNewText;
+      sNewText.clear();
+    }
+  }
+}
+
+std::vector<std::string> TutorialLevelOne::GetText() {
+  std::vector<std::string> sText;
+
+  if (bFlying) {
+    if (!bKilledKnight || !bPrincessGenerated) {
+      sText.push_back(sSteerMessage);
+      sText.push_back("fly back to your tower");
+
+      return sText;
+    } else {
+      sText.push_back(sSteerMessage);
+      sText.push_back("fly over the princess to pick her up");
+      sText.push_back("bring captured princess to the tower");
+#ifndef JOYSTICK_TUTORIAL
+      sText.push_back("(you can shoot while flying!)");
+#endif
+
+      return sText;
+    }
+  }
+
+  if (!bKilledKnight) {
+    sText.push_back(sShootingMessage);
+    sText.push_back("aim for the knights!");
+    sText.push_back("don't let them get to the tower");
+
+    return sText;
+  }
+
+  if (bPrincessGenerated) {
+    if (!bPrincessCaptured) {
+      sText.push_back("princess in sight!");
+      sText.push_back(sTakeOffMessage);
+
+      return sText;
+    }
+
+    sText.push_back("capture four princesses to beat the level");
+    sText.push_back("don't let knights get to the tower!");
+
+    return sText;
+  }
+
+  return sText;
+}
+
+void TutorialLevelOne::Update() {
+  if (pTexter != 0)
+    pTexter->SetText(GetText());
+}
+
+void TutorialLevelOne::KnightKilled() {
+  if (bKilledKnight == false) {
+    bKilledKnight = true;
+    Update();
+  }
+}
+
+void TutorialLevelOne::FlyOn() {
+  bFlying = true;
+  Update();
+}
+
+void TutorialLevelOne::FlyOff() {
+  bFlying = false;
+  Update();
+}
+
+void TutorialLevelOne::PrincessGenerate() {
+  bPrincessGenerated = true;
+  Update();
+}
+
+void TutorialLevelOne::PrincessCaptured() {
+  bPrincessCaptured = true;
+  Update();
+}
+
+std::vector<std::string> TutorialLevelTwo::GetText() {
+  std::vector<std::string> sText;
+
+  if (!bTraderGenerated)
+    return sText;
+
+  if (!bTraderKilled) {
+    sText.push_back("trader in sight!");
+    sText.push_back("kill a trader to get a power up");
+
+    return sText;
+  }
+
+  if (!bBonusPickedUp) {
+    sText.push_back("traders drop power ups");
+    sText.push_back("fly over to pick them up");
+    sText.push_back("collect as many as you can!");
+
+    return sText;
+  }
+
+  return sText;
+}
+
+void TutorialLevelTwo::Update() {
+  if (pTexter != 0)
+    pTexter->SetText(GetText());
+}
+
+void TutorialLevelTwo::TraderKilled() {
+  if (bTraderKilled == false) {
+    bTraderKilled = true;
+    Update();
+  }
+}
+
+void TutorialLevelTwo::TraderGenerate() {
+  bTraderGenerated = true;
+  Update();
+}
+
+void TutorialLevelTwo::BonusPickUp() {
+  bBonusPickedUp = true;
+  Update();
+}
+
+void SimpleVisualEntity::Update() {
+  if (bTimer) {
+    if (t.Tick()) {
+      seq.Toggle();
+      t = Timer(nPeriod * seq.GetTime());
+    }
+  } else if (bStep) {
+    Point p = GetPosition();
+    if (p != pPrev) {
+      bImageToggle = !bImageToggle;
+
+      if (bImageToggle)
+        seq.Toggle();
+    }
+    pPrev = p;
+  }
+}
+
+void SimpleVisualEntity::Draw(SP<ScalingDrawer> pDr) {
+  pDr->Draw(seq.GetImage(), GetPosition(), bCenter);
+}
+
+void StaticImage::Draw(SP<ScalingDrawer> pDr) {
+  pDr->Draw(img, GetPosition(), bCentered);
+}
+
+void StaticRectangle::Draw(SP<ScalingDrawer> pDr) {
+  pDr->pGr->DrawRectangle(r, c, false);
+}
+
+void SimpleSoundEntity::Update() {
+  if (t.Tick()) {
+    pSnd->PlaySound(seq.GetSound());
+
+    if (seq.nActive == seq.vSounds.size() - 1) {
+      bExist = false;
+      return;
+    }
+
+    seq.Toggle();
+    t = Timer(nPeriod * seq.GetTime());
+  }
+}
+
+void AnimationOnce::Update() {
+  SimpleVisualEntity::Update();
+
+  if (SimpleVisualEntity::seq.nActive == 0) {
+    if (!bOnce)
+      bExist = false;
+  } else {
+    bOnce = false;
+  }
+}
+
+void MenuDisplay::Draw(SP<ScalingDrawer> pDr) {
+  Point p = pLeftTop;
+  for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
+    if (!pCurr->vEntries[i].bDisabled)
+      pNum->DrawWord(pCurr->vEntries[i].sText, p, false);
+    else
+      pNum->DrawColorWord(pCurr->vEntries[i].sText, p, Color(125, 125, 125),
+                          false);
+
+    if (pCurr->nMenuPosition == i)
+      pMenuCaret->pos = p + Point(-11, pCurr->vEntries[i].szSize.y / 4);
+
+    p.y += pCurr->vEntries[i].szSize.y;
+  }
+}
+
+void MenuDisplay::OnMouseMove(Point pMouse) {
+  pMouse.x /= 4;
+  pMouse.y /= 4;
+
+  Point p = pLeftTop;
+  for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
+    if (!pCurr->vEntries[i].bDisabled &&
+        InsideRectangle(Rectangle(p, pCurr->vEntries[i].szSize), pMouse)) {
+      pCurr->nMenuPosition = i;
+      return;
+    }
+    p.y += pCurr->vEntries[i].szSize.y;
+  }
+}
+
+void Countdown::Update() {
+  ++nCount;
+  if (nCount % nFramesInSecond == 0)
+    --nTime;
+  if (nTime == 0)
+    bExist = false;
+}
+
+void Countdown::Draw(SP<ScalingDrawer> pDr) {
+  pNum->DrawNumber(nTime, Point(22, 2));
+}
+
+bool PhysicalEntity::HitDetection(SP<PhysicalEntity> pPh) {
+  Point d = GetPosition() - pPh->GetPosition();
+  unsigned r1 = GetRadius(), r2 = pPh->GetRadius();
+  return unsigned(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);
+}
+
+TrackballTracker::TrackballTracker() {
+  nMaxLength = 3;
+  for (int i = 0; i < nMaxLength; i++)
+    lsMouse.push_back(Point(0, 0));
+  trigFlag = false;
+  threshold = 25;
+}
+
+void TrackballTracker::Update() {
+  Point p = mtr.GetRelMovement();
+
+  lsMouse.push_front(p);
+  lsMouse.pop_back();
+}
+
+bool TrackballTracker::IsTrigger() {
+  std::vector<int> v;
+  for (std::list<Point>::iterator itr = lsMouse.begin(); v.size() < 3; ++itr)
+    v.push_back(int(fPoint(*itr).Length()));
+
+  return (v[1] > v[0]) && (v[1] > v[2]);
+}
+
+fPoint TrackballTracker::GetAvMovement() {
+  fPoint p;
+  for (std::list<Point>::iterator itr = lsMouse.begin(), etr = lsMouse.end();
+       itr != etr; ++itr)
+    p += *itr;
+
+  p.x /= lsMouse.size();
+  p.y /= lsMouse.size();
+
+  return p;
+}
+
+int TrackballTracker::GetDerivative() {
+  if (nMaxLength > 1)
+    return GetLengthSq(lsMouse.front()) - GetLengthSq(*++lsMouse.begin());
+  else
+    return 0;
+}
+
+void Critter::Move() {
+  fPos += fVel;
+  if (!InsideRectangle(rBound, fPos.ToPnt())) {
+    if (bDieOnExit)
+      bExist = false;
+    else {
+      if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
+        fPos.y -= fVel.y;
+      else if (InsideRectangle(rBound, (fPos - fPoint(fVel.x, 0)).ToPnt()))
+        fPos.x -= fVel.x;
+      else
+        fPos -= fVel;
+    }
+  }
+}
+
+void FancyCritter::Move() {
+  if (tm.Tick()) {
+    fPos += fVel;
+    seq.Toggle();
+  }
+
+  if (!InsideRectangle(rBound, fPos.ToPnt())) {
+    if (bDieOnExit)
+      bExist = false;
+    else {
+      if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
+        fPos.y -= fVel.y;
+      else if (InsideRectangle(rBound, (fPos - fPoint(fVel.x, 0)).ToPnt()))
+        fPos.x -= fVel.x;
+      else
+        fPos -= fVel;
+    }
+  }
+}
+
+Cutscene::Cutscene(SP<TwrGlobalController> pGl_, Rectangle rBound_,
+                   std::string sRun, std::string sChase, bool bFlip)
+    : BasicController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
+      pCrFollow(this, 0), bRelease(false), tm(nFramesInSecond / 5),
+      Beepy(true) {
+  ImageSequence seq1 = pGl_->pr(sRun);
+
+  int xPos = 5;
+  if (bFlip)
+    xPos = rBound_.sz.x - 5;
+  float m = 1;
+  if (bFlip)
+    m = -1;
+
+  SP<FancyCritter> pCr1 =
+      new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 10, 0),
+                       rBound, 3, seq1, nFramesInSecond / 5);
+  AddBoth(pCr1);
+
+  pCrRun = pCr1;
+
+  ImageSequence seq2 = pGl_->pr(sChase);
+
+  SP<FancyCritter> pCr2 =
+      new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 12, 0),
+                       rBound, 3, seq2, nFramesInSecond / 5);
+
+  pCrFollow = pCr2;
+}
+
+void Cutscene::Update() {
+  if (!bRelease && pCrRun->GetPosition().x >= rBound.sz.x / 3 &&
+      pCrRun->GetPosition().x <= rBound.sz.x * 2 / 3) {
+    bRelease = true;
+
+    SP<FancyCritter> pCr2 = pCrFollow;
+    AddBoth(pCr2);
+  }
+
+  if (!pCrFollow->bExist) {
+    pGl->Next();
+  }
+
+  if (tm.Tick()) {
+    if (Beepy)
+      pGl->pSnd->PlaySound(pGl->pr.GetSnd("beep"));
+    else
+      pGl->pSnd->PlaySound(pGl->pr.GetSnd("boop"));
+
+    Beepy = !Beepy;
+  }
+
+  BasicController::Update();
+}
+
+void Cutscene::OnKey(GuiKeyType c, bool bUp) {
+  if (!bUp && c == '\\' && pGl->sbCheatsOn.Get())
+    pGl->Next();
+}
+
+FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
+  if (bDef) {
+    fMap["speed"] = 5;
+    fMap["frequency"] = fInitialFrequency;
+    uMap["pershot"] = 1;
+    uMap["total"] = nInitialFireballs;
+  }
+}
+
+FireballBonus &FireballBonus::operator+=(const FireballBonus &f) {
+  Union(fMap, f.fMap);
+  Union(uMap, f.uMap);
+  Union(bMap, f.bMap);
+
+  return *this;
+}
+
+std::ostream &operator<<(std::ostream &ofs, FireballBonus b) {
+  Out(ofs, b.fMap) << "\n";
+  Out(ofs, b.uMap) << "\n";
+  Out(ofs, b.bMap) << "\n";
+
+  return ofs;
+}
+
+Chain Chain::Evolve() {
+  if (bInfinite)
+    return Chain(true);
+  else if (nGeneration == 0)
+    return Chain();
+  else
+    return Chain(nGeneration - 1);
+}
+
+void ChainExplosion::Update() {
+  if (SimpleVisualEntity::t.Check()) {
+    r += delta;
+  }
+
+  CleanUp(pBc->lsPpl);
+
+  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+       itr != pBc->lsPpl.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+
+    if (this->HitDetection(*itr)) {
+      if ((*itr)->GetType() == 'W')
+        continue;
+      if ((*itr)->GetType() == 'E')
+        continue;
+
+      (*itr)->OnHit('F');
+
+      if (!ch.IsLast()) {
+        SP<ChainExplosion> pCE =
+            new ChainExplosion(AnimationOnce(GetPriority(), Reset(seq),
+                                             SimpleVisualEntity::t.nPeriod,
+                                             (*itr)->GetPosition(), true),
+                               r_in, delta, pBc, ch.Evolve());
+        pBc->AddBoth(pCE);
+      }
+    }
+  }
+
+  AnimationOnce::Update();
+}
+
+void KnightOnFire::RandomizeVelocity() {
+  fVel = RandomAngle();
+  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
+}
+
+BonusScore::BonusScore(SP<AdvancedController> pAc_, Point p_, unsigned nScore_)
+    : p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0),
+      pAc(this, pAc_), c(255, 255, 0), nScore(nScore_), nScoreSoFar(0) {
+  std::ostringstream ostr(sText);
+  ostr << '+' << nScore;
+  sText = ostr.str();
+}
+
+void SoundControls::Update() {
+  if (nTheme != -1)
+    plr.SwitchTheme(nTheme);
+  else
+    plr.StopMusic();
+}
+
+void PositionTracker::On() {
+  bPressed = true;
+  nCounter = 0;
+}
+
+int PositionTracker::Off() {
+  bPressed = false;
+  return nCounter;
+}
+
+void PositionTracker::Update() {
+  if (bPressed)
+    ++nCounter;
+}
+
+void PositionTracker::UpdateMouse(Point pMouse_) {
+  pMouse = pMouse_;
+  pMouse.x /= 2;
+  pMouse.y /= 2;
+}
+
+void PositionTracker::UpdateLastDownPosition(Point pMouse_) {
+  pLastDownPosition = pMouse_;
+  pLastDownPosition.x /= 2;
+  pLastDownPosition.y /= 2;
+}
+
+fPoint PositionTracker::GetFlightDirection(fPoint fDragonPos) {
+  return pLastDownPosition - fDragonPos;
+}
+
+AdvancedController::AdvancedController(const AdvancedController &a)
+    : BasicController(a), tr(a.tr), t(a.t), bCh(a.bCh), nLvl(a.nLvl),
+      nSlimeNum(a.nSlimeNum), bPaused(a.bPaused), tLoseTimer(a.tLoseTimer),
+      bGhostTime(a.bGhostTime), tBlink(a.tBlink), bBlink(a.bBlink), pGr(a.pGr),
+      tStep(a.tStep), bLeft(a.bLeft), pSc(a.pSc), bLeftDown(a.bLeftDown),
+      bRightDown(a.bRightDown), nLastDir(a.nLastDir),
+      bWasDirectionalInput(a.bWasDirectionalInput), pt(a.pt), mc(a.mc),
+      bFirstUpdate(true), pTutorialText(this, a.pTutorialText),
+      tutOne(a.tutOne), tutTwo(a.tutTwo), bTimerFlash(a.bTimerFlash),
+      pMgGen(a.pMgGen) {
+  CopyArrayASSP(this, a.vCs, vCs);
+  CopyArrayASSP(this, a.vRd, vRd);
+  CopyArrayASSP(this, a.vDr, vDr);
+  CopyArrayASSP(this, a.lsBonus, lsBonus);
+  CopyArrayASSP(this, a.lsSlimes, lsSlimes);
+  CopyArrayASSP(this, a.lsSliminess, lsSliminess);
+}
+
+void DragonScoreController::OnMouseDown(Point pPos) {
+  if (bClickToExit)
+    pGl->Next();
+}
+
+int GetFireballRaduis(FireballBonus &fb) {
+  int n = fb.uMap["big"];
+
+  if (n == 0)
+    return 6;
+  else if (n == 1)
+    return 9;
+  else if (n == 2)
+    return 12;
+  else
+    return 18;
+}
+
+std::string GetSizeSuffix(FireballBonus &fb) {
+  int n = fb.uMap["big"];
+
+  if (n == 0)
+    return "";
+  else if (n == 1)
+    return "_15";
+  else if (n == 2)
+    return "_2";
+  else
+    return "_3";
+}
+
+float GetExplosionInitialRaduis(FireballBonus &fb) {
+  int n = fb.uMap["big"];
+  float fCf;
+
+  if (n == 0)
+    fCf = 1;
+  else if (n == 1)
+    fCf = 1.5;
+  else if (n == 2)
+    fCf = 2;
+  else
+    fCf = 3;
+
+  return 3 * fCf;
+}
+
+float GetExplosionExpansionRate(FireballBonus &fb) {
+  int n = fb.uMap["big"];
+  float fCf;
+
+  if (n == 0)
+    fCf = 1;
+  else if (n == 1)
+    fCf = 1.5;
+  else if (n == 2)
+    fCf = 2;
+  else
+    fCf = 3;
+
+  return 3.9F * fCf;
+}
+
+Fireball::Fireball(Point p, fPoint v, SP<AdvancedController> pBc_,
+                   FireballBonus &fb_, Chain ch_, unsigned nChain_)
+    : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
+              nFramesInSecond / 10),
+      pBc(this, pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
+  Critter::fVel.Normalize(fb.fMap["speed"]);
+
+  if (!fb.bMap["laser"])
+    Critter::seq = pBc->pGl->pr("fireball" + GetSizeSuffix(fb));
+  else {
+    Polar pol(Critter::fVel);
+    unsigned n = DiscreetAngle(pol.a, 16);
+    Critter::seq =
+        ImageSequence(pBc->pGl->pr("laser" + GetSizeSuffix(fb)).vImage[n]);
+  }
+}
+
+void Fireball::Update() {
+  CleanUp(pBc->lsPpl);
+
+  bool bMultiHit = false;
+
+  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+       itr != pBc->lsPpl.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+
+    if (this->HitDetection(*itr)) {
+      char cType = (*itr)->GetType();
+
+      if (cType == 'W' || cType == 'E') {
+        (*itr)->OnHit('F');
+
+        bExist = false;
+        return;
+      } else
+        pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("death"));
+
+      if ((*itr)->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
+        (*itr)->OnHit('F');
+      else {
+        (*itr)->bExist = false;
+        SP<KnightOnFire> pKn = new KnightOnFire(
+            Critter((*itr)->GetRadius(), (*itr)->GetPosition(), fPoint(),
+                    rBound, 1.F, ImageSequence(), true),
+            pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"]));
+        pBc->AddBoth(pKn);
+      }
+
+      if (!bMultiHit) {
+        bool bKeepGoing = (fb.uMap["through"] != 0) || fb.bMap["through_flag"];
+
+        if (nChain != 0 || !bKeepGoing)
+          bExist = false;
+
+        if (bKeepGoing) {
+          if (fb.bMap["through_flag"])
+            fb.bMap["through_flag"] = false;
+          else
+            --fb.uMap["through"];
+        }
+
+        if (bKeepGoing) {
+          fPoint v = fVel;
+
+          for (unsigned i = 0; i < nChain; ++i) {
+            SP<Fireball> pFb = new Fireball(
+                (*itr)->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
+                pBc, fb, Chain(), nChain);
+            pBc->AddBoth(pFb);
+          }
+        }
+
+        if (fb.uMap["explode"] > 0) {
+          SP<ChainExplosion> pEx;
+
+          if (!fb.bMap["laser"]) {
+            pEx = new ChainExplosion(
+                AnimationOnce(GetPriority(),
+                              pBc->pGl->pr("explosion" + GetSizeSuffix(fb)),
+                              nFramesInSecond / 10, (*itr)->GetPosition(),
+                              true),
+                GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
+                pBc, Chain(fb.uMap["explode"] - 1));
+          } else {
+            pEx = new ChainExplosion(
+                AnimationOnce(GetPriority(),
+                              pBc->pGl->pr("laser_expl" + GetSizeSuffix(fb)),
+                              nFramesInSecond / 10, (*itr)->GetPosition(),
+                              true),
+                GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
+                pBc, Chain(fb.uMap["explode"] - 1));
+          }
+
+          pBc->AddBoth(pEx);
+
+          pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("explosion"));
+        }
+      }
+
+      bMultiHit = true;
+    }
+  }
+
+  Critter::Update();
+}
+
+void TimedFireballBonus::Update() {
+  if (t.Tick())
+    bExist = false;
+}
+
+void CircularFireball::Update() {
+  Fireball::Update();
+
+  if (t.Tick())
+    bExist = false;
+
+  fPoint p = fPoint(GetPosition()) - i_pos;
+  if (p.Length() < fRadius)
+    return;
+  fPoint fPen(-p.y, p.x);
+  p.Normalize((p.Length() - fRadius) * 2);
+  fPen -= p;
+
+  fPen.Normalize(fVel.Length());
+  fVel = fPen;
+
+  if (fb.bMap["laser"]) {
+    Polar pol(Critter::fVel);
+    unsigned n = DiscreetAngle(pol.a, 16);
+    Critter::seq =
+        ImageSequence(pBc->pGl->pr("laser" + GetSizeSuffix(fb)).vImage[n]);
+  }
+}
+
+void Road::Draw(SP<ScalingDrawer> pDr) {
+  unsigned n = pDr->nFactor;
+  if (bVertical)
+    pDr->pGr->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
+                                      (nCoord + 5) * n, rBound.sz.y * n),
+                            Color(63, 63, 63), false);
+  else
+    pDr->pGr->DrawRectangle(Rectangle(rBound.p.x * n, (nCoord - 5) * n,
+                                      rBound.sz.x * n, (nCoord + 5) * n),
+                            Color(63, 63, 63), false);
+}
+
+void Road::RoadMap(Point &p, Point &v) {
+  if (rand() % 2) {
+    if (!bVertical) {
+      p.y = nCoord - 7;
+      p.x = rBound.p.x;
+      v = Point(1, 0);
+    } else {
+      p.x = nCoord;
+      p.y = rBound.p.y;
+      v = Point(0, 1);
+    }
+  } else {
+    if (!bVertical) {
+      p.y = nCoord - 7;
+      p.x = rBound.sz.x - 1;
+      v = Point(-1, 0);
+    } else {
+      p.x = nCoord;
+      p.y = rBound.sz.y - 1;
+      v = Point(0, -1);
+    }
+  }
+}
+
+void FancyRoad::Draw(SP<ScalingDrawer> pDr) {
+  unsigned n = pDr->nFactor;
+  Image *p = pDr->pGr->GetImage(pAd->pGl->pr["road"]);
+  Size sz = p->GetSize();
+
+  if (bVertical)
+    for (int i = 0; (i - 1) * sz.y < rBound.sz.y * int(n); ++i)
+      pDr->pGr->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
+                          pAd->pGl->pr["road"], false);
+  else
+    for (int i = 0; (i - 1) * sz.x < rBound.sz.x * int(n); ++i)
+      pDr->pGr->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
+                          pAd->pGl->pr["road"], false);
+}
+
+void SummonSkeletons(SP<AdvancedController> pAc, Point p) {
+  int nNum = 4;
+
+  if (pAc->nLvl > 6)
+    nNum = 6;
+  if (pAc->nLvl >= 10)
+    nNum = 8;
+
+  for (int i = 0; i < nNum; ++i) {
+    fPoint f = GetWedgeAngle(Point(1, 1), 1, i, nNum + 1);
+    f.Normalize(15);
+
+    pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_summon"));
+    SP<SkellyGenerator> pSkel = new SkellyGenerator(p + f.ToPnt(), pAc);
+    pAc->AddE(pSkel);
+  }
+}
+
+void Princess::OnHit(char cWhat) {
+  SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 250);
+  pAc->AddBoth(pB);
+
+  bExist = false;
+
+  SP<AnimationOnce> pAn = new AnimationOnce(
+      GetPriority(),
+      fVel.x < 0 ? pAc->pGl->pr("princess_die_f")
+                 : pAc->pGl->pr("princess_die"),
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+
+  pAc->AddBoth(pAn);
+}
+
+void Princess::Draw(SP<ScalingDrawer> pDr) {
+  Critter::Draw(pDr);
+
+  Point p = GetPosition();
+  p.y += 13;
+#ifdef UNDERLINE_UNIT_TEXT
+  if (sUnderText != "")
+    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+#endif
+}
+
+SkellyGenerator::SkellyGenerator(Point p_, SP<AdvancedController> pAdv_)
+    : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(this, pAdv_) {
+  SP<AnimationOnce> pSlm =
+      new AnimationOnce(2.F, pAdv->pGl->pr("skelly_summon"),
+                        unsigned(.1F * nFramesInSecond), p_, true);
+  pAdv_->AddBoth(pSlm);
+}
+
+Mage::Mage(const Critter &cr, SP<AdvancedController> pAc_, bool bAngry_)
+    : Critter(cr), pAc(this, pAc_), bAngry(bAngry_), bCasting(false),
+      tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
+      tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
+  fMvVel = Critter::fVel;
+
+  bAngry = true;
+  pAc->pGl->bAngry = true;
+}
+
+void Mage::OnHit(char cWhat) {
+  bExist = false;
+
+  SP<AnimationOnce> pAn = new AnimationOnce(
+      GetPriority(),
+      fVel.x < 0 ? pAc->pGl->pr("mage_die_f") : pAc->pGl->pr("mage_die"),
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+
+  pAc->AddBoth(pAn);
+
+  pAc->pGl->bAngry = true;
+
+  if (pAc->nLvl > 6)
+    SummonSlimes();
+}
+
+ImageSequence GetBonusImage(int n, Preloader &pr) {
+  if (n == 0)
+    return pr("void_bonus");
+  if (n == 1)
+    return pr("pershot_bonus");
+  if (n == 2)
+    return pr("laser_bonus");
+  if (n == 3)
+    return pr("big_bonus");
+  if (n == 4)
+    return pr("totnum_bonus");
+  if (n == 5)
+    return pr("explode_bonus");
+  if (n == 6)
+    return pr("split_bonus");
+  if (n == 7)
+    return pr("burning_bonus");
+  if (n == 8)
+    return pr("ring_bonus");
+  if (n == 9)
+    return pr("nuke_bonus");
+  if (n == 10)
+    return pr("speed_bonus");
+
+  return pr("void_bonus");
+}
+
+FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
+                                               SP<AdvancedController> pAd_)
+    : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
+      bBlink(false), pAd(this, pAd_), tm(nBonusOnGroundTime), sUnderText("") {
+  seq = GetBonusImage(n, pAd->pGl->pr);
+  coronaSeq = pAd->pGl->pr("corona");
+}
+
+void FireballBonusAnimation::Draw(SP<ScalingDrawer> pDr) {
+  pDr->Draw(coronaSeq.GetImage(), GetPosition(), bCenter);
+  Animation::Draw(pDr);
+
+  Point p = GetPosition();
+  p.y += 13;
+
+#ifdef UNDERLINE_UNIT_TEXT
+  if (sUnderText != "")
+    pAd->pGl->pNum->DrawWord(sUnderText, p, true);
+#endif
+}
+
+void FireballBonusAnimation::Update() {
+  coronaSeq.Toggle();
+  Animation::Update();
+
+  if (tm.Tick())
+    bExist = false;
+
+  if (!bBlink && tm.nPeriod && (tm.nPeriod - tm.nTimer) < 7 * nFramesInSecond) {
+    bBlink = true;
+
+    ImageSequence img;
+
+    unsigned nSz = seq.vImage.size();
+
+    for (unsigned i = 0; i < nSz; ++i) {
+      int nLm = 1;
+      if (seq.vIntervals.size() > i)
+        nLm = seq.vIntervals[i];
+      if (nLm == 0)
+        nLm = 1;
+      for (int j = 0; j < nLm; ++j) {
+        img.Add(seq.vImage[i]);
+        img.Add(pAd->pGl->pr["empty"]);
+      }
+    }
+
+    seq = img;
+  }
+}
+
+void Trader::OnHit(char cWhat) {
+  SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 60);
+  pAc->AddBoth(pB);
+
+  bExist = false;
+
+  pAc->tutTwo.TraderKilled();
+
+  SP<AnimationOnce> pAn = new AnimationOnce(
+      GetPriority(),
+      fVel.x < 0 ? pAc->pGl->pr("trader_die") : pAc->pGl->pr("trader_die_f"),
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+
+  pAc->AddBoth(pAn);
+
+  SP<FireballBonusAnimation> pFb =
+      new FireballBonusAnimation(GetPosition(), RandomBonus(false), pAc);
+  if (bFirstBns) {
+    pFb->sUnderText = "loot";
+    bFirstBns = false;
+  }
+  pAc->AddBoth(pFb);
+  PushBackASSP(pAc.GetRawPointer(), pAc->lsBonus, pFb);
+}
+
+void Trader::Draw(SP<ScalingDrawer> pDr) {
+  Critter::Draw(pDr);
+
+  Point p = GetPosition();
+  p.y += 13;
+#ifdef UNDERLINE_UNIT_TEXT
+  if (sUnderText != "")
+    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+#endif
+}
+
+void Knight::Draw(SP<ScalingDrawer> pDr) {
+  Critter::Draw(pDr);
+
+  Point p = GetPosition();
+  p.y += 13;
+#ifdef UNDERLINE_UNIT_TEXT
+  if (sUnderText != "")
+    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+#endif
+}
+
+void Knight::KnockBack() {
+  if (fVel != fPoint(0, 0))
+    fPos -= fVel / fVel.Length();
+}
+
+void Knight::Update() {
+  for (unsigned i = 0; i < pAc->vCs.size(); ++i)
+    if (this->HitDetection(pAc->vCs[i])) {
+      pAc->vCs[i]->OnKnight(GetType());
+
+      bExist = false;
+      break;
+    }
+
+  if (cType == 'S') {
+    CleanUp(pAc->lsPpl);
+
+    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
+         itr != pAc->lsPpl.end(); ++itr) {
+      if (!(*itr)->bExist)
+        continue;
+
+      if (this->HitDetection(*itr)) {
+
+        if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
+          pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("death"));
+          (*itr)->OnHit('S');
+        }
+      }
+    }
+
+    CleanUp(pAc->lsBonus);
+
+    for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+             pAc->lsBonus.begin();
+         itr != pAc->lsBonus.end(); ++itr) {
+      if (!(*itr)->bExist)
+        continue;
+
+      if (this->HitDetection(*itr)) {
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("skeleton_bonus"));
+        (*itr)->bExist = false;
+      }
+    }
+  }
+
+  Point p = GetPosition();
+  if (p != pPrev) {
+    bImageToggle = !bImageToggle;
+
+    if (bImageToggle) {
+      seq.Toggle();
+
+      if (seq.nActive == 3)
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("step_left"));
+      else if (seq.nActive == 6)
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("step_right"));
+    }
+  }
+  pPrev = p;
+}
+
+MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, SP<AdvancedController> pAc_)
+    : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("megaslime"),
+              nFramesInSecond / 5),
+      pAc(this, pAc_), nHealth(nSlimeHealthMax) {
+  bDieOnExit = false;
+}
+
+void MegaSlime::RandomizeVelocity() {
+  fVel = RandomAngle();
+
+  if (rand() % 7 == 0)
+    fVel = fPoint(rBound.sz.x / 2, rBound.sz.y / 2) - fPoint(GetPosition());
+
+  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
+}
+
+void MegaSlime::Update() {
+  CleanUp(pAc->lsBonus);
+
+  for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+           pAc->lsBonus.begin();
+       itr != pAc->lsBonus.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+
+    if (this->HitDetection(*itr)) {
+      (*itr)->bExist = false;
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_bonus"));
+    }
+  }
+
+  if (t.Tick()) {
+    seq.Toggle();
+    t = Timer(nPeriod * seq.GetTime() + rand() % 2);
+
+    if (seq.nActive == 11) {
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_jump"));
+      RandomizeVelocity();
+    } else if (seq.nActive == 16) {
+      fVel = fPoint(0, 0);
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_land"));
+    }
+  }
+}
+
+Ghostiness::Ghostiness(Point p_, SP<AdvancedController> pAdv_, Critter knCp_,
+                       int nGhostHit_)
+    : p(p_), pAdv(this, pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
+  ImageSequence seq = pAdv->pGl->pr("ghost_knight_burn");
+  if (nGhostHit == 0)
+    seq = pAdv->pGl->pr("ghost_burn");
+
+  unsigned n = unsigned(.2F * nFramesInSecond / fDeathMultiplier);
+
+  t = Timer(n * seq.GetTotalTime());
+
+  SP<AnimationOnce> pFire = new AnimationOnce(2.F, seq, n, p_, true);
+  pAdv_->AddBoth(pFire);
+}
+
+Slime::Slime(fPoint fPos, Rectangle rBound, SP<AdvancedController> pAc_,
+             int nGeneration_)
+    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
+      pAc(this, pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
+  RandomizeVelocity();
+  ++pAc->nSlimeNum;
+}
+
+void Slime::RandomizeVelocity() {
+  fVel = RandomAngle();
+
+  if (rand() % 7 == 0)
+    fVel = fPoint(rBound.sz.x / 2, rBound.sz.y / 2) - fPoint(GetPosition());
+
+  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
+}
+
+Slime::~Slime() {
+  if (pAc != 0) {
+    --pAc->nSlimeNum;
+  }
+}
+
+Sliminess::Sliminess(Point p_, SP<AdvancedController> pAdv_, bool bFast_,
+                     int nGeneration_)
+    : p(p_), pAdv(this, pAdv_), bFast(bFast_), nGeneration(nGeneration_),
+      pSlm(this, 0) {
+  ImageSequence seq = bFast ? pAdv->pGl->pr("slime_reproduce_fast")
+                            : pAdv->pGl->pr("slime_reproduce");
+
+  t = bFast ? Timer(unsigned(1.3F * nFramesInSecond))
+            : Timer(unsigned(2.3F * nFramesInSecond));
+
+  SP<AnimationOnce> pSlmTmp =
+      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true);
+  pSlm = pSlmTmp;
+  pAdv_->AddBoth(pSlmTmp);
+
+  ++pAdv_->nSlimeNum;
+}
+
+void Sliminess::Update() {
+  if (t.Tick()) {
+    bExist = false;
+
+    SP<Slime> pSlm = new Slime(p, pAdv->rBound, pAdv, nGeneration);
+    pAdv->AddBoth(pSlm);
+    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
+    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsSlimes, pSlm);
+  }
+}
+
+void Sliminess::Kill() {
+  bExist = false;
+  pSlm->bExist = false;
+}
+
+Sliminess::~Sliminess() {
+  if (pAdv != 0)
+    --pAdv->nSlimeNum;
+}
+
+MegaSliminess::MegaSliminess(Point p_, SP<AdvancedController> pAdv_)
+    : p(p_), pAdv(this, pAdv_), pSlm(this, 0) {
+  ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
+
+  SP<AnimationOnce> pSlmTmp =
+      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true);
+  pSlm = pSlmTmp;
+  pAdv_->AddBoth(pSlmTmp);
+
+  pAdv->pGl->pSnd->PlaySound(pAdv->pGl->pr.GetSnd("slime_spawn"));
+}
+
+void MegaSliminess::Update() {
+  if (pSlm->bExist == false) {
+    bExist = false;
+
+    SP<MegaSlime> pSlm = new MegaSlime(p, pAdv->rBound, pAdv);
+    pAdv->AddBoth(pSlm);
+    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
+  }
+}
+
+FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
+                             unsigned nTime)
+    : SimpleVisualEntity(2.F, seq, true, unsigned(.1F * nFramesInSecond)) {
+  fPos = pStart;
+  tTermination = Timer(nTime);
+  fVel = (fPoint(pEnd) - fPoint(pStart)) / float(nTime);
+}
+
+void FloatingSlime::Update() {
+  SimpleVisualEntity::Update();
+
+  fPos += fVel;
+
+  if (tTermination.Tick())
+    bExist = false;
+}
+
+void BasicController::AddV(SP<VisualEntity> pVs) {
+  lsDraw.push_back(ASSP<VisualEntity>(this, pVs));
+}
+
+void BasicController::AddE(SP<EventEntity> pEv) {
+  lsUpdate.push_back(ASSP<EventEntity>(this, pEv));
+}
+
+void BasicController::AddBackground(Color c) {
+  Rectangle r = rBound.sz;
+  r.sz.x *= pGl->pDr->nFactor;
+  r.sz.y *= pGl->pDr->nFactor;
+
+  SP<StaticRectangle> pBkg = new StaticRectangle(r, c, -1.F);
+
+  AddV(pBkg);
+}
+
+BasicController::BasicController(const BasicController &b)
+    : GameController(b), bNoRefresh(b.bNoRefresh) {
+  CopyArrayASSP(this, b.lsDraw, lsDraw);
+  CopyArrayASSP(this, b.lsUpdate, lsUpdate);
+  CopyArrayASSP(this, b.lsPpl, lsPpl);
+}
+
+BasicController::BasicController(SP<TwrGlobalController> pGl_, Rectangle rBound,
+                                 Color c)
+    : GameController(pGl_, rBound), bNoRefresh(false) {
+  AddBackground(c);
+}
+
+void BasicController::Update() {
+  CleanUp(lsUpdate);
+  CleanUp(lsDraw);
+  CleanUp(lsPpl);
+
+  std::list<ASSP<EventEntity>>::iterator itr;
+  for (itr = lsUpdate.begin(); itr != lsUpdate.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+    (*itr)->Move();
+  }
+
+  for (itr = lsUpdate.begin(); itr != lsUpdate.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+
+    (*itr)->Update();
+  }
+
+  {
+    std::list<ASSP<VisualEntity>>::iterator itr;
+
+    std::multimap<ScreenPos, SP<VisualEntity>> mmp;
+
+    for (itr = lsDraw.begin(); itr != lsDraw.end(); ++itr) {
+      if (!(*itr)->bExist)
+        continue;
+
+      mmp.insert(std::pair<ScreenPos, SP<VisualEntity>>(
+          ScreenPos((*itr)->GetPriority(), ((*itr)->GetPosition())), *itr));
+    }
+
+    for (std::multimap<ScreenPos, SP<VisualEntity>>::iterator
+             mitr = mmp.begin(),
+             metr = mmp.end();
+         mitr != metr; ++mitr)
+      mitr->second->Draw(pGl->pDr);
+  }
+
+  if (!bNoRefresh)
+    pGl->pGraph->RefreshAll();
+}
+
+void BasicController::OnKey(GuiKeyType c, bool bUp) {
+  if (bUp)
+    return;
+
+  pGl->Next();
+}
+
+MenuController::MenuController(SP<TwrGlobalController> pGl_, Rectangle rBound,
+                               Color c, int nResumePosition_)
+    : BasicController(pGl_, rBound, c), nResumePosition(nResumePosition_),
+      pMenuDisplay(this, 0), mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()),
+      pHintText(this, 0), pOptionText(this, 0) {
+  bNoRefresh = true;
+}
+
+void StartScreenController::Next() {
+  pGl->Next();
+  pGl->pSnd->PlaySound(pGl->pr.GetSnd("start_game"));
+}
+
+void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
+  if (bUp)
+    return;
+
+  if (c == GUI_ESCAPE)
+    pGl->Menu();
+  else
+    Next();
+}
+
+BuyNowController::BuyNowController(SP<TwrGlobalController> pGl_,
+                                   Rectangle rBound, Color c)
+    : BasicController(pGl_, rBound, c), t(120), nSlimeCount(50),
+      tVel(nFramesInSecond / 2) {
+  for (int i = 0; i < nSlimeCount; i++) {
+    mSlimes.push_back(
+        new Animation(0, pGl->pr("slime"), nFramesInSecond / 10,
+                      Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true));
+    mSlimeVel.push_back(fPoint());
+    mSlimePos.push_back(mSlimes.back()->pos);
+  }
+
+  bNoRefresh = true;
+}
+
+void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {
+  fVel = RandomAngle();
+
+  if (rand() % 7 == 0)
+    fVel = fPoint(rBound.sz.x / 2, rBound.sz.y / 2) - fPoint(pPos);
+
+  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
+}
+
+void BuyNowController::DrawSlimes() {
+  for (unsigned i = 0; i < mSlimes.size(); i++)
+    mSlimes[i]->Draw(pGl->pDr);
+}
+
+void BuyNowController::Update() {
+  BasicController::Update();
+
+  if (tVel.Tick()) {
+    for (unsigned i = 0; i < mSlimes.size(); i++)
+      if (float(rand()) / RAND_MAX < .25)
+        RandomizeVelocity(mSlimeVel[i], mSlimePos[i]);
+  }
+
+  for (unsigned i = 0; i < mSlimes.size(); i++) {
+    mSlimes[i]->Update();
+    mSlimePos[i] += mSlimeVel[i];
+    mSlimes[i]->pos = mSlimePos[i].ToPnt();
+  }
+
+  if (t >= 0)
+    t--;
+
+  pGl->pGraph->RefreshAll();
+}
+
+void BuyNowController::OnKey(GuiKeyType c, bool bUp) {
+  if (t < 0)
+    BasicController::OnKey(c, bUp);
+}
+
+void BuyNowController::OnMouseDown(Point pPos) {
+  if (t < 0)
+    BasicController::OnMouseDown(pPos);
+}
+
+void BrokenLine::CloseLast() {
+  if (vEdges.empty() || vEdges.back().empty())
+    throw SegmentSimpleException("CloseLast", "Invalid (empty) segment arrays");
+
+  if (vEdges.back().front() != vEdges.back().back())
+    vEdges.back().push_back(vEdges.back().front());
+}
+
+void BrokenLine::Add(fPoint p) {
+  if (vEdges.empty())
+    vEdges.push_back(VecLine());
+  vEdges.back().push_back(p);
+}
+
+void BrokenLine::Join(const BrokenLine &b) {
+  for (unsigned i = 0; i < b.vEdges.size(); ++i)
+    vEdges.push_back(b.vEdges[i]);
+}
+
+BrokenLine::BrokenLine(fPoint p1, fPoint p2) {
+  Add(p1);
+  Add(p2);
+}
+
+BrokenLine::BrokenLine(fPoint p1, fPoint p2, fPoint p3) {
+  Add(p1);
+  Add(p2);
+  Add(p3);
+}
+
+BrokenLine::BrokenLine(fPoint p1, fPoint p2, fPoint p3, fPoint p4) {
+  Add(p1);
+  Add(p2);
+  Add(p3);
+  Add(p4);
+}
+
+BrokenLine::BrokenLine(Rectangle r) {
+  Add(r.p);
+  Add(fPoint(float(r.Left()), float(r.Bottom())));
+  Add(fPoint(float(r.Right()), float(r.Top())));
+  Add(r.GetBottomRight());
+  CloseLast();
+}
+
+fPoint BrokenLine::RandomByLength() {
+  if (vEdges.empty())
+    throw SegmentSimpleException("RandomByLength",
+                                 "Invalid (empty) segment arrays");
+
+  float fLength = 0;
+  for (unsigned i = 0; i < vEdges.size(); ++i) {
+    if (vEdges[i].empty())
+      throw SegmentSimpleException("RandomByLength",
+                                   "Invalid (empty) segment arrays");
+    if (vEdges[i].size() == 1)
+      continue;
+    for (unsigned j = 1; j < vEdges[i].size(); ++j)
+      fLength += (vEdges[i][j] - vEdges[i][j - 1]).Length();
+  }
+
+  if (fLength == 0)
+    return RandomBySegment();
+
+  fLength = fLength * rand() / RAND_MAX;
+
+  for (unsigned i = 0; i < vEdges.size(); ++i) {
+    if (vEdges[i].size() == 1)
+      continue;
+
+    for (unsigned j = 1; j < vEdges[i].size(); ++j) {
+      fPoint f = vEdges[i][j] - vEdges[i][j - 1];
+      if (fLength <= f.Length()) {
+        f.Normalize(fLength);
+        return vEdges[i][j - 1] + f;
+      }
+
+      fLength -= f.Length();
+    }
+  }
+
+  return vEdges[0][0];
+}
+
+fPoint BrokenLine::RandomBySegment() {
+  if (vEdges.empty())
+    throw SegmentSimpleException("RandomBySegment",
+                                 "Invalid (empty) segment arrays");
+
+  unsigned nSegment = rand() % vEdges.size();
+
+  if (vEdges[nSegment].size() == 0)
+    throw SegmentSimpleException("RandomBySegment",
+                                 "Invalid (empty) segment arrays");
+  if (vEdges[nSegment].size() == 1)
+    return vEdges[nSegment][0];
+
+  unsigned nSegment2 = rand() % (vEdges[nSegment].size() - 1);
+
+  fPoint f = vEdges[nSegment][nSegment2 + 1] - vEdges[nSegment][nSegment2];
+  f.Normalize(f.Length() * rand() / RAND_MAX);
+  return vEdges[nSegment][nSegment2] + f;
+}
+
+std::ostream &operator<<(std::ostream &ofs, const BrokenLine &bl) {
+  for (unsigned i = 0; i < bl.vEdges.size(); ++i) {
+    for (unsigned j = 0; j < bl.vEdges[i].size(); ++j)
+      ofs << bl.vEdges[i][j] << " ";
+    ofs << "| ";
+  }
+  ofs << "& ";
+  return ofs;
+}
+
+std::istream &operator>>(std::istream &ifs, BrokenLine &bl) {
+  bl.vEdges.clear();
+
+  std::string str;
+
+  std::getline(ifs, str, '&');
+  ifs.get();
+
+  std::istringstream istr(str);
+
+  while (true) {
+    std::string part;
+    std::getline(istr, part, '|');
+
+    if (istr.fail())
+      break;
+
+    istr.get();
+
+    BrokenLine bPart;
+
+    std::istringstream is(part);
+    fPoint p;
+    while (is >> p)
+      bPart.Add(p);
+
+    bl.Join(bPart);
+  }
+
+  return ifs;
+}
+
+void LevelLayout::Convert(int n) {
+  float p1 = float(sBound.sz.x) / n;
+  float p2 = float(sBound.sz.y) / n;
+
+  unsigned i, j;
+
+  for (i = 0; i < blKnightGen.vEdges.size(); ++i)
+    for (j = 0; j < blKnightGen.vEdges[i].size(); ++j) {
+      blKnightGen.vEdges[i][j].x *= p1;
+      blKnightGen.vEdges[i][j].y *= p2;
+    }
+
+  for (i = 0; i < vCastleLoc.size(); ++i) {
+    vCastleLoc[i].x = Crd(vCastleLoc[i].x * p1);
+    vCastleLoc[i].y = Crd(vCastleLoc[i].y * p2);
+  }
+
+  for (i = 0; i < vRoadGen.size(); ++i)
+    if (vRoadGen[i].bVertical)
+      vRoadGen[i].nCoord = Crd(vRoadGen[i].nCoord * p1);
+    else
+      vRoadGen[i].nCoord = Crd(vRoadGen[i].nCoord * p2);
+}
+
+std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f) {
+  ofs << "LEVEL " << f.nLvl << "\n\n";
+
+  ofs << "FREQ ";
+  for (unsigned k = 0; k < f.vFreq.size(); ++k)
+    ofs << f.vFreq[k] / nFramesInSecond << " ";
+  ofs << "\n";
+
+  ofs << "SPWN " << f.blKnightGen << "\n";
+
+  ofs << "CSTL ";
+  for (unsigned i = 0; i < f.vCastleLoc.size(); ++i)
+    ofs << f.vCastleLoc[i] << " ";
+  ofs << "\n";
+
+  ofs << "ROAD ";
+  for (unsigned j = 0; j < f.vRoadGen.size(); ++j)
+    ofs << f.vRoadGen[j] << " ";
+  ofs << "\n";
+
+  ofs << "TIME " << f.nTimer << "\n";
+
+  ofs << "\n";
+
+  return ofs;
+}
+
+std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
+  f = LevelLayout(f.sBound);
+
+  ParsePosition("LEVEL", ifs);
+
+  ifs >> f.nLvl;
+
+  {
+    std::string str;
+    ParseGrabLine("FREQ", ifs, str);
+    std::istringstream istr(str);
+
+    float n;
+    while (istr >> n) {
+      n *= nFramesInSecond;
+
+      f.vFreq.push_back(n);
+    }
+  }
+
+  {
+    std::string str;
+    ParseGrabLine("SPWN", ifs, str);
+    std::istringstream istr(str);
+
+    istr >> f.blKnightGen;
+  }
+
+  {
+    std::string str;
+    ParseGrabLine("CSTL", ifs, str);
+    std::istringstream istr(str);
+
+    Point p;
+    while (istr >> p)
+      f.vCastleLoc.push_back(p);
+  }
+
+  {
+    std::string str;
+    ParseGrabLine("ROAD", ifs, str);
+    std::istringstream istr(str);
+
+    Road r(0, 0, f.sBound);
+    while (istr >> r)
+      f.vRoadGen.push_back(r);
+  }
+
+  {
+    std::string str;
+    ParseGrabLine("TIME", ifs, str);
+    std::istringstream istr(str);
+
+    istr >> f.nTimer;
+
+    f.nTimer *= nFramesInSecond;
+  }
+
+  return ifs;
+}
+
+float KnightGenerator::GetRate() {
+  if (pBc->bGhostTime)
+    return dRate / fIncreaseKnightRate2;
+
+  if (pBc->GetCompletionRate() < fIncreaseRateFraction1)
+    return dRate;
+  else if (pBc->GetCompletionRate() < fIncreaseRateFraction2)
+    return dRate / fIncreaseKnightRate1;
+  else
+    return dRate / fIncreaseKnightRate2;
+}
+
+KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
+                                 SP<AdvancedController> pBc_,
+                                 const BrokenLine &bl_)
+    : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
+      seq(pBc_->pGl->pr("knight")), bl(bl_), tm(1), bFirst(false) {
+  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
+    bFirst = true;
+#ifdef TRIAL_VERSION
+  if (pBc->nLvl == 1)
+    bFirst = true;
+#endif
+}
+
+void KnightGenerator::Generate(bool bGolem) {
+  Point p = bl.RandomByLength().ToPnt();
+
+  unsigned n = unsigned(rand() % pBc->vCs.size());
+
+  fPoint v = pBc->vCs[n]->GetPosition() - p;
+  v.Normalize(fKnightSpeed);
+  p += rBound.p;
+
+  SP<Knight> pCr = new Knight(Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
+
+  if (bFirst) {
+    pCr->sUnderText = "destroy";
+    bFirst = false;
+  }
+
+  if (bGolem) {
+    pCr = new Knight(
+        Critter(14, p, v * .5, rBound, 3,
+                v.x < 0 ? pBc->pGl->pr("golem") : pBc->pGl->pr("golem_f"),
+                true),
+        pBc, 'W');
+  } else if (pBc->bGhostTime) // && (pBc->nLvl <= 6)) we want BOTH ghosts and
+                              // golems
+  {
+    pCr->seq = pBc->pGl->pr("ghost_knight");
+    pCr->cType = 'G';
+    pCr->fVel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
+  }
+
+  pBc->AddBoth(pCr);
+  PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+}
+
+void KnightGenerator::Update() {
+  if (tm.Tick()) {
+    tm = Timer(GetRandTimeFromRate(GetRate()));
+    Generate();
+  }
+}
+
+PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
+                                     SP<AdvancedController> pBc_)
+    : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
+      tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
+  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
+    bFirst = true;
+
+#ifdef TRIAL_VERSION
+  if (pBc->nLvl == 1)
+    bFirst = true;
+#endif
+}
+
+void PrincessGenerator::Update() {
+  if (tm.Tick()) {
+    tm = Timer(GetRandTimeFromRate(dRate));
+
+    Point p, v;
+
+    pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+
+    fPoint vel(v);
+
+    vel.Normalize(fPrincessSpeed);
+
+    SP<Princess> pCr =
+        new Princess(Critter(7, p, vel, rBound, 3,
+                             vel.x < 0 ? pBc->pGl->pr("princess_f")
+                                       : pBc->pGl->pr("princess"),
+                             true),
+                     pBc);
+    if (bFirst) {
+      pCr->sUnderText = "capture";
+      bFirst = false;
+    }
+    pBc->AddBoth(pCr);
+    PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+    pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("princess_arrive"));
+
+    pBc->tutOne.PrincessGenerate();
+  }
+}
+
+MageGenerator::MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
+                             SP<AdvancedController> pBc_)
+    : rBound(rBound_), pBc(this, pBc_) {
+  if (pBc->pGl->bAngry)
+    dRate = dAngryRate_;
+  else
+    dRate = dRate_;
+
+  tm = Timer(GetRandTimeFromRate(dRate));
+}
+
+void MageGenerator::Update() {
+  if (tm.Tick()) {
+    if (dRate == 0)
+      return;
+
+    tm = Timer(GetRandTimeFromRate(dRate));
+
+    MageGenerate();
+  }
+}
+
+void MageGenerator::MageGenerate() {
+  Point p, v;
+
+  pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+
+  fPoint vel(v);
+
+  vel.Normalize(fMageSpeed);
+
+  SP<Mage> pCr = new Mage(
+      Critter(7, p, vel, rBound, 3,
+              vel.x < 0 ? pBc->pGl->pr("mage_f") : pBc->pGl->pr("mage"), true),
+      pBc, pBc->pGl->bAngry);
+  pBc->AddBoth(pCr);
+  PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+}
+
+float TraderGenerator::GetRate() {
+  if (pBc->GetCompletionRate() < fIncreaseRateFraction1)
+    return dRate;
+  else if (pBc->GetCompletionRate() < fIncreaseRateFraction2)
+    return dRate / fIncreaseTraderRate1;
+  else
+    return dRate / fIncreaseTraderRate2;
+}
+
+TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
+                                 SP<AdvancedController> pBc_)
+    : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
+      tm(GetRandTimeFromRate(dRate_)), bFirst(false), bFirstBns(false) {
+  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0) {
+    bFirst = true;
+    bFirstBns = true;
+  }
+
+#ifdef TRIAL_VERSION
+  if (pBc->nLvl == 1) {
+    bFirst = true;
+    bFirstBns = true;
+  }
+#endif
+}
+
+void TraderGenerator::Update() {
+  if (tm.Tick()) {
+    tm = Timer(GetRandTimeFromRate(GetRate()));
+
+    Point p, v;
+
+    pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+
+    fPoint vel(v);
+    vel.Normalize(fTraderSpeed);
+
+    SP<Trader> pCr = new Trader(
+        Critter(7, p, vel, rBound, 3,
+                vel.x < 0 ? pBc->pGl->pr("trader") : pBc->pGl->pr("trader_f"),
+                true),
+        pBc, bFirstBns);
+
+    if (bFirst) {
+      pCr->sUnderText = "kill";
+      bFirst = false;
+    }
+
+    pBc->AddBoth(pCr);
+    PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+
+    pBc->tutTwo.TraderGenerate();
+  }
+}
+
+void DragonLeash::ModifyTilt(Point trackball) {
+  tilt -= tilt * naturalScaleFactor;
+  tilt += trackball.x * trackballScaleFactor;
+
+  if (tilt > maxTilt)
+    tilt = maxTilt;
+  if (tilt < -maxTilt)
+    tilt = -maxTilt;
+}
+
+fPoint DragonLeash::GetNewVelocity(Point trackball) {
+  ModifyTilt(trackball);
+  Polar p = Polar(lastVel);
+  p.r = speed;
+  p.a += tilt;
+  lastVel = p.TofPoint();
+  return lastVel;
+}
+
+ButtonSet::ButtonSet(int q, int w, int e, int d, int c, int x, int z, int a,
+                     int sp) {
+  vCodes.push_back(q);
+  vCodes.push_back(w);
+  vCodes.push_back(e);
+  vCodes.push_back(d);
+  vCodes.push_back(c);
+  vCodes.push_back(x);
+  vCodes.push_back(z);
+  vCodes.push_back(a);
+  vCodes.push_back(sp);
+}
+
+Point ButtonSet::GetPoint(int nCode) {
+  Point p = Point();
+
+  if (nCode == vCodes[0])
+    p = Point(-1, -1);
+  if (nCode == vCodes[1])
+    p = Point(0, -1);
+  if (nCode == vCodes[2])
+    p = Point(1, -1);
+  if (nCode == vCodes[3])
+    p = Point(1, 0);
+  if (nCode == vCodes[4])
+    p = Point(1, 1);
+  if (nCode == vCodes[5])
+    p = Point(0, 1);
+  if (nCode == vCodes[6])
+    p = Point(-1, 1);
+  if (nCode == vCodes[7])
+    p = Point(-1, 0);
+
+  return p;
+}
+
+unsigned GetRandNum(unsigned nRange) {
+  return unsigned(float(rand()) / (float(RAND_MAX) + 1) * nRange);
+}
+
+unsigned GetRandFromDistribution(std::vector<float> vProb) {
+  float fSum = 0;
+
+  for (unsigned i = 0; i < vProb.size(); ++i)
+    fSum += vProb[i];
+
+  float fRand = float(rand()) / (float(RAND_MAX) + 1) * fSum;
+
+  fSum = 0;
+
+  for (unsigned i = 0; i < vProb.size(); ++i) {
+    fSum += vProb[i];
+    if (fSum > fRand)
+      return i;
+  }
+
+  throw std::string("bad range");
+}
+
+unsigned RandomBonus(bool bInTower) {
+  std::vector<float> v;
+
+  v.push_back(0.F);  // time
+  v.push_back(1.2F); // pershot
+  v.push_back(.5F);  // laser
+  v.push_back(1.F);  // big
+  v.push_back(1.F);  // total num
+  v.push_back(.8F);  // explode
+  v.push_back(1.F);  // split fireball
+  v.push_back(.15F); // set on fire
+
+  if (bInTower)
+    v.push_back(1.F); // ring fireball
+  else
+    v.push_back(0.F);
+
+  v.push_back(.1F); // nuke
+  v.push_back(.8F); // speed
+  v.push_back(0.F); // shooting frequency
+
+  return GetRandFromDistribution(v);
+}
+
+unsigned GetFireballChainNum(FireballBonus &fb) {
+  int nRet = fb.uMap["fireballchainnum"];
+
+  if (nRet != 0)
+    ++nRet;
+
+  return nRet;
+}
+
+SP<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
+  if (pAd->nLvl > 6)
+    nTime = unsigned(nTime * fBonusTimeMutiplierTwo);
+  else if (pAd->nLvl > 3)
+    nTime = unsigned(nTime * fBonusTimeMutiplierOne);
+
+  SP<TimedFireballBonus> pBonus;
+
+  if (n == 0)
+    pBonus =
+        new TimedFireballBonus(FireballBonus(n, "regenerate", 2U), nTime * 2);
+  else if (n == 1)
+    pBonus = new TimedFireballBonus(FireballBonus(n, "pershot", 1U), nTime);
+  else if (n == 2) {
+    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
+    pBonus->Add("through", 1U);
+    pBonus->Add("laser", true);
+  } else if (n == 3)
+    pBonus = new TimedFireballBonus(FireballBonus(n, "big", 1U), nTime);
+  else if (n == 4) {
+    pBonus = new TimedFireballBonus(
+        FireballBonus(n, "total", nFireballsPerBonus), nTime * 2);
+  } else if (n == 5)
+    pBonus = new TimedFireballBonus(FireballBonus(n, "explode", 1U), nTime);
+  else if (n == 6) {
+    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
+    pBonus->Add("fireballchainnum", 1U);
+    pBonus->Add("through_flag", true);
+  } else if (n == 7)
+    pBonus = new TimedFireballBonus(FireballBonus(n, "setonfire", 1U), nTime);
+  else if (n == 8) {
+    FireballBonus fb = GetAllBonuses();
+
+    Point p = GetPosition();
+
+    if (pCs != 0)
+      p = pCs->GetPosition();
+
+    int nNumCirc = fb.uMap["pershot"] + 1;
+
+    fPoint fVel = RandomAngle();
+
+    for (int i = 0; i < nNumCirc; ++i) {
+      SP<CircularFireball> pFb = new CircularFireball(
+          Fireball(p, GetWedgeAngle(fVel, 1.F, i, nNumCirc + 1), pAd, fb,
+                   Chain(), GetFireballChainNum(fb)),
+          35, nTime * 2);
+      pAd->AddBoth(pFb);
+    }
+
+    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime * 2);
+  } else if (n == 9) {
+    CleanUp(pAd->lsPpl);
+
+    nSlimeMax *= 2;
+
+    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin(),
+                                                     etr = pAd->lsPpl.end();
+         itr != etr; ++itr)
+      if ((*itr)->GetType() == 'K' || (*itr)->GetType() == 'S' ||
+          (*itr)->GetType() == 'L') {
+        if ((*itr)->GetType() == 'K' &&
+            GetAllBonuses().uMap["setonfire"] != 0) {
+          (*itr)->bExist = false;
+          SP<KnightOnFire> pKn = new KnightOnFire(
+              Critter((*itr)->GetRadius(), (*itr)->GetPosition(), fPoint(),
+                      rBound, 1.F, ImageSequence(), true),
+              pAd, 15 * nFramesInSecond,
+              Chain(GetAllBonuses().uMap["setonfire"]));
+          pAd->AddBoth(pKn);
+        } else
+          (*itr)->OnHit('F');
+      }
+
+    nSlimeMax /= 2;
+  } else if (n == 10) {
+    pBonus = new TimedFireballBonus(FireballBonus(n, "speed", 2.5F), nTime);
+  } else {
+    pBonus = new TimedFireballBonus(FireballBonus(n, "frequency", .5F), nTime);
+  }
+
+  return pBonus;
+}
+
+void Dragon::FlushBonuses() {
+  for (std::list<ASSP<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
+                                                     etr = lsBonuses.end();
+       itr != etr; ++itr)
+    pAd->pGl->lsBonusesToCarryOver.push_back(*itr);
+}
+
+void Dragon::RecoverBonuses() {
+  for (std::list<SP<TimedFireballBonus>>::iterator
+           itr = pAd->pGl->lsBonusesToCarryOver.begin(),
+           etr = pAd->pGl->lsBonusesToCarryOver.end();
+       itr != etr; ++itr) {
+    AddBonus(*itr, true);
+  }
+}
+
+FireballBonus Dragon::GetAllBonuses() {
+  CleanUp(lsBonuses);
+  FireballBonus fbRet(-1, true);
+
+  for (std::list<ASSP<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
+                                                     etr = lsBonuses.end();
+       itr != etr; ++itr)
+    fbRet += **itr;
+
+  fbRet.uMap["total"] += nExtraFireballs;
+
+  return fbRet;
+}
+
+Dragon::Dragon(SP<Castle> pCs_, SP<AdvancedController> pAd_,
+               ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
+    : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
+      Critter(13, pCs_ == 0 ? pAd_->vCs[0]->GetPosition() : pCs_->GetPosition(),
+              Point(), pAd_->rBound, 1, ImageSequence()),
+      bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(this, pCs_), bt(bt_),
+      nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
+      nExtraFireballs(0), bRegenLocked(false),
+      tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
+  nFireballCount = GetAllBonuses().uMap["total"];
+
+  if (pCs != 0 && pCs->pDrag == 0) {
+    pCs->pDrag = this;
+    bFly = false;
+    Critter::dPriority = 3;
+    Critter::fPos = pCs->GetPosition();
+  } else {
+    bFly = true;
+    Critter::dPriority = 5;
+    Critter::fPos = pAd->vCs[0]->GetPosition();
+  }
+
+  SimpleVisualEntity::seq = imgStable;
+  Critter::bDieOnExit = false;
+
+  pAd->pGl->lsBonusesToCarryOver.clear();
+}
+
+void Dragon::Update() {
+  if (bRegenLocked) {
+    if (tRegenUnlock.Tick())
+      bRegenLocked = false;
+  } else {
+    FireballBonus fb = GetAllBonuses();
+
+    int nPeriod = nInitialRegen;
+    if (nPeriod < 2)
+      nPeriod = 2;
+
+    nPeriod = int(float(nPeriod) * nFramesInSecond / 10);
+
+    tFireballRegen.Tick();
+
+    if (int(tFireballRegen.nTimer) >= nPeriod) {
+      tFireballRegen.nTimer = 0;
+
+      if (nFireballCount < int(fb.uMap["total"])) {
+        if (nInitialRegen == 0)
+          nFireballCount = int(fb.uMap["total"]);
+        else
+          ++nFireballCount;
+      }
+    }
+  }
+
+  if (bFly) {
+    bool bHitCastle = false;
+
+    for (unsigned i = 0; i < pAd->vCs.size(); ++i)
+      if (this->HitDetection(pAd->vCs[i])) {
+        if (pAd->vCs[i]->pDrag != 0)
+          continue;
+        bHitCastle = true;
+        break;
+      }
+
+    if (bTookOff == true) {
+      if (bHitCastle == false)
+        bTookOff = false;
+    } else {
+      if (bHitCastle == true)
+        Toggle();
+    }
+  }
+
+  if (bFly && (!bCarry || cCarry == 'P')) {
+    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+         itr != pAd->lsPpl.end(); ++itr) {
+      if (!(*itr)->bExist)
+        continue;
+
+      if ((**itr).GetType() == 'P' && this->HitDetection(*itr)) {
+        bCarry = true;
+        imgCarry = (*itr)->GetImage();
+        cCarry = 'P';
+        ++nPrCr;
+
+        (*itr)->bExist = false;
+
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("pickup"));
+        break;
+      }
+    }
+  }
+
+  if (bFly) {
+    CleanUp(pAd->lsBonus);
+
+    for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+             pAd->lsBonus.begin();
+         itr != pAd->lsBonus.end(); ++itr) {
+      if (!(*itr)->bExist)
+        continue;
+
+      if (this->HitDetection(*itr)) {
+        AddBonus(GetBonus((*itr)->n, nBonusPickUpTime));
+        (*itr)->bExist = false;
+
+        pAd->tutTwo.BonusPickUp();
+      }
+    }
+  }
+
+  Critter::Update();
+}
+
+Point Dragon::GetPosition() {
+  if (pCs != 0)
+    return (fPos + fPoint(0, -1)).ToPnt();
+  return fPos.ToPnt();
+}
+
+void Dragon::Draw(SP<ScalingDrawer> pDr) {
+  if (bCarry)
+    pDr->Draw(imgCarry, GetPosition(), true);
+
+  if (!bFly) {
+    if (!nTimer)
+      pDr->Draw(SimpleVisualEntity::seq.vImage[0],
+                pCs->GetPosition() - Point(0, 22));
+    else
+      pDr->Draw(SimpleVisualEntity::seq.vImage[1],
+                pCs->GetPosition() - Point(0, 22));
+  } else {
+    Polar p(Critter::fVel);
+    pDr->Draw(imgFly.vImage[DiscreetAngle(p.a, 16)], GetPosition());
+  }
+
+  if (nTimer > 0)
+    --nTimer;
+}
+
+void Dragon::AddBonus(SP<TimedFireballBonus> pBonus, bool bSilent) {
+  if (!bSilent)
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("powerup"));
+
+  if (pBonus == 0)
+    return;
+
+  PushBackASSP(this, lsBonuses, pBonus);
+  pAd->AddE(pBonus);
+}
+
+void Dragon::Fire(fPoint fDir) {
+  if (fDir == fPoint())
+    return;
+
+  CleanUp(lsBalls);
+
+  FireballBonus fb(-1, true);
+#ifndef FLIGHT_POWER_MODE
+  if (!bFly)
+#endif
+    fb = GetAllBonuses();
+  fb.fMap["speed"] *= fFireballSpeed;
+  if (bFly)
+    fb.fMap["speed"] += fDragonSpeed;
+
+  if (nFireballCount == 0)
+    return;
+
+  if (!bFly)
+    pAd->tutOne.ShotFired();
+
+  tFireballRegen.nTimer = 0;
+  bRegenLocked = true;
+  tRegenUnlock.nTimer = 0;
+
+  --nFireballCount;
+
+  nTimer = 4;
+
+  unsigned nNumber = fb.uMap["pershot"];
+
+  float fSpread = 1.F;
+
+  if (nNumber > 1) {
+    fSpread = nNumber * .05F;
+    if (fSpread > .5F)
+      fSpread = 1.F;
+  }
+
+  for (unsigned i = 0; i < nNumber; ++i) {
+    Point pPos = GetPosition();
+    if (!bFly)
+      pPos += Point(-10, -25);
+    else
+      pPos += (fDir / fDir.Length() * 5.F).ToPnt();
+
+    fPoint fShoot = fDir;
+    if (nNumber > 1)
+      fShoot = GetWedgeAngle(fDir, fSpread, i, nNumber);
+
+    if (nNumber % 2 == 0 && (i == nNumber / 2 || i == nNumber / 2 - 1)) {
+      fShoot = fDir;
+      fPoint fNormalized = fDir / fDir.Length();
+      if (i == nNumber / 2)
+        pPos = Point(Crd(pPos.x + fNormalized.y * 6),
+                     Crd(pPos.y - fNormalized.x * 6));
+      else
+        pPos = Point(Crd(pPos.x - fNormalized.y * 6),
+                     Crd(pPos.y + fNormalized.x * 6));
+    }
+
+    SP<Fireball> pFb =
+        new Fireball(pPos, fShoot, pAd, fb, Chain(), GetFireballChainNum(fb));
+    pAd->AddBoth(pFb);
+    if (i == nNumber / 2)
+      PushBackASSP(this, lsBalls, pFb);
+  }
+
+  if (fb.bMap["laser"])
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("laser"));
+  else
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("shoot"));
+}
+
+void Dragon::Toggle() {
+  if (!bFly) {
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("leave_tower"));
+
+    bFly = true;
+    bTookOff = true;
+
+    pAd->tutOne.FlyOn();
+
+    SimpleVisualEntity::seq = imgFly;
+    SimpleVisualEntity::dPriority = 5;
+
+    pCs->pDrag = 0;
+    pCs = 0;
+
+    fVel = pAd->pt.GetFlightDirection(GetPosition());
+
+    if (fVel.Length() == 0)
+      fVel = fPoint(0, -1);
+    fVel.Normalize(leash.speed);
+
+    return;
+  }
+
+  for (unsigned i = 0; i < pAd->vCs.size(); ++i)
+    if (this->HitDetection(pAd->vCs[i])) {
+      if (pAd->vCs[i]->pDrag != 0 || bTookOff || pAd->vCs[i]->bBroken)
+        continue;
+
+      pAd->pt.Off();
+
+      bFly = false;
+
+      pAd->tutOne.FlyOff();
+
+      pCs = pAd->vCs[i];
+      pCs->pDrag = this;
+
+      if (cCarry == 'P') {
+        pAd->tutOne.PrincessCaptured();
+        pAd->vCs[i]->nPrincesses += nPrCr;
+
+        unsigned j;
+        for (j = 0; j < pAd->vCs.size(); ++j) {
+          if (pAd->vCs[j]->nPrincesses < 4)
+            break;
+        }
+
+        if (j != pAd->vCs.size()) {
+          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("princess_capture"));
+        } else {
+          FlushBonuses();
+
+          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("win_level"));
+          pAd->pGl->Next();
+        }
+      } else if (cCarry == 'T')
+        AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
+      else
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("return_tower"));
+
+      bCarry = false;
+      cCarry = ' ';
+      nPrCr = 0;
+
+      SimpleVisualEntity::dPriority = 3;
+
+      SimpleVisualEntity::seq = imgStable;
+      Critter::fPos = pAd->vCs[i]->GetPosition();
+      Critter::fVel = Point();
+
+      return;
+    }
+
+  CleanUp(pAd->lsPpl);
+
+  if (bCarry)
+    return;
+
+  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+       itr != pAd->lsPpl.end(); ++itr) {
+    if (!(*itr)->bExist)
+      continue;
+
+    if ((**itr).GetType() != 'T')
+      continue;
+
+    if (this->HitDetection(*itr)) {
+      if (!bCarry) {
+        bCarry = true;
+        imgCarry = (*itr)->GetImage();
+        cCarry = (*itr)->GetType();
+
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("pickup"));
+      } else {
+        throw SimpleException("not supposed to drop things");
+      }
+
+      (*itr)->bExist = false;
+
+      return;
+    }
+  }
+}
+
+void AlmostBasicController::Update() {
+  CleanUp(lsUpdate);
+  CleanUp(lsDraw);
+
+  if (lsDraw.size() == 1) {
+    pGl->Next();
+    return;
+  }
+
+  BasicController::Update();
+}
+
+void AlmostBasicController::OnKey(GuiKeyType c, bool bUp) {
+  if (!bUp)
+    pGl->Next();
+}
+
 void BackgroundMusicPlayer::SwitchTheme(int nTheme) {
   if (bOff)
     return;
