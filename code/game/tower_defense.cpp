@@ -48,11 +48,6 @@ void DrawStuff(Rectangle rBound, SP<Graphic> pGraph, SP<Soundic> pSnd,
 	p2.x -= sz2.x/2;
 	p2.y -= sz2.y/2;
 
-	//p1.x *= 2;
-	//p1.y *= 2;
-	//p2.x *= 2;
-	//p2.y *= 2;
-	
 	pGraph->DrawImage(p1, pr["splash"], false);
 
 	pGraph->DrawImage(p2, pr["loading"], Rectangle(0,0,144*n/9,32), false);
@@ -125,20 +120,13 @@ TwrGlobalController::TwrGlobalController(
   pr.LoadSeqTS("burn\\burn.txt", "burn");
   pr.LoadTS("empty.bmp", "empty");
 
-  // pr.LoadSeqTS("arrow\\arrow.txt", "arrow");
-  // pr.LoadSeqTS("arrow\\newpointer.txt", "arrow");
   pr.LoadSeqTS("arrow\\sword.txt", "arrow");
   pr.LoadSeqTS("arrow\\claw.txt", "claw");
-
-  // ForEachImage(pr("arrow"), ImageFlipper(pGraph));
 
   DrawStuff(rBound, pGraph, pSndRaw_, pr, 1);
 
   pr.LoadSeqTS("corona\\crosshair.txt", "corona"); // (not used icon)
-  // pr.LoadSeqTS("bonus\\peter_bonus.txt", "bonus");
-  pr.LoadSeqTS("bonus\\void.txt", "void_bonus"); // (not used icon)
-  // pr.LoadSeqTS("bonus\\burning.txt", "burning_bonus");	// 0 - time (not
-  // used)
+  pr.LoadSeqTS("bonus\\void.txt", "void_bonus");
   pr.LoadSeqTS("bonus\\pershot.txt", "pershot_bonus"); // 1 - pershot
   pr.LoadSeqTS("bonus\\laser.txt", "laser_bonus");     // 2 - laser
   pr.LoadSeqTS("bonus\\big.txt", "big_bonus");         // 3 - big
@@ -285,7 +273,6 @@ TwrGlobalController::TwrGlobalController(
   pr.LoadSnd("start_game.wav", "start_game");
   pr.LoadSnd("death01.wav", "death");
   pr.LoadSnd("golem_death2.wav", "golem_death");
-  // pr.LoadSnd("megaslime_death.wav", "megaslime_die");
   pr.LoadSnd("megaslime_spawn1.wav", "slime_spawn");
   pr.LoadSnd("megaslime_spawn2.wav", "megaslime_die");
   pr.LoadSnd("megaslime_hit.wav", "megaslime_hit");
@@ -313,7 +300,6 @@ TwrGlobalController::TwrGlobalController(
   pr.LoadSnd("hit_golem.wav", "hit_golem");
   pr.LoadSnd("slime_poke.wav", "slime_poke");
   pr.LoadSnd("slime_summon.wav", "slime_summon");
-  // pr.LoadSnd("reload.wav","reload");
   pr.LoadSnd("princess_arrive.wav", "princess_arrive");
 
   pr.LoadSnd("sound/A.wav", "A");
@@ -357,14 +343,6 @@ TwrGlobalController::TwrGlobalController(
 
   if (!sbSoundOn.Get())
     pSnd->Toggle();
-
-  /*
-      pNum->CacheColor(Color(255, 255, 0, 205));
-      pNum->CacheColor(Color(255, 255, 0, 155));
-      pNum->CacheColor(Color(255, 255, 0, 105));
-      pNum->CacheColor(Color(255, 255, 0, 55));
-      pNum->CacheColor(Color(255, 255, 0, 5));
-      */
 
   pNum->CacheColor(Color(205, 205, 0));
   pNum->CacheColor(Color(155, 155, 0));
@@ -412,8 +390,6 @@ void TwrGlobalController::StartUp() {
   SP<BasicController> pCut2 =
       new Cutscene(this, rBound, "knight", "dragon_walk_f", true);
   SP<BasicController> pCut3 = new Cutscene(this, rBound, "dragon_walk", "mage");
-
-  // SP<Countdown> pCnn = new Countdown(pNum, 15);
 
   SP<SoundControls> pBckgMusic = new SoundControls(plr, BG_BACKGROUND);
   SP<SoundControls> pNoMusic = new SoundControls(plr, -1);
@@ -595,13 +571,6 @@ void TwrGlobalController::StartUp() {
       pr["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true);
   SP<VisualEntity> pSlimeUpd = new SlimeUpdater(pBuy.GetRawPointer());
 
-  /*
-for(int i = 6; i <= 12; ++i)
-  {
-          SP<Animation> pSlm = new Animation(0, pr("slime"), nFramesInSecond/10,
-Point(rBound.sz.x*i/18, rBound.sz.y/2), true); pBuy->AddBoth(pSlm);
-  }*/
-
   pBuy->AddV(pL);
   pBuy->AddV(pSlimeUpd);
   pBuy->AddBoth(pBurnL);
@@ -666,7 +635,6 @@ KnightOnFire::KnightOnFire(const Critter &cr, SP<BasicController> pBc_,
       t(nFramesInSecond / 5) {
   Critter::seq = pBc->pGl->pr("knight_fire");
   RandomizeVelocity();
-  // pBc->lsPpl.push_back(this);
 }
 
 void KnightOnFire::Update() {
@@ -824,7 +792,6 @@ AdvancedController::AdvancedController(SP<TwrGlobalController> pGl_,
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(0),
       bTakeOffToggle(false), pTutorialText(this, 0),
       mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()), bTimerFlash(false) {
-  // imgCursor = pGl->pr("arrow");
   bNoRefresh = true;
 
   tLoseTimer.nPeriod = 0;
@@ -941,28 +908,11 @@ const float fSpreadFactor = 2.0f;
 
     if (c == 't')
       t.nTimer = t.nPeriod - 1;
-    // t.nTimer = t.nPeriod-30*nFramesInSecond;
 
     if (c >= GUI_F1 && c <= GUI_F10)
       for (unsigned i = 0; i < vDr.size(); ++i)
         vDr[i]->AddBonus(vDr[i]->GetBonus(c - GUI_F1 + 1, nBonusCheatTime));
   }
-
-  /*
-  if(c == 'm')
-          pGl->plr.ToggleOff();
-
-  if(c == 'n')
-          pGl->pSnd->Toggle();
-
-  if(c == 'b')
-          BoolToggle(pGl->sbTutorialOn);
-
-  if(c == 'p')
-  {
-          bPaused = !bPaused;
-          pGl->plr.ToggleOff();
-  */
 
 #ifdef PC_VERSION
   if (c == GUI_ESCAPE)
@@ -980,35 +930,6 @@ const float fSpreadFactor = 2.0f;
         vDr[0]->Fire(fFb);
       }
     }
-
-    // this does directional shooting using the qwerty keys
-    /*
-        for(unsigned i = 0; i < vDr.size(); ++i)
-    {
-        Point p = vDr[i]->bt.GetPoint(c);
-
-        if(p == Point())
-            continue;
-
-        fPoint fp(p);
-        fp.Normalize();
-
-        if(vDr[i]->bFly)
-        {
-            fp.x *= 3;
-            fp.y *= 3;
-
-            vDr[i]->fVel = fp;
-        }
-        else
-        {
-            fp.x += (float(rand())/RAND_MAX - .5F) / fSpreadFactor;
-            fp.y += (float(rand())/RAND_MAX - .5F) / fSpreadFactor;
-
-            vDr[i]->Fire(fp);
-        }
-    }
-        */
 
 #ifdef KEYBOARD_CONTROLS
   // directional shooting using arrow keys
@@ -1049,19 +970,6 @@ const float fSpreadFactor = 2.0f;
 #endif
 }
 
-/*
-void AdvancedController::SetDir(Point pPos, bool bInTower)
-{
-        pPos.x /= 2;
-        pPos.y /= 2;
-
-        fDir = pPos - vDr[0]->GetPosition();
-        if(bInTower)
-                fDir -= Point(-10, -25);
-        fDir.Normalize();
-}
-*/
-
 void AdvancedController::OnMouse(Point pPos) {
   Size sz1 = GetProgramInfo().szScreenRez;
   Size sz2 = pGl->pWrp->szActualRez;
@@ -1072,7 +980,6 @@ void AdvancedController::OnMouse(Point pPos) {
   pPos.x *= Crd(fX);
   pPos.y *= Crd(fY);
 
-  // tr.mtr.OnMouse(pPos);
   pt.UpdateMouse(pPos);
   mc.SetCursorPos(pPos);
 }
@@ -1090,8 +997,6 @@ void AdvancedController::OnMouseDown(Point pPos) {
   pt.UpdateMouse(pPos);
   pt.UpdateLastDownPosition(pPos);
   pt.On();
-
-  // if(pt.GetDirection(vDr[0]->GetPosition()).Length() < vDr[0]->GetRadius())
 
   if (bPaused)
     return;
@@ -1175,15 +1080,10 @@ void AdvancedController::MegaGeneration(Point p) {
 
 void MouseCursor::DrawCursor() {
   Index img;
-  // if(vDr[0]->bFly)
-  //{
   if (bPressed)
     img = imgCursor.vImage.at(1);
   else
     img = imgCursor.vImage.at(0);
-  //}
-  // else
-  //	img = imgCursor.GetImage();
 
   Size sz = pGl->pGraph->GetImage(img)->GetSize();
   Point p = pCursorPos;
@@ -1224,9 +1124,6 @@ void DragonScoreController::DoubleClick() { pGl->Next(); }
   }
 
   BasicController::Update();
-
-  // if(t.Tick())
-  //	pGl->Next();
 }
 
 /*virtual*/ void HighScoreShower::Draw(SP<ScalingDrawer> pDr) {
@@ -1337,8 +1234,6 @@ void Castle::OnKnight(char cWhat) {
         pDrag->fVel = fPoint(0, -1);
       pDrag->fVel.Normalize(pDrag->leash.speed);
 
-      // pDrag->bExist = false;
-
       pDrag = 0;
     }
 
@@ -1402,8 +1297,6 @@ void Castle::OnKnight(char cWhat) {
   }
 
   Critter::Draw(pDr);
-
-  // pAv->pGl->pNum->DrawNumber(nPrincesses, GetPosition() + Point(0, 18));
 }
 
 /*virtual*/ void AdvancedController::Update() {
@@ -1434,7 +1327,6 @@ void Castle::OnKnight(char cWhat) {
     Rectangle r(Point(rBound.sz.x / 2 - (s1.size() * nCharWidth) / 2 - 10,
                       rBound.sz.y / 2 - 10),
                 Size(s1.size() * nCharWidth + 18, 21));
-    // Rectangle r(Point(rBound.sz.x/2 - 10, rBound.sz.y/2 - 10), Size(20, 20));
 
     r.p.x *= nScale;
     r.p.y *= nScale;
@@ -1486,48 +1378,14 @@ void Castle::OnKnight(char cWhat) {
     if (tr.IsTrigger()) {
       fPoint p = tr.GetMovement();
 
-      // std::cout << p.x << " " << p.y << " " << p.Length() << "\n";
-
       if (p.Length() > 50) {
         if (p.Length() > 250)
           p.Normalize(250);
 
         vDr[0]->Fire(p);
       }
-
-      // p.Normalize(5);
-
-      // SP<Fireball> pFr = new Fireball(pDr->GetPosition(), p, rBound, this);
-      // AddBoth(pFr);
     }
-
-    /*
-    if(pt.bPressed)
-    {
-            if(tShootTimer.Tick())
-            {
-                    fPoint fFb = pt.GetDirection(vDr[0]->GetPosition() +
-    Point(-10, -25)); fFb.Normalize(100); vDr[0]->Fire(fFb);
-            }
-    }
-    else
-    {
-            if(tShootTimer.Tick())
-                    tShootTimer.nTimer = tShootTimer.nPeriod - 1;
-    }
-    */
   } else {
-    // fPoint p = tr.GetAvMovement();
-    // if(p.Length() <= 25)
-    //    return;
-
-    // p.Normalize(3);
-
-    // if(p != fPoint())
-    //    vDr[0]->fVel = p;
-
-    // vDr[0]->fVel = vDr[0]->leash.GetNewVelocity(tr.GetMovement());
-
     if (pt.bPressed) {
       fPoint v = vDr[0]->fVel;
       fPoint d = pt.GetDirection(vDr[0]->GetPosition());
@@ -1535,16 +1393,7 @@ void Castle::OnKnight(char cWhat) {
       if (d.Length() == 0)
         d = v;
 
-      // d.Normalize();
       d.Normalize(v.Length());
-
-      // fPoint fDelta = d*Dot(v, d) - v;
-      // fDelta /= 3;
-
-      // if(Dot(v, d) < 0)
-      //	fDelta *= -1;
-
-      // vDr[0]->fVel += fDelta;
 
       vDr[0]->fVel = v * fFlightCoefficient + d;
       vDr[0]->fVel.Normalize(vDr[0]->leash.speed);
@@ -1564,7 +1413,6 @@ void Castle::OnKnight(char cWhat) {
 #ifdef FULL_VERSION
   if (!bGhostTime) {
     if (t.Tick()) {
-      // pSc->plr.StopMusic();
       bGhostTime = true;
 
       if (!pGl->sbMusicOn.Get())
@@ -1622,8 +1470,6 @@ void Castle::OnKnight(char cWhat) {
       if ((*itr)->GetType() == 'K') {
         pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_poke"));
 
-        // if(bExist)
-        //    --pAc->nSlimeNum;
         bExist = false;
 
         SP<AnimationOnce> pAn =
@@ -1756,9 +1602,6 @@ bool AreWeFullScreen() {
 
   return bRet;
 }
-
-// std::ofstream ofs_move ("moves.txt");
-// std::ofstream ofs_angl ("angles.txt");
 
 ProgramInfo GetProgramInfo() {
   ProgramInfo inf;
@@ -1920,10 +1763,6 @@ void TowerGameGlobalController::Fire() {
   if (t.Tick()) {
     bExist = false;
 
-    // SP<Slime> pSlm = new Slime(p, pAdv->rBound, pAdv);
-    // pAdv->AddBoth(pSlm);
-    // PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
-
     unsigned n = unsigned(rand() % pAdv->vCs.size());
 
     fPoint v = pAdv->vCs[n]->GetPosition() - p;
@@ -1951,8 +1790,6 @@ void TowerGameGlobalController::Fire() {
           bCasting = true;
           Critter::seq = pAc->pGl->pr("mage_spell");
           Critter::fVel = fPoint(0, 0);
-
-          // tUntilSpell = Timer(GetTimeUntillSpell());
         }
     } else {
       if (tSpellAnimate.Tick()) {
@@ -1960,7 +1797,6 @@ void TowerGameGlobalController::Fire() {
       }
 
       if (tSpell.UntilTick() == int(1.F * nFramesInSecond)) {
-        // SummonSlimes();
         SummonSkeletons(pAc, GetPosition());
       }
 
@@ -1980,8 +1816,6 @@ void Mage::SummonSlimes() {
   for (int i = 0; i < 2; ++i) {
     fPoint f = RandomAngle();
     f.Normalize(10);
-
-    // pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_summon"));
 
     SP<Sliminess> pSlm = new Sliminess(GetPosition() + f.ToPnt(), pAc, true, 0);
     pAc->AddE(pSlm);
@@ -2052,7 +1886,6 @@ void Mage::SummonSlimes() {
 }
 
 /*virtual*/ void MegaSlime::OnHit(char cWhat) {
-  // KnockBack();
   if (nHealth > 0) {
     --nHealth;
     pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_hit"));
@@ -2112,14 +1945,9 @@ void MenuController::OnKey(GuiKeyType c, bool bUp) {
   }
 }
 
-void MenuController::OnMouse(Point pPos) {
-  // mc.SetCursorPos(pPos);
-  // pMenuDisplay->OnMouseMove(pPos);
-}
+void MenuController::OnMouse(Point pPos) {}
 
-void MenuController::OnMouseDown(Point pPos) {
-  // pMenuDisplay->Boop();
-}
+void MenuController::OnMouseDown(Point pPos) {}
 
 void MenuController::Update() {
   BasicController::Update();
@@ -2132,7 +1960,6 @@ void MenuController::Update() {
       pHintText->Draw(pGl->pDr);
   }
 
-  // mc.DrawCursor();
   pGl->pGraph->RefreshAll();
 }
 
@@ -2191,11 +2018,6 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, SP<NumberDrawer> pNum_,
 
   vOptionText.resize(memOptions.vEntries.size());
 
-  // vOptionText.at(nMusic) = "background music";
-  // vOptionText.at(nSound) = "sound effects";
-  // vOptionText.at(nTutorial) = "tutorial hints in fist two levels";
-  // vOptionText.at(nFullScreen) = "full screen mode\n(relaunch for changes to
-  // take place)";
   if (bCheatsUnlocked)
     vOptionText.at(nCheats) =
         "f1-f10 to get bonuses\n\\ to skip level\ni for invincibility";
@@ -2298,9 +2120,6 @@ void MenuDisplay::UpdateMenuEntries() {
   vOptionText.at(nFullScreen) = sExtra;
 
   bool bCheatsOn = pMenuController->pGl->sbCheatsOn.Get();
-  // std::string sCheatExtra = "off";
-  // if(bCheatsOn)
-  //	sCheatExtra = "bonus f1-f10 skip \\ invincible i";
 
   if (bCheatsUnlocked)
     memOptions.vEntries.at(nCheats).sText = "cheats: " + OnOffString(bCheatsOn);

@@ -79,8 +79,6 @@ const float fIncreaseKnightRate2 = 3.F;
 const float fIncreaseTraderRate1 = 1.5F;
 const float fIncreaseTraderRate2 = 2.F;
 
-// const int nSlimeTotalGenerations = 4;
-
 const int nSummonChance = nFramesInSecond * 12;
 const int nSummonRadius = 60;
 
@@ -342,54 +340,6 @@ struct NumberDrawer : virtual public SP_Info {
     pDr->pGr->DeleteImage(nImg);
   }
 
-  /*
-  void DrawNumber(unsigned n, Point p, unsigned nDigits = 0)
-{
-  std::vector<unsigned> vDigits;
-  if(n == 0)
-      vDigits.push_back(0);
-  while(n != 0)
-  {
-      vDigits.push_back(n%10);
-      n /= 10;
-  }
-
-  unsigned i, sz = unsigned(vDigits.size());
-  for(i = 0; int(i) < int(nDigits) - int(sz); ++i)
-      vDigits.push_back(0);
-
-  for(i = 0; i < vDigits.size(); ++i)
-  {
-      pDr->Draw(vImg[ vImgIndx['0' + vDigits[vDigits.size() - i - 1]] ],
-Point(p.x + 4 * i, p.y), false);
-  }
-}
-  */
-
-  /*
-  void DrawNumber(unsigned n, Point p, unsigned nDigits = 0)
-{
-  std::vector<unsigned> vDigits;
-  if(n == 0)
-      vDigits.push_back(0);
-  while(n != 0)
-  {
-      vDigits.push_back(n%10);
-      n /= 10;
-  }
-
-  unsigned i, sz = unsigned(vDigits.size());
-  for(i = 0; int(i) < int(nDigits) - int(sz); ++i)
-      vDigits.push_back(0);
-
-  for(i = 0; i < vDigits.size(); ++i)
-  {
-      pDr->Draw(vImg[ vImgIndx['0' + vDigits[vDigits.size() - i - 1]] ],
-Point(p.x + 4 * i, p.y), false);
-  }
-}
-  */
-
   std::string GetNumber(unsigned n, unsigned nDigits = 0) {
     std::string s;
     if (n == 0)
@@ -644,8 +594,6 @@ struct TwrGlobalController : virtual public SP_Info {
   void Menu();
 
   // Point pCursorPos;
-  // void DrawCursor();
-  // void fPos(Point pPos);
 };
 
 /** Controller that draws a single full-screen image and advances on key. */
@@ -1370,9 +1318,6 @@ struct PhysicalEntity : virtual public ScreenEntity {
   }
 };
 
-// extern std::ofstream ofs_move;
-// extern std::ofstream ofs_angl;
-
 /** Tracks mouse for trackball-style steering (angle and fire). */
 struct TrackballTracker {
   MouseTracker mtr;
@@ -1393,29 +1338,6 @@ struct TrackballTracker {
   void Update() {
     Point p = mtr.GetRelMovement();
 
-    // if(p != Point())
-    //    pWr->Write("My " + S(p.x) + " " + S(p.y) + "\n");
-
-    /*
-    pWr->Write( S(int(fPoint(p).Length())) + "\t" );
-
-
-
-    int i = int(fPoint(p).Length());
-    if(i == 0)
-    {
-        ofs_move << "\n";
-        ofs_angl << "\n";
-        pWr->Write("\n");
-    }
-    else
-    {
-        ofs_move << i << "\t";
-        ofs_angl << int(atan2(double(-p.y), p.x) * 180 / 3.1415) << "\t";
-        pWr->Write(S(int(atan2(double(-p.y), p.x) * 180 / 3.1415)) + "\n");
-    }
-    */
-
     lsMouse.push_front(p);
     lsMouse.pop_back();
   }
@@ -1423,20 +1345,6 @@ struct TrackballTracker {
   /** Returns true when the middle sample has the largest length (gesture peak).
    */
   bool IsTrigger() {
-    /*
-int p = GetDerivative();
-    if(!trigFlag && p >= threshold*threshold)
-    {
-            trigFlag = true;
-            return true;
-    }
-    else if(trigFlag && p < threshold*threshold)
-    {
-            trigFlag = false;
-    }
-
-    return false;
-*/
     std::vector<int> v;
     for (std::list<Point>::iterator itr = lsMouse.begin(); v.size() < 3; ++itr)
       v.push_back(int(fPoint(*itr).Length()));
@@ -1445,19 +1353,7 @@ int p = GetDerivative();
   }
 
   /** Second element of lsMouse (recent movement). */
-  Point GetMovement() {
-    /*
-    Point p1 = *(lsMouse.begin());
-    Point p2 = *(++lsMouse.begin());
-
-    int l1 = fPoint(p1).Length();
-    int l2 = fPoint(p2).Length();
-
-    return l1 > l2 ? p1 : p2;
-    */
-
-    return *(++lsMouse.begin());
-  }
+  Point GetMovement() { return *(++lsMouse.begin()); }
 
   /** Returns the average of recent movement samples. */
   fPoint GetAvMovement() {
@@ -1612,10 +1508,6 @@ struct BasicController : public GameController {
 
   /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
   void AddBackground(Color c) {
-    // Index nBckImg = pGl->pDr->pGr->GetBlankImage(rBound.sz);
-    // pGl->pDr->pGr->RectangleOnto(nBckImg, rBound.sz, c);
-    // pGl->pDr->Scale(nBckImg);
-
     Rectangle r = rBound.sz;
     r.sz.x *= pGl->pDr->nFactor;
     r.sz.y *= pGl->pDr->nFactor;
@@ -1829,11 +1721,8 @@ struct BuyNowController : public BasicController {
 
     for (unsigned i = 0; i < mSlimes.size(); i++) {
       mSlimes[i]->Update();
-      // if(rand()%2 == 0)
-      //	mSlimes[i]->pos += Point(rand()%3 - 1, rand()%3 - 1);
       mSlimePos[i] += mSlimeVel[i];
       mSlimes[i]->pos = mSlimePos[i].ToPnt();
-      // mSlimes[i]->Draw(pGl->pDr);
     }
 
     if (t >= 0)
@@ -2257,8 +2146,6 @@ struct AdvancedController : public BasicController {
   MageGenerator *pMgGen;
   SP<SoundControls> pSc;
 
-  // Timer tShootTimer;
-
   PositionTracker pt;
   bool bTakeOffToggle;
 
@@ -2298,8 +2185,6 @@ struct AdvancedController : public BasicController {
   /*virtual*/ void Fire();
 
   float GetCompletionRate();
-
-  // void SetDir(Point pPos, bool bInTower);
 
   MouseCursor mc;
 
@@ -2482,7 +2367,6 @@ struct Fireball : public Critter {
           }
 
           if (bKeepGoing) {
-            // fPoint v = RandomAngle(fVel, 1.F/12);
             fPoint v = fVel;
 
             for (unsigned i = 0; i < nChain; ++i) {
@@ -2792,7 +2676,6 @@ struct Mage : public Critter, public ConsumableEntity {
         tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
     fMvVel = Critter::fVel;
 
-    // meh
     bAngry = true;
     pAc->pGl->bAngry = true;
   }
@@ -2892,9 +2775,8 @@ struct FireballBonusAnimation : public Animation,
     if (tm.Tick())
       bExist = false;
 
-    if (!bBlink && tm.nPeriod && (tm.nPeriod - tm.nTimer) < 7 * nFramesInSecond)
-    // if(!bBlink && float(tm.nPeriod - tm.nTimer)/tm.nPeriod < .15f)
-    {
+    if (!bBlink && tm.nPeriod &&
+        (tm.nPeriod - tm.nTimer) < 7 * nFramesInSecond) {
       bBlink = true;
 
       ImageSequence img;
@@ -2960,8 +2842,6 @@ struct Trader : public Critter, public ConsumableEntity {
 
     Point p = GetPosition();
     p.y += 13;
-    // p.x *= pDr->nFactor;
-    // p.y *= pDr->nFactor;
 #ifdef UNDERLINE_UNIT_TEXT
     if (sUnderText != "")
       pAc->pGl->pNum->DrawWord(sUnderText, p, true);
@@ -3069,23 +2949,7 @@ struct Knight : public Critter, public ConsumableEntity {
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() {
-    return cType;
-
-    /*
-    if(!bGhost)
-    {
-            if(bSkeleton)
-                    return 'S';
-            else
-                    return 'K';
-    }
-    else
-    {
-            return 'G';
-    }
-    */
-  }
+  /*virtual*/ char GetType() { return cType; }
 };
 
 /** Large slime unit: splits or merges (MegaSlime logic). */
@@ -3118,9 +2982,6 @@ struct MegaSlime : public Critter, public ConsumableEntity {
    * frames, play sounds and either randomize movement or stop.
    */
   /*virtual*/ void Update() {
-    // if(t.Tick() && float(rand())/RAND_MAX < .25)
-    //	RandomizeVelocity();
-
     CleanUp(pAc->lsBonus);
 
     for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
@@ -3147,8 +3008,6 @@ struct MegaSlime : public Critter, public ConsumableEntity {
         pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_land"));
       }
     }
-
-    // Critter::Update();
   }
 
   /*virtual*/ void OnHit(char cWhat);
@@ -3222,7 +3081,6 @@ struct Slime : public Critter, public ConsumableEntity {
   ~Slime() {
     if (pAc != 0) {
       --pAc->nSlimeNum;
-      // std::cout << pAc->nSlimeNum << "\n";
     }
   }
 };
@@ -3809,7 +3667,6 @@ struct MageGenerator : virtual public EventEntity {
   }
 
   /*virtual*/ void Update() {
-    // if(float(rand())/RAND_MAX < dRate )
     if (tm.Tick()) {
       if (dRate == 0)
         return;
@@ -4048,16 +3905,6 @@ unsigned GetFireballChainNum(FireballBonus &fb) {
   return nRet;
 }
 
-/*
-unsigned GetFireballChainSplit(FireballBonus& fb)
-{
-        int nRet = fb.uMap["fireballchainnum"];
-        if(fb.bMap["fireballchainnum_flag"])
-                nRet += 2;
-        return nRet;
-}
-*/
-
 /** Player dragon: carries bonuses and fireballs, steer/shoot, collision with
  * units. */
 struct Dragon : public Critter {
@@ -4094,30 +3941,16 @@ struct Dragon : public Critter {
     else if (n == 4) {
       pBonus = new TimedFireballBonus(
           FireballBonus(n, "total", nFireballsPerBonus), nTime * 2);
-      //++nExtraFireballs;
     } else if (n == 5)
       pBonus = new TimedFireballBonus(FireballBonus(n, "explode", 1U), nTime);
     else if (n == 6) {
       pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
       pBonus->Add("fireballchainnum", 1U);
       pBonus->Add("through_flag", true);
-    }
-    /*
-            else if(n == 7)
-    {
-        pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
-        pBonus->Add("fireballchain_flag", true);
-        pBonus->Add("fireballchainnum_flag", true);
-        pBonus->Add("fireballchain", 1U);
-    }
-            */
-    else if (n == 7)
+    } else if (n == 7)
       pBonus = new TimedFireballBonus(FireballBonus(n, "setonfire", 1U), nTime);
     else if (n == 8) {
       FireballBonus fb = GetAllBonuses();
-
-      // fb.fMap["speed"] = (4.F + fb.uMap["regenerate"]*2.F) * 10 /
-      // nFramesInSecond;
 
       Point p = GetPosition();
 
@@ -4131,8 +3964,6 @@ struct Dragon : public Critter {
       for (int i = 0; i < nNumCirc; ++i) {
         SP<CircularFireball> pFb = new CircularFireball(
             Fireball(p, GetWedgeAngle(fVel, 1.F, i, nNumCirc + 1), pAd, fb,
-                     // Chain(true /*fb.uMap["fireballchain"]*/),
-                     // fb.uMap["fireballchainnum"]), 40, nTime);
                      Chain(), GetFireballChainNum(fb)),
             35, nTime * 2);
         pAd->AddBoth(pFb);
@@ -4298,8 +4129,6 @@ struct Dragon : public Critter {
         tFireballRegen.nTimer = 0;
 
         if (nFireballCount < int(fb.uMap["total"])) {
-          // pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("reload"));
-
           if (nInitialRegen ==
               0) // this is so 0 fireball regen will not be limited by framerate
             nFireballCount = int(fb.uMap["total"]);
@@ -4434,9 +4263,6 @@ struct Dragon : public Critter {
     if (bFly)
       fb.fMap["speed"] += fDragonSpeed;
 
-    // if(fb.uMap["total"] <= lsBalls.size())
-    //    return;
-
     if (nFireballCount == 0)
       return;
 
@@ -4556,9 +4382,6 @@ struct Dragon : public Critter {
           if (j != pAd->vCs.size()) {
             pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("princess_capture"));
           } else {
-            // if(pAd->bGhostTime)
-            //	pAd->pSc->plr.StopMusic();
-
             FlushBonuses();
 
             pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("win_level"));
@@ -4584,11 +4407,6 @@ struct Dragon : public Critter {
 
     CleanUp(pAd->lsPpl);
 
-    // disables dropping when carrying princesses
-    // if(bCarry && cCarry == 'P')
-    //	return;
-
-    // disable dropping altogether
     if (bCarry)
       return;
 
@@ -4624,21 +4442,6 @@ if((**itr).GetType() == 'G')
           pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("pickup"));
         } else {
           throw SimpleException("not supposed to drop things");
-          /*
-if(cCarry == 'T' || (**itr).GetType() == 'T')
-                  AddBonus(GetBonus(RandomBonus(false), nBonusPickUpTime));
-          else
-          {
-                  if(cCarry == 'K')
-                          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("knight_fall"));
-                  else
-                          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("dropping"));
-          }
-
-bCarry = false;
-cCarry = ' ';
-          nPrCr = 0;
-*/
         }
 
         (*itr)->bExist = false;
@@ -4646,19 +4449,6 @@ cCarry = ' ';
         return;
       }
     }
-    /*
-    if(bCarry)
-    {
-        if(cCarry == 'T')
-                            AddBonus(GetBonus(RandomBonus(false),
-    nBonusPickUpTime)); else
-                            pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("dropping"));
-
-        bCarry = false;
-        cCarry = ' ';
-                    nPrCr = 0;
-    }
-    */
   }
 };
 
@@ -4680,7 +4470,7 @@ struct AlmostBasicController : public BasicController {
   }
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp) {
-    if (!bUp) // && c == '\\')
+    if (!bUp)
       pGl->Next();
   }
 

@@ -41,10 +41,6 @@ void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
   vSdlMapper[SDLK_PAGEUP] = GUI_PGUP;
   vSdlMapper[SDLK_PAGEDOWN] = GUI_PGDOWN;
 
-  // vSdlMapper[SDLK_NUMLOCK] = GUI_NUMLOCK;
-  // vSdlMapper[SDLK_CAPSLOCK] = GUI_CAPSLOCK;
-  // vSdlMapper[SDLK_SCROLLOCK] = GUI_SCRLOCK;
-
   vSdlMapper[SDLK_RSHIFT] = GUI_SHIFT;
   vSdlMapper[SDLK_LSHIFT] = GUI_SHIFT;
   vSdlMapper[SDLK_RCTRL] = GUI_CTRL;
@@ -57,9 +53,7 @@ unsigned GetTicks() { return SDL_GetTicks(); }
 
 SP<FileManager> GetFileManager() { return new StdFileManager(); }
 
-int main(int argc, char *argv[])
-// int main()
-{
+int main(int argc, char *argv[]) {
   srand((unsigned)time(NULL));
 
   SDL_Event event;
@@ -79,29 +73,6 @@ int main(int argc, char *argv[])
 
     Rectangle rOffSet = sBound;
 
-    /*const SDL_VideoInfo* pInf = SDL_GetVideoInfo();
-    if(inf.bFlexibleResolution && inf.bFullScreen)
-    {
-            sBound = Rectangle(Point(0, 0), Size(pInf->current_w,
-    pInf->current_h));
-
-            if(!inf.bBlackBox)
-            {
-                    inf.szScreenRez.x = pInf->current_w;
-                    inf.szScreenRez.y = pInf->current_h;
-            }
-            else
-            {
-                    rOffSet.p.x = (pInf->current_w - inf.szScreenRez.x)/2;
-                    rOffSet.p.y = (pInf->current_h - inf.szScreenRez.y)/2;
-
-                    if(rOffSet.p.x < 0)
-                            rOffSet.p.x = 0;
-                    if(rOffSet.p.y < 0)
-                            rOffSet.p.y = 0;
-            }
-    }*/
-
     SP<SdlGraphicalInterface> pGraph =
         new SdlGraphicalInterface(sBound.sz, inf.bFullScreen, rOffSet);
     SP<GraphicalInterface<Index>> pGr =
@@ -119,7 +90,6 @@ int main(int argc, char *argv[])
 
     if (inf.bMouseCapture) {
       SDL_ShowCursor(SDL_DISABLE);
-      // SDL_WM_GrabInput(SDL_GRAB_ON);
       SDL_SetWindowGrab(pGraph->pScreenWindow, SDL_TRUE);
     }
 
@@ -154,12 +124,8 @@ int main(int argc, char *argv[])
           if (event.key.keysym.sym == SDLK_EQUALS)
             std::cout << "Global: " << nGlobalSuperMegaCounter << "\n";
         } else if (event.type == SDL_MOUSEMOTION) {
-          // std::cout << "Evn: " << event.motion.x << " " << event.motion.y <<
-          // "\n";
-
           int x, y;
           SDL_GetRelativeMouseState(&x, &y);
-          // std::cout << "Sdl: " << x << " " << y << "\n";
 
           pMousePos += Point(x, y);
           if (inf.bMouseCapture)
