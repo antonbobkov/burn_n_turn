@@ -1,4 +1,4 @@
-#include "tower_defense.h"
+#include "game.h"
 
 SkellyGenerator::SkellyGenerator(Point p_, SP<AdvancedController> pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(this, pAdv_) {

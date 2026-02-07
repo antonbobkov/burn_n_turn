@@ -1,4 +1,4 @@
-#include "tower_defense.h"
+#include "game.h"
 
 FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
   if (bDef) {

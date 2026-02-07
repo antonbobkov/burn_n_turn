@@ -1,4 +1,4 @@
-#include "tower_defense.h"
+#include "game.h"
 
 void SummonSkeletons(SP<AdvancedController> pAc, Point p) {
   int nNum = 4;

@@ -1,4 +1,5 @@
 #include "level.h"
+#include "game.h"
 
 #include "General.h"
 
@@ -294,4 +295,35 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
   }
 
   return ifs;
+}
+
+void FancyRoad::Draw(SP<ScalingDrawer> pDr) {
+  unsigned n = pDr->nFactor;
+  Image *p = pDr->pGr->GetImage(pAd->pGl->pr["road"]);
+  Size sz = p->GetSize();
+
+  if (bVertical)
+    for (int i = 0; (i - 1) * sz.y < rBound.sz.y * int(n); ++i)
+      pDr->pGr->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
+                          pAd->pGl->pr["road"], false);
+  else
+    for (int i = 0; (i - 1) * sz.x < rBound.sz.x * int(n); ++i)
+      pDr->pGr->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
+                          pAd->pGl->pr["road"], false);
+}
+
+void ReadLevels(std::string sFile, Rectangle rBound, LevelStorage &vLvl) {
+  std::istringstream istr;
+
+  std::ifstream ifs(sFile.c_str());
+
+  LevelLayout l(rBound);
+  while (ifs >> l) {
+    l.Convert();
+    vLvl.push_back(l);
+  }
+
+  if (vLvl.size() == 0)
+    throw SimpleException("<global>", "ReadLevels",
+                          "Cannot read levels at " + sFile);
 }

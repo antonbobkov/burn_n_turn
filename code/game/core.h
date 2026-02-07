@@ -115,4 +115,40 @@ inline int GetRandTimeFromRate(float fRate) {
 unsigned GetRandNum(unsigned nRange);
 unsigned GetRandFromDistribution(std::vector<float> vProb);
 
+struct TowerDataWrap;
+struct MenuController;
+
+/** Plays level music from vThemes; SwitchTheme/StopMusic/ToggleOff control
+ * playback. */
+struct BackgroundMusicPlayer {
+  int nCurrTheme;
+  std::vector<Index> vThemes;
+  SP<Soundic> pSnd;
+
+  bool bOff;
+
+  BackgroundMusicPlayer() : nCurrTheme(-1), pSnd(0), bOff(false) {}
+
+  void SwitchTheme(int nTheme);
+  void StopMusic();
+
+  void ToggleOff();
+};
+
+enum { BG_MUSIC_CHANNEL = 0 };
+
+enum {
+  BG_BACKGROUND = 0,
+  BG_SLOW_BACKGROUND = 1,
+  BG_BACKGROUND2 = 2,
+  BG_SLOW_BACKGROUND2 = 3,
+  BG_BACKGROUND3 = 4,
+  BG_SLOW_BACKGROUND3 = 5
+};
+
+struct TwrGlobalController;
+struct GameController;
+
+ProgramInfo GetProgramInfo();
+
 #endif

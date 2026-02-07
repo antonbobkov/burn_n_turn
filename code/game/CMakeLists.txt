@@ -12,8 +12,7 @@ add_executable(tower_defense
   critters.cpp
   critter_generators.cpp
   dragon.cpp
-  tower_defense.cpp
-  tower_defense.h
+  gameplay.cpp
 )
 
 target_include_directories(tower_defense PRIVATE

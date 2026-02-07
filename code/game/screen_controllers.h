@@ -174,7 +174,7 @@ struct BasicController : public GameController {
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
-  /*virtual*/ void OnMouseDown(Point pPos) { pGl->Next(); }
+  /*virtual*/ void OnMouseDown(Point pPos);
 };
 
 /** Cursor image and position; Draw/Update for rendering and click state. */
@@ -312,7 +312,7 @@ struct AlmostBasicController : public BasicController {
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
-  /*virtual*/ void OnMouseDown(Point pPos) { pGl->Next(); }
+  /*virtual*/ void OnMouseDown(Point pPos);
 };
 
 #endif

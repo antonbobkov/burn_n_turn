@@ -1,4 +1,4 @@
-#include "tower_defense.h"
+#include "game.h"
 
 SimpleController::SimpleController(SP<TwrGlobalController> pGraph,
                                    std::string strFileName)
@@ -183,6 +183,8 @@ void BasicController::OnKey(GuiKeyType c, bool bUp) {
 
   pGl->Next();
 }
+
+void BasicController::OnMouseDown(Point pPos) { pGl->Next(); }
 
 void MouseCursor::DrawCursor() {
   Index img;
@@ -614,3 +616,5 @@ void AlmostBasicController::OnKey(GuiKeyType c, bool bUp) {
   if (!bUp)
     pGl->Next();
 }
+
+void AlmostBasicController::OnMouseDown(Point pPos) { pGl->Next(); }

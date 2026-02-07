@@ -75,6 +75,8 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
   return ifs >> r.bVertical >> r.nCoord;
 }
 
+struct AdvancedController;
+
 /** One level: bounds, knight spawn line, castle positions, roads, timer, spawn
  * freqs; Convert scales coords. */
 struct LevelLayout {
@@ -95,6 +97,8 @@ struct LevelLayout {
 };
 
 typedef std::vector<LevelLayout> LevelStorage;
+
+void ReadLevels(std::string sFile, Rectangle rBound, LevelStorage &vLvl);
 
 std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f);
 std::istream &operator>>(std::istream &ifs, LevelLayout &f);
