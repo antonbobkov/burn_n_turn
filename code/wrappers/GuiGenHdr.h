@@ -350,9 +350,19 @@ public:
   }
 };
 
+/* Default: no check, return value as-is (for non-pointer handle types). */
 template <class NullExc, class T>
 T PointerAssert(crefString strClsName_, crefString strFnName_,
                 crefString strPntName_, T pnt) {
+  (void)strClsName_;
+  (void)strFnName_;
+  (void)strPntName_;
+  return pnt;
+}
+/* Pointer overload: check for null and throw if invalid. */
+template <class NullExc, class P>
+P *PointerAssert(crefString strClsName_, crefString strFnName_,
+                 crefString strPntName_, P *pnt) {
   if (!pnt)
     throw NullExc(strClsName_, strFnName_, strPntName_);
   return pnt;

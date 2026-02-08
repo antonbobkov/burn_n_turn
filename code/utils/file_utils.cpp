@@ -1,4 +1,5 @@
 #include "file_utils.h"
+#include "exception.h"
 
 #include <fstream>
 
@@ -188,40 +189,6 @@ void Separate(std::string &strFile, std::string &strFolder) {
       strRet = "";
     }
   }
-}
-
-void RecordKeeper::ReadDef() {
-  std::ifstream ifs(sDefFile.c_str());
-
-  if (ifs.fail())
-    throw SimpleException("RecordKeeper", "ReadDef",
-                          "Cannot open file " + sDefFile + " for reading");
-
-  Read(ifs);
-}
-
-void RecordKeeper::WriteDef() {
-  std::ofstream ofs(sDefFile.c_str());
-
-  if (ofs.fail())
-    throw SimpleException("RecordKeeper", "WriteDef",
-                          "Cannot open file " + sDefFile + " for writing");
-
-  Write(ofs);
-}
-
-void RecordCollection::NewRecordKeeper(SP<RecordKeeper> pRec) {
-  vRecords.push_back(pRec);
-}
-
-void RecordCollection::Read(std::istream &ifs) {
-  for (size_t i = 0, sz = vRecords.size(); i < sz; ++i)
-    vRecords[i]->Read(ifs);
-}
-
-void RecordCollection::Write(std::ostream &ofs) {
-  for (size_t i = 0, sz = vRecords.size(); i < sz; ++i)
-    vRecords[i]->Write(ofs);
 }
 
 } // namespace Gui

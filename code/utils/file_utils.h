@@ -9,13 +9,9 @@
  * (own and expose an ostream* or istream*). FileManager and implementations:
  * StdFileManager, InMemoryFileManager (open files, return stream handlers).
  * FilePath: path plus slash/convention, allowed chars, and ReadFile/WriteFile.
- * Record persistence: RecordKeeper, Record<A,B>, RecordCollection (key-value
- * with ReadDef/WriteDef). SavableVariable<T>: single value load/save to a
- * file. Helpers: Separate (split path into folder and file), BoolToggle.
+ * SavableVariable<T>: single value load/save to a file. Helpers: Separate
+ * (split path into folder and file), BoolToggle.
  */
-
-#include "SmartPointer.h"
-#include "exception.h"
 
 #include <fstream>
 #include <iostream>
@@ -49,6 +45,7 @@ protected:
 
 public:
   OutStreamHandler(std::ostream *pStr) : pStr_(pStr) {}
+  virtual ~OutStreamHandler() {}
 
   std::ostream &GetStream() { return *pStr_; }
 };
@@ -60,6 +57,7 @@ protected:
 
 public:
   InStreamHandler(std::istream *pStr) : pStr_(pStr) {}
+  virtual ~InStreamHandler() {}
 
   std::istream &GetStream() { return *pStr_; }
 };
@@ -162,55 +160,6 @@ private:
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
 
-/* --- Record persistence (key-value to a default file) --- */
-
-/* Base for types that read/write themselves to a stream and have a default
- * file path for ReadDef/WriteDef. */
-class RecordKeeper : public SP_Info {
-  std::string sDefFile;
-
-public:
-  RecordKeeper(std::string sDefFile_ = "") : sDefFile(sDefFile_) {}
-  virtual ~RecordKeeper() {}
-
-  virtual void Read(std::istream &ifs) = 0;
-  virtual void Write(std::ostream &ofs) = 0;
-
-  void SetDefFile(std::string sDefFile_) { sDefFile = sDefFile_; }
-
-  /* Load from sDefFile; throws on open failure. */
-  void ReadDef();
-  /* Save to sDefFile; throws on open failure. */
-  void WriteDef();
-};
-
-/* Map-backed record: Get/Put by key, Read/Write as size then pairs. */
-template <class A, class B> class Record : public RecordKeeper {
-  std::map<A, B> mpEntries;
-
-public:
-  B &Get(const A &a) { return mpEntries[a]; }
-  const B &Get(const A &a) const { return mpEntries[a]; }
-
-  void Put(const A &a, const B &b) { mpEntries[a] = b; }
-
-  /*virtual*/ void Read(std::istream &ifs);
-  /*virtual*/ void Write(std::ostream &ofs);
-};
-
-/* Forwards Read/Write to each registered RecordKeeper in order. */
-class RecordCollection : public RecordKeeper {
-  std::vector<SP<RecordKeeper>> vRecords;
-
-public:
-  RecordCollection(std::string sDef_ = "") : RecordKeeper(sDef_) {}
-
-  void NewRecordKeeper(SP<RecordKeeper> pRec);
-
-  /*virtual*/ void Read(std::istream &ifs);
-  /*virtual*/ void Write(std::ostream &ofs);
-};
-
 /* --- Single-value persistence (SavableVariable) --- */
 
 /* Holds a value of type T and uses a path to load/save it. Takes a FilePath*
@@ -273,28 +222,6 @@ inline void BoolToggle(SavableVariable<bool> &sv) { sv.Set(!sv.Get()); }
 
 /* Split path in strFile into folder and file; folder part goes to strFolder. */
 void Separate(std::string &strFile, std::string &strFolder);
-
-/* --- Record<A,B> template method definitions --- */
-
-template <class A, class B> void Record<A, B>::Read(std::istream &ifs) {
-  unsigned nSz;
-  ifs >> nSz;
-  for (unsigned i = 0; i < nSz; ++i) {
-    A a;
-    B b;
-
-    ifs >> a >> b;
-    mpEntries[a] = b;
-  }
-}
-
-template <class A, class B> void Record<A, B>::Write(std::ostream &ofs) {
-  ofs << mpEntries.size() << "\n";
-  for (typename std::map<A, B>::iterator itr = mpEntries.begin(),
-                                         etr = mpEntries.end();
-       itr != etr; ++itr)
-    ofs << itr->first << " " << itr->second << "\n";
-}
 
 } // namespace Gui
 
