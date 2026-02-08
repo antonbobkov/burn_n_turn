@@ -1,5 +1,7 @@
 #include "SuiSdl.h"
 
+#include "exception.h"
+
 namespace Gui {
 
 SdlSoundInterface::SdlSoundInterface() {

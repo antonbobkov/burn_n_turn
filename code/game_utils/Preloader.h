@@ -26,9 +26,12 @@
 #include <string>
 #include <vector>
 
-#include "General.h"
 #include "GuiGen.h"
+#include "SmartPointer.h"
 #include "SuiGen.h"
+#include "file_utils.h"
+#include "index.h"
+#include "timer.h"
 
 namespace Gui {
 

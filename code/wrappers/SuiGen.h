@@ -1,8 +1,9 @@
 #ifndef SUIGEN_ALREADY_INCLUDED_08_25
 #define SUIGEN_ALREADY_INCLUDED_08_25
 
-#include "General.h"
 #include "SmartPointer.h"
+#include "index.h"
+
 namespace Gui {
 
 template <class SndHndl> class SoundInterface : virtual public SP_Info {

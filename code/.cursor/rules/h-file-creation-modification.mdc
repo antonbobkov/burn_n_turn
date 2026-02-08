@@ -1,0 +1,7 @@
+---
+globs: *.h
+alwaysApply: false
+---
+When adding a new .h file, add a common on top of file describing what it does.
+When adding a new class to .h files, add a comment for whole class and for each non-trivial member function.
+When adding a new function to .h files, add a comment describing the function.

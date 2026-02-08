@@ -1,6 +1,7 @@
 #ifndef GLOBAL_GUI_INCLUDE_GUARD_09_04_10_04_01_PM
 #define GLOBAL_GUI_INCLUDE_GUARD_09_04_10_04_01_PM
 
+#include "General.h"
 #include "event.h"
 
 #include "GuiGen.h"

@@ -1,7 +1,7 @@
 #include "level.h"
 #include "game.h"
 
-#include "General.h"
+#include "file_utils.h"
 
 void Road::Draw(SP<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;

@@ -2,6 +2,8 @@
 
 #include "GuiGen.h"
 
+#include "General.h"
+
 namespace Gui {
 void fPoint::Normalize(float f) {
   if (x == 0 && y == 0)

@@ -8,6 +8,9 @@
  */
 
 #include "SuiSdl.h"
+
+#include "exception.h"
+
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <iostream>

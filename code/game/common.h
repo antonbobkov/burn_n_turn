@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_COMMON_H
 #define TOWER_DEFENSE_COMMON_H
 
+#include "General.h"
 #include "GuiGen.h"
 #include "SuiGen.h"
 
@@ -141,45 +142,6 @@ template <class T> void CopyArrayASSP(SP_Info *pInf, const T &from, T &to) {
        itr != etr; ++itr)
     to.push_back(CopyASSP(pInf, *itr));
 }
-
-/** Persists a value in a file; Get/Set, optional load on construction and save
- * on set. */
-template <class T> class SavableVariable {
-  T var;
-  std::string sFileName;
-
-public:
-  SavableVariable(std::string sFileName_, T var_default, bool bLoad = true)
-      : sFileName(sFileName_) {
-    if (!bLoad)
-      var = var_default;
-    else {
-      std::ifstream ifs(sFileName.c_str());
-      ifs >> var;
-
-      if (ifs.fail())
-        var = var_default;
-    }
-  }
-
-  void Save() {
-    std::ofstream ofs(sFileName.c_str());
-    ofs << var;
-  }
-
-  void Set(T new_var, bool bSave = true) {
-    var = new_var;
-    if (bSave)
-      Save();
-  }
-
-  T Get() { return var; }
-
-  const T *GetConstPointer() { return &var; }
-};
-
-/** Flip the boolean in sv and persist it. */
-inline void BoolToggle(SavableVariable<bool> &sv) { sv.Set(!sv.Get()); }
 
 template <class T>
 void Union(std::map<std::string, T> &TarMap,

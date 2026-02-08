@@ -4,10 +4,10 @@
 #include "common.h"
 #include "core.h"
 #include "entities.h"
+#include "file_utils.h"
 #include "fireball.h"
 #include "level.h"
 #include "tutorial.h"
-
 
 /** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
  * Fire, etc.). */
@@ -97,7 +97,6 @@ struct TwrGlobalController : virtual public SP_Info {
 #include "dragon.h"
 #include "gameplay.h"
 #include "screen_controllers.h"
-
 
 /** Fancy road: draws tiled road image; needs AdvancedController for resources.
  */

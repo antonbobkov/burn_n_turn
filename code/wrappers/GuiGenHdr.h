@@ -14,8 +14,10 @@
 
 #include <fstream>
 
-#include "General.h"
 #include "SmartPointer.h"
+#include "exception.h"
+#include "file_utils.h"
+#include "index.h"
 
 namespace Gui {
 typedef int Crd;

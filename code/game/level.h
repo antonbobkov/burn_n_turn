@@ -2,6 +2,8 @@
 #define TOWER_DEFENSE_LEVEL_H
 
 #include "entities.h"
+#include "exception.h"
+
 
 /** Exception for BrokenLine segment errors (e.g. invalid/empty segment). */
 class SegmentSimpleException : public MyException {

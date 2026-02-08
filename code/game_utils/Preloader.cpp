@@ -1,5 +1,8 @@
 #include "Preloader.h"
 
+#include "General.h"
+#include "exception.h"
+
 namespace Gui {
 
 // --- SoundSequence ---
