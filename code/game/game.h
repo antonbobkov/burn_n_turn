@@ -64,7 +64,6 @@ struct TwrGlobalController : virtual public SP_Info {
   bool bAngry;
 
   SavableVariable<int> snProgress;
-
   SavableVariable<bool> sbSoundOn;
   SavableVariable<bool> sbMusicOn;
   SavableVariable<bool> sbTutorialOn;

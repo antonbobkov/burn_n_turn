@@ -47,26 +47,22 @@ bool ParseGrabLine(std::string sToken, std::istream &ifs,
   }
 }
 
-FilePath::FilePath(bool bInLinux_, std::string sPath_)
-    : bInLinux(bInLinux_), sPath(sPath_) {
-  pFm = new StdFileManager();
-
-  Slash(sPath);
-
+FilePath::FilePath(bool inLinux, std::string path)
+    : in_linux_(inLinux), path_(path) {
+  fm_ = new StdFileManager();
+  Slash(path_);
   std::string str;
   str += "abcdefghijklmnopqrstuvwxyz";
   str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   str += "1234567890";
   str += " .-_()?<>+,\\/#";
-
   for (unsigned i = 0; i < str.length(); ++i)
-    stAllowed.insert(str[i]);
-
-  Format(sPath);
+    allowed_.insert(str[i]);
+  path_ = Format(path_);
 }
 
-void FilePath::Slash(std::string &s) {
-  if (!bInLinux) {
+void FilePath::Slash(std::string &s) const {
+  if (!in_linux_) {
     for (unsigned i = 0; i < s.length(); ++i)
       if (s[i] == '/')
         s[i] = '\\';
@@ -77,31 +73,32 @@ void FilePath::Slash(std::string &s) {
   }
 }
 
-void FilePath::Parse(std::string &s) { s = GetParse(s); }
+std::string FilePath::GetRelativePath(std::string s) const {
+  return GetParse(s);
+}
 
-std::string FilePath::GetParse(std::string s) {
+std::string FilePath::GetParse(std::string s) const {
   Slash(s);
-  s = sPath + s;
-
+  s = path_ + s;
   return GetFormatted(s);
 }
 
-void FilePath::Format(std::string &s) { s = GetFormatted(s); }
+std::string FilePath::Format(std::string s) const { return GetFormatted(s); }
 
-std::string FilePath::GetFormatted(std::string s) {
+std::string FilePath::GetFormatted(std::string s) const {
   std::string s_clean = "";
   for (unsigned i = 0; i < s.length(); ++i)
-    if (stAllowed.find(s[i]) != stAllowed.end())
+    if (allowed_.find(s[i]) != allowed_.end())
       s_clean += s[i];
   return s_clean;
 }
 
 SP<OutStreamHandler> FilePath::WriteFile(std::string s) {
-  return pFm->WriteFile(s);
+  return fm_->WriteFile(s);
 }
 
 SP<InStreamHandler> FilePath::ReadFile(std::string s) {
-  return pFm->ReadFile(s);
+  return fm_->ReadFile(s);
 }
 
 SP<OutStreamHandler> StdFileManager::WriteFile(std::string s) {
@@ -121,21 +118,16 @@ SP<InStreamHandler> FunnyFileManager::ReadFile(std::string s) {
 }
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp) {
-  ofs << "SYSTEM " << fp.bInLinux << "\nPATH " << fp.sPath << "\n";
-
+  ofs << "SYSTEM " << fp.in_linux_ << "\nPATH " << fp.path_ << "\n";
   return ofs;
 }
 
 std::istream &operator>>(std::istream &ifs, FilePath &fp) {
   ParsePosition("SYSTEM", ifs);
-
-  ifs >> fp.bInLinux;
-
-  ParseGrabLine("PATH", ifs, fp.sPath);
-
-  fp.Slash(fp.sPath);
-  fp.Format(fp.sPath);
-
+  ifs >> fp.in_linux_;
+  ParseGrabLine("PATH", ifs, fp.path_);
+  fp.Slash(fp.path_);
+  fp.path_ = fp.Format(fp.path_);
   return ifs;
 }
 

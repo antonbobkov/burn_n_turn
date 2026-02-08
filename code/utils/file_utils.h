@@ -17,7 +17,6 @@
 #include "SmartPointer.h"
 #include "exception.h"
 
-
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -97,31 +96,33 @@ public:
 /* --- Path --- */
 
 /* Path representation: base path, slash style (Linux vs Windows), allowed
- * characters, and a FileManager for ReadFile/WriteFile. Parse/Format and
- * GetParse/GetFormatted normalize and validate path strings. */
-struct FilePath {
-  std::set<char> stAllowed;
+ * characters, and a FileManager for ReadFile/WriteFile. GetRelativePath and
+ * GetParse return base path + relative part; Format/GetFormatted validate.
+ * Safe to copy. */
+class FilePath {
+public:
+  FilePath(bool inLinux = false, std::string path = "");
 
-  bool bInLinux;
-  std::string sPath;
-
-  SP<FileManager> pFm;
-
-  FilePath(bool bInLinux_ = false, std::string sPath_ = "");
-
-  /* Convert slashes to the current convention (bInLinux). */
-  void Slash(std::string &s);
-  /* In-place: set s to base path + s, normalized. */
-  void Parse(std::string &s);
-  /* Return base path + s, normalized (no in-place change to s). */
-  std::string GetParse(std::string s);
-  /* In-place: strip disallowed chars from s. */
-  void Format(std::string &s);
+  /* Return base path + s, normalized. */
+  std::string GetRelativePath(std::string s) const;
   /* Return s with disallowed chars stripped. */
-  std::string GetFormatted(std::string s);
+  std::string Format(std::string s) const;
 
   SP<OutStreamHandler> WriteFile(std::string s);
   SP<InStreamHandler> ReadFile(std::string s);
+
+  friend std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
+  friend std::istream &operator>>(std::istream &ifs, FilePath &fp);
+
+private:
+  void Slash(std::string &s) const;
+  std::string GetParse(std::string s) const;
+  std::string GetFormatted(std::string s) const;
+
+  std::set<char> allowed_;
+  bool in_linux_;
+  std::string path_;
+  SP<FileManager> fm_;
 };
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
@@ -178,47 +179,56 @@ public:
 
 /* --- Single-value persistence (SavableVariable) --- */
 
-/* Holds a value of type T and a file name. On construction (if bLoad), loads
- * from the file; on Set(..., true) or Save(), writes to the file. Uses
- * stream >> and << so T must support them. If the file is missing or read
- * fails, the default value is used. */
+/* Holds a value of type T and uses a path to load/save it. Takes a FilePath
+ * (by copy) and a file name; on construction (if load), loads via
+ * FilePath::ReadFile; on Set(..., true) or Save(), writes via
+ * FilePath::WriteFile. Uses stream >> and << so T must support them. If
+ * read fails, the default value is used. */
 template <class T> class SavableVariable {
-  T var;
-  std::string sFileName;
-
 public:
-  /* sFileName_ is the path for load/save; var_default used when not loading
-   * or when read fails; bLoad = false skips reading. */
-  SavableVariable(std::string sFileName_, T var_default, bool bLoad = true)
-      : sFileName(sFileName_) {
-    if (!bLoad)
-      var = var_default;
+  /* path: where to read/write; fileName: name passed to ReadFile/WriteFile;
+   * defaultVal: used when not loading or read fails; load: false skips read.
+   */
+  SavableVariable(const FilePath &path, std::string fileName, T defaultVal,
+                  bool load = true)
+      : fp_(path), file_(fileName) {
+    if (!load)
+      var_ = defaultVal;
     else {
-      std::ifstream ifs(sFileName.c_str());
-      ifs >> var;
-
-      if (ifs.fail())
-        var = var_default;
+      SP<InStreamHandler> pIn = fp_.ReadFile(file_);
+      if (pIn.GetRawPointer()) {
+        std::istream &ifs = pIn->GetStream();
+        ifs >> var_;
+        if (ifs.fail())
+          var_ = defaultVal;
+      } else
+        var_ = defaultVal;
     }
   }
 
-  /* Write current value to the file. */
+  /* Write current value to the file via FilePath::WriteFile. */
   void Save() {
-    std::ofstream ofs(sFileName.c_str());
-    ofs << var;
+    SP<OutStreamHandler> pOut = fp_.WriteFile(file_);
+    if (pOut.GetRawPointer())
+      pOut->GetStream() << var_;
   }
 
-  /* Update value and optionally write to file (bSave default true). */
-  void Set(T new_var, bool bSave = true) {
-    var = new_var;
-    if (bSave)
+  /* Update value and optionally write to file (saveToFile default true). */
+  void Set(T value, bool saveToFile = true) {
+    var_ = value;
+    if (saveToFile)
       Save();
   }
 
-  T Get() { return var; }
+  T Get() const { return var_; }
 
   /* For code that needs a const pointer to the stored value. */
-  const T *GetConstPointer() { return &var; }
+  const T *GetConstPointer() const { return &var_; }
+
+private:
+  T var_;
+  FilePath fp_;
+  std::string file_;
 };
 
 /* Flip the boolean in sv and save to its file. */

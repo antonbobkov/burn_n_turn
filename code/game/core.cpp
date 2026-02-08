@@ -306,13 +306,13 @@ TwrGlobalController::TwrGlobalController(
       pSndRaw(this, pSndRaw_), pSnd(this, new SoundInterfaceProxy(pSndRaw)),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
       pFancyNum(this, pFancyNum_), pWrp(pWrp_), pMenu(this, 0),
-      vLevelPointers(3), sbTutorialOn("tutorial_on.txt", true, true),
-      snProgress("stuff.txt", 0, true),
-      sbFullScreen(sFullScreenPath, false, true),
-      sbSoundOn("soundon.txt", true, true),
-      sbMusicOn("musicon.txt", true, true),
-      sbCheatsOn("cheat.txt", false, true),
-      sbCheatsUnlocked("more_stuff.txt", false, true) {
+      vLevelPointers(3), sbTutorialOn(fp, "tutorial_on.txt", true, true),
+      snProgress(fp, "stuff.txt", 0, true),
+      sbFullScreen(fp, sFullScreenPath, false, true),
+      sbSoundOn(fp, "soundon.txt", true, true),
+      sbMusicOn(fp, "musicon.txt", true, true),
+      sbCheatsOn(fp, "cheat.txt", false, true),
+      sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {
   {
     std::ifstream ifs("high.txt");
 
@@ -939,21 +939,24 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   SP<ScalingDrawer> pBigDr = new ScalingDrawer(pGr, nScale * 2);
 
   std::string sPath = "dragonfont\\";
-  fp.Parse(sPath);
+  sPath = fp.GetRelativePath(sPath);
 
   pNum = new NumberDrawer(pDr, sPath, "dragonfont");
   pBigNum = new NumberDrawer(pBigDr, sPath, "dragonfont");
   pFancyNum = new FontWriter(fp, "dragonfont\\dragonfont2.txt", pGr, 2);
 
+  std::string levelsFile;
 #ifdef FULL_VERSION
 #ifdef SMALL_SCREEN_VERSION
-  ReadLevels(fp.sPath + "levels_small.txt", rBound, vLvl);
+  levelsFile = "levels_small.txt";
 #else
-  ReadLevels(fp.sPath + "levels.txt", rBound, vLvl);
+  levelsFile = "levels.txt";
 #endif
 #else
-  ReadLevels(fp.sPath + "levels_trial.txt", rBound, vLvl);
+  levelsFile = "levels_trial.txt";
 #endif
+  levelsFile = fp.GetRelativePath(levelsFile);
+  ReadLevels(levelsFile, rBound, vLvl);
 
   pCnt = new TwrGlobalController(pDr, pNum, pBigNum, pFancyNum, pSm, vLvl,
                                  rBound, this, fp);

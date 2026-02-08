@@ -1,0 +1,10 @@
+- class style guide
+  - class name is CamelCase
+  - function names are CamelCase
+  - variables names are snake_case
+  - public first, private last
+  - comment above each non-trivial/non-obvious member function and member variable
+  - member variables end with an underscore
+  - none of the other function arguments end in underscore
+  - no public variables, everything should be controlled via public member functions. Use getters and setters if needed.
+  - if non-template, functions > 1 line should be implemented in cpp file
