@@ -11,5 +11,8 @@ build/
 bin/stuff.txt
 bin/musicon.txt
 bin/soundon.txt
+bin/error.txt
+bin/tutorial_on.txt
+
 
 

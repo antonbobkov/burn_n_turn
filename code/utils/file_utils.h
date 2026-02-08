@@ -7,7 +7,7 @@
  * Stream parsing: ParsePosition, ParseGrabNext, ParseGrabLine (token-based
  * reads from an istream). Stream handlers: OutStreamHandler, InStreamHandler
  * (own and expose an ostream* or istream*). FileManager and implementations:
- * StdFileManager, FunnyFileManager (open files, return stream handlers).
+ * StdFileManager, InMemoryFileManager (open files, return stream handlers).
  * FilePath: path plus slash/convention, allowed chars, and ReadFile/WriteFile.
  * Record persistence: RecordKeeper, Record<A,B>, RecordCollection (key-value
  * with ReadDef/WriteDef). SavableVariable<T>: single value load/save to a
@@ -21,6 +21,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <string>
@@ -41,56 +42,79 @@ bool ParseGrabLine(std::string sToken, std::istream &ifs, std::string &sResult);
 
 /* --- Stream handlers --- */
 
-/* Owns an std::ostream* and deletes it in the destructor; exposes GetStream().
- */
-class OutStreamHandler : public SP_Info {
+/* Owns an std::ostream via unique_ptr; exposes GetStream(). */
+class OutStreamHandler {
 protected:
-  std::ostream *pStr;
+  std::unique_ptr<std::ostream> pStr_;
 
 public:
-  OutStreamHandler(std::ostream *pStr_) : pStr(pStr_) {}
+  OutStreamHandler(std::ostream *pStr) : pStr_(pStr) {}
 
-  ~OutStreamHandler() { delete pStr; }
-
-  std::ostream &GetStream() { return *pStr; }
+  std::ostream &GetStream() { return *pStr_; }
 };
 
-/* Owns an std::istream* and deletes it in the destructor; exposes GetStream().
- */
-class InStreamHandler : public SP_Info {
+/* Owns an std::istream via unique_ptr; exposes GetStream(). */
+class InStreamHandler {
 protected:
-  std::istream *pStr;
+  std::unique_ptr<std::istream> pStr_;
 
 public:
-  InStreamHandler(std::istream *pStr_) : pStr(pStr_) {}
+  InStreamHandler(std::istream *pStr) : pStr_(pStr) {}
 
-  ~InStreamHandler() { delete pStr; }
-
-  std::istream &GetStream() { return *pStr; }
+  std::istream &GetStream() { return *pStr_; }
 };
 
 /* --- File managers --- */
 
-/* Abstract interface: open files for read or write, returning smart-pointer
- * stream handlers. */
-class FileManager : public SP_Info {
+/* Abstract interface: open files for read or write, returning unique_ptr
+ * stream handlers. Not copyable. */
+class FileManager {
 public:
-  virtual SP<OutStreamHandler> WriteFile(std::string s) = 0;
-  virtual SP<InStreamHandler> ReadFile(std::string s) = 0;
-};
+  virtual std::unique_ptr<OutStreamHandler> WriteFile(std::string s) = 0;
+  virtual std::unique_ptr<InStreamHandler> ReadFile(std::string s) = 0;
+  virtual bool FileExists(std::string s) = 0;
 
-/* Writes/reads under a "../" prefix (e.g. for data next to executable). */
-class FunnyFileManager : public FileManager {
-public:
-  /*virtual*/ SP<OutStreamHandler> WriteFile(std::string s);
-  /*virtual*/ SP<InStreamHandler> ReadFile(std::string s);
+  FileManager() = default;
+  FileManager(const FileManager &) = delete;
+  FileManager &operator=(const FileManager &) = delete;
+
+  virtual ~FileManager() {}
 };
 
 /* Uses the given path as-is for opening files. */
 class StdFileManager : public FileManager {
 public:
-  /*virtual*/ SP<OutStreamHandler> WriteFile(std::string s);
-  /*virtual*/ SP<InStreamHandler> ReadFile(std::string s);
+  /*virtual*/ std::unique_ptr<OutStreamHandler> WriteFile(std::string s);
+  /*virtual*/ std::unique_ptr<InStreamHandler> ReadFile(std::string s);
+  /*virtual*/ bool FileExists(std::string s);
+};
+
+/* OutStreamHandler that on destruction copies ostream content into a map. */
+class InMemoryOutStreamHandler : public OutStreamHandler {
+public:
+  InMemoryOutStreamHandler(std::string path,
+                           std::map<std::string, std::string> *files,
+                           std::ostringstream *stream);
+  ~InMemoryOutStreamHandler();
+
+private:
+  std::string path_;
+  std::map<std::string, std::string> *files_;
+  std::ostringstream *stream_;
+};
+
+/* In-memory filesystem: path -> string. WriteFile/ReadFile use stringstreams;
+ * when a write stream is destroyed, its content is stored in the map. */
+class InMemoryFileManager : public FileManager {
+public:
+  /*virtual*/ std::unique_ptr<OutStreamHandler> WriteFile(std::string path);
+  /*virtual*/ std::unique_ptr<InStreamHandler> ReadFile(std::string path);
+  /*virtual*/ bool FileExists(std::string path);
+  /* Contents of path, or empty string if not found. */
+  std::string GetFileContents(std::string path) const;
+
+private:
+  std::map<std::string, std::string> files_;
 };
 
 /* --- Path --- */
@@ -98,23 +122,34 @@ public:
 /* Path representation: base path, slash style (Linux vs Windows), allowed
  * characters, and a FileManager for ReadFile/WriteFile. GetRelativePath and
  * GetParse return base path + relative part; Format/GetFormatted validate.
- * Safe to copy. */
+ * Not copyable; create via Create or CreateFromStream, store as unique_ptr
+ * in owner (e.g. TowerDataWrap), pass raw pointer elsewhere. */
 class FilePath {
 public:
-  FilePath(bool inLinux = false, std::string path = "");
+  /* All arguments required; fm must outlive this FilePath. */
+  static std::unique_ptr<FilePath> Create(bool inLinux, std::string path,
+                                          FileManager *fm);
+  /* Read SYSTEM and PATH lines from stream; fm must outlive the result. */
+  static std::unique_ptr<FilePath> CreateFromStream(std::istream &ifs,
+                                                    FileManager *fm);
 
   /* Return base path + s, normalized. */
   std::string GetRelativePath(std::string s) const;
   /* Return s with disallowed chars stripped. */
   std::string Format(std::string s) const;
 
-  SP<OutStreamHandler> WriteFile(std::string s);
-  SP<InStreamHandler> ReadFile(std::string s);
+  std::unique_ptr<OutStreamHandler> WriteFile(std::string s);
+  std::unique_ptr<InStreamHandler> ReadFile(std::string s);
+  bool FileExists(std::string s) const;
+
+  FilePath(const FilePath &) = delete;
+  FilePath &operator=(const FilePath &) = delete;
 
   friend std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
-  friend std::istream &operator>>(std::istream &ifs, FilePath &fp);
 
 private:
+  FilePath(bool inLinux, std::string path, FileManager *fm);
+
   void Slash(std::string &s) const;
   std::string GetParse(std::string s) const;
   std::string GetFormatted(std::string s) const;
@@ -122,11 +157,10 @@ private:
   std::set<char> allowed_;
   bool in_linux_;
   std::string path_;
-  SP<FileManager> fm_;
+  FileManager *fm_;
 };
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
-std::istream &operator>>(std::istream &ifs, FilePath &fp);
 
 /* --- Record persistence (key-value to a default file) --- */
 
@@ -179,24 +213,25 @@ public:
 
 /* --- Single-value persistence (SavableVariable) --- */
 
-/* Holds a value of type T and uses a path to load/save it. Takes a FilePath
- * (by copy) and a file name; on construction (if load), loads via
- * FilePath::ReadFile; on Set(..., true) or Save(), writes via
- * FilePath::WriteFile. Uses stream >> and << so T must support them. If
- * read fails, the default value is used. */
+/* Holds a value of type T and uses a path to load/save it. Takes a FilePath*
+ * and a file name; on construction (if load), loads via FilePath::ReadFile;
+ * on Set(..., true) or Save(), writes via FilePath::WriteFile. Caller keeps
+ * FilePath lifetime. Uses stream >> and << so T must support them. */
 template <class T> class SavableVariable {
 public:
-  /* path: where to read/write; fileName: name passed to ReadFile/WriteFile;
-   * defaultVal: used when not loading or read fails; load: false skips read.
-   */
-  SavableVariable(const FilePath &path, std::string fileName, T defaultVal,
+  /* path: where to read/write (non-null); fileName: name passed to
+   * ReadFile/WriteFile; defaultVal when not loading or read fails;
+   * load: false skips read. */
+  SavableVariable(FilePath *path, std::string fileName, T defaultVal,
                   bool load = true)
       : fp_(path), file_(fileName) {
     if (!load)
       var_ = defaultVal;
+    else if (!fp_->FileExists(file_))
+      var_ = defaultVal;
     else {
-      SP<InStreamHandler> pIn = fp_.ReadFile(file_);
-      if (pIn.GetRawPointer()) {
+      std::unique_ptr<InStreamHandler> pIn = fp_->ReadFile(file_);
+      if (pIn) {
         std::istream &ifs = pIn->GetStream();
         ifs >> var_;
         if (ifs.fail())
@@ -208,8 +243,8 @@ public:
 
   /* Write current value to the file via FilePath::WriteFile. */
   void Save() {
-    SP<OutStreamHandler> pOut = fp_.WriteFile(file_);
-    if (pOut.GetRawPointer())
+    std::unique_ptr<OutStreamHandler> pOut = fp_->WriteFile(file_);
+    if (pOut)
       pOut->GetStream() << var_;
   }
 
@@ -227,7 +262,7 @@ public:
 
 private:
   T var_;
-  FilePath fp_;
+  FilePath *fp_;
   std::string file_;
 };
 

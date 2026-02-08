@@ -312,10 +312,11 @@ void FancyRoad::Draw(SP<ScalingDrawer> pDr) {
                           pAd->pGl->pr["road"], false);
 }
 
-void ReadLevels(std::string sFile, Rectangle rBound, LevelStorage &vLvl) {
-  std::istringstream istr;
-
-  std::ifstream ifs(sFile.c_str());
+void ReadLevels(Gui::FilePath *fp, std::string sFile, Rectangle rBound,
+                LevelStorage &vLvl) {
+  std::string path = fp->GetRelativePath(sFile);
+  std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile(path);
+  std::istream &ifs = ih->GetStream();
 
   LevelLayout l(rBound);
   while (ifs >> l) {

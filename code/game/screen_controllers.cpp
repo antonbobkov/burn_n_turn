@@ -592,9 +592,12 @@ void DragonScoreController::Update() {
   if (pGl->nHighScore < pGl->nScore) {
     pGl->nHighScore = pGl->nScore;
 
-    std::ofstream ofs("high.txt");
-    ofs << pGl->nScore;
-    ofs.close();
+    FilePath *fp = pGl->pWrp->GetFilePath();
+    if (fp) {
+      std::unique_ptr<Gui::OutStreamHandler> oh = fp->WriteFile("high.txt");
+      if (oh)
+        oh->GetStream() << pGl->nScore;
+    }
   }
 
   BasicController::Update();

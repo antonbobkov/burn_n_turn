@@ -15,3 +15,7 @@ add_library(Utils
   SmartPointer.h
   SmartPointer.cpp
 )
+
+add_executable(file_utils_test file_utils_test.cpp)
+target_link_libraries(file_utils_test PRIVATE Utils Catch2::Catch2WithMain)
+add_test(NAME file_utils_test COMMAND $<TARGET_FILE:file_utils_test>)

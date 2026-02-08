@@ -47,9 +47,23 @@ bool ParseGrabLine(std::string sToken, std::istream &ifs,
   }
 }
 
-FilePath::FilePath(bool inLinux, std::string path)
-    : in_linux_(inLinux), path_(path) {
-  fm_ = new StdFileManager();
+std::unique_ptr<FilePath> FilePath::Create(bool inLinux, std::string path,
+                                           FileManager *fm) {
+  return std::unique_ptr<FilePath>(new FilePath(inLinux, path, fm));
+}
+
+std::unique_ptr<FilePath> FilePath::CreateFromStream(std::istream &ifs,
+                                                     FileManager *fm) {
+  ParsePosition("SYSTEM", ifs);
+  bool inLinux;
+  ifs >> inLinux;
+  std::string path;
+  ParseGrabLine("PATH", ifs, path);
+  return Create(inLinux, path, fm);
+}
+
+FilePath::FilePath(bool inLinux, std::string path, FileManager *fm)
+    : in_linux_(inLinux), path_(path), fm_(fm) {
   Slash(path_);
   std::string str;
   str += "abcdefghijklmnopqrstuvwxyz";
@@ -93,42 +107,75 @@ std::string FilePath::GetFormatted(std::string s) const {
   return s_clean;
 }
 
-SP<OutStreamHandler> FilePath::WriteFile(std::string s) {
+std::unique_ptr<OutStreamHandler> FilePath::WriteFile(std::string s) {
   return fm_->WriteFile(s);
 }
 
-SP<InStreamHandler> FilePath::ReadFile(std::string s) {
+std::unique_ptr<InStreamHandler> FilePath::ReadFile(std::string s) {
   return fm_->ReadFile(s);
 }
 
-SP<OutStreamHandler> StdFileManager::WriteFile(std::string s) {
-  return new OutStreamHandler(new std::ofstream(s.c_str()));
+bool FilePath::FileExists(std::string s) const { return fm_->FileExists(s); }
+
+std::unique_ptr<OutStreamHandler> StdFileManager::WriteFile(std::string s) {
+  return std::unique_ptr<OutStreamHandler>(
+      new OutStreamHandler(new std::ofstream(s.c_str())));
 }
 
-SP<InStreamHandler> StdFileManager::ReadFile(std::string s) {
-  return new InStreamHandler(new std::ifstream(s.c_str()));
+std::unique_ptr<InStreamHandler> StdFileManager::ReadFile(std::string s) {
+  std::unique_ptr<std::ifstream> pIfs(new std::ifstream(s.c_str()));
+  if (!pIfs->is_open())
+    throw SimpleException("StdFileManager", "ReadFile",
+                          std::string("file not found: ") + s);
+  return std::unique_ptr<InStreamHandler>(new InStreamHandler(pIfs.release()));
 }
 
-SP<OutStreamHandler> FunnyFileManager::WriteFile(std::string s) {
-  return new OutStreamHandler(new std::ofstream(("../" + s).c_str()));
+bool StdFileManager::FileExists(std::string s) {
+  std::ifstream ifs(s.c_str());
+  return ifs.is_open();
 }
 
-SP<InStreamHandler> FunnyFileManager::ReadFile(std::string s) {
-  return new InStreamHandler(new std::ifstream(("../" + s).c_str()));
+InMemoryOutStreamHandler::InMemoryOutStreamHandler(
+    std::string path, std::map<std::string, std::string> *files,
+    std::ostringstream *stream)
+    : OutStreamHandler(stream), path_(path), files_(files), stream_(stream) {}
+
+InMemoryOutStreamHandler::~InMemoryOutStreamHandler() {
+  if (stream_ && files_)
+    (*files_)[path_] = stream_->str();
+}
+
+std::unique_ptr<OutStreamHandler>
+InMemoryFileManager::WriteFile(std::string path) {
+  std::ostringstream *oss = new std::ostringstream();
+  return std::unique_ptr<OutStreamHandler>(
+      new InMemoryOutStreamHandler(path, &files_, oss));
+}
+
+std::unique_ptr<InStreamHandler>
+InMemoryFileManager::ReadFile(std::string path) {
+  std::map<std::string, std::string>::const_iterator it = files_.find(path);
+  if (it == files_.end())
+    throw SimpleException("InMemoryFileManager", "ReadFile",
+                          std::string("file not found: ") + path);
+  return std::unique_ptr<InStreamHandler>(
+      new InStreamHandler(new std::istringstream(it->second)));
+}
+
+bool InMemoryFileManager::FileExists(std::string path) {
+  return files_.find(path) != files_.end();
+}
+
+std::string InMemoryFileManager::GetFileContents(std::string path) const {
+  std::map<std::string, std::string>::const_iterator it = files_.find(path);
+  if (it == files_.end())
+    return "";
+  return it->second;
 }
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp) {
   ofs << "SYSTEM " << fp.in_linux_ << "\nPATH " << fp.path_ << "\n";
   return ofs;
-}
-
-std::istream &operator>>(std::istream &ifs, FilePath &fp) {
-  ParsePosition("SYSTEM", ifs);
-  ifs >> fp.in_linux_;
-  ParseGrabLine("PATH", ifs, fp.path_);
-  fp.Slash(fp.path_);
-  fp.path_ = fp.Format(fp.path_);
-  return ifs;
 }
 
 void Separate(std::string &strFile, std::string &strFolder) {

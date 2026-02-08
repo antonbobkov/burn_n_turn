@@ -1,7 +1,7 @@
 ---
 alwaysApply: true
 ---
-After modifying code, build the project to verify correctness. After modifying CMake files, run cmake and build. After modifying tests, run tests to make sure they pass.
+After modifying code, build the project to verify correctness. After modifying CMake files, run cmake and build. After modifying tests, run tests to make sure they pass. If a file has a "_test.cc" file associated with it (for example, file_utils_test.cc for file_utils.h and file_utils.cc), after modifying code in that file, make sure tests pass in _test file.
 
 To make and build, run `cd c:\coding\dragongame_git\build; cmake ../code -G "MinGW Makefiles"; mingw32-make`
 

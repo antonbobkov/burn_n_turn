@@ -143,7 +143,7 @@ public:
 class Preloader : virtual public SP_Info {
 public:
   Preloader(SP<GraphicalInterface<Index>> pGr_, SP<SoundInterface<Index>> pSn_,
-            FilePath fp_ = FilePath());
+            FilePath *fp);
 
   /** Image index by key; throws if not found. */
   Index &operator[](std::string key);
@@ -208,7 +208,7 @@ private:
   std::vector<Color> vTr;
   unsigned nScale;
 
-  FilePath fp;
+  FilePath *fp_;
 
   SP<GraphicalInterface<Index>> pGr;
   SP<SoundInterface<Index>> pSn;

@@ -193,10 +193,10 @@ void GuiSaveImage(std::ostream *pStr, const Image *pImg) {
                           "Failed to write into the provided stream");
 }
 
-FontWriter::FontWriter(FilePath &fp, std::string sFont,
+FontWriter::FontWriter(FilePath *fp, std::string sFont,
                        SP<GraphicalInterface<Index>> pGr_, unsigned nZoom)
     : vImgIndx(256, -1), pGr(pGr_) {
-  sFont = fp.GetRelativePath(sFont);
+  sFont = fp->GetRelativePath(sFont);
 
   std::string sFontPath;
   std::string sFontName = sFont;
@@ -208,7 +208,7 @@ FontWriter::FontWriter(FilePath &fp, std::string sFont,
   std::string sFontPicture;
   std::getline(ifs, sFontPicture);
 
-  sFontPicture = fp.Format(sFontPicture);
+  sFontPicture = fp->Format(sFontPicture);
 
   Color cTransp;
   int na, nb, nc;

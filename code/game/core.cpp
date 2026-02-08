@@ -112,17 +112,20 @@ void NumberDrawer::CacheColor(Color c) {
   mpCachedRecolorings[c] = vNewColors;
 }
 
-NumberDrawer::NumberDrawer(SP<ScalingDrawer> pDr_, std::string sFontPath,
-                           std::string sFontName)
+NumberDrawer::NumberDrawer(SP<ScalingDrawer> pDr_, Gui::FilePath *fp,
+                           std::string sFontPath, std::string sFontName)
     : pDr(this, pDr_), vImgIndx(256, -1) {
-  std::ifstream ifs((sFontPath + sFontName + ".txt").c_str());
+  std::string txtPath = fp->GetRelativePath(sFontPath + sFontName + ".txt");
+  std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile(txtPath);
+  std::istream &ifs = ih->GetStream();
 
   unsigned n;
   unsigned char c;
   for (n = 0; c = ifs.get(), !ifs.fail(); ++n)
     vImgIndx[c] = n;
 
-  Index nImg = pDr->LoadImage((sFontPath + sFontName + ".bmp").c_str());
+  std::string bmpPath = fp->GetRelativePath(sFontPath + sFontName + ".bmp");
+  Index nImg = pDr->LoadImage(bmpPath);
   Image *pImg = pDr->pGr->GetImage(nImg);
   for (unsigned i = 0; i < n; ++i) {
     Index nCurr = pDr->pGr->GetBlankImage(Size(3, 5));
@@ -300,7 +303,7 @@ const std::string sFullScreenPath = "fullscreen.txt";
 TwrGlobalController::TwrGlobalController(
     SP<ScalingDrawer> pDr_, SP<NumberDrawer> pNum_, SP<NumberDrawer> pBigNum_,
     SP<FontWriter> pFancyNum_, SP<Soundic> pSndRaw_, const LevelStorage &vLvl_,
-    Rectangle rBound_, TowerDataWrap *pWrp_, FilePath fp)
+    Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(this, pDr_), pGraph(this, pDr_->pGr), pNum(this, pNum_),
       pBigNum(this, pBigNum_), pr(pDr_->pGr, pSndRaw_, fp),
       pSndRaw(this, pSndRaw_), pSnd(this, new SoundInterfaceProxy(pSndRaw)),
@@ -314,12 +317,10 @@ TwrGlobalController::TwrGlobalController(
       sbCheatsOn(fp, "cheat.txt", false, true),
       sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {
   {
-    std::ifstream ifs("high.txt");
-
-    if (!ifs.fail())
-      ifs >> nHighScore;
-
-    ifs.close();
+    if (fp->FileExists("high.txt")) {
+      std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile("high.txt");
+      ih->GetStream() >> nHighScore;
+    }
   }
 
   typedef ImagePainter::ColorMap ColorMap;
@@ -918,12 +919,10 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 
   pWr = pe.pMsg.GetRawPointer();
 
+  fm_ = std::unique_ptr<Gui::FileManager>(new Gui::StdFileManager());
   {
-    std::ifstream ifs("config.txt");
-    if (ifs.fail())
-      throw SimpleException("TowerDataWrap", "<constructor>",
-                            "Need config.txt file!");
-    ifs >> fp;
+    std::unique_ptr<Gui::InStreamHandler> ih = fm_->ReadFile("config.txt");
+    fp_ = Gui::FilePath::CreateFromStream(ih->GetStream(), fm_.get());
   }
 
   Rectangle sBound = Rectangle(pe.szScreenRez);
@@ -938,12 +937,11 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 
   SP<ScalingDrawer> pBigDr = new ScalingDrawer(pGr, nScale * 2);
 
-  std::string sPath = "dragonfont\\";
-  sPath = fp.GetRelativePath(sPath);
+  std::string sFontPath = "dragonfont\\";
 
-  pNum = new NumberDrawer(pDr, sPath, "dragonfont");
-  pBigNum = new NumberDrawer(pBigDr, sPath, "dragonfont");
-  pFancyNum = new FontWriter(fp, "dragonfont\\dragonfont2.txt", pGr, 2);
+  pNum = new NumberDrawer(pDr, fp_.get(), sFontPath, "dragonfont");
+  pBigNum = new NumberDrawer(pBigDr, fp_.get(), sFontPath, "dragonfont");
+  pFancyNum = new FontWriter(fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2);
 
   std::string levelsFile;
 #ifdef FULL_VERSION
@@ -955,11 +953,10 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 #else
   levelsFile = "levels_trial.txt";
 #endif
-  levelsFile = fp.GetRelativePath(levelsFile);
-  ReadLevels(levelsFile, rBound, vLvl);
+  ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
   pCnt = new TwrGlobalController(pDr, pNum, pBigNum, pFancyNum, pSm, vLvl,
-                                 rBound, this, fp);
+                                 rBound, this, fp_.get());
   pCnt->StartUp();
 }
 

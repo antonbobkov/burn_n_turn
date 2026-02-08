@@ -3,6 +3,10 @@
 
 #include "common.h"
 
+namespace Gui {
+class FilePath;
+}
+
 /** Polar coordinates (radius r, angle a); converts to/from fPoint, supports
  * multiply for rotation. */
 struct Polar {
@@ -61,7 +65,7 @@ struct NumberDrawer : virtual public SP_Info {
 
   void CacheColor(Color c);
 
-  NumberDrawer(SP<ScalingDrawer> pDr_, std::string sFontPath,
+  NumberDrawer(SP<ScalingDrawer> pDr_, Gui::FilePath *fp, std::string sFontPath,
                std::string sFontName);
 
   std::string GetNumber(unsigned n, unsigned nDigits = 0);

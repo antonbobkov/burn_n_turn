@@ -51,8 +51,6 @@ void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
 
 unsigned GetTicks() { return SDL_GetTicks(); }
 
-SP<FileManager> GetFileManager() { return new StdFileManager(); }
-
 int main(int argc, char *argv[]) {
   srand((unsigned)time(NULL));
 

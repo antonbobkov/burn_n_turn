@@ -618,7 +618,7 @@ struct FontWriter : virtual public SP_Info {
   Color clSymbol;
   int nGap;
 
-  FontWriter(FilePath &fp, std::string sFont,
+  FontWriter(FilePath *fp, std::string sFont,
              SP<GraphicalInterface<Index>> pGr_, unsigned nZoom = 1);
 
   Size GetSize(std::string s);

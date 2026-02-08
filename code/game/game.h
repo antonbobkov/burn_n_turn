@@ -80,8 +80,7 @@ struct TwrGlobalController : virtual public SP_Info {
   TwrGlobalController(SP<ScalingDrawer> pDr_, SP<NumberDrawer> pNum_,
                       SP<NumberDrawer> pBigNum_, SP<FontWriter> pFancyNum_,
                       SP<Soundic> pSndRaw_, const LevelStorage &vLvl_,
-                      Rectangle rBound_, TowerDataWrap *pWrp_,
-                      FilePath fp = FilePath());
+                      Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp);
 
   TowerDataWrap *pWrp;
 
@@ -108,23 +107,27 @@ struct FancyRoad : public Road {
 };
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
-struct TowerDataWrap {
+class TowerDataWrap {
+public:
+  TowerDataWrap(ProgramEngine pe);
+
+  FilePath *GetFilePath() const { return fp_.get(); }
+
   SP<Event> pExitProgram;
 
   SP<GraphicalInterface<Index>> pGr;
   SP<SoundInterface<Index>> pSm;
-
-  FilePath fp;
 
   SP<ScalingDrawer> pDr;
   SP<NumberDrawer> pNum;
   SP<NumberDrawer> pBigNum;
   SP<FontWriter> pFancyNum;
 
+  std::unique_ptr<FileManager> fm_;
+  std::unique_ptr<FilePath> fp_;
+
   LevelStorage vLvl;
   SP<TwrGlobalController> pCnt;
-
-  TowerDataWrap(ProgramEngine pe);
 
   Size szActualRez;
 };

@@ -168,8 +168,8 @@ std::string PreloaderExceptionLoad::GetErrorMessage() const {
 // --- Preloader ---
 
 Preloader::Preloader(SP<GraphicalInterface<Index>> pGr_,
-                     SP<SoundInterface<Index>> pSn_, FilePath fp_)
-    : pGr(pGr_), pSn(pSn_), nScale(1), fp(fp_) {}
+                     SP<SoundInterface<Index>> pSn_, FilePath *fp)
+    : pGr(pGr_), pSn(pSn_), nScale(1), fp_(fp) {}
 
 void Preloader::AddTransparent(Color c) { vTr.push_back(c); }
 
@@ -216,7 +216,7 @@ void Preloader::AddSequence(ImageSequence pImg, std::string key) {
 }
 
 void Preloader::Load(std::string fName, std::string key) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
     mpImg[key] = pImg;
@@ -231,7 +231,7 @@ void Preloader::Load(std::string fName, std::string key) {
 }
 
 void Preloader::LoadT(std::string fName, std::string key, Color c) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
     if (c == Color(0, 0, 0, 0))
@@ -250,7 +250,7 @@ void Preloader::LoadT(std::string fName, std::string key, Color c) {
 }
 
 void Preloader::LoadS(std::string fName, std::string key, unsigned nScale_) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
     if (nScale_ == 0)
@@ -270,7 +270,7 @@ void Preloader::LoadS(std::string fName, std::string key, unsigned nScale_) {
 
 void Preloader::LoadTS(std::string fName, std::string key, Color c,
                        unsigned nScale_) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
     if (c == Color(0, 0, 0, 0))
@@ -293,9 +293,9 @@ void Preloader::LoadTS(std::string fName, std::string key, Color c,
 }
 
 ImageSequence Preloader::LoadSeq(std::string fName) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   ImageSequence imgSeq;
-  SP<InStreamHandler> pFl = fp.ReadFile(fName);
+  std::unique_ptr<InStreamHandler> pFl = fp_->ReadFile(fName);
   std::istream &ifs = pFl->GetStream();
   std::string strFolder;
   Separate(fName, strFolder);
@@ -312,7 +312,7 @@ ImageSequence Preloader::LoadSeq(std::string fName) {
       bFancy = true;
       continue;
     }
-    s = fp.Format(s);
+    s = fp_->Format(s);
     imgSeq.Add(pGr->LoadImage(strFolder + s), n);
   }
   if (imgSeq.vImage.empty())
@@ -409,7 +409,7 @@ Index Preloader::LoadSndRaw(std::string fName) {
 
 void Preloader::LoadSnd(std::string fName, std::string key) {
   try {
-    fName = fp.GetRelativePath(fName);
+    fName = fp_->GetRelativePath(fName);
     Index i = LoadSndRaw(fName);
     mpSnd[key] = i;
   } catch (PreloaderException &exPre) {
@@ -419,9 +419,9 @@ void Preloader::LoadSnd(std::string fName, std::string key) {
 }
 
 void Preloader::LoadSndSeq(std::string fName, std::string key) {
-  fName = fp.GetRelativePath(fName);
+  fName = fp_->GetRelativePath(fName);
   SoundSequence sndSeq;
-  SP<InStreamHandler> pFl = fp.ReadFile(fName);
+  std::unique_ptr<InStreamHandler> pFl = fp_->ReadFile(fName);
   std::istream &ifs = pFl->GetStream();
   std::string strFolder;
   Separate(fName, strFolder);

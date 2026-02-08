@@ -4,6 +4,9 @@
 #include "entities.h"
 #include "exception.h"
 
+namespace Gui {
+class FilePath;
+}
 
 /** Exception for BrokenLine segment errors (e.g. invalid/empty segment). */
 class SegmentSimpleException : public MyException {
@@ -100,7 +103,8 @@ struct LevelLayout {
 
 typedef std::vector<LevelLayout> LevelStorage;
 
-void ReadLevels(std::string sFile, Rectangle rBound, LevelStorage &vLvl);
+void ReadLevels(Gui::FilePath *fp, std::string sFile, Rectangle rBound,
+                LevelStorage &vLvl);
 
 std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f);
 std::istream &operator>>(std::istream &ifs, LevelLayout &f);
