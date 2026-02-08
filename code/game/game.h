@@ -123,7 +123,7 @@ public:
   SP<NumberDrawer> pBigNum;
   SP<FontWriter> pFancyNum;
 
-  std::unique_ptr<FileManager> fm_;
+  FileManager *p_fm_;
   std::unique_ptr<FilePath> fp_;
 
   LevelStorage vLvl;

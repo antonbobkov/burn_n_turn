@@ -51,3 +51,5 @@ add_subdirectory(wrappers_sdl_impl)
 add_subdirectory(wrappers_mock)
 
 add_subdirectory(game)
+
+add_subdirectory(simulation)

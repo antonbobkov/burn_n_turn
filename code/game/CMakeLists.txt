@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(TowerDefense LANGUAGES CXX)
 
-add_executable(tower_defense
-  main.cpp
+add_library(GameCore STATIC
   core.cpp
   entities.cpp
   level.cpp
@@ -14,7 +13,15 @@ add_executable(tower_defense
   dragon.cpp
   gameplay.cpp
 )
+target_include_directories(GameCore PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/game_utils
+  ${CMAKE_SOURCE_DIR}/wrappers
+  ${CMAKE_SOURCE_DIR}/utils
+)
+target_link_libraries(GameCore PUBLIC GameUtils)
 
+add_executable(tower_defense main.cpp)
 target_include_directories(tower_defense PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/game_utils
@@ -31,7 +38,7 @@ target_link_directories(tower_defense PRIVATE
   ${SDL_MIXER_PATH}/lib
 )
 target_link_libraries(tower_defense PRIVATE
-  GameUtils
+  GameCore
   GuiSdl
   SuiSdl
   mingw32

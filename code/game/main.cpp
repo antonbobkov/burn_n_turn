@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Global.h"
+#include "file_utils.h"
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"
@@ -91,8 +92,9 @@ int main(int argc, char *argv[]) {
       SDL_SetWindowGrab(pGraph->pScreenWindow, SDL_TRUE);
     }
 
+    std::unique_ptr<Gui::FileManager> fm(new Gui::StdFileManager());
     ProgramEngine pe(NewSwitchEvent(bExit, bTrue), pGr, pSndMng, new IoWriter(),
-                     inf.szScreenRez);
+                     inf.szScreenRez, fm.get());
 
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);

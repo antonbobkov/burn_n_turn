@@ -919,10 +919,10 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 
   pWr = pe.pMsg.GetRawPointer();
 
-  fm_ = std::unique_ptr<Gui::FileManager>(new Gui::StdFileManager());
+  p_fm_ = pe.GetFileManager();
   {
-    std::unique_ptr<Gui::InStreamHandler> ih = fm_->ReadFile("config.txt");
-    fp_ = Gui::FilePath::CreateFromStream(ih->GetStream(), fm_.get());
+    std::unique_ptr<Gui::InStreamHandler> ih = p_fm_->ReadFile("config.txt");
+    fp_ = Gui::FilePath::CreateFromStream(ih->GetStream(), p_fm_);
   }
 
   Rectangle sBound = Rectangle(pe.szScreenRez);

@@ -9,6 +9,7 @@
 #include "SuiGen.h"
 
 namespace Gui {
+class FileManager;
 struct ProgramInfo {
   Size szScreenRez;
   std::string strTitle;
@@ -41,23 +42,29 @@ struct ProgramEngine {
   SP<SoundInterface<Index>> pSndMng;
   SP<MessageWriter> pMsg;
 
+  FileManager *p_fm;
+
   Size szScreenRez;
   Size szActualRez;
 
   ProgramEngine(SP<Event> pExitProgram_, SP<GraphicalInterface<Index>> pGr_,
-                SP<SoundInterface<Index>> pSndMng_, SP<MessageWriter> pMsg_)
-      : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_) {
+                SP<SoundInterface<Index>> pSndMng_, SP<MessageWriter> pMsg_,
+                FileManager *p_fm_)
+      : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
+        p_fm(p_fm_) {
     szScreenRez = GetProgramInfo().szScreenRez;
     szActualRez = szScreenRez;
   }
 
   ProgramEngine(SP<Event> pExitProgram_, SP<GraphicalInterface<Index>> pGr_,
                 SP<SoundInterface<Index>> pSndMng_, SP<MessageWriter> pMsg_,
-                Size szScreenRez_)
+                Size szScreenRez_, FileManager *p_fm_)
       : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
-        szScreenRez(szScreenRez_) {
+        p_fm(p_fm_), szScreenRez(szScreenRez_) {
     szActualRez = szScreenRez;
   }
+
+  FileManager *GetFileManager() const { return p_fm; }
 };
 
 class GlobalController : virtual public SP_Info {
