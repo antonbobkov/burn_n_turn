@@ -3,6 +3,7 @@ project(TowerDefense LANGUAGES CXX)
 
 add_library(GameCore STATIC
   core.cpp
+  game_runner_interface_impl.cc
   entities.cpp
   level.cpp
   tutorial.cpp
@@ -21,7 +22,8 @@ target_include_directories(GameCore PUBLIC
 )
 target_link_libraries(GameCore PUBLIC GameUtils)
 
-add_executable(tower_defense main.cpp)
+add_executable(tower_defense
+  ${CMAKE_SOURCE_DIR}/wrappers_sdl_impl/sdl_game_runner_main.cpp)
 target_include_directories(tower_defense PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/game_utils

@@ -1,9 +1,8 @@
 #include "simulation.h"
 
-#include "Global.h"
 #include "MessageWriter.h"
 #include "file_utils.h"
-
+#include "game_runner_interface.h"
 
 #include "GuiMock.h"
 #include "SuiMock.h"

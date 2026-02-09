@@ -153,6 +153,6 @@ enum {
 struct TwrGlobalController;
 struct GameController;
 
-ProgramInfo GetProgramInfo();
+extern const std::string sFullScreenPath;
 
 #endif

@@ -4,7 +4,7 @@ project(GameUtils LANGUAGES CXX)
 add_library(GameUtils
   event.cpp
   event.h
-  Global.h
+  game_runner_interface.h
   MessageWriter.cpp
   MessageWriter.h
   Preloader.cpp

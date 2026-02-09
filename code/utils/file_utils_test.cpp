@@ -82,6 +82,50 @@ TEST_CASE("FilePath GetRelativePath with non-empty base",
   REQUIRE(result.size() > 8u);
 }
 
+TEST_CASE("FilePath GetRelativePath dot and file adds slash Linux",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, ".", mgr);
+  REQUIRE(fp->GetRelativePath("file") == "./file");
+}
+
+TEST_CASE("FilePath GetRelativePath dot and file adds slash Windows",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, ".", mgr);
+  REQUIRE(fp->GetRelativePath("file") == ".\\file");
+}
+
+TEST_CASE("FilePath GetRelativePath base slash and leading slash in s",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, "./", mgr);
+  REQUIRE(fp->GetRelativePath("/file") == "./file");
+}
+
+TEST_CASE("FilePath GetRelativePath double slashes collapsed Linux",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp =
+      Gui::FilePath::Create(true, "data//", mgr);
+  REQUIRE(fp->GetRelativePath("file") == "data/file");
+}
+
+TEST_CASE("FilePath GetRelativePath double slashes collapsed Windows",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp =
+      Gui::FilePath::Create(false, "data\\\\", mgr);
+  REQUIRE(fp->GetRelativePath("file") == "data\\file");
+}
+
+TEST_CASE("FilePath GetRelativePath empty base unchanged",
+          "[file_utils][FilePath]") {
+  Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
+  std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, "", mgr);
+  REQUIRE(fp->GetRelativePath("a/b") == "a/b");
+}
+
 TEST_CASE("FilePath Format strips disallowed chars", "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);

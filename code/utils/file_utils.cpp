@@ -88,14 +88,58 @@ void FilePath::Slash(std::string &s) const {
   }
 }
 
+namespace {
+
+char PreferredSlash(bool in_linux) { return in_linux ? '/' : '\\'; }
+
+/* Replace any run of sep with a single sep. Leaves the path readable and
+ * avoids double slashes. Examples (sep is '/'): "a//b" -> "a/b",
+ * "a///b" -> "a/b", "a/b/c" unchanged. Same idea for backslash on Windows:
+ * "a\\\\b" -> "a\\b". */
+void CollapseSlash(std::string &s, char sep) {
+  std::string out;
+  out.reserve(s.size());
+  for (size_t i = 0; i < s.size(); ++i) {
+    if (s[i] == sep) {
+      out += sep;
+      while (i + 1 < s.size() && s[i + 1] == sep)
+        ++i;
+    } else
+      out += s[i];
+  }
+  s = std::move(out);
+}
+
+void TrimTrailingSlash(std::string &s, char sep) {
+  while (!s.empty() && s.back() == sep)
+    s.pop_back();
+}
+
+void TrimLeadingSlash(std::string &s, char sep) {
+  while (!s.empty() && s.front() == sep)
+    s.erase(0, 1);
+}
+
+} // namespace
+
 std::string FilePath::GetRelativePath(std::string s) const {
   return GetParse(s);
 }
 
 std::string FilePath::GetParse(std::string s) const {
-  Slash(s);
-  s = path_ + s;
-  return GetFormatted(s);
+  char sep = PreferredSlash(in_linux_);
+  std::string base = path_;
+  std::string rel = s;
+  Slash(rel);
+  CollapseSlash(base, sep);
+  CollapseSlash(rel, sep);
+  TrimTrailingSlash(base, sep);
+  TrimLeadingSlash(rel, sep);
+  std::string result = base;
+  if (!base.empty() && !rel.empty())
+    result += sep;
+  result += rel;
+  return GetFormatted(result);
 }
 
 std::string FilePath::Format(std::string s) const { return GetFormatted(s); }

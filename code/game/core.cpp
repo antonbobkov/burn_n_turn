@@ -859,49 +859,6 @@ void TwrGlobalController::Menu() {
   pMenu->nResumePosition = nActive;
   nActive = 0;
 }
-bool AreWeFullScreen() {
-  std::ifstream ifs(sFullScreenPath);
-
-  bool bRet;
-  ifs >> bRet;
-
-  if (ifs.fail())
-    return false;
-
-  return bRet;
-}
-
-ProgramInfo GetProgramInfo() {
-  ProgramInfo inf;
-
-  // inf.szScreenRez = Size(640, 480);
-  // inf.szScreenRez = Size(1024, 768);
-  // inf.szScreenRez = Size(960, 640);
-
-#ifdef SMALL_SCREEN_VERSION
-  inf.szScreenRez = Size(854, 480);
-#else
-  inf.szScreenRez = Size(960, 600);
-#endif
-
-  inf.strTitle = "Tower Defense";
-  inf.nFramerate = 1000 / nFramesInSecond;
-  inf.bMouseCapture = false;
-
-  static bool bFullScreen = AreWeFullScreen();
-
-  if (bFullScreen) {
-    inf.bFullScreen = true;
-    inf.bFlexibleResolution = true;
-    inf.bBlackBox = true;
-  }
-
-  return inf;
-}
-
-SP<GlobalController> GetGlobalController(ProgramEngine pe) {
-  return new TowerGameGlobalController(pe);
-}
 
 TowerGameGlobalController::TowerGameGlobalController(ProgramEngine pe) {
   pData = new TowerDataWrap(pe);

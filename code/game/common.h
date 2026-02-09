@@ -20,7 +20,7 @@
 
 #include "Preloader.h"
 
-#include "Global.h"
+#include "game_runner_interface.h"
 
 #define FULL_VERSION
 #define PC_VERSION
