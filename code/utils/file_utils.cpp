@@ -2,8 +2,36 @@
 #include "exception.h"
 
 #include <fstream>
+#include <iterator>
 
 namespace Gui {
+
+namespace {
+
+/* On destruction copies ostream content into the given map at path. */
+class InMemoryOutStreamHandler : public OutStreamHandler {
+public:
+  InMemoryOutStreamHandler(std::string path,
+                           std::map<std::string, std::string> *files,
+                           std::ostringstream *stream);
+  ~InMemoryOutStreamHandler() override;
+
+private:
+  std::string path_;
+  std::map<std::string, std::string> *files_;
+};
+
+InMemoryOutStreamHandler::InMemoryOutStreamHandler(
+    std::string path, std::map<std::string, std::string> *files,
+    std::ostringstream *stream)
+    : OutStreamHandler(stream), path_(path), files_(files) {}
+
+InMemoryOutStreamHandler::~InMemoryOutStreamHandler() {
+  if (files_ && pStr_)
+    (*files_)[path_] = static_cast<std::ostringstream *>(pStr_.get())->str();
+}
+
+} // namespace
 
 bool ParsePosition(std::string sToken, std::istream &ifs) {
   std::string s;
@@ -180,14 +208,19 @@ bool StdFileManager::FileExists(std::string s) {
   return ifs.is_open();
 }
 
-InMemoryOutStreamHandler::InMemoryOutStreamHandler(
-    std::string path, std::map<std::string, std::string> *files,
-    std::ostringstream *stream)
-    : OutStreamHandler(stream), path_(path), files_(files), stream_(stream) {}
+std::string GetFileContent(FileManager *fm, std::string path) {
+  if (!fm->FileExists(path))
+    return "";
+  std::unique_ptr<InStreamHandler> ih = fm->ReadFile(path);
+  std::istream &is = ih->GetStream();
+  return std::string(std::istreambuf_iterator<char>(is),
+                     std::istreambuf_iterator<char>());
+}
 
-InMemoryOutStreamHandler::~InMemoryOutStreamHandler() {
-  if (stream_ && files_)
-    (*files_)[path_] = stream_->str();
+void WriteContentToFile(FileManager *fm, std::string path,
+                        std::string content) {
+  std::unique_ptr<OutStreamHandler> out = fm->WriteFile(path);
+  out->GetStream() << content;
 }
 
 std::unique_ptr<OutStreamHandler>
@@ -211,11 +244,50 @@ bool InMemoryFileManager::FileExists(std::string path) {
   return files_.find(path) != files_.end();
 }
 
-std::string InMemoryFileManager::GetFileContents(std::string path) const {
-  std::map<std::string, std::string>::const_iterator it = files_.find(path);
-  if (it == files_.end())
-    return "";
-  return it->second;
+CachingReadOnlyFileManager::CachingReadOnlyFileManager(
+    FileManager *underlying_file_manager, std::string filter_substring)
+    : underlying_(underlying_file_manager), filter_substring_(filter_substring),
+      cache_miss_count_(0) {}
+
+bool CachingReadOnlyFileManager::PathMatchesFilter(std::string path) const {
+  if (filter_substring_.empty())
+    return true;
+  return path.find(filter_substring_) != std::string::npos;
+}
+
+std::unique_ptr<OutStreamHandler>
+CachingReadOnlyFileManager::WriteFile(std::string path) {
+  std::ostringstream *oss = new std::ostringstream();
+  return std::unique_ptr<OutStreamHandler>(
+      new InMemoryOutStreamHandler(path, &cache_, oss));
+}
+
+std::unique_ptr<InStreamHandler>
+CachingReadOnlyFileManager::ReadFile(std::string path) {
+  std::map<std::string, std::string>::const_iterator it = cache_.find(path);
+  if (it != cache_.end())
+    return std::unique_ptr<InStreamHandler>(
+        new InStreamHandler(new std::istringstream(it->second)));
+  if (!PathMatchesFilter(path) || !underlying_->FileExists(path))
+    throw SimpleException("CachingReadOnlyFileManager", "ReadFile",
+                          std::string("file not found: ") + path);
+  std::string content = GetFileContent(underlying_, path);
+  cache_[path] = content;
+  ++cache_miss_count_;
+  return std::unique_ptr<InStreamHandler>(
+      new InStreamHandler(new std::istringstream(content)));
+}
+
+bool CachingReadOnlyFileManager::FileExists(std::string path) {
+  if (cache_.find(path) != cache_.end())
+    return true;
+  if (!PathMatchesFilter(path))
+    return false;
+  return underlying_->FileExists(path);
+}
+
+int CachingReadOnlyFileManager::TestOnlyGetCacheMissCount() const {
+  return cache_miss_count_;
 }
 
 std::ostream &operator<<(std::ostream &ofs, const FilePath &fp) {

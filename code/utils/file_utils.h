@@ -7,7 +7,7 @@
  * Stream parsing: ParsePosition, ParseGrabNext, ParseGrabLine (token-based
  * reads from an istream). Stream handlers: OutStreamHandler, InStreamHandler
  * (own and expose an ostream* or istream*). FileManager and implementations:
- * StdFileManager, InMemoryFileManager (open files, return stream handlers).
+ * StdFileManager, InMemoryFileManager, CachingReadOnlyFileManager.
  * FilePath: path plus slash/convention, allowed chars, and ReadFile/WriteFile.
  * SavableVariable<T>: single value load/save to a file. Helpers: Separate
  * (split path into folder and file), BoolToggle.
@@ -62,6 +62,16 @@ public:
   std::istream &GetStream() { return *pStr_; }
 };
 
+/* --- File manager helpers --- */
+
+class FileManager;
+
+/* Read full content of path from fm; return "" if file does not exist.
+ * Uses FileExists first, no exceptions. */
+std::string GetFileContent(FileManager *fm, std::string path);
+/* Write content to path via fm (stream is closed on handler destroy). */
+void WriteContentToFile(FileManager *fm, std::string path, std::string content);
+
 /* --- File managers --- */
 
 /* Abstract interface: open files for read or write, returning unique_ptr
@@ -87,20 +97,6 @@ public:
   /*virtual*/ bool FileExists(std::string s);
 };
 
-/* OutStreamHandler that on destruction copies ostream content into a map. */
-class InMemoryOutStreamHandler : public OutStreamHandler {
-public:
-  InMemoryOutStreamHandler(std::string path,
-                           std::map<std::string, std::string> *files,
-                           std::ostringstream *stream);
-  ~InMemoryOutStreamHandler();
-
-private:
-  std::string path_;
-  std::map<std::string, std::string> *files_;
-  std::ostringstream *stream_;
-};
-
 /* In-memory filesystem: path -> string. WriteFile/ReadFile use stringstreams;
  * when a write stream is destroyed, its content is stored in the map. */
 class InMemoryFileManager : public FileManager {
@@ -108,11 +104,36 @@ public:
   /*virtual*/ std::unique_ptr<OutStreamHandler> WriteFile(std::string path);
   /*virtual*/ std::unique_ptr<InStreamHandler> ReadFile(std::string path);
   /*virtual*/ bool FileExists(std::string path);
-  /* Contents of path, or empty string if not found. */
-  std::string GetFileContents(std::string path) const;
 
 private:
   std::map<std::string, std::string> files_;
+};
+
+/* Wraps another FileManager and caches read content. Read: serve from cache
+ * or fetch from underlying (if path matches filter) and store in cache.
+ * Write: store in cache only. Only paths whose name contains filter_substring
+ * are read from underlying; others are visible only if in cache. Caller owns
+ * the underlying pointer and must keep it alive. */
+class CachingReadOnlyFileManager : public FileManager {
+public:
+  /* filter_substring empty means all paths visible from underlying. */
+  explicit CachingReadOnlyFileManager(FileManager *underlying_file_manager,
+                                      std::string filter_substring = "");
+
+  /*virtual*/ std::unique_ptr<OutStreamHandler> WriteFile(std::string path);
+  /*virtual*/ std::unique_ptr<InStreamHandler> ReadFile(std::string path);
+  /*virtual*/ bool FileExists(std::string path);
+
+  /* For tests only: times ReadFile read from the underlying (cache miss). */
+  int TestOnlyGetCacheMissCount() const;
+
+private:
+  bool PathMatchesFilter(std::string path) const;
+
+  FileManager *underlying_;
+  std::string filter_substring_;
+  std::map<std::string, std::string> cache_;
+  int cache_miss_count_;
 };
 
 /* --- Path --- */

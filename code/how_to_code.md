@@ -18,3 +18,6 @@
 - avoid explicit new/delete. Use std::unique_ptr instead when possible
 - avoid using unsigned int/long when possible
 - use anonymous namespaces for helper functions in .cpp files
+
+- functions
+  - prefer pointers to non-const references
