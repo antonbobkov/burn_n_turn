@@ -32,7 +32,7 @@ void MockGraphicalInterface::DeleteImage(std::string pImg) {
 Image *MockGraphicalInterface::GetImage(std::string pImg) const {
   auto it = images_.find(pImg);
   if (it == images_.end())
-    return nullptr;
+    throw ImageNullException("MockGraphicalInterface", "GetImage", pImg);
   return it->second.get();
 }
 
