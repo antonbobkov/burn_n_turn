@@ -9,13 +9,17 @@
 
 namespace Gui {
 
-/* Fake image so GetImage can return a valid pointer. No real drawing. */
+/* Fake image so GetImage can return a valid pointer. No real drawing.
+ * GetPixelSafe returns default color when out of bounds (for small
+ * placeholders). */
 class MockImage : public Image {
 public:
   explicit MockImage(Size sz);
 
   /*virtual*/ void SetPixel(Point p, const Color &c);
   /*virtual*/ Color GetPixel(Point p) const;
+  /*virtual*/ void SetPixelSafe(Point p, const Color &c);
+  /*virtual*/ Color GetPixelSafe(Point p) const;
 };
 
 /* Graphics backend that does no real drawing. LoadImage returns the path

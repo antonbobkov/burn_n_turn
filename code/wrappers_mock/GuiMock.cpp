@@ -14,6 +14,17 @@ Color MockImage::GetPixel(Point p) const {
   return Color();
 }
 
+void MockImage::SetPixelSafe(Point p, const Color &c) {
+  if (InsideRectangle(GetRectangle(), p))
+    SetPixel(p, c);
+}
+
+Color MockImage::GetPixelSafe(Point p) const {
+  if (!InsideRectangle(GetRectangle(), p))
+    return Color();
+  return GetPixel(p);
+}
+
 void MockGraphicalInterface::DeleteImage(std::string pImg) {
   images_.erase(pImg);
 }
