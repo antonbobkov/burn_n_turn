@@ -26,12 +26,10 @@ Color MockImage::GetPixelSafe(Point p) const {
 }
 
 void MockGraphicalInterface::DeleteImage(std::string pImg) {
-  std::cout << "Deleting image: " << pImg << std::endl;
   images_.erase(pImg);
 }
 
 Image *MockGraphicalInterface::GetImage(std::string pImg) const {
-  std::cout << "Getting image: " << pImg << std::endl;
   auto it = images_.find(pImg);
   if (it == images_.end())
     throw ImageNullException("MockGraphicalInterface", "GetImage", pImg);
@@ -46,8 +44,7 @@ std::string MockGraphicalInterface::GetBlankImage(Size sz) {
 }
 
 std::string MockGraphicalInterface::LoadImage(std::string sFileName) {
-  std::string key =
-      sFileName + "_" + std::to_string(next_id_++);
+  std::string key = sFileName + "_" + std::to_string(next_id_++);
   images_[key] = std::make_unique<MockImage>(key, Size(1, 1));
   return key;
 }

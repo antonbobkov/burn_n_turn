@@ -21,10 +21,6 @@ public:
   /*virtual*/ void SetPixelSafe(Point p, const Color &c);
   /*virtual*/ Color GetPixelSafe(Point p) const;
 
-  ~MockImage() override {
-    std::cout << "MockImage destroyed: " << name_ << std::endl;
-  };
-
 private:
   std::string name_;
 };
