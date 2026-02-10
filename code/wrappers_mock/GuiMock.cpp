@@ -2,7 +2,7 @@
 
 namespace Gui {
 
-MockImage::MockImage(Size sz) : Image(sz) {}
+MockImage::MockImage(std::string name, Size sz) : Image(sz), name_(name) {}
 
 void MockImage::SetPixel(Point p, const Color &c) {
   (void)p;
@@ -26,10 +26,12 @@ Color MockImage::GetPixelSafe(Point p) const {
 }
 
 void MockGraphicalInterface::DeleteImage(std::string pImg) {
+  std::cout << "Deleting image: " << pImg << std::endl;
   images_.erase(pImg);
 }
 
 Image *MockGraphicalInterface::GetImage(std::string pImg) const {
+  std::cout << "Getting image: " << pImg << std::endl;
   auto it = images_.find(pImg);
   if (it == images_.end())
     throw ImageNullException("MockGraphicalInterface", "GetImage", pImg);
@@ -37,15 +39,17 @@ Image *MockGraphicalInterface::GetImage(std::string pImg) const {
 }
 
 std::string MockGraphicalInterface::GetBlankImage(Size sz) {
-  std::string key = "blank_" + std::to_string(next_blank_id_++);
-  images_[key] = std::make_unique<MockImage>(sz);
+  std::string key = "blank_" + std::to_string(sz.x) + "_" +
+                    std::to_string(sz.y) + "_" + std::to_string(next_id_++);
+  images_[key] = std::make_unique<MockImage>(key, sz);
   return key;
 }
 
 std::string MockGraphicalInterface::LoadImage(std::string sFileName) {
-  if (images_.find(sFileName) == images_.end())
-    images_[sFileName] = std::make_unique<MockImage>(Size(1, 1));
-  return sFileName;
+  std::string key =
+      sFileName + "_" + std::to_string(next_id_++);
+  images_[key] = std::make_unique<MockImage>(key, Size(1, 1));
+  return key;
 }
 
 void MockGraphicalInterface::SaveImage(std::string sFileName,

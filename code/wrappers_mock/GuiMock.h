@@ -14,19 +14,26 @@ namespace Gui {
  * placeholders). */
 class MockImage : public Image {
 public:
-  explicit MockImage(Size sz);
+  explicit MockImage(std::string name, Size sz);
 
   /*virtual*/ void SetPixel(Point p, const Color &c);
   /*virtual*/ Color GetPixel(Point p) const;
   /*virtual*/ void SetPixelSafe(Point p, const Color &c);
   /*virtual*/ Color GetPixelSafe(Point p) const;
+
+  ~MockImage() override {
+    std::cout << "MockImage destroyed: " << name_ << std::endl;
+  };
+
+private:
+  std::string name_;
 };
 
-/* Graphics backend that does no real drawing. LoadImage returns the path
- * string; other ops are no-op or use stored mock images. */
+/* Graphics backend that does no real drawing. LoadImage and GetBlankImage
+ * return unique keys (suffix _0, _1, ...). Never reuses the same object. */
 class MockGraphicalInterface : public GraphicalInterface<std::string> {
 public:
-  MockGraphicalInterface() : next_blank_id_(0) {}
+  MockGraphicalInterface() : next_id_(0) {}
 
   /*virtual*/ void DeleteImage(std::string pImg);
   /*virtual*/ Image *GetImage(std::string pImg) const;
@@ -41,8 +48,8 @@ public:
 private:
   /* Handle string -> fake image. */
   std::map<std::string, std::unique_ptr<MockImage>> images_;
-  /* Used to build unique keys for GetBlankImage. */
-  unsigned next_blank_id_;
+  /* Unique suffix for LoadImage and GetBlankImage keys (_0, _1, ...). */
+  unsigned next_id_;
 };
 
 } // namespace Gui
