@@ -90,53 +90,65 @@ template <class T> class smart_pointer {
   template <class N> friend smart_pointer<N> make_smart(N *pPointTo_);
 
   T *pPointTo;
+  SP_Info *pPointToSPInfo;
 
-  void CONSTRUCT(T *pPointTo_) {
+  void CONSTRUCT(T *pPointTo_, SP_Info *pInfo) {
     pPointTo = pPointTo_;
+    pPointToSPInfo = pInfo;
 
-    if (pPointTo)
-      ++pPointTo->_SP_INFO_COUNTER;
+    if (pPointToSPInfo)
+      ++pPointToSPInfo->_SP_INFO_COUNTER;
   }
 
-  smart_pointer<T> &EQUAL(T *pPointTo_) {
-    if (pPointTo)
-      DELETE_REGULAR_POINTER(pPointTo);
+  smart_pointer<T> &EQUAL(T *pPointTo_, SP_Info *pInfo) {
+    if (pPointToSPInfo)
+      DELETE_REGULAR_POINTER(pPointToSPInfo);
 
     pPointTo = pPointTo_;
+    pPointToSPInfo = pInfo;
 
-    if (pPointTo)
-      ++pPointTo->_SP_INFO_COUNTER;
+    if (pPointToSPInfo)
+      ++pPointToSPInfo->_SP_INFO_COUNTER;
 
     return *this;
   }
 
-  explicit smart_pointer(T *pPointTo_) { CONSTRUCT(pPointTo_); }
+  /* Only make_smart calls this; T is complete there so T* -> SP_Info* is ok.
+   */
+  explicit smart_pointer(T *pPointTo_)
+      : pPointTo(pPointTo_),
+        pPointToSPInfo(pPointTo_) {
+    if (pPointToSPInfo)
+      ++pPointToSPInfo->_SP_INFO_COUNTER;
+  }
 
 public:
-  smart_pointer() : pPointTo(0) {}
+  smart_pointer() : pPointTo(0), pPointToSPInfo(0) {}
 
-  smart_pointer(const smart_pointer<T> &pSmPnt) { CONSTRUCT(pSmPnt.pPointTo); }
+  smart_pointer(const smart_pointer<T> &pSmPnt) {
+    CONSTRUCT(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
+  }
 
   template <class N> smart_pointer(const smart_pointer<N> &pSmPnt) {
-    CONSTRUCT(pSmPnt.pPointTo);
+    CONSTRUCT(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
   }
 
   template <class N> smart_pointer(const SSP<N> &pPrmPnt);
 
   smart_pointer<T> &operator=(const smart_pointer<T> &pSmPnt) {
-    return EQUAL(pSmPnt.pPointTo);
+    return EQUAL(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
   }
 
   template <class N>
   smart_pointer<T> &operator=(const smart_pointer<N> &pSmPnt) {
-    return EQUAL(pSmPnt.pPointTo);
+    return EQUAL(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
   }
 
   template <class N> smart_pointer<T> &operator=(const SSP<N> &pPrmPnt);
 
   ~smart_pointer() {
-    if (pPointTo)
-      DELETE_REGULAR_POINTER(pPointTo);
+    if (pPointToSPInfo)
+      DELETE_REGULAR_POINTER(pPointToSPInfo);
   }
 
   T *operator->() const { return pPointTo; }
@@ -278,13 +290,14 @@ public:
 template <class T>
 template <class N>
 smart_pointer<T>::smart_pointer(const SSP<N> &pPrmPnt) {
-  CONSTRUCT(pPrmPnt.pPointTo);
+  CONSTRUCT(pPrmPnt.pPointTo, static_cast<SP_Info *>(pPrmPnt.pPointTo));
 }
 
 template <class T>
 template <class N>
 smart_pointer<T> &smart_pointer<T>::operator=(const SSP<N> &pPrmPnt) {
-  return EQUAL(pPrmPnt.pPointTo);
+  return EQUAL(pPrmPnt.pPointTo,
+               static_cast<SP_Info *>(pPrmPnt.pPointTo));
 }
 
 /* Copyable SSP for use in containers (e.g. arrays); otherwise same as SSP. */

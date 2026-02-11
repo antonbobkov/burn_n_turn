@@ -62,14 +62,12 @@ TEST_CASE("smart_pointer operator== and operator!=", "[smart_pointer]") {
 /* Raw-pointer construction is disallowed: smart_pointer<T> p(new T())
  * does not compile; use make_smart(new T()) instead. */
 
-/* Forward declaration: raw pointer is fine, smart_pointer is not (destructor
- * needs complete type to call DELETE_REGULAR_POINTER). Example below must
- * not compile: set the #if to 1 and build to verify. */
+/* Forward declaration: smart_pointer now supports incomplete types by storing
+ * SP_Info* separately; only make_smart and SSP copy need the complete type. */
 struct Incomplete;
-#if 0
-TEST_CASE("smart_pointer with incomplete type (expect compile failure)",
-          "[smart_pointer][.incomplete]") {
-  smart_pointer<Incomplete> p;  // fails when ~smart_pointer<Incomplete>() runs
-  (void)p;
+TEST_CASE("smart_pointer with incomplete type (default construct and destroy)",
+          "[smart_pointer][incomplete]") {
+  smart_pointer<Incomplete> p;
+  REQUIRE(p.is_null());
+  REQUIRE(p.get() == nullptr);
 }
-#endif
