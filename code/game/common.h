@@ -111,9 +111,6 @@ const unsigned nFireballsPerBonus = 3U;
 
 extern int nSlimeMax;
 
-#pragma warning(disable : 4250)
-#pragma warning(disable : 4355)
-
 using namespace Gui;
 
 typedef Gui::GraphicalInterface<Index> Graphic;
