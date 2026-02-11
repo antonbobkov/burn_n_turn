@@ -61,3 +61,15 @@ TEST_CASE("smart_pointer operator== and operator!=", "[smart_pointer]") {
 
 /* Raw-pointer construction is disallowed: smart_pointer<T> p(new T())
  * does not compile; use make_smart(new T()) instead. */
+
+/* Forward declaration: raw pointer is fine, smart_pointer is not (destructor
+ * needs complete type to call DELETE_REGULAR_POINTER). Example below must
+ * not compile: set the #if to 1 and build to verify. */
+struct Incomplete;
+#if 0
+TEST_CASE("smart_pointer with incomplete type (expect compile failure)",
+          "[smart_pointer][.incomplete]") {
+  smart_pointer<Incomplete> p;  // fails when ~smart_pointer<Incomplete>() runs
+  (void)p;
+}
+#endif
