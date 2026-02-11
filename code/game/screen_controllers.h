@@ -14,6 +14,7 @@ struct SimpleController : public GameController {
 
   /*virtual*/ void Update();
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  /*virtual*/ std::string GetControllerName() const { return "basic"; }
 };
 
 /** Controller that draws background + text that flashes every second. */
@@ -28,6 +29,7 @@ struct FlashingController : public GameController {
 
   /*virtual*/ void Update();
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  /*virtual*/ std::string GetControllerName() const { return "basic"; }
 };
 
 struct MenuDisplay;
@@ -175,6 +177,7 @@ struct BasicController : public GameController {
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
   /*virtual*/ void OnMouseDown(Point pPos);
+  /*virtual*/ std::string GetControllerName() const { return "basic"; }
 };
 
 /** Cursor image and position; Draw/Update for rendering and click state. */
@@ -211,6 +214,7 @@ struct MenuController : public BasicController {
   /*virtual*/ void OnMouseDown(Point pPos);
 
   /*virtual*/ void Update();
+  /*virtual*/ std::string GetControllerName() const { return "menu"; }
 };
 
 struct StartScreenController : public BasicController {
@@ -223,6 +227,7 @@ struct StartScreenController : public BasicController {
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
   /*virtual*/ void OnMouseDown(Point pPos) { Next(); }
+  /*virtual*/ std::string GetControllerName() const { return "start"; }
 };
 
 struct BuyNowController;
@@ -264,6 +269,7 @@ struct BuyNowController : public BasicController {
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
   /*virtual*/ void OnMouseDown(Point pPos);
+  /*virtual*/ std::string GetControllerName() const { return "buy"; }
 };
 
 struct Cutscene : public BasicController {
@@ -286,6 +292,7 @@ struct Cutscene : public BasicController {
   /*virtual*/ void Update();
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void OnMouseDown(Point pPos) {}
+  /*virtual*/ std::string GetControllerName() const { return "cutscene"; }
 };
 
 /** Controller that shows dragon score and exits on click or timer. */
@@ -301,6 +308,7 @@ struct DragonScoreController : public BasicController {
   /*virtual*/ void DoubleClick();
 
   /*virtual*/ void OnMouseDown(Point pPos);
+  /*virtual*/ std::string GetControllerName() const { return "score"; }
 };
 
 /** BasicController that advances (Next) when only background is left or on
@@ -313,6 +321,7 @@ struct AlmostBasicController : public BasicController {
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
   /*virtual*/ void OnMouseDown(Point pPos);
+  /*virtual*/ std::string GetControllerName() const { return "logo"; }
 };
 
 #endif

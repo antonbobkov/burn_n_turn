@@ -143,6 +143,7 @@ struct AdvancedController : public BasicController {
   /*virtual*/ void OnMouseDown(Point pPos);
   /*virtual*/ void OnMouseUp();
   /*virtual*/ void Fire();
+  /*virtual*/ std::string GetControllerName() const { return "level"; }
 
   float GetCompletionRate();
 

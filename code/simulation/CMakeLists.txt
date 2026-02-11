@@ -18,5 +18,15 @@ target_link_libraries(Simulation PUBLIC
   GameUtils
 )
 
-add_executable(simulation_main simulation_main.cpp)
-target_link_libraries(simulation_main PRIVATE Simulation)
+add_executable(simulation_test simulation_test.cpp)
+target_include_directories(simulation_test PRIVATE
+  ${CMAKE_SOURCE_DIR}/game
+  ${CMAKE_SOURCE_DIR}/game_utils
+  ${CMAKE_SOURCE_DIR}/utils
+  ${CMAKE_SOURCE_DIR}/wrappers
+  ${CMAKE_SOURCE_DIR}/wrappers_mock
+)
+target_link_libraries(simulation_test PRIVATE
+  Simulation Catch2::Catch2WithMain
+)
+add_test(NAME simulation_test COMMAND $<TARGET_FILE:simulation_test>)

@@ -29,6 +29,9 @@ struct GameController : virtual public SP_Info {
   virtual void OnMouseUp() {}
   virtual void DoubleClick() {}
   virtual void Fire() {}
+
+  /** Name of this screen for simulation/inspection (e.g. "menu", "level"). */
+  virtual std::string GetControllerName() const { return "basic"; }
 };
 
 #include "screen_controllers.h"
@@ -149,6 +152,15 @@ public:
   /*virtual*/ void MouseUp();
   /*virtual*/ void DoubleClick();
   /*virtual*/ void Fire();
+
+  /** For simulation/inspection: current tower controller (levels, menu, etc.). */
+  TwrGlobalController *GetTowerController() const;
+  /** Active screen index (0=menu, 1..=logos/start/levels). */
+  unsigned GetActiveControllerIndex() const;
+  /** Total number of screens. */
+  unsigned GetControllerCount() const;
+  /** Name of current screen for simulation (e.g. "menu", "start", "level"). */
+  std::string GetActiveControllerName() const;
 };
 
 #endif

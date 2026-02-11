@@ -1,15 +1,17 @@
-#include "simulation.h"
+/*
+ * simulation_test - Catch2 test: run game simulation, reach level and menu,
+ * toggle sound and verify file change in CachingReadOnlyFileManager.
+ */
 
 #include "MessageWriter.h"
 #include "file_utils.h"
 #include "game_runner_interface.h"
 #include "game.h"
 #include "General.h"
-
 #include "GuiMock.h"
 #include "SuiMock.h"
 
-#include <iostream>
+#include <catch2/catch.hpp>
 #include <memory>
 #include <string>
 
@@ -20,39 +22,19 @@ namespace {
 const unsigned kSimulationFrames = 900;
 const unsigned kScreenW = 960;
 const unsigned kScreenH = 600;
-
 const std::string kSoundFileName("soundon.txt");
-
-/* Frames at which to press Enter to advance menu (logo1 -> logo2 -> start ->
- * first level). */
 const unsigned kKeyPressFrames[] = {8, 18, 28};
 const unsigned kKeyPressCount = 3;
 
-/* Tower center in screen coords (scale 2: 480,300 logical -> 960,600 screen). */
-const Crd kTowerX = kScreenW / 2;
-const Crd kTowerY = kScreenH * 3 / 4;
-
-void LogState(TowerGameGlobalController *ctrl) {
-  TwrGlobalController *twr = ctrl->GetTowerController();
-  if (!twr)
-    return;
-  std::cout << "[sim] screen " << ctrl->GetActiveControllerName() << " ("
-            << ctrl->GetActiveControllerIndex() << "/"
-            << ctrl->GetControllerCount() << ") score=" << twr->nScore
-            << " high=" << twr->nHighScore << "\n";
-}
-
 } // namespace
 
-void RunSimulation() {
-  std::cout << "[sim] Starting simulation (seed 12345)\n";
+TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
+          "[simulation][integration]") {
   srand(12345);
 
-  std::cout << "[sim] Creating mocks and file manager\n";
   SP<MockGraphicalInterface> p_mock_gr(new MockGraphicalInterface());
   SP<GraphicalInterface<Index>> p_gr(
       new SimpleGraphicalInterface<std::string>(p_mock_gr));
-
   SP<MockSoundInterface> p_mock_snd(new MockSoundInterface());
   SP<SoundInterface<Index>> p_snd(
       new SimpleSoundInterface<std::string>(p_mock_snd));
@@ -67,84 +49,95 @@ void RunSimulation() {
   SP<MessageWriter> p_msg(new EmptyWriter());
   Size sz(kScreenW, kScreenH);
 
-  std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
   ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
   SP<TowerGameGlobalController> p_gl(new TowerGameGlobalController(pe));
 
+  bool reached_level = false;
+  bool reached_menu = false;
   std::string sound_content_before;
-  bool sound_toggle_verified = false;
+  bool sound_file_flipped = false;
 
-  std::cout << "[sim] Running " << kSimulationFrames
-            << " frames (keys to level, keyboard take off, fly & shoot, menu)\n";
   for (unsigned i = 0; i < kSimulationFrames && !b_exit; ++i) {
+    /* Name of current screen (e.g. "level", "menu", "logo"). */
     std::string screen_name = p_gl->GetActiveControllerName();
+    if (screen_name == "level")
+      reached_level = true;
+    if (screen_name == "menu")
+      reached_menu = true;
 
+    /* Press Enter to advance through logo and start screens into first level. */
     for (unsigned k = 0; k < kKeyPressCount; ++k)
       if (i == kKeyPressFrames[k])
         p_gl->KeyDown(GUI_RETURN);
 
     if (screen_name == "level") {
-      /* Take off with keyboard (space). */
+      /* Press Space to take off dragon from the tower. */
       if (i == 35)
         p_gl->KeyDown(static_cast<GuiKeyType>(' '));
-      /* Fly: hold mouse and move to steer dragon. */
+      /* Move cursor so dragon flies toward that point (first flight leg). */
       if (i >= 36 && i <= 80)
         p_gl->MouseMove(Point(kScreenW / 2 - 80 + (i - 36) * 2, kScreenH / 2));
+      /* Hold mouse button to start steering the dragon. */
       if (i == 36)
         p_gl->MouseDown(Point(kScreenW / 2 - 80, kScreenH / 2));
+      /* Release mouse after first flight. */
       if (i == 81)
         p_gl->MouseUp();
+      /* Shoot a fireball in the current flight direction. */
       if (i == 85)
         p_gl->Fire();
+      /* Move cursor for second flight leg (other direction). */
       if (i >= 90 && i <= 130)
-        p_gl->MouseMove(Point(kScreenW / 2 + 100 - (i - 90), kScreenH / 2 - 30));
+        p_gl->MouseMove(
+            Point(kScreenW / 2 + 100 - (i - 90), kScreenH / 2 - 30));
+      /* Hold mouse to steer again. */
       if (i == 90)
         p_gl->MouseDown(Point(kScreenW / 2 + 100, kScreenH / 2 - 30));
+      /* Release mouse after second flight. */
       if (i == 131)
         p_gl->MouseUp();
+      /* Shoot another fireball. */
       if (i == 135)
         p_gl->Fire();
-
-      /* Open game menu and toggle sound (writes to file via SavableVariable). */
       if (i == 150)
         sound_content_before = GetFileContent(fm.get(), kSoundFileName);
+      /* Open the in-game pause menu. */
       if (i == 151)
         p_gl->KeyDown(GUI_ESCAPE);
     }
 
-    /* Menu navigation: open options, toggle sound (when we are in menu). */
     if (screen_name == "menu") {
+      /* Move menu selection down to "options". */
       if (i == 152)
         p_gl->KeyDown(GUI_DOWN);
       if (i == 153)
         p_gl->KeyDown(GUI_DOWN);
       if (i == 154)
         p_gl->KeyDown(GUI_DOWN);
+      /* Confirm to open the options submenu. */
       if (i == 155)
         p_gl->KeyDown(GUI_RETURN);
+      /* Move selection down to the sound toggle. */
       if (i == 156)
         p_gl->KeyDown(GUI_DOWN);
+      /* Confirm to toggle sound on/off (writes to file). */
       if (i == 157)
         p_gl->KeyDown(GUI_RETURN);
-      if (i >= 158 && i <= 165 && !sound_toggle_verified) {
+      if (i >= 158 && i <= 165) {
         std::string sound_after = GetFileContent(fm.get(), kSoundFileName);
-        if (sound_content_before != sound_after) {
-          sound_toggle_verified = true;
-          std::cout << "[sim] sound file changed: \""
-                    << sound_content_before << "\" -> \"" << sound_after
-                    << "\"\n";
-        }
+        if (sound_content_before != sound_after)
+          sound_file_flipped = true;
       }
+      /* Go back from options to main menu. */
       if (i == 166)
         p_gl->KeyDown(GUI_ESCAPE);
     }
 
+    /* Advance the game by one frame. */
     p_gl->Update();
-
-    if (i == 0 || (i + 1) % 200 == 0 || i == kSimulationFrames - 1)
-      LogState(p_gl.GetRawPointer());
   }
-  if (sound_toggle_verified)
-    std::cout << "[sim] Verified: sound toggle wrote to file (cache).\n";
-  std::cout << "[sim] Done\n";
+
+  REQUIRE(reached_level);
+  REQUIRE(reached_menu);
+  REQUIRE(sound_file_flipped);
 }

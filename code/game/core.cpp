@@ -917,6 +917,27 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   pCnt->StartUp();
 }
 
+TwrGlobalController *TowerGameGlobalController::GetTowerController() const {
+  return pData ? pData->pCnt.GetRawPointer() : nullptr;
+}
+
+unsigned TowerGameGlobalController::GetActiveControllerIndex() const {
+  TwrGlobalController *twr = GetTowerController();
+  return twr ? twr->nActive : 0;
+}
+
+unsigned TowerGameGlobalController::GetControllerCount() const {
+  TwrGlobalController *twr = GetTowerController();
+  return twr ? twr->vCnt.size() : 0;
+}
+
+std::string TowerGameGlobalController::GetActiveControllerName() const {
+  TwrGlobalController *twr = GetTowerController();
+  if (!twr || twr->nActive >= twr->vCnt.size())
+    return "";
+  return twr->vCnt[twr->nActive]->GetControllerName();
+}
+
 void TowerGameGlobalController::Update() {
   pData->pCnt->vCnt[pData->pCnt->nActive]->Update();
 }
