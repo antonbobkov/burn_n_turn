@@ -3,13 +3,14 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "MessageWriter.h"
-#include "file_utils.h"
-#include "game_runner_interface.h"
-#include "game.h"
 #include "General.h"
 #include "GuiMock.h"
+#include "MessageWriter.h"
 #include "SuiMock.h"
+#include "file_utils.h"
+#include "game.h"
+#include "game_runner_interface.h"
+
 
 #include <catch2/catch.hpp>
 #include <memory>
@@ -32,12 +33,14 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
           "[simulation][integration]") {
   srand(12345);
 
-  SP<MockGraphicalInterface> p_mock_gr(new MockGraphicalInterface());
-  SP<GraphicalInterface<Index>> p_gr(
-      new SimpleGraphicalInterface<std::string>(p_mock_gr));
-  SP<MockSoundInterface> p_mock_snd(new MockSoundInterface());
-  SP<SoundInterface<Index>> p_snd(
-      new SimpleSoundInterface<std::string>(p_mock_snd));
+  smart_pointer<MockGraphicalInterface> p_mock_gr =
+      make_smart(new MockGraphicalInterface());
+  smart_pointer<GraphicalInterface<Index>> p_gr =
+      make_smart(new SimpleGraphicalInterface<std::string>(p_mock_gr));
+  smart_pointer<MockSoundInterface> p_mock_snd =
+      make_smart(new MockSoundInterface());
+  smart_pointer<SoundInterface<Index>> p_snd =
+      make_smart(new SimpleSoundInterface<std::string>(p_mock_snd));
 
   std::unique_ptr<Gui::StdFileManager> underlying(new Gui::StdFileManager());
   std::unique_ptr<Gui::CachingReadOnlyFileManager> fm(
@@ -45,12 +48,13 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
 
   bool b_exit = false;
   bool b_true = true;
-  SP<Event> p_exit_ev(NewSwitchEvent(b_exit, b_true));
-  SP<MessageWriter> p_msg(new EmptyWriter());
+  smart_pointer<Event> p_exit_ev = make_smart(NewSwitchEvent(b_exit, b_true));
+  smart_pointer<MessageWriter> p_msg = make_smart(new EmptyWriter());
   Size sz(kScreenW, kScreenH);
 
   ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-  SP<TowerGameGlobalController> p_gl(new TowerGameGlobalController(pe));
+  smart_pointer<TowerGameGlobalController> p_gl =
+      make_smart(new TowerGameGlobalController(pe));
 
   bool reached_level = false;
   bool reached_menu = false;
@@ -65,7 +69,8 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     if (screen_name == "menu")
       reached_menu = true;
 
-    /* Press Enter to advance through logo and start screens into first level. */
+    /* Press Enter to advance through logo and start screens into first level.
+     */
     for (unsigned k = 0; k < kKeyPressCount; ++k)
       if (i == kKeyPressFrames[k])
         p_gl->KeyDown(GUI_RETURN);

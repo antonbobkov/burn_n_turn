@@ -1,6 +1,6 @@
 #include "game.h"
 
-SimpleController::SimpleController(SP<TwrGlobalController> pGraph,
+SimpleController::SimpleController(smart_pointer<TwrGlobalController> pGraph,
                                    std::string strFileName)
     : GameController(pGraph) {
   nImage = pGl->pGraph->LoadImage(strFileName);
@@ -19,9 +19,9 @@ void SimpleController::OnKey(GuiKeyType c, bool bUp) {
   pGl->Next();
 }
 
-FlashingController::FlashingController(SP<TwrGlobalController> pGraph,
-                                       std::string strFileName,
-                                       std::string strTextName)
+FlashingController::FlashingController(
+    smart_pointer<TwrGlobalController> pGraph, std::string strFileName,
+    std::string strTextName)
     : GameController(pGraph), nTimer(0), bShow(true) {
   nImage = pGl->pGraph->LoadImage(strFileName);
   nText = pGl->pGraph->LoadImage(strTextName);
@@ -60,7 +60,7 @@ std::string OnOffString(bool b) {
     return "off";
 }
 
-void MenuDisplay::Draw(SP<ScalingDrawer> pDr) {
+void MenuDisplay::Draw(smart_pointer<ScalingDrawer> pDr) {
   Point p = pLeftTop;
   for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
     if (!pCurr->vEntries[i].bDisabled)
@@ -99,15 +99,15 @@ void Countdown::Update() {
     bExist = false;
 }
 
-void Countdown::Draw(SP<ScalingDrawer> pDr) {
+void Countdown::Draw(smart_pointer<ScalingDrawer> pDr) {
   pNum->DrawNumber(nTime, Point(22, 2));
 }
 
-void BasicController::AddV(SP<VisualEntity> pVs) {
+void BasicController::AddV(smart_pointer<VisualEntity> pVs) {
   lsDraw.push_back(ASSP<VisualEntity>(this, pVs));
 }
 
-void BasicController::AddE(SP<EventEntity> pEv) {
+void BasicController::AddE(smart_pointer<EventEntity> pEv) {
   lsUpdate.push_back(ASSP<EventEntity>(this, pEv));
 }
 
@@ -116,7 +116,8 @@ void BasicController::AddBackground(Color c) {
   r.sz.x *= pGl->pDr->nFactor;
   r.sz.y *= pGl->pDr->nFactor;
 
-  SP<StaticRectangle> pBkg = new StaticRectangle(r, c, -1.F);
+  smart_pointer<StaticRectangle> pBkg =
+      make_smart(new StaticRectangle(r, c, -1.F));
 
   AddV(pBkg);
 }
@@ -128,8 +129,8 @@ BasicController::BasicController(const BasicController &b)
   CopyArrayASSP(this, b.lsPpl, lsPpl);
 }
 
-BasicController::BasicController(SP<TwrGlobalController> pGl_, Rectangle rBound,
-                                 Color c)
+BasicController::BasicController(smart_pointer<TwrGlobalController> pGl_,
+                                 Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
 }
@@ -156,17 +157,17 @@ void BasicController::Update() {
   {
     std::list<ASSP<VisualEntity>>::iterator itr;
 
-    std::multimap<ScreenPos, SP<VisualEntity>> mmp;
+    std::multimap<ScreenPos, smart_pointer<VisualEntity>> mmp;
 
     for (itr = lsDraw.begin(); itr != lsDraw.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
 
-      mmp.insert(std::pair<ScreenPos, SP<VisualEntity>>(
+      mmp.insert(std::pair<ScreenPos, smart_pointer<VisualEntity>>(
           ScreenPos((*itr)->GetPriority(), ((*itr)->GetPosition())), *itr));
     }
 
-    for (std::multimap<ScreenPos, SP<VisualEntity>>::iterator
+    for (std::multimap<ScreenPos, smart_pointer<VisualEntity>>::iterator
              mitr = mmp.begin(),
              metr = mmp.end();
          mitr != metr; ++mitr)
@@ -204,8 +205,8 @@ void MouseCursor::DrawCursor() {
 
 void MouseCursor::SetCursorPos(Point pPos) { pCursorPos = pPos; }
 
-MenuController::MenuController(SP<TwrGlobalController> pGl_, Rectangle rBound,
-                               Color c, int nResumePosition_)
+MenuController::MenuController(smart_pointer<TwrGlobalController> pGl_,
+                               Rectangle rBound, Color c, int nResumePosition_)
     : BasicController(pGl_, rBound, c), nResumePosition(nResumePosition_),
       pMenuDisplay(this, 0), mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()),
       pHintText(this, 0), pOptionText(this, 0) {
@@ -235,19 +236,19 @@ void MenuController::Update() {
   BasicController::Update();
 
   if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
-    if (pOptionText != 0)
+    if (pOptionText.GetRawPointer() != 0)
       pOptionText->Draw(pGl->pDr);
   } else {
-    if (pHintText != 0)
+    if (pHintText.GetRawPointer() != 0)
       pHintText->Draw(pGl->pDr);
   }
 
   pGl->pGraph->RefreshAll();
 }
 
-MenuDisplay::MenuDisplay(Point pLeftTop_, SP<NumberDrawer> pNum_,
-                         SP<Animation> pMenuCaret_,
-                         SP<MenuController> pMenuController_,
+MenuDisplay::MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
+                         smart_pointer<Animation> pMenuCaret_,
+                         smart_pointer<MenuController> pMenuController_,
                          bool bCheatsUnlocked_)
     : pLeftTop(pLeftTop_), pNum(this, pNum_), pMenuCaret(this, pMenuCaret_),
       pMenuController(this, pMenuController_), pCurr(&memMain),
@@ -322,7 +323,7 @@ void MenuDisplay::PositionIncrement(bool bUp) {
       break;
   }
 
-  if (pMenuController->pOptionText != 0)
+  if (pMenuController->pOptionText.GetRawPointer() != 0)
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }
@@ -411,7 +412,7 @@ void MenuDisplay::UpdateMenuEntries() {
   memLoadChapter.vEntries.at(2).bDisabled =
       (pMenuController->pGl->snProgress.Get() < 2);
 
-  if (pMenuController->pOptionText != 0)
+  if (pMenuController->pOptionText.GetRawPointer() != 0)
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }
@@ -443,14 +444,14 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
     Next();
 }
 
-BuyNowController::BuyNowController(SP<TwrGlobalController> pGl_,
+BuyNowController::BuyNowController(smart_pointer<TwrGlobalController> pGl_,
                                    Rectangle rBound, Color c)
     : BasicController(pGl_, rBound, c), t(120), nSlimeCount(50),
       tVel(nFramesInSecond / 2) {
   for (int i = 0; i < nSlimeCount; i++) {
-    mSlimes.push_back(
+    mSlimes.push_back(make_smart(
         new Animation(0, pGl->pr("slime"), nFramesInSecond / 10,
-                      Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true));
+                      Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true)));
     mSlimeVel.push_back(fPoint());
     mSlimePos.push_back(mSlimes.back()->pos);
   }
@@ -503,9 +504,11 @@ void BuyNowController::OnMouseDown(Point pPos) {
     BasicController::OnMouseDown(pPos);
 }
 
-void SlimeUpdater::Draw(SP<ScalingDrawer> pDr) { pBuy->DrawSlimes(); }
+void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
+  pBuy->DrawSlimes();
+}
 
-Cutscene::Cutscene(SP<TwrGlobalController> pGl_, Rectangle rBound_,
+Cutscene::Cutscene(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : BasicController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
       pCrFollow(this, 0), bRelease(false), tm(nFramesInSecond / 5),
@@ -519,18 +522,18 @@ Cutscene::Cutscene(SP<TwrGlobalController> pGl_, Rectangle rBound_,
   if (bFlip)
     m = -1;
 
-  SP<FancyCritter> pCr1 =
+  smart_pointer<FancyCritter> pCr1 = make_smart(
       new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 10, 0),
-                       rBound, 3, seq1, nFramesInSecond / 5);
+                       rBound, 3, seq1, nFramesInSecond / 5));
   AddBoth(pCr1);
 
   pCrRun = pCr1;
 
   ImageSequence seq2 = pGl_->pr(sChase);
 
-  SP<FancyCritter> pCr2 =
+  smart_pointer<FancyCritter> pCr2 = make_smart(
       new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 12, 0),
-                       rBound, 3, seq2, nFramesInSecond / 5);
+                       rBound, 3, seq2, nFramesInSecond / 5));
 
   pCrFollow = pCr2;
 }
@@ -540,7 +543,7 @@ void Cutscene::Update() {
       pCrRun->GetPosition().x <= rBound.sz.x * 2 / 3) {
     bRelease = true;
 
-    SP<FancyCritter> pCr2 = pCrFollow;
+    smart_pointer<FancyCritter> pCr2 = pCrFollow;
     AddBoth(pCr2);
   }
 
@@ -570,15 +573,15 @@ void DragonScoreController::OnMouseDown(Point pPos) {
     pGl->Next();
 }
 
-DragonScoreController::DragonScoreController(SP<TwrGlobalController> pGl_,
-                                             Rectangle rBound, Color c,
-                                             bool bScoreShow)
+DragonScoreController::DragonScoreController(
+    smart_pointer<TwrGlobalController> pGl_, Rectangle rBound, Color c,
+    bool bScoreShow)
     : BasicController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {
-    AddV(new HighScoreShower(pGl, rBound));
+    AddV(make_smart(new HighScoreShower(pGl, rBound)));
   } else
-    AddV(new IntroTextShower(pGl, rBound));
+    AddV(make_smart(new IntroTextShower(pGl, rBound)));
 }
 
 void DragonScoreController::OnKey(GuiKeyType c, bool bUp) {

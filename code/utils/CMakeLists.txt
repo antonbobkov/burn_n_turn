@@ -14,10 +14,14 @@ add_library(Utils
   index.cpp
   General.h
   General.cpp
-  SmartPointer.h
-  SmartPointer.cpp
+  smart_pointer.h
+  smart_pointer.cpp
 )
 
 add_executable(file_utils_test file_utils_test.cpp)
 target_link_libraries(file_utils_test PRIVATE Utils Catch2::Catch2WithMain)
 add_test(NAME file_utils_test COMMAND $<TARGET_FILE:file_utils_test>)
+
+add_executable(smart_pointer_test smart_pointer_test.cpp)
+target_link_libraries(smart_pointer_test PRIVATE Utils Catch2::Catch2WithMain)
+add_test(NAME smart_pointer_test COMMAND $<TARGET_FILE:smart_pointer_test>)

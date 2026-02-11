@@ -27,10 +27,10 @@
 #include <vector>
 
 #include "GuiGen.h"
-#include "SmartPointer.h"
 #include "SuiGen.h"
 #include "file_utils.h"
 #include "index.h"
+#include "smart_pointer.h"
 #include "timer.h"
 
 namespace Gui {
@@ -88,8 +88,8 @@ template <class T> void ForEachImage(ImageSequence &img, T t) {
 
 /** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {
-  SP<GraphicalInterface<Index>> pGr;
-  ImageFlipper(SP<GraphicalInterface<Index>> pGr_);
+  smart_pointer<GraphicalInterface<Index>> pGr;
+  ImageFlipper(smart_pointer<GraphicalInterface<Index>> pGr_);
   void operator()(Index &img);
 };
 
@@ -97,11 +97,12 @@ struct ImageFlipper {
 struct ImagePainter {
   typedef std::pair<Color, Color> ColorMap;
 
-  SP<GraphicalInterface<Index>> pGr;
+  smart_pointer<GraphicalInterface<Index>> pGr;
   std::vector<ColorMap> vTr;
 
-  ImagePainter(SP<GraphicalInterface<Index>> pGr_, Color cFrom, Color cTo);
-  ImagePainter(SP<GraphicalInterface<Index>> pGr_,
+  ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_, Color cFrom,
+               Color cTo);
+  ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_,
                const std::vector<ColorMap> &vTr_);
   /** Copy image and apply all vTr color replacements (from -> to). */
   void operator()(Index &img);
@@ -142,8 +143,8 @@ public:
 /** Loads and caches images, sequences, and sounds by string key. */
 class Preloader : virtual public SP_Info {
 public:
-  Preloader(SP<GraphicalInterface<Index>> pGr_, SP<SoundInterface<Index>> pSn_,
-            FilePath *fp);
+  Preloader(smart_pointer<GraphicalInterface<Index>> pGr_,
+            smart_pointer<SoundInterface<Index>> pSn_, FilePath *fp);
 
   /** Image index by key; throws if not found. */
   Index &operator[](std::string key);
@@ -210,8 +211,8 @@ private:
 
   FilePath *fp_;
 
-  SP<GraphicalInterface<Index>> pGr;
-  SP<SoundInterface<Index>> pSn;
+  smart_pointer<GraphicalInterface<Index>> pGr;
+  smart_pointer<SoundInterface<Index>> pSn;
 };
 
 } // namespace Gui

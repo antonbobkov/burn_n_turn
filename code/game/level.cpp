@@ -3,7 +3,7 @@
 
 #include "file_utils.h"
 
-void Road::Draw(SP<ScalingDrawer> pDr) {
+void Road::Draw(smart_pointer<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;
   if (bVertical)
     pDr->pGr->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
@@ -297,7 +297,7 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
   return ifs;
 }
 
-void FancyRoad::Draw(SP<ScalingDrawer> pDr) {
+void FancyRoad::Draw(smart_pointer<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;
   Image *p = pDr->pGr->GetImage(pAd->pGl->pr["road"]);
   Size sz = p->GetSize();

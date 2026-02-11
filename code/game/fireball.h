@@ -57,7 +57,7 @@ struct ChainExplosion : virtual public AnimationOnce,
   SSP<BasicController> pBc;
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
-                 SP<BasicController> pBc_, Chain ch_ = Chain())
+                 smart_pointer<BasicController> pBc_, Chain ch_ = Chain())
       : AnimationOnce(av), r(r_), r_in(r_), delta(delta_), pBc(this, pBc_),
         ch(ch_) {}
 
@@ -70,7 +70,7 @@ struct ChainExplosion : virtual public AnimationOnce,
    */
   /*virtual*/ void Update();
 
-  void Draw(SP<ScalingDrawer> pDr) { AnimationOnce::Draw(pDr); }
+  void Draw(smart_pointer<ScalingDrawer> pDr) { AnimationOnce::Draw(pDr); }
 };
 
 struct KnightOnFire : public Critter {
@@ -82,8 +82,8 @@ struct KnightOnFire : public Critter {
   /** Set fVel to random direction, scaled by fKnightFireSpeed. */
   void RandomizeVelocity();
 
-  KnightOnFire(const Critter &cr, SP<BasicController> pBc_, unsigned nTimer_,
-               Chain c_);
+  KnightOnFire(const Critter &cr, smart_pointer<BasicController> pBc_,
+               unsigned nTimer_, Chain c_);
 
   /*virtual*/ void Update();
 };
@@ -102,8 +102,8 @@ struct Fireball : public Critter {
       : pBc(this, f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
         nChain(f.nChain), Critter(f) {}
 
-  Fireball(Point p, fPoint v, SP<AdvancedController> pBc_, FireballBonus &fb_,
-           Chain ch_ = Chain(), unsigned nChain_ = 1);
+  Fireball(Point p, fPoint v, smart_pointer<AdvancedController> pBc_,
+           FireballBonus &fb_, Chain ch_ = Chain(), unsigned nChain_ = 1);
 
   /*virtual*/ void Update();
 };
@@ -143,11 +143,12 @@ struct FireballBonusAnimation : public Animation,
   std::string sUnderText;
   ImageSequence coronaSeq;
 
-  FireballBonusAnimation(Point p_, unsigned n_, SP<AdvancedController> pAd_);
+  FireballBonusAnimation(Point p_, unsigned n_,
+                         smart_pointer<AdvancedController> pAd_);
 
   /*virtual*/ unsigned GetRadius() { return 20U; }
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ void Update();
 };

@@ -67,7 +67,7 @@ struct Road : virtual public VisualEntity {
   /*virtual*/ float GetPriority() { return 0; }
   /*virtual*/ Point GetPosition() { return Point(); }
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   void RoadMap(Point &p, Point &v);
 };

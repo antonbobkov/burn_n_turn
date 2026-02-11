@@ -74,7 +74,8 @@ int TrackballTracker::GetDerivative() {
     return 0;
 }
 
-BonusScore::BonusScore(SP<AdvancedController> pAc_, Point p_, unsigned nScore_)
+BonusScore::BonusScore(smart_pointer<AdvancedController> pAc_, Point p_,
+                       unsigned nScore_)
     : p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0),
       pAc(this, pAc_), c(255, 255, 0), nScore(nScore_), nScoreSoFar(0) {
   std::ostringstream ostr(sText);
@@ -143,7 +144,7 @@ struct AdNumberDrawer : public VisualEntity {
 
   AdNumberDrawer() : pAd(this, 0) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     unsigned n = pDr->nFactor;
 
 #ifdef FULL_VERSION
@@ -198,7 +199,7 @@ struct BonusDrawer : public VisualEntity {
       : pAd(this, 0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {
   }
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr) {
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     if (t.Tick())
       ++nAnimationCounter;
 
@@ -210,7 +211,7 @@ struct BonusDrawer : public VisualEntity {
       for (BonusList::iterator itr = lst.begin(), etr = lst.end(); itr != etr;
            ++itr) {
 
-        SP<TimedFireballBonus> pBns = *itr;
+        smart_pointer<TimedFireballBonus> pBns = *itr;
 
         if (pBns->t.nPeriod &&
             (pBns->t.nPeriod - pBns->t.nTimer) < 4 * nFramesInSecond)
@@ -244,56 +245,63 @@ struct BonusDrawer : public VisualEntity {
   /*virtual*/ float GetPriority() { return 10; }
 };
 
-AdvancedController::AdvancedController(SP<TwrGlobalController> pGl_,
+AdvancedController::AdvancedController(smart_pointer<TwrGlobalController> pGl_,
                                        Rectangle rBound, Color c,
                                        const LevelLayout &lvl)
     : BasicController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
-      bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(0),
+      bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
       bTakeOffToggle(false), pTutorialText(this, 0),
-      mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()), bTimerFlash(false) {
+      mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()), bTimerFlash(false) {}
+
+void AdvancedController::Init(smart_pointer<AdvancedController> pSelf_,
+                              const LevelLayout &lvl) {
+  pSelf = pSelf_;
   bNoRefresh = true;
 
   tLoseTimer.nPeriod = 0;
 
-  SP<AdNumberDrawer> pNm = new AdNumberDrawer();
-  pNm->pAd = this;
+  smart_pointer<AdNumberDrawer> pNm = make_smart(new AdNumberDrawer());
+  pNm->pAd = pSelf.GetRawPointer();
   AddV(pNm);
 
-  SP<BonusDrawer> pBd = new BonusDrawer();
-  pBd->pAd = this;
+  smart_pointer<BonusDrawer> pBd = make_smart(new BonusDrawer());
+  pBd->pAd = pSelf.GetRawPointer();
   AddV(pBd);
 
-  SP<KnightGenerator> pGen =
-      new KnightGenerator(lvl.vFreq.at(0), rBound, this, lvl.blKnightGen);
-  SP<PrincessGenerator> pPGen =
-      new PrincessGenerator(lvl.vFreq.at(1), rBound, this);
-  SP<TraderGenerator> pTGen =
-      new TraderGenerator(lvl.vFreq.at(2), rBound, this);
-  SP<MageGenerator> pMGen =
-      new MageGenerator(lvl.vFreq.at(3), lvl.vFreq.at(4), rBound, this);
+  smart_pointer<KnightGenerator> pGen = make_smart(
+      new KnightGenerator(lvl.vFreq.at(0), rBound, pSelf, lvl.blKnightGen));
+  smart_pointer<PrincessGenerator> pPGen =
+      make_smart(new PrincessGenerator(lvl.vFreq.at(1), rBound, pSelf));
+  smart_pointer<TraderGenerator> pTGen =
+      make_smart(new TraderGenerator(lvl.vFreq.at(2), rBound, pSelf));
+  smart_pointer<MageGenerator> pMGen = make_smart(
+      new MageGenerator(lvl.vFreq.at(3), lvl.vFreq.at(4), rBound, pSelf));
 
   pGr = pGen.GetRawPointer();
   pMgGen = pMGen.GetRawPointer();
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    PushBackASSP(this, vRd, new FancyRoad(lvl.vRoadGen[i], this));
+    PushBackASSP(pSelf.GetRawPointer(), vRd,
+                 make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
-    PushBackASSP(this, vCs, new Castle(lvl.vCastleLoc[i], rBound, this));
+    PushBackASSP(pSelf.GetRawPointer(), vCs,
+                 make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
 
   t = Timer(lvl.nTimer);
 
   PushBackASSP(
-      this, vDr,
-      new Dragon(vCs[0], this, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
-                 ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
+      pSelf.GetRawPointer(), vDr,
+      make_smart(new Dragon(
+          vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
+          ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
 
   Point pos(pGl->rBound.sz.x / 2, pGl->rBound.sz.y);
-  SP<TutorialTextEntity> pTT = new TutorialTextEntity(
-      1, pos, pGl->pNum, pGl->sbTutorialOn.GetConstPointer());
+  smart_pointer<TutorialTextEntity> pTT = make_smart(new TutorialTextEntity(
+      1, pos, pGl->pNum, pGl->sbTutorialOn.GetConstPointer()));
   pTutorialText = pTT;
 
 #ifdef PC_VERSION
@@ -535,11 +543,11 @@ void AdvancedController::MegaGeneration() {
 }
 
 void AdvancedController::MegaGeneration(Point p) {
-  SP<MegaSliminess> pSlm = new MegaSliminess(p, this);
+  smart_pointer<MegaSliminess> pSlm = make_smart(new MegaSliminess(p, pSelf));
   AddE(pSlm);
 }
 
-/*virtual*/ void HighScoreShower::Draw(SP<ScalingDrawer> pDr) {
+/*virtual*/ void HighScoreShower::Draw(smart_pointer<ScalingDrawer> pDr) {
   int nScale = 2;
   int nCharWidth = 4;
 
@@ -569,7 +577,7 @@ void AdvancedController::MegaGeneration(Point p) {
   // pGl->pBigNum->DrawWord("high:", Point(0, 0), false);
 }
 
-/*virtual*/ void IntroTextShower::Draw(SP<ScalingDrawer> pDr) {
+/*virtual*/ void IntroTextShower::Draw(smart_pointer<ScalingDrawer> pDr) {
   int nScale = 2;
 
   Point pCnt = Point(rBound.sz.x / 2 * nScale, rBound.sz.y / 2 * nScale);
@@ -769,7 +777,7 @@ void AdvancedController::MegaGeneration(Point p) {
 #endif
 }
 
-/*virtual*/ void BonusScore::Draw(SP<ScalingDrawer> pDr) {
+/*virtual*/ void BonusScore::Draw(smart_pointer<ScalingDrawer> pDr) {
   if (nC < 11)
     pAc->pGl->pNum->DrawWord(sText, p, true);
   else

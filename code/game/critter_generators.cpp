@@ -1,10 +1,11 @@
 #include "game.h"
 
-SkellyGenerator::SkellyGenerator(Point p_, SP<AdvancedController> pAdv_)
+SkellyGenerator::SkellyGenerator(Point p_,
+                                 smart_pointer<AdvancedController> pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(this, pAdv_) {
-  SP<AnimationOnce> pSlm =
-      new AnimationOnce(2.F, pAdv->pGl->pr("skelly_summon"),
-                        unsigned(.1F * nFramesInSecond), p_, true);
+  smart_pointer<AnimationOnce> pSlm =
+      make_smart(new AnimationOnce(2.F, pAdv->pGl->pr("skelly_summon"),
+                                   unsigned(.1F * nFramesInSecond), p_, true));
   pAdv_->AddBoth(pSlm);
 }
 
@@ -21,7 +22,7 @@ float KnightGenerator::GetRate() {
 }
 
 KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
-                                 SP<AdvancedController> pBc_,
+                                 smart_pointer<AdvancedController> pBc_,
                                  const BrokenLine &bl_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       seq(pBc_->pGl->pr("knight")), bl(bl_), tm(1), bFirst(false) {
@@ -42,7 +43,8 @@ void KnightGenerator::Generate(bool bGolem) {
   v.Normalize(fKnightSpeed);
   p += rBound.p;
 
-  SP<Knight> pCr = new Knight(Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
+  smart_pointer<Knight> pCr =
+      make_smart(new Knight(Critter(7, p, v, rBound, 3, seq, true), pBc, 'K'));
 
   if (bFirst) {
     pCr->sUnderText = "destroy";
@@ -50,11 +52,11 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   if (bGolem) {
-    pCr = new Knight(
+    pCr = make_smart(new Knight(
         Critter(14, p, v * .5, rBound, 3,
                 v.x < 0 ? pBc->pGl->pr("golem") : pBc->pGl->pr("golem_f"),
                 true),
-        pBc, 'W');
+        pBc, 'W'));
   } else if (pBc->bGhostTime) {
     pCr->seq = pBc->pGl->pr("ghost_knight");
     pCr->cType = 'G';
@@ -73,7 +75,7 @@ void KnightGenerator::Update() {
 }
 
 PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
-                                     SP<AdvancedController> pBc_)
+                                     smart_pointer<AdvancedController> pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
   if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
@@ -97,12 +99,12 @@ void PrincessGenerator::Update() {
 
     vel.Normalize(fPrincessSpeed);
 
-    SP<Princess> pCr =
-        new Princess(Critter(7, p, vel, rBound, 3,
-                             vel.x < 0 ? pBc->pGl->pr("princess_f")
-                                       : pBc->pGl->pr("princess"),
-                             true),
-                     pBc);
+    smart_pointer<Princess> pCr =
+        make_smart(new Princess(Critter(7, p, vel, rBound, 3,
+                                        vel.x < 0 ? pBc->pGl->pr("princess_f")
+                                                  : pBc->pGl->pr("princess"),
+                                        true),
+                                pBc));
     if (bFirst) {
       pCr->sUnderText = "capture";
       bFirst = false;
@@ -116,7 +118,7 @@ void PrincessGenerator::Update() {
 }
 
 MageGenerator::MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
-                             SP<AdvancedController> pBc_)
+                             smart_pointer<AdvancedController> pBc_)
     : rBound(rBound_), pBc(this, pBc_) {
   if (pBc->pGl->bAngry)
     dRate = dAngryRate_;
@@ -146,10 +148,10 @@ void MageGenerator::MageGenerate() {
 
   vel.Normalize(fMageSpeed);
 
-  SP<Mage> pCr = new Mage(
+  smart_pointer<Mage> pCr = make_smart(new Mage(
       Critter(7, p, vel, rBound, 3,
               vel.x < 0 ? pBc->pGl->pr("mage_f") : pBc->pGl->pr("mage"), true),
-      pBc, pBc->pGl->bAngry);
+      pBc, pBc->pGl->bAngry));
   pBc->AddBoth(pCr);
   PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
 }
@@ -164,7 +166,7 @@ float TraderGenerator::GetRate() {
 }
 
 TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
-                                 SP<AdvancedController> pBc_)
+                                 smart_pointer<AdvancedController> pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false), bFirstBns(false) {
   if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0) {
@@ -191,11 +193,11 @@ void TraderGenerator::Update() {
     fPoint vel(v);
     vel.Normalize(fTraderSpeed);
 
-    SP<Trader> pCr = new Trader(
+    smart_pointer<Trader> pCr = make_smart(new Trader(
         Critter(7, p, vel, rBound, 3,
                 vel.x < 0 ? pBc->pGl->pr("trader") : pBc->pGl->pr("trader_f"),
                 true),
-        pBc, bFirstBns);
+        pBc, bFirstBns));
 
     if (bFirst) {
       pCr->sUnderText = "kill";
@@ -218,9 +220,9 @@ void TraderGenerator::Update() {
     fPoint v = pAdv->vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    SP<Knight> pCr = new Knight(
+    smart_pointer<Knight> pCr = make_smart(new Knight(
         Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->pr("skelly"), true), pAdv,
-        'S');
+        'S'));
     pAdv->AddBoth(pCr);
     PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pCr);
   }

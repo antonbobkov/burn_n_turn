@@ -104,19 +104,20 @@ bool ImageSequence::ToggleTimed() {
 
 // --- ImageFlipper ---
 
-ImageFlipper::ImageFlipper(SP<GraphicalInterface<Index>> pGr_) : pGr(pGr_) {}
+ImageFlipper::ImageFlipper(smart_pointer<GraphicalInterface<Index>> pGr_)
+    : pGr(pGr_) {}
 
 void ImageFlipper::operator()(Index &img) { img = pGr->FlipImage(img); }
 
 // --- ImagePainter ---
 
-ImagePainter::ImagePainter(SP<GraphicalInterface<Index>> pGr_, Color cFrom,
-                           Color cTo)
+ImagePainter::ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_,
+                           Color cFrom, Color cTo)
     : pGr(pGr_) {
   vTr.push_back(ColorMap(cFrom, cTo));
 }
 
-ImagePainter::ImagePainter(SP<GraphicalInterface<Index>> pGr_,
+ImagePainter::ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_,
                            const std::vector<ColorMap> &vTr_)
     : pGr(pGr_), vTr(vTr_) {}
 
@@ -167,8 +168,8 @@ std::string PreloaderExceptionLoad::GetErrorMessage() const {
 
 // --- Preloader ---
 
-Preloader::Preloader(SP<GraphicalInterface<Index>> pGr_,
-                     SP<SoundInterface<Index>> pSn_, FilePath *fp)
+Preloader::Preloader(smart_pointer<GraphicalInterface<Index>> pGr_,
+                     smart_pointer<SoundInterface<Index>> pSn_, FilePath *fp)
     : pGr(pGr_), pSn(pSn_), nScale(1), fp_(fp) {}
 
 void Preloader::AddTransparent(Color c) { vTr.push_back(c); }

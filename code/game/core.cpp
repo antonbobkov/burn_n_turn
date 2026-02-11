@@ -112,7 +112,7 @@ void NumberDrawer::CacheColor(Color c) {
   mpCachedRecolorings[c] = vNewColors;
 }
 
-NumberDrawer::NumberDrawer(SP<ScalingDrawer> pDr_, Gui::FilePath *fp,
+NumberDrawer::NumberDrawer(smart_pointer<ScalingDrawer> pDr_, Gui::FilePath *fp,
                            std::string sFontPath, std::string sFontName)
     : pDr(this, pDr_), vImgIndx(256, -1) {
   std::string txtPath = fp->GetRelativePath(sFontPath + sFontName + ".txt");
@@ -260,8 +260,8 @@ MessageWriter *pWr = 0;
 
 int nSlimeMax = 100;
 
-void DrawStuff(Rectangle rBound, SP<Graphic> pGraph, SP<Soundic> pSnd,
-               Preloader &pr, int n) {
+void DrawStuff(Rectangle rBound, smart_pointer<Graphic> pGraph,
+               smart_pointer<Soundic> pSnd, Preloader &pr, int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;
@@ -301,8 +301,9 @@ void DrawStuff(Rectangle rBound, SP<Graphic> pGraph, SP<Soundic> pSnd,
 const std::string sFullScreenPath = "fullscreen.txt";
 
 TwrGlobalController::TwrGlobalController(
-    SP<ScalingDrawer> pDr_, SP<NumberDrawer> pNum_, SP<NumberDrawer> pBigNum_,
-    SP<FontWriter> pFancyNum_, SP<Soundic> pSndRaw_, const LevelStorage &vLvl_,
+    smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
+    smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
+    smart_pointer<Soundic> pSndRaw_, const LevelStorage &vLvl_,
     Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(this, pDr_), pGraph(this, pDr_->pGr), pNum(this, pNum_),
       pBigNum(this, pBigNum_), pr(pDr_->pGr, pSndRaw_, fp),
@@ -582,59 +583,65 @@ TwrGlobalController::TwrGlobalController(
   pNum->CacheColor(Color(5, 5, 0));
 }
 
-void TwrGlobalController::StartUp() {
+void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
+  pSelf = pSelf_;
   nScore = 0;
   bAngry = false;
 
-  SP<Animation> pStr =
+  smart_pointer<Animation> pStr = make_smart(
       new Animation(0, pr("start"), nFramesInSecond / 5,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true);
+                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
   // menu
-  SP<MenuController> pMenuHolder = new MenuController(
-      this, rBound, Color(0, 0, 0), 3); // resume position shouldn't matter
+  smart_pointer<MenuController> pMenuHolder = make_smart(new MenuController(
+      pSelf, rBound, Color(0, 0, 0), 3)); // resume position shouldn't matter
   pMenu = pMenuHolder;
 
   // logo 1
-  SP<BasicController> pCnt0_1 =
-      new AlmostBasicController(BasicController(this, rBound, Color(0, 0, 0)));
+  smart_pointer<BasicController> pCnt0_1 = make_smart(new AlmostBasicController(
+      BasicController(pSelf, rBound, Color(0, 0, 0))));
   // logo 2
-  SP<BasicController> pCnt0_2 =
-      new AlmostBasicController(BasicController(this, rBound, Color(0, 0, 0)));
+  smart_pointer<BasicController> pCnt0_2 = make_smart(new AlmostBasicController(
+      BasicController(pSelf, rBound, Color(0, 0, 0))));
   // press start screen
-  SP<BasicController> pCnt1 =
-      new StartScreenController(this, rBound, Color(0, 0, 0));
+  smart_pointer<BasicController> pCnt1 =
+      make_smart(new StartScreenController(pSelf, rBound, Color(0, 0, 0)));
   // game over
-  SP<BasicController> pCnt2 =
-      new AlmostBasicController(BasicController(this, rBound, Color(0, 0, 0)));
+  smart_pointer<BasicController> pCnt2 = make_smart(new AlmostBasicController(
+      BasicController(pSelf, rBound, Color(0, 0, 0))));
   // you win!
-  SP<BasicController> pCnt3 = new BasicController(this, rBound, Color(0, 0, 0));
+  smart_pointer<BasicController> pCnt3 =
+      make_smart(new BasicController(pSelf, rBound, Color(0, 0, 0)));
   // score
-  SP<DragonScoreController> pScore =
-      new DragonScoreController(this, rBound, Color(0, 0, 0), true);
+  smart_pointer<DragonScoreController> pScore = make_smart(
+      new DragonScoreController(pSelf, rBound, Color(0, 0, 0), true));
   // intro tutorial screen (non PC version)
-  SP<DragonScoreController> pIntro =
-      new DragonScoreController(this, rBound, Color(0, 0, 0), false);
+  smart_pointer<DragonScoreController> pIntro = make_smart(
+      new DragonScoreController(pSelf, rBound, Color(0, 0, 0), false));
 
   // cutscenes
-  SP<BasicController> pCut1 = new Cutscene(this, rBound, "princess", "knight");
-  SP<BasicController> pCut2 =
-      new Cutscene(this, rBound, "knight", "dragon_walk_f", true);
-  SP<BasicController> pCut3 = new Cutscene(this, rBound, "dragon_walk", "mage");
+  smart_pointer<BasicController> pCut1 =
+      make_smart(new Cutscene(pSelf, rBound, "princess", "knight"));
+  smart_pointer<BasicController> pCut2 =
+      make_smart(new Cutscene(pSelf, rBound, "knight", "dragon_walk_f", true));
+  smart_pointer<BasicController> pCut3 =
+      make_smart(new Cutscene(pSelf, rBound, "dragon_walk", "mage"));
 
-  SP<SoundControls> pBckgMusic = new SoundControls(plr, BG_BACKGROUND);
-  SP<SoundControls> pNoMusic = new SoundControls(plr, -1);
+  smart_pointer<SoundControls> pBckgMusic =
+      make_smart(new SoundControls(plr, BG_BACKGROUND));
+  smart_pointer<SoundControls> pNoMusic =
+      make_smart(new SoundControls(plr, -1));
 
-  SP<Animation> pWin = new Animation(
-      0, pr("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true);
-  SP<StaticImage> pL = new StaticImage(
-      pr["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true);
-  SP<Animation> pBurnL =
+  smart_pointer<Animation> pWin = make_smart(new Animation(
+      0, pr("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
+  smart_pointer<StaticImage> pL = make_smart(new StaticImage(
+      pr["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true));
+  smart_pointer<Animation> pBurnL = make_smart(
       new Animation(0, pr("burn"), 3,
-                    Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true);
-  SP<Animation> pBurnR =
+                    Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true));
+  smart_pointer<Animation> pBurnR = make_smart(
       new Animation(0, pr("burn"), 4,
-                    Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true);
+                    Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true));
   pBurnR->seq.nActive += 4;
 
   std::vector<std::string> vHintPref;
@@ -658,40 +665,40 @@ void TwrGlobalController::StartUp() {
   std::string sHint = vHintPref.at(rand() % vHintPref.size()) +
                       vHints.at(rand() % vHints.size());
 
-  SP<TextDrawEntity> pHintText = new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum);
-  SP<TextDrawEntity> pOptionText = new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
+  smart_pointer<TextDrawEntity> pHintText = make_smart(new TextDrawEntity(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum));
+  smart_pointer<TextDrawEntity> pOptionText = make_smart(new TextDrawEntity(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum));
 
-  SP<AnimationOnce> pO =
+  smart_pointer<AnimationOnce> pO = make_smart(
       new AnimationOnce(0, pr("over"), nFramesInSecond / 2,
-                        Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true);
-  SP<AnimationOnce> pPlu =
+                        Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
+  smart_pointer<AnimationOnce> pPlu = make_smart(
       new AnimationOnce(0, pr("pluanbo"), nFramesInSecond / 10,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true);
-  SP<AnimationOnce> pGen =
+                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
+  smart_pointer<AnimationOnce> pGen = make_smart(
       new AnimationOnce(0, pr("gengui"), nFramesInSecond / 5,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true);
+                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
 
-  SP<SimpleSoundEntity> pOver =
-      new SimpleSoundEntity(pr.GetSndSeq("over"), nFramesInSecond / 2, pSnd);
-  SP<SimpleSoundEntity> pPluSnd = new SimpleSoundEntity(
-      pr.GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd);
-  SP<SimpleSoundEntity> pClkSnd =
-      new SimpleSoundEntity(pr.GetSndSeq("click"), nFramesInSecond / 5, pSnd);
+  smart_pointer<SimpleSoundEntity> pOver = make_smart(
+      new SimpleSoundEntity(pr.GetSndSeq("over"), nFramesInSecond / 2, pSnd));
+  smart_pointer<SimpleSoundEntity> pPluSnd = make_smart(new SimpleSoundEntity(
+      pr.GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd));
+  smart_pointer<SimpleSoundEntity> pClkSnd = make_smart(
+      new SimpleSoundEntity(pr.GetSndSeq("click"), nFramesInSecond / 5, pSnd));
 
 #ifdef TRIAL_VERSION
-  SP<StaticImage> pTrial = new StaticImage(
-      pr["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true);
+  smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(
+      pr["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
   pCnt1->AddV(pTrial);
 #endif
 
-  SP<Animation> pMenuCaret =
-      new Animation(2, pr("arrow"), 3, Point(0, 0), true);
+  smart_pointer<Animation> pMenuCaret =
+      make_smart(new Animation(2, pr("arrow"), 3, Point(0, 0), true));
   // menu entity
-  SP<MenuDisplay> pMenuDisplay =
+  smart_pointer<MenuDisplay> pMenuDisplay = make_smart(
       new MenuDisplay(Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-                      pMenuCaret, pMenu, sbCheatsUnlocked.Get());
+                      pMenuCaret, pMenu, sbCheatsUnlocked.Get()));
 
   pMenu->AddBoth(pMenuDisplay);
   pMenu->pMenuDisplay = pMenuDisplay;
@@ -744,8 +751,9 @@ void TwrGlobalController::StartUp() {
 #endif
 
   for (unsigned i = 0; i < vLvl.size(); ++i) {
-    SP<AdvancedController> pAd =
-        new AdvancedController(this, rBound, Color(0, 0, 0), vLvl[i]);
+    smart_pointer<AdvancedController> pAd = make_smart(
+        new AdvancedController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    pAd->Init(pAd, vLvl[i]);
 
     pAd->AddE(pBckgMusic);
     pAd->pSc = pBckgMusic;
@@ -771,36 +779,36 @@ void TwrGlobalController::StartUp() {
   }
 
 #ifdef TRIAL_VERSION
-  SP<BuyNowController> pBuy =
-      new BuyNowController(this, rBound, Color(0, 0, 0));
+  smart_pointer<BuyNowController> pBuy =
+      make_smart(new BuyNowController(pSelf, rBound, Color(0, 0, 0)));
 
-  SP<Animation> pGolem =
+  smart_pointer<Animation> pGolem = make_smart(
       new Animation(0, pr("golem_f"), nFramesInSecond / 10,
-                    Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true);
-  SP<Animation> pSkeleton1 =
+                    Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
+  smart_pointer<Animation> pSkeleton1 = make_smart(
       new Animation(0, pr("skelly"), nFramesInSecond / 4,
-                    Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true);
-  SP<Animation> pSkeleton2 = new Animation(
+                    Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
+  smart_pointer<Animation> pSkeleton2 = make_smart(new Animation(
       0, pr("skelly"), nFramesInSecond / 4 + 1,
-      Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true);
-  SP<Animation> pSkeleton3 = new Animation(
+      Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
+  smart_pointer<Animation> pSkeleton3 = make_smart(new Animation(
       0, pr("skelly"), nFramesInSecond / 4 - 1,
-      Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true);
-  SP<Animation> pMage =
+      Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
+  smart_pointer<Animation> pMage = make_smart(
       new Animation(0, pr("mage_spell"), nFramesInSecond / 2,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true);
-  SP<Animation> pGhost =
-      new Animation(0, pr("ghost"), nFramesInSecond / 6,
-                    Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true);
-  SP<Animation> pWhiteKnight =
-      new Animation(0, pr("ghost_knight"), nFramesInSecond / 6,
-                    Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true);
+                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
+  smart_pointer<Animation> pGhost = make_smart(new Animation(
+      0, pr("ghost"), nFramesInSecond / 6,
+      Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
+  smart_pointer<Animation> pWhiteKnight = make_smart(new Animation(
+      0, pr("ghost_knight"), nFramesInSecond / 6,
+      Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
 
-  // SP<StaticImage> pBuyNow = new StaticImage(pr["buy"],Point(rBound.sz.x/2 -
-  // 73,rBound.sz.y/3 + 33), true);
-  SP<StaticImage> pBuyNow = new StaticImage(
-      pr["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true);
-  SP<VisualEntity> pSlimeUpd = new SlimeUpdater(pBuy.GetRawPointer());
+  // smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(...));
+  smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(
+      pr["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
+  smart_pointer<VisualEntity> pSlimeUpd =
+      make_smart(new SlimeUpdater(pBuy.GetRawPointer()));
 
   pBuy->AddV(pL);
   pBuy->AddV(pSlimeUpd);
@@ -852,7 +860,7 @@ void TwrGlobalController::Restart(int nActive_ /* = -1*/) {
 
   CleanIslandSeeded(this);
 
-  StartUp();
+  StartUp(pSelf);
 }
 
 void TwrGlobalController::Menu() {
@@ -890,15 +898,18 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   pGr = pe.pGr;
   pSm = pe.pSndMng;
 
-  pDr = new ScalingDrawer(pGr, nScale);
+  pDr = make_smart(new ScalingDrawer(pGr, nScale));
 
-  SP<ScalingDrawer> pBigDr = new ScalingDrawer(pGr, nScale * 2);
+  smart_pointer<ScalingDrawer> pBigDr =
+      make_smart(new ScalingDrawer(pGr, nScale * 2));
 
   std::string sFontPath = "dragonfont\\";
 
-  pNum = new NumberDrawer(pDr, fp_.get(), sFontPath, "dragonfont");
-  pBigNum = new NumberDrawer(pBigDr, fp_.get(), sFontPath, "dragonfont");
-  pFancyNum = new FontWriter(fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2);
+  pNum = make_smart(new NumberDrawer(pDr, fp_.get(), sFontPath, "dragonfont"));
+  pBigNum =
+      make_smart(new NumberDrawer(pBigDr, fp_.get(), sFontPath, "dragonfont"));
+  pFancyNum = make_smart(
+      new FontWriter(fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2));
 
   std::string levelsFile;
 #ifdef FULL_VERSION
@@ -912,9 +923,9 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 #endif
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
-  pCnt = new TwrGlobalController(pDr, pNum, pBigNum, pFancyNum, pSm, vLvl,
-                                 rBound, this, fp_.get());
-  pCnt->StartUp();
+  pCnt = make_smart(new TwrGlobalController(pDr, pNum, pBigNum, pFancyNum, pSm,
+                                            vLvl, rBound, this, fp_.get()));
+  pCnt->StartUp(pCnt);
 }
 
 TwrGlobalController *TowerGameGlobalController::GetTowerController() const {

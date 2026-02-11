@@ -38,7 +38,7 @@ void TutorialTextEntity::SetText(std::vector<std::string> v) {
   }
 }
 
-void TutorialTextEntity::Draw(SP<ScalingDrawer> pDr) {
+void TutorialTextEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
   if (pIsTutorialOn && (*pIsTutorialOn == false))
     return;
 
@@ -113,7 +113,7 @@ std::vector<std::string> TutorialLevelOne::GetText() {
 }
 
 void TutorialLevelOne::Update() {
-  if (pTexter != 0)
+  if (pTexter.GetRawPointer() != 0)
     pTexter->SetText(GetText());
 }
 
@@ -169,7 +169,7 @@ std::vector<std::string> TutorialLevelTwo::GetText() {
 }
 
 void TutorialLevelTwo::Update() {
-  if (pTexter != 0)
+  if (pTexter.GetRawPointer() != 0)
     pTexter->SetText(GetText());
 }
 

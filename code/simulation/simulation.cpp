@@ -1,10 +1,11 @@
 #include "simulation.h"
 
+#include "General.h"
 #include "MessageWriter.h"
 #include "file_utils.h"
-#include "game_runner_interface.h"
 #include "game.h"
-#include "General.h"
+#include "game_runner_interface.h"
+
 
 #include "GuiMock.h"
 #include "SuiMock.h"
@@ -28,7 +29,8 @@ const std::string kSoundFileName("soundon.txt");
 const unsigned kKeyPressFrames[] = {8, 18, 28};
 const unsigned kKeyPressCount = 3;
 
-/* Tower center in screen coords (scale 2: 480,300 logical -> 960,600 screen). */
+/* Tower center in screen coords (scale 2: 480,300 logical -> 960,600 screen).
+ */
 const Crd kTowerX = kScreenW / 2;
 const Crd kTowerY = kScreenH * 3 / 4;
 
@@ -49,13 +51,15 @@ void RunSimulation() {
   srand(12345);
 
   std::cout << "[sim] Creating mocks and file manager\n";
-  SP<MockGraphicalInterface> p_mock_gr(new MockGraphicalInterface());
-  SP<GraphicalInterface<Index>> p_gr(
-      new SimpleGraphicalInterface<std::string>(p_mock_gr));
+  smart_pointer<MockGraphicalInterface> p_mock_gr =
+      make_smart(new MockGraphicalInterface());
+  smart_pointer<GraphicalInterface<Index>> p_gr =
+      make_smart(new SimpleGraphicalInterface<std::string>(p_mock_gr));
 
-  SP<MockSoundInterface> p_mock_snd(new MockSoundInterface());
-  SP<SoundInterface<Index>> p_snd(
-      new SimpleSoundInterface<std::string>(p_mock_snd));
+  smart_pointer<MockSoundInterface> p_mock_snd =
+      make_smart(new MockSoundInterface());
+  smart_pointer<SoundInterface<Index>> p_snd =
+      make_smart(new SimpleSoundInterface<std::string>(p_mock_snd));
 
   std::unique_ptr<Gui::StdFileManager> underlying(new Gui::StdFileManager());
   std::unique_ptr<Gui::CachingReadOnlyFileManager> fm(
@@ -63,19 +67,21 @@ void RunSimulation() {
 
   bool b_exit = false;
   bool b_true = true;
-  SP<Event> p_exit_ev(NewSwitchEvent(b_exit, b_true));
-  SP<MessageWriter> p_msg(new EmptyWriter());
+  smart_pointer<Event> p_exit_ev = make_smart(NewSwitchEvent(b_exit, b_true));
+  smart_pointer<MessageWriter> p_msg = make_smart(new EmptyWriter());
   Size sz(kScreenW, kScreenH);
 
   std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
   ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-  SP<TowerGameGlobalController> p_gl(new TowerGameGlobalController(pe));
+  smart_pointer<TowerGameGlobalController> p_gl =
+      make_smart(new TowerGameGlobalController(pe));
 
   std::string sound_content_before;
   bool sound_toggle_verified = false;
 
-  std::cout << "[sim] Running " << kSimulationFrames
-            << " frames (keys to level, keyboard take off, fly & shoot, menu)\n";
+  std::cout
+      << "[sim] Running " << kSimulationFrames
+      << " frames (keys to level, keyboard take off, fly & shoot, menu)\n";
   for (unsigned i = 0; i < kSimulationFrames && !b_exit; ++i) {
     std::string screen_name = p_gl->GetActiveControllerName();
 
@@ -97,7 +103,8 @@ void RunSimulation() {
       if (i == 85)
         p_gl->Fire();
       if (i >= 90 && i <= 130)
-        p_gl->MouseMove(Point(kScreenW / 2 + 100 - (i - 90), kScreenH / 2 - 30));
+        p_gl->MouseMove(
+            Point(kScreenW / 2 + 100 - (i - 90), kScreenH / 2 - 30));
       if (i == 90)
         p_gl->MouseDown(Point(kScreenW / 2 + 100, kScreenH / 2 - 30));
       if (i == 131)
@@ -105,7 +112,8 @@ void RunSimulation() {
       if (i == 135)
         p_gl->Fire();
 
-      /* Open game menu and toggle sound (writes to file via SavableVariable). */
+      /* Open game menu and toggle sound (writes to file via SavableVariable).
+       */
       if (i == 150)
         sound_content_before = GetFileContent(fm.get(), kSoundFileName);
       if (i == 151)
@@ -130,9 +138,8 @@ void RunSimulation() {
         std::string sound_after = GetFileContent(fm.get(), kSoundFileName);
         if (sound_content_before != sound_after) {
           sound_toggle_verified = true;
-          std::cout << "[sim] sound file changed: \""
-                    << sound_content_before << "\" -> \"" << sound_after
-                    << "\"\n";
+          std::cout << "[sim] sound file changed: \"" << sound_content_before
+                    << "\" -> \"" << sound_after << "\"\n";
         }
       }
       if (i == 166)

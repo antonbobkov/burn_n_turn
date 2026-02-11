@@ -1,6 +1,6 @@
 #include "game.h"
 
-void SummonSkeletons(SP<AdvancedController> pAc, Point p) {
+void SummonSkeletons(smart_pointer<AdvancedController> pAc, Point p) {
   int nNum = 4;
 
   if (pAc->nLvl > 6)
@@ -13,27 +13,29 @@ void SummonSkeletons(SP<AdvancedController> pAc, Point p) {
     f.Normalize(15);
 
     pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_summon"));
-    SP<SkellyGenerator> pSkel = new SkellyGenerator(p + f.ToPnt(), pAc);
+    smart_pointer<SkellyGenerator> pSkel =
+        make_smart(new SkellyGenerator(p + f.ToPnt(), pAc));
     pAc->AddE(pSkel);
   }
 }
 
 void Princess::OnHit(char cWhat) {
-  SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 250);
+  smart_pointer<BonusScore> pB =
+      make_smart(new BonusScore(pAc, GetPosition(), 250));
   pAc->AddBoth(pB);
 
   bExist = false;
 
-  SP<AnimationOnce> pAn = new AnimationOnce(
+  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->pr("princess_die_f")
                  : pAc->pGl->pr("princess_die"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
 }
 
-void Princess::Draw(SP<ScalingDrawer> pDr) {
+void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -44,7 +46,8 @@ void Princess::Draw(SP<ScalingDrawer> pDr) {
 #endif
 }
 
-Mage::Mage(const Critter &cr, SP<AdvancedController> pAc_, bool bAngry_)
+Mage::Mage(const Critter &cr, smart_pointer<AdvancedController> pAc_,
+           bool bAngry_)
     : Critter(cr), pAc(this, pAc_), bAngry(bAngry_), bCasting(false),
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
       tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
@@ -57,10 +60,10 @@ Mage::Mage(const Critter &cr, SP<AdvancedController> pAc_, bool bAngry_)
 void Mage::OnHit(char cWhat) {
   bExist = false;
 
-  SP<AnimationOnce> pAn = new AnimationOnce(
+  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->pr("mage_die_f") : pAc->pGl->pr("mage_die"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
 
@@ -122,22 +125,23 @@ unsigned RandomBonus(bool bInTower) {
 }
 
 void Trader::OnHit(char cWhat) {
-  SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 60);
+  smart_pointer<BonusScore> pB =
+      make_smart(new BonusScore(pAc, GetPosition(), 60));
   pAc->AddBoth(pB);
 
   bExist = false;
 
   pAc->tutTwo.TraderKilled();
 
-  SP<AnimationOnce> pAn = new AnimationOnce(
+  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->pr("trader_die") : pAc->pGl->pr("trader_die_f"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
 
-  SP<FireballBonusAnimation> pFb =
-      new FireballBonusAnimation(GetPosition(), RandomBonus(false), pAc);
+  smart_pointer<FireballBonusAnimation> pFb = make_smart(
+      new FireballBonusAnimation(GetPosition(), RandomBonus(false), pAc));
   if (bFirstBns) {
     pFb->sUnderText = "loot";
     bFirstBns = false;
@@ -146,7 +150,7 @@ void Trader::OnHit(char cWhat) {
   PushBackASSP(pAc.GetRawPointer(), pAc->lsBonus, pFb);
 }
 
-void Trader::Draw(SP<ScalingDrawer> pDr) {
+void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -157,7 +161,7 @@ void Trader::Draw(SP<ScalingDrawer> pDr) {
 #endif
 }
 
-void Knight::Draw(SP<ScalingDrawer> pDr) {
+void Knight::Draw(smart_pointer<ScalingDrawer> pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -241,7 +245,8 @@ void Knight::OnHit(char cWhat) {
 
     pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("golem_death"));
 
-    SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 5000);
+    smart_pointer<BonusScore> pB =
+        make_smart(new BonusScore(pAc, GetPosition(), 5000));
   }
 
   bExist = false;
@@ -249,7 +254,8 @@ void Knight::OnHit(char cWhat) {
   pAc->tutOne.KnightKilled();
 
   if (cType != 'G') {
-    SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 100);
+    smart_pointer<BonusScore> pB =
+        make_smart(new BonusScore(pAc, GetPosition(), 100));
     pAc->AddBoth(pB);
 
     ImageSequence seqDead = pAc->pGl->pr("knight_die");
@@ -263,17 +269,19 @@ void Knight::OnHit(char cWhat) {
         seqDead = pAc->pGl->pr("golem_die_f");
     }
 
-    SP<AnimationOnce> pAn = new AnimationOnce(
+    smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
         dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
-        GetPosition(), true);
+        GetPosition(), true));
     pAc->AddBoth(pAn);
   } else {
-    SP<Ghostiness> pGhs = new Ghostiness(GetPosition(), pAc, *this, nGhostHit);
+    smart_pointer<Ghostiness> pGhs =
+        make_smart(new Ghostiness(GetPosition(), pAc, *this, nGhostHit));
     pAc->AddE(pGhs);
   }
 }
 
-MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, SP<AdvancedController> pAc_)
+MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound,
+                     smart_pointer<AdvancedController> pAc_)
     : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("megaslime"),
               nFramesInSecond / 5),
       pAc(this, pAc_), nHealth(nSlimeHealthMax) {
@@ -327,20 +335,21 @@ void MegaSlime::OnHit(char cWhat) {
 
   bExist = false;
 
-  SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 500);
+  smart_pointer<BonusScore> pB =
+      make_smart(new BonusScore(pAc, GetPosition(), 500));
   pAc->AddBoth(pB);
 
   ImageSequence seqDead = pAc->pGl->pr("megaslime_die");
   pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_die"));
 
-  SP<AnimationOnce> pAn = new AnimationOnce(
+  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
-      GetPosition(), true);
+      GetPosition(), true));
   pAc->AddBoth(pAn);
 }
 
-Ghostiness::Ghostiness(Point p_, SP<AdvancedController> pAdv_, Critter knCp_,
-                       int nGhostHit_)
+Ghostiness::Ghostiness(Point p_, smart_pointer<AdvancedController> pAdv_,
+                       Critter knCp_, int nGhostHit_)
     : p(p_), pAdv(this, pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
   ImageSequence seq = pAdv->pGl->pr("ghost_knight_burn");
   if (nGhostHit == 0)
@@ -350,7 +359,8 @@ Ghostiness::Ghostiness(Point p_, SP<AdvancedController> pAdv_, Critter knCp_,
 
   t = Timer(n * seq.GetTotalTime());
 
-  SP<AnimationOnce> pFire = new AnimationOnce(2.F, seq, n, p_, true);
+  smart_pointer<AnimationOnce> pFire =
+      make_smart(new AnimationOnce(2.F, seq, n, p_, true));
   pAdv_->AddBoth(pFire);
 }
 
@@ -361,7 +371,7 @@ void Ghostiness::Update() {
     if (nGhostHit == 0)
       return;
 
-    SP<Knight> pCr = new Knight(knCp, pAdv, 'G');
+    smart_pointer<Knight> pCr = make_smart(new Knight(knCp, pAdv, 'G'));
     if (nGhostHit == 1)
       pCr->seq = pAdv->pGl->pr("ghost");
     else
@@ -373,8 +383,8 @@ void Ghostiness::Update() {
   }
 }
 
-Slime::Slime(fPoint fPos, Rectangle rBound, SP<AdvancedController> pAc_,
-             int nGeneration_)
+Slime::Slime(fPoint fPos, Rectangle rBound,
+             smart_pointer<AdvancedController> pAc_, int nGeneration_)
     : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
       pAc(this, pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
@@ -391,7 +401,7 @@ void Slime::RandomizeVelocity() {
 }
 
 Slime::~Slime() {
-  if (pAc != 0) {
+  if (pAc.GetRawPointer() != 0) {
     --pAc->nSlimeNum;
   }
 }
@@ -411,9 +421,9 @@ void Slime::Update() {
 
         bExist = false;
 
-        SP<AnimationOnce> pAn =
+        smart_pointer<AnimationOnce> pAn = make_smart(
             new AnimationOnce(dPriority, pAc->pGl->pr("slime_poke"),
-                              nFramesInSecond / 5, GetPosition(), true);
+                              nFramesInSecond / 5, GetPosition(), true));
         pAc->AddBoth(pAn);
 
         break;
@@ -459,9 +469,9 @@ void Slime::OnHit(char cWhat) {
     pAc->MegaGeneration(fAvg.ToPnt());
 
     for (unsigned i = 0; i < vDeadSlimes.size(); ++i) {
-      SP<FloatingSlime> pSlm =
+      smart_pointer<FloatingSlime> pSlm = make_smart(
           new FloatingSlime(pAc->pGl->pr("slime_cloud"), vDeadSlimes[i],
-                            fAvg.ToPnt(), nFramesInSecond * 1);
+                            fAvg.ToPnt(), nFramesInSecond * 1));
       pAc->AddBoth(pSlm);
     }
 
@@ -473,13 +483,14 @@ void Slime::OnHit(char cWhat) {
   bool bRevive = (cWhat != 'M');
 
   if (cWhat != 'M') {
-    SP<BonusScore> pB = new BonusScore(pAc, GetPosition(), 1);
+    smart_pointer<BonusScore> pB =
+        make_smart(new BonusScore(pAc, GetPosition(), 1));
     pAc->AddBoth(pB);
   }
 
-  SP<AnimationOnce> pAn = new AnimationOnce(
+  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       dPriority, pAc->pGl->pr(bRevive ? "slime_die" : "slime_poke"),
-      nFramesInSecond / 5, GetPosition(), true);
+      nFramesInSecond / 5, GetPosition(), true));
   pAc->AddBoth(pAn);
 
   if (!bRevive)
@@ -489,15 +500,15 @@ void Slime::OnHit(char cWhat) {
     fPoint f = RandomAngle();
     f.Normalize(4);
 
-    SP<Sliminess> pSlm =
-        new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1);
+    smart_pointer<Sliminess> pSlm = make_smart(
+        new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
     pAc->AddE(pSlm);
     PushBackASSP(pAc.GetRawPointer(), pAc->lsSliminess, pSlm);
   }
 }
 
-Sliminess::Sliminess(Point p_, SP<AdvancedController> pAdv_, bool bFast_,
-                     int nGeneration_)
+Sliminess::Sliminess(Point p_, smart_pointer<AdvancedController> pAdv_,
+                     bool bFast_, int nGeneration_)
     : p(p_), pAdv(this, pAdv_), bFast(bFast_), nGeneration(nGeneration_),
       pSlm(this, 0) {
   ImageSequence seq = bFast ? pAdv->pGl->pr("slime_reproduce_fast")
@@ -506,8 +517,8 @@ Sliminess::Sliminess(Point p_, SP<AdvancedController> pAdv_, bool bFast_,
   t = bFast ? Timer(unsigned(1.3F * nFramesInSecond))
             : Timer(unsigned(2.3F * nFramesInSecond));
 
-  SP<AnimationOnce> pSlmTmp =
-      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true);
+  smart_pointer<AnimationOnce> pSlmTmp = make_smart(
+      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true));
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
@@ -518,7 +529,8 @@ void Sliminess::Update() {
   if (t.Tick()) {
     bExist = false;
 
-    SP<Slime> pSlm = new Slime(p, pAdv->rBound, pAdv, nGeneration);
+    smart_pointer<Slime> pSlm =
+        make_smart(new Slime(p, pAdv->rBound, pAdv, nGeneration));
     pAdv->AddBoth(pSlm);
     PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
     PushBackASSP(pAdv.GetRawPointer(), pAdv->lsSlimes, pSlm);
@@ -531,16 +543,16 @@ void Sliminess::Kill() {
 }
 
 Sliminess::~Sliminess() {
-  if (pAdv != 0)
+  if (pAdv.GetRawPointer() != 0)
     --pAdv->nSlimeNum;
 }
 
-MegaSliminess::MegaSliminess(Point p_, SP<AdvancedController> pAdv_)
+MegaSliminess::MegaSliminess(Point p_, smart_pointer<AdvancedController> pAdv_)
     : p(p_), pAdv(this, pAdv_), pSlm(this, 0) {
   ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
 
-  SP<AnimationOnce> pSlmTmp =
-      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true);
+  smart_pointer<AnimationOnce> pSlmTmp = make_smart(
+      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true));
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
@@ -551,7 +563,8 @@ void MegaSliminess::Update() {
   if (pSlm->bExist == false) {
     bExist = false;
 
-    SP<MegaSlime> pSlm = new MegaSlime(p, pAdv->rBound, pAdv);
+    smart_pointer<MegaSlime> pSlm =
+        make_smart(new MegaSlime(p, pAdv->rBound, pAdv));
     pAdv->AddBoth(pSlm);
     PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
   }
@@ -615,12 +628,14 @@ void Mage::SummonSlimes() {
     fPoint f = RandomAngle();
     f.Normalize(10);
 
-    SP<Sliminess> pSlm = new Sliminess(GetPosition() + f.ToPnt(), pAc, true, 0);
+    smart_pointer<Sliminess> pSlm =
+        make_smart(new Sliminess(GetPosition() + f.ToPnt(), pAc, true, 0));
     pAc->AddE(pSlm);
   }
 }
 
-Castle::Castle(Point p, Rectangle rBound_, SP<AdvancedController> pAv_)
+Castle::Castle(Point p, Rectangle rBound_,
+               smart_pointer<AdvancedController> pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
       nPrincesses(0), pAv(this, pAv_), pDrag(this, 0), bBroken(false) {}
 
@@ -641,7 +656,7 @@ void Castle::OnKnight(char cWhat) {
     bBroken = true;
     nPrincesses = 0;
 
-    if (pDrag != 0) {
+    if (pDrag.GetRawPointer() != 0) {
 
       pDrag->bFly = true;
       pDrag->bTookOff = true;
@@ -662,7 +677,7 @@ void Castle::OnKnight(char cWhat) {
     return;
   }
 
-  if (pDrag != 0) {
+  if (pDrag.GetRawPointer() != 0) {
     pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("one_princess"));
 
     --nPrincesses;
@@ -671,12 +686,12 @@ void Castle::OnKnight(char cWhat) {
       fPoint v = RandomAngle();
       v.Normalize(fPrincessSpeed * 3.F);
 
-      SP<Princess> pCr =
-          new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                               v.x < 0 ? pAv->pGl->pr("princess_f")
-                                       : pAv->pGl->pr("princess"),
-                               true),
-                       pAv);
+      smart_pointer<Princess> pCr =
+          make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
+                                          v.x < 0 ? pAv->pGl->pr("princess_f")
+                                                  : pAv->pGl->pr("princess"),
+                                          true),
+                                  pAv));
       pAv->AddBoth(pCr);
       PushBackASSP(pAv.GetRawPointer(), pAv->lsPpl, pCr);
     }
@@ -691,12 +706,12 @@ void Castle::OnKnight(char cWhat) {
                  cos(r + i * 2 * 3.1415F / nPrincesses));
         v.Normalize(fPrincessSpeed * 3.F);
 
-        SP<Princess> pCr =
-            new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                 v.x < 0 ? pAv->pGl->pr("princess_f")
-                                         : pAv->pGl->pr("princess"),
-                                 true),
-                         pAv);
+        smart_pointer<Princess> pCr =
+            make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
+                                            v.x < 0 ? pAv->pGl->pr("princess_f")
+                                                    : pAv->pGl->pr("princess"),
+                                            true),
+                                    pAv));
         pAv->AddBoth(pCr);
         PushBackASSP(pAv.GetRawPointer(), pAv->lsPpl, pCr);
       }
@@ -706,7 +721,7 @@ void Castle::OnKnight(char cWhat) {
   }
 }
 
-void Castle::Draw(SP<ScalingDrawer> pDr) {
+void Castle::Draw(smart_pointer<ScalingDrawer> pDr) {
   Critter::seq.nActive = nPrincesses;
 
   if (nPrincesses > 4)

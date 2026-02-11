@@ -55,11 +55,11 @@ void ChainExplosion::Update() {
       (*itr)->OnHit('F');
 
       if (!ch.IsLast()) {
-        SP<ChainExplosion> pCE =
+        smart_pointer<ChainExplosion> pCE = make_smart(
             new ChainExplosion(AnimationOnce(GetPriority(), Reset(seq),
                                              SimpleVisualEntity::t.nPeriod,
                                              (*itr)->GetPosition(), true),
-                               r_in, delta, pBc, ch.Evolve());
+                               r_in, delta, pBc, ch.Evolve()));
         pBc->AddBoth(pCE);
       }
     }
@@ -73,7 +73,8 @@ void KnightOnFire::RandomizeVelocity() {
   fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
 }
 
-KnightOnFire::KnightOnFire(const Critter &cr, SP<BasicController> pBc_,
+KnightOnFire::KnightOnFire(const Critter &cr,
+                           smart_pointer<BasicController> pBc_,
                            unsigned nTimer_, Chain c_)
     : Critter(cr), pBc(this, pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
       t(nFramesInSecond / 5) {
@@ -99,10 +100,10 @@ void KnightOnFire::Update() {
         (*itr)->OnHit('F');
       else {
         (*itr)->bExist = false;
-        SP<KnightOnFire> pKn = new KnightOnFire(
+        smart_pointer<KnightOnFire> pKn = make_smart(new KnightOnFire(
             Critter(GetRadius(), (*itr)->GetPosition(), fPoint(), rBound,
                     GetPriority(), ImageSequence(), true),
-            pBc, nTimer_i, c.Evolve());
+            pBc, nTimer_i, c.Evolve()));
         pBc->AddBoth(pKn);
       }
     }
@@ -111,9 +112,9 @@ void KnightOnFire::Update() {
   if (nTimer != 0 && --nTimer == 0) {
     bExist = false;
 
-    SP<AnimationOnce> pAn = new AnimationOnce(
+    smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
         dPriority, pBc->pGl->pr("knight_die"),
-        unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true);
+        unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
     pBc->AddBoth(pAn);
   }
 
@@ -188,7 +189,7 @@ unsigned GetFireballChainNum(FireballBonus &fb) {
   return nRet;
 }
 
-Fireball::Fireball(Point p, fPoint v, SP<AdvancedController> pBc_,
+Fireball::Fireball(Point p, fPoint v, smart_pointer<AdvancedController> pBc_,
                    FireballBonus &fb_, Chain ch_, unsigned nChain_)
     : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
               nFramesInSecond / 10),
@@ -230,10 +231,10 @@ void Fireball::Update() {
         (*itr)->OnHit('F');
       else {
         (*itr)->bExist = false;
-        SP<KnightOnFire> pKn = new KnightOnFire(
+        smart_pointer<KnightOnFire> pKn = make_smart(new KnightOnFire(
             Critter((*itr)->GetRadius(), (*itr)->GetPosition(), fPoint(),
                     rBound, 1.F, ImageSequence(), true),
-            pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"]));
+            pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"])));
         pBc->AddBoth(pKn);
       }
 
@@ -254,32 +255,32 @@ void Fireball::Update() {
           fPoint v = fVel;
 
           for (unsigned i = 0; i < nChain; ++i) {
-            SP<Fireball> pFb = new Fireball(
+            smart_pointer<Fireball> pFb = make_smart(new Fireball(
                 (*itr)->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
-                pBc, fb, Chain(), nChain);
+                pBc, fb, Chain(), nChain));
             pBc->AddBoth(pFb);
           }
         }
 
         if (fb.uMap["explode"] > 0) {
-          SP<ChainExplosion> pEx;
+          smart_pointer<ChainExplosion> pEx;
 
           if (!fb.bMap["laser"]) {
-            pEx = new ChainExplosion(
+            pEx = make_smart(new ChainExplosion(
                 AnimationOnce(GetPriority(),
                               pBc->pGl->pr("explosion" + GetSizeSuffix(fb)),
                               nFramesInSecond / 10, (*itr)->GetPosition(),
                               true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
-                pBc, Chain(fb.uMap["explode"] - 1));
+                pBc, Chain(fb.uMap["explode"] - 1)));
           } else {
-            pEx = new ChainExplosion(
+            pEx = make_smart(new ChainExplosion(
                 AnimationOnce(GetPriority(),
                               pBc->pGl->pr("laser_expl" + GetSizeSuffix(fb)),
                               nFramesInSecond / 10, (*itr)->GetPosition(),
                               true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
-                pBc, Chain(fb.uMap["explode"] - 1));
+                pBc, Chain(fb.uMap["explode"] - 1)));
           }
 
           pBc->AddBoth(pEx);
@@ -324,15 +325,15 @@ void CircularFireball::Update() {
   }
 }
 
-FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
-                                               SP<AdvancedController> pAd_)
+FireballBonusAnimation::FireballBonusAnimation(
+    Point p_, unsigned n_, smart_pointer<AdvancedController> pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       bBlink(false), pAd(this, pAd_), tm(nBonusOnGroundTime), sUnderText("") {
   seq = GetBonusImage(n, pAd->pGl->pr);
   coronaSeq = pAd->pGl->pr("corona");
 }
 
-void FireballBonusAnimation::Draw(SP<ScalingDrawer> pDr) {
+void FireballBonusAnimation::Draw(smart_pointer<ScalingDrawer> pDr) {
   pDr->Draw(coronaSeq.GetImage(), GetPosition(), bCenter);
   Animation::Draw(pDr);
 

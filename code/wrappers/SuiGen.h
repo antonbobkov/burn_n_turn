@@ -1,8 +1,8 @@
 #ifndef SUIGEN_ALREADY_INCLUDED_08_25
 #define SUIGEN_ALREADY_INCLUDED_08_25
 
-#include "SmartPointer.h"
 #include "index.h"
+#include "smart_pointer.h"
 
 namespace Gui {
 
@@ -21,12 +21,13 @@ public:
 
 template <class SndHndl>
 class SimpleSoundInterface : public SoundInterface<Index>, public IndexRemover {
-  SP<SoundInterface<SndHndl>> pSn;
+  smart_pointer<SoundInterface<SndHndl>> pSn;
 
   IndexKeeper<SndHndl> kp;
 
 public:
-  SimpleSoundInterface(SP<SoundInterface<SndHndl>> pSn_) : pSn(pSn_) {}
+  SimpleSoundInterface(smart_pointer<SoundInterface<SndHndl>> pSn_)
+      : pSn(pSn_) {}
 
   /*virtual*/ void DeleteSound(Index snd);
   /*virtual*/ Index LoadSound(std::string sFile);

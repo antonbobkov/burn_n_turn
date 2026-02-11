@@ -26,7 +26,8 @@ int main(int argc, char **args) {
     return 1;
   }
 
-  SP<Gui::SdlSoundInterface> pSnd = new Gui::SdlSoundInterface();
+  smart_pointer<Gui::SdlSoundInterface> pSnd =
+      make_smart(new Gui::SdlSoundInterface());
   Gui::SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
 
   SDL_Window *window =
@@ -107,7 +108,7 @@ int main(int argc, char **args) {
     Mix_FreeMusic(music);
   if (soundLoaded)
     soundIf.DeleteSound(sndIndex);
-  pSnd = 0;
+  pSnd = smart_pointer<Gui::SdlSoundInterface>();
 
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);

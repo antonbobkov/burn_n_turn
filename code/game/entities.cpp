@@ -1,6 +1,6 @@
 #include "entities.h"
 
-void TextDrawEntity::Draw(SP<ScalingDrawer> pDr) {
+void TextDrawEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
   Point p = pos;
   for (unsigned i = 0; i < vText.size(); ++i) {
     pNum->DrawWord(vText[i], p, bCenter);
@@ -26,15 +26,15 @@ void SimpleVisualEntity::Update() {
   }
 }
 
-void SimpleVisualEntity::Draw(SP<ScalingDrawer> pDr) {
+void SimpleVisualEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
   pDr->Draw(seq.GetImage(), GetPosition(), bCenter);
 }
 
-void StaticImage::Draw(SP<ScalingDrawer> pDr) {
+void StaticImage::Draw(smart_pointer<ScalingDrawer> pDr) {
   pDr->Draw(img, GetPosition(), bCentered);
 }
 
-void StaticRectangle::Draw(SP<ScalingDrawer> pDr) {
+void StaticRectangle::Draw(smart_pointer<ScalingDrawer> pDr) {
   pDr->pGr->DrawRectangle(r, c, false);
 }
 
@@ -63,7 +63,7 @@ void AnimationOnce::Update() {
   }
 }
 
-bool PhysicalEntity::HitDetection(SP<PhysicalEntity> pPh) {
+bool PhysicalEntity::HitDetection(smart_pointer<PhysicalEntity> pPh) {
   Point d = GetPosition() - pPh->GetPosition();
   unsigned r1 = GetRadius(), r2 = pPh->GetRadius();
   return unsigned(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);

@@ -19,7 +19,8 @@ struct GameController : virtual public SP_Info {
   GameController(const GameController &gc)
       : pGl(this, gc.pGl), rBound(gc.rBound) {}
 
-  GameController(SP<TwrGlobalController> pGl_, Rectangle rBound_ = Rectangle())
+  GameController(smart_pointer<TwrGlobalController> pGl_,
+                 Rectangle rBound_ = Rectangle())
       : pGl(this, pGl_), rBound(rBound_) {}
 
   virtual void Update() {}
@@ -78,16 +79,21 @@ struct TwrGlobalController : virtual public SP_Info {
 
   BackgroundMusicPlayer plr;
 
-  std::list<SP<TimedFireballBonus>> lsBonusesToCarryOver;
+  std::list<smart_pointer<TimedFireballBonus>> lsBonusesToCarryOver;
 
-  TwrGlobalController(SP<ScalingDrawer> pDr_, SP<NumberDrawer> pNum_,
-                      SP<NumberDrawer> pBigNum_, SP<FontWriter> pFancyNum_,
-                      SP<Soundic> pSndRaw_, const LevelStorage &vLvl_,
-                      Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp);
+  TwrGlobalController(smart_pointer<ScalingDrawer> pDr_,
+                      smart_pointer<NumberDrawer> pNum_,
+                      smart_pointer<NumberDrawer> pBigNum_,
+                      smart_pointer<FontWriter> pFancyNum_,
+                      smart_pointer<Soundic> pSndRaw_,
+                      const LevelStorage &vLvl_, Rectangle rBound_,
+                      TowerDataWrap *pWrp_, FilePath *fp);
 
   TowerDataWrap *pWrp;
 
-  void StartUp();
+  smart_pointer<TwrGlobalController> pSelf;
+
+  void StartUp(smart_pointer<TwrGlobalController> pSelf);
   void Next();
   void Restart(int nActive_ = -1);
   void Menu();
@@ -102,11 +108,11 @@ struct TwrGlobalController : virtual public SP_Info {
 /** Fancy road: draws tiled road image; needs AdvancedController for resources.
  */
 struct FancyRoad : public Road {
-  FancyRoad(const Road &rd, SP<AdvancedController> pAd_)
+  FancyRoad(const Road &rd, smart_pointer<AdvancedController> pAd_)
       : Road(rd), pAd(this, pAd_) {}
   SSP<AdvancedController> pAd;
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
@@ -116,21 +122,21 @@ public:
 
   FilePath *GetFilePath() const { return fp_.get(); }
 
-  SP<Event> pExitProgram;
+  smart_pointer<Event> pExitProgram;
 
-  SP<GraphicalInterface<Index>> pGr;
-  SP<SoundInterface<Index>> pSm;
+  smart_pointer<GraphicalInterface<Index>> pGr;
+  smart_pointer<SoundInterface<Index>> pSm;
 
-  SP<ScalingDrawer> pDr;
-  SP<NumberDrawer> pNum;
-  SP<NumberDrawer> pBigNum;
-  SP<FontWriter> pFancyNum;
+  smart_pointer<ScalingDrawer> pDr;
+  smart_pointer<NumberDrawer> pNum;
+  smart_pointer<NumberDrawer> pBigNum;
+  smart_pointer<FontWriter> pFancyNum;
 
   FileManager *p_fm_;
   std::unique_ptr<FilePath> fp_;
 
   LevelStorage vLvl;
-  SP<TwrGlobalController> pCnt;
+  smart_pointer<TwrGlobalController> pCnt;
 
   Size szActualRez;
 };
@@ -153,7 +159,8 @@ public:
   /*virtual*/ void DoubleClick();
   /*virtual*/ void Fire();
 
-  /** For simulation/inspection: current tower controller (levels, menu, etc.). */
+  /** For simulation/inspection: current tower controller (levels, menu, etc.).
+   */
   TwrGlobalController *GetTowerController() const;
   /** Active screen index (0=menu, 1..=logos/start/levels). */
   unsigned GetActiveControllerIndex() const;

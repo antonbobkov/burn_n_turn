@@ -9,7 +9,8 @@
 struct SimpleController : public GameController {
   Index nImage;
 
-  SimpleController(SP<TwrGlobalController> pGraph, std::string strFileName);
+  SimpleController(smart_pointer<TwrGlobalController> pGraph,
+                   std::string strFileName);
   ~SimpleController();
 
   /*virtual*/ void Update();
@@ -23,8 +24,8 @@ struct FlashingController : public GameController {
   unsigned nTimer;
   bool bShow;
 
-  FlashingController(SP<TwrGlobalController> pGraph, std::string strFileName,
-                     std::string strTextName);
+  FlashingController(smart_pointer<TwrGlobalController> pGraph,
+                     std::string strFileName, std::string strTextName);
   ~FlashingController();
 
   /*virtual*/ void Update();
@@ -87,12 +88,13 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 
   SSP<MenuController> pMenuController;
 
-  MenuDisplay(Point pLeftTop_, SP<NumberDrawer> pNum_,
-              SP<Animation> pMenuCaret_, SP<MenuController> pMenuController_,
+  MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
+              smart_pointer<Animation> pMenuCaret_,
+              smart_pointer<MenuController> pMenuController_,
               bool bCheatsUnlocked_);
 
   /** Draws the menu entries and the caret at the current selection. */
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return 0; }
 
@@ -130,7 +132,7 @@ struct Countdown : public VisualEntity, public EventEntity {
   SSP<NumberDrawer> pNum;
   unsigned nTime, nCount;
 
-  Countdown(SP<NumberDrawer> pNum_, unsigned nTime_)
+  Countdown(smart_pointer<NumberDrawer> pNum_, unsigned nTime_)
       : pNum(this, pNum_), nTime(nTime_), nCount(0) {}
 
   /** Decrements the countdown every second; removes this when it reaches zero.
@@ -138,7 +140,7 @@ struct Countdown : public VisualEntity, public EventEntity {
   /*virtual*/ void Update();
 
   /** Draws the remaining countdown at a fixed screen position. */
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ Point GetPosition() { return Point(0, 0); }
 };
@@ -151,9 +153,9 @@ struct BasicController : public GameController {
   std::list<ASSP<ConsumableEntity>> lsPpl;
 
   /** Add visual entity to lsDraw. */
-  void AddV(SP<VisualEntity> pVs);
+  void AddV(smart_pointer<VisualEntity> pVs);
   /** Adds an event entity to the update list. */
-  void AddE(SP<EventEntity> pEv);
+  void AddE(smart_pointer<EventEntity> pEv);
 
   template <class T> void AddBoth(T &t) {
     lsDraw.push_back(ASSP<VisualEntity>(this, t));
@@ -165,7 +167,8 @@ struct BasicController : public GameController {
 
   BasicController(const BasicController &b);
   bool bNoRefresh;
-  BasicController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c);
+  BasicController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
+                  Color c);
 
   /**
    * Each frame: remove dead things from the lists, move everything that can
@@ -206,8 +209,8 @@ struct MenuController : public BasicController {
   SSP<TextDrawEntity> pHintText;
   SSP<TextDrawEntity> pOptionText;
 
-  MenuController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c,
-                 int nResumePosition_);
+  MenuController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
+                 Color c, int nResumePosition_);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void OnMouse(Point pPos);
@@ -218,7 +221,8 @@ struct MenuController : public BasicController {
 };
 
 struct StartScreenController : public BasicController {
-  StartScreenController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c)
+  StartScreenController(smart_pointer<TwrGlobalController> pGl_,
+                        Rectangle rBound, Color c)
       : BasicController(pGl_, rBound, c) {}
 
   /** Advance to next screen and play start_game sound. */
@@ -237,21 +241,22 @@ struct SlimeUpdater : public VisualEntity {
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
   /*virtual*/ float GetPriority() { return 0; }
 };
 
 /** Controller for buy-now screen: slime animations and timer. */
 struct BuyNowController : public BasicController {
   int t;
-  std::vector<SP<Animation>> mSlimes;
+  std::vector<smart_pointer<Animation>> mSlimes;
   std::vector<fPoint> mSlimeVel;
   std::vector<fPoint> mSlimePos;
   int nSlimeCount;
 
   Timer tVel;
 
-  BuyNowController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c);
+  BuyNowController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
+                   Color c);
 
   /** Set fVel to random direction, sometimes toward center; scale by speed. */
   void RandomizeVelocity(fPoint &fVel, fPoint pPos);
@@ -286,8 +291,8 @@ struct Cutscene : public BasicController {
    * Runner starts left or right depending on flip; when the runner reaches the
    * middle, the chaser is released. Beep/boop timer for sound.
    */
-  Cutscene(SP<TwrGlobalController> pGl_, Rectangle rBound_, std::string sRun,
-           std::string sChase, bool bFlip = false);
+  Cutscene(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_,
+           std::string sRun, std::string sChase, bool bFlip = false);
 
   /*virtual*/ void Update();
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
@@ -300,8 +305,8 @@ struct DragonScoreController : public BasicController {
   Timer t;
   bool bClickToExit;
 
-  DragonScoreController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c,
-                        bool bScoreShow);
+  DragonScoreController(smart_pointer<TwrGlobalController> pGl_,
+                        Rectangle rBound, Color c, bool bScoreShow);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void Update();

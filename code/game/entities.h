@@ -22,7 +22,7 @@ struct ScreenEntity : virtual public Entity {
 };
 
 struct VisualEntity : virtual public ScreenEntity {
-  virtual void Draw(SP<ScalingDrawer> pDr) {}
+  virtual void Draw(smart_pointer<ScalingDrawer> pDr) {}
   virtual float GetPriority() { return 0; }
   VisualEntity() = default;
   VisualEntity(const VisualEntity &) = default;
@@ -39,14 +39,14 @@ struct TextDrawEntity : virtual public VisualEntity {
   SSP<NumberDrawer> pNum;
 
   TextDrawEntity(float dPriority_, Point pos_, bool bCenter_, std::string sText,
-                 SP<NumberDrawer> pNum_)
+                 smart_pointer<NumberDrawer> pNum_)
       : dPriority(dPriority_), pos(pos_), bCenter(bCenter_), pNum(this, pNum_) {
     SetText(sText);
   }
 
   void SetText(std::string sText) { vText = BreakUpString(sText); }
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 };
@@ -76,7 +76,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
       : dPriority(dPriority_), seq(seq_), bCenter(bCenter_), bTimer(false),
         bStep(bStep_), nPeriod(1), bImageToggle(false) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 
@@ -95,7 +95,7 @@ struct SimpleSoundEntity : virtual public EventEntity {
   SSP<SoundInterfaceProxy> pSnd;
 
   SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
-                    SP<SoundInterfaceProxy> pSnd_)
+                    smart_pointer<SoundInterfaceProxy> pSnd_)
       : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()),
         pSnd(this, pSnd_) {}
 
@@ -138,7 +138,7 @@ struct StaticImage : public VisualEntity {
               float dPriority_ = 0)
       : img(img_), dPriority(dPriority_), p(p_), bCentered(bCentered_) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ Point GetPosition() { return p; }
 
@@ -154,7 +154,7 @@ struct StaticRectangle : public VisualEntity {
   StaticRectangle(Rectangle r_, Color c_, float dPriority_ = 0)
       : r(r_), c(c_), dPriority(dPriority_) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ Point GetPosition() { return Point(0, 0); }
 
@@ -165,7 +165,7 @@ struct StaticRectangle : public VisualEntity {
 struct PhysicalEntity : virtual public ScreenEntity {
   virtual unsigned GetRadius() { return 0; }
 
-  bool HitDetection(SP<PhysicalEntity> pPh);
+  bool HitDetection(smart_pointer<PhysicalEntity> pPh);
 };
 
 /** PhysicalEntity that can be hit (OnHit), has type (GetType) and image

@@ -41,7 +41,7 @@ struct ScalingDrawer : public Drawer {
   unsigned nFactor;
   Color cTr;
 
-  ScalingDrawer(SP<Graphic> pGr_, unsigned nFactor_,
+  ScalingDrawer(smart_pointer<Graphic> pGr_, unsigned nFactor_,
                 Color cTr_ = Color(0, 255, 255))
       : nFactor(nFactor_), cTr(cTr_) {
     pGr = pGr_;
@@ -65,8 +65,8 @@ struct NumberDrawer : virtual public SP_Info {
 
   void CacheColor(Color c);
 
-  NumberDrawer(SP<ScalingDrawer> pDr_, Gui::FilePath *fp, std::string sFontPath,
-               std::string sFontName);
+  NumberDrawer(smart_pointer<ScalingDrawer> pDr_, Gui::FilePath *fp,
+               std::string sFontPath, std::string sFontName);
 
   std::string GetNumber(unsigned n, unsigned nDigits = 0);
 
@@ -89,7 +89,7 @@ class SoundInterfaceProxy : virtual public SP_Info {
   SSP<Soundic> pSndRaw;
 
 public:
-  SoundInterfaceProxy(SP<Soundic> pSndRaw_)
+  SoundInterfaceProxy(smart_pointer<Soundic> pSndRaw_)
       : pSndRaw(this, pSndRaw_), bSoundOn(true) {}
 
   void PlaySound(Index i, int nChannel = -1, bool bLoop = false);
@@ -127,11 +127,11 @@ struct MenuController;
 struct BackgroundMusicPlayer {
   int nCurrTheme;
   std::vector<Index> vThemes;
-  SP<Soundic> pSnd;
+  smart_pointer<Soundic> pSnd;
 
   bool bOff;
 
-  BackgroundMusicPlayer() : nCurrTheme(-1), pSnd(0), bOff(false) {}
+  BackgroundMusicPlayer() : nCurrTheme(-1), pSnd(), bOff(false) {}
 
   void SwitchTheme(int nTheme);
   void StopMusic();

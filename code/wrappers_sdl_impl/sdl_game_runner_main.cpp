@@ -6,7 +6,6 @@
 #include "file_utils.h"
 #include "game_runner_interface.h"
 
-
 #include "GuiSdl.h"
 #include "SuiSdl.h"
 
@@ -71,14 +70,15 @@ int main(int argc, char *argv[]) {
 
     Rectangle rOffSet = sBound;
 
-    SP<SdlGraphicalInterface> pGraph =
-        new SdlGraphicalInterface(sBound.sz, inf.bFullScreen, rOffSet);
-    SP<GraphicalInterface<Index>> pGr =
-        new SimpleGraphicalInterface<SdlImage *>(pGraph);
+    smart_pointer<SdlGraphicalInterface> pGraph = make_smart(
+        new SdlGraphicalInterface(sBound.sz, inf.bFullScreen, rOffSet));
+    smart_pointer<GraphicalInterface<Index>> pGr =
+        make_smart(new SimpleGraphicalInterface<SdlImage *>(pGraph));
 
-    SP<SdlSoundInterface> pSound = new SdlSoundInterface();
-    SP<SoundInterface<Index>> pSndMng =
-        new SimpleSoundInterface<Mix_Chunk *>(pSound);
+    smart_pointer<SdlSoundInterface> pSound =
+        make_smart(new SdlSoundInterface());
+    smart_pointer<SoundInterface<Index>> pSndMng =
+        make_smart(new SimpleSoundInterface<Mix_Chunk *>(pSound));
 
     // SDL_WM_SetIcon(SDL_LoadBMP("icon\\game_icon.bmp"), NULL);
     // pGraph->SetIcon("icon\\game_icon.bmp");
@@ -92,13 +92,13 @@ int main(int argc, char *argv[]) {
     }
 
     std::unique_ptr<Gui::FileManager> fm(new Gui::StdFileManager());
-    ProgramEngine pe(NewSwitchEvent(bExit, bTrue), pGr, pSndMng, new IoWriter(),
-                     inf.szScreenRez, fm.get());
+    ProgramEngine pe(make_smart(NewSwitchEvent(bExit, bTrue)), pGr, pSndMng,
+                     make_smart(new IoWriter()), inf.szScreenRez, fm.get());
 
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);
 
-    SP<GlobalController> pGl = GetGlobalController(pe);
+    smart_pointer<GlobalController> pGl = GetGlobalController(pe);
 
     std::map<int, GuiKeyType> vSdlMapper;
     SdlMapKeys(vSdlMapper);

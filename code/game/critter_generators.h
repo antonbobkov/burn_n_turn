@@ -13,7 +13,7 @@ struct SkellyGenerator : public EventEntity {
 
   SSP<AdvancedController> pAdv;
 
-  SkellyGenerator(Point p_, SP<AdvancedController> pAdv_);
+  SkellyGenerator(Point p_, smart_pointer<AdvancedController> pAdv_);
 
   /*virutal*/ void Update();
 };
@@ -34,7 +34,8 @@ struct KnightGenerator : virtual public EventEntity {
   /** Returns the current spawn rate (depends on completion and ghost mode). */
   float GetRate();
 
-  KnightGenerator(float dRate_, Rectangle rBound_, SP<AdvancedController> pBc_,
+  KnightGenerator(float dRate_, Rectangle rBound_,
+                  smart_pointer<AdvancedController> pBc_,
                   const BrokenLine &bl_);
 
   /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
@@ -52,7 +53,7 @@ struct PrincessGenerator : virtual public EventEntity {
   bool bFirst;
 
   PrincessGenerator(float dRate_, Rectangle rBound_,
-                    SP<AdvancedController> pBc_);
+                    smart_pointer<AdvancedController> pBc_);
 
   /**
    * When the timer fires: pick a random road and spawn a princess there,
@@ -69,7 +70,7 @@ struct MageGenerator : virtual public EventEntity {
   Timer tm;
 
   MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
-                SP<AdvancedController> pBc_);
+                smart_pointer<AdvancedController> pBc_);
 
   /*virtual*/ void Update();
 
@@ -88,7 +89,8 @@ struct TraderGenerator : virtual public EventEntity {
 
   float GetRate();
 
-  TraderGenerator(float dRate_, Rectangle rBound_, SP<AdvancedController> pBc_);
+  TraderGenerator(float dRate_, Rectangle rBound_,
+                  smart_pointer<AdvancedController> pBc_);
 
   /*virtual*/ void Update();
 };

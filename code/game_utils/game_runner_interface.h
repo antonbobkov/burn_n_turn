@@ -36,29 +36,32 @@ Gui::ProgramInfo GetProgramInfo();
 namespace Gui {
 
 struct ProgramEngine {
-  SP<Event> pExitProgram;
+  smart_pointer<Event> pExitProgram;
 
-  SP<GraphicalInterface<Index>> pGr;
-  SP<SoundInterface<Index>> pSndMng;
-  SP<MessageWriter> pMsg;
+  smart_pointer<GraphicalInterface<Index>> pGr;
+  smart_pointer<SoundInterface<Index>> pSndMng;
+  smart_pointer<MessageWriter> pMsg;
 
   FileManager *p_fm;
 
   Size szScreenRez;
   Size szActualRez;
 
-  ProgramEngine(SP<Event> pExitProgram_, SP<GraphicalInterface<Index>> pGr_,
-                SP<SoundInterface<Index>> pSndMng_, SP<MessageWriter> pMsg_,
-                FileManager *p_fm_)
+  ProgramEngine(smart_pointer<Event> pExitProgram_,
+                smart_pointer<GraphicalInterface<Index>> pGr_,
+                smart_pointer<SoundInterface<Index>> pSndMng_,
+                smart_pointer<MessageWriter> pMsg_, FileManager *p_fm_)
       : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
         p_fm(p_fm_) {
     szScreenRez = GetProgramInfo().szScreenRez;
     szActualRez = szScreenRez;
   }
 
-  ProgramEngine(SP<Event> pExitProgram_, SP<GraphicalInterface<Index>> pGr_,
-                SP<SoundInterface<Index>> pSndMng_, SP<MessageWriter> pMsg_,
-                Size szScreenRez_, FileManager *p_fm_)
+  ProgramEngine(smart_pointer<Event> pExitProgram_,
+                smart_pointer<GraphicalInterface<Index>> pGr_,
+                smart_pointer<SoundInterface<Index>> pSndMng_,
+                smart_pointer<MessageWriter> pMsg_, Size szScreenRez_,
+                FileManager *p_fm_)
       : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
         p_fm(p_fm_), szScreenRez(szScreenRez_) {
     szActualRez = szScreenRez;
@@ -83,6 +86,6 @@ public:
 
 } // namespace Gui
 
-SP<Gui::GlobalController> GetGlobalController(Gui::ProgramEngine pe);
+smart_pointer<Gui::GlobalController> GetGlobalController(Gui::ProgramEngine pe);
 
 #endif // GAME_RUNNER_INTERFACE_H

@@ -7,7 +7,7 @@
 using namespace Gui;
 
 class Event : virtual public SP_Info {
-  friend void Trigger(SP<Event> pE);
+  friend void Trigger(smart_pointer<Event> pE);
 
   virtual void Trigger() = 0;
 
@@ -15,7 +15,7 @@ public:
   virtual ~Event() {}
 };
 
-void Trigger(SP<Event> pE);
+void Trigger(smart_pointer<Event> pE);
 
 class EmptyEvent : public Event {
 public:
@@ -71,28 +71,30 @@ CpSwitchEvent<A, B> *NewCpSwitchEvent(A &objCurr_, B objNew_) {
 }
 
 struct SequenceOfEvents : public Event {
-  std::vector<SP<Event>> vEv;
+  std::vector<smart_pointer<Event>> vEv;
   /*virtual*/ void Trigger();
   SequenceOfEvents() {}
-  SequenceOfEvents(SP<Event> pEv1, SP<Event> pEv2) {
+  SequenceOfEvents(smart_pointer<Event> pEv1, smart_pointer<Event> pEv2) {
     vEv.push_back(pEv1);
     vEv.push_back(pEv2);
   }
-  SequenceOfEvents(SP<Event> pEv1, SP<Event> pEv2, SP<Event> pEv3) {
+  SequenceOfEvents(smart_pointer<Event> pEv1, smart_pointer<Event> pEv2,
+                   smart_pointer<Event> pEv3) {
     vEv.push_back(pEv1);
     vEv.push_back(pEv2);
     vEv.push_back(pEv3);
   }
 };
 
-SequenceOfEvents *TwoEvents(SP<Event> pEv1, SP<Event> pEv2);
+SequenceOfEvents *TwoEvents(smart_pointer<Event> pEv1,
+                            smart_pointer<Event> pEv2);
 
 class MakeSoundEvent : public Event {
   SoundInterface<Index> *pSn;
   Index Snd;
 
 public:
-  MakeSoundEvent(SP<SoundInterface<Index>> pSn_, Index Snd_)
+  MakeSoundEvent(smart_pointer<SoundInterface<Index>> pSn_, Index Snd_)
       : pSn(pSn_.GetRawPointer()), Snd(Snd_) {}
   MakeSoundEvent(SoundInterface<Index> *pSn_, Index Snd_)
       : pSn(pSn_), Snd(Snd_) {}

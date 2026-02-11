@@ -22,7 +22,8 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   const bool *pIsTutorialOn;
 
-  TutorialTextEntity(float dPriority_, Point pos_, SP<NumberDrawer> pNum_,
+  TutorialTextEntity(float dPriority_, Point pos_,
+                     smart_pointer<NumberDrawer> pNum_,
                      const bool *pIsTutorialOn_)
       : dPriority(dPriority_), pos(pos_), pNum(this, pNum_), t(1), nOffset(0),
         nTextVerticalSpacing(7), nDelta(1), pIsTutorialOn(pIsTutorialOn_) {}
@@ -31,7 +32,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   void SetText(std::vector<std::string> v);
 
   /** Draw sText lines with vertical offset nOffset; skip if tutorial off. */
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 
@@ -48,11 +49,11 @@ struct TutorialLevelOne {
   bool bPrincessGenerated;
   bool bPrincessCaptured;
 
-  SP<TutorialTextEntity> pTexter;
+  smart_pointer<TutorialTextEntity> pTexter;
 
   TutorialLevelOne()
       : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
-        bPrincessCaptured(false), pTexter(0) {}
+        bPrincessCaptured(false), pTexter() {}
 
   /** Chooses which tutorial lines to show for level one. */
   std::vector<std::string> GetText();
@@ -85,11 +86,11 @@ struct TutorialLevelTwo {
   bool bTraderKilled;
   bool bBonusPickedUp;
 
-  SP<TutorialTextEntity> pTexter;
+  smart_pointer<TutorialTextEntity> pTexter;
 
   TutorialLevelTwo()
       : bTraderGenerated(false), bTraderKilled(false), bBonusPickedUp(false),
-        pTexter(0) {}
+        pTexter() {}
 
   /** Build tutorial lines from trader/bonus state. */
   std::vector<std::string> GetText();

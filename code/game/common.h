@@ -176,7 +176,7 @@ template <class A, class B> void PushBackASSP(SP_Info *pInf, A &arr, B *pnt) {
 }
 
 template <class A, class B>
-void PushBackASSP(SP_Info *pInf, A &arr, SP<B> pnt) {
+void PushBackASSP(SP_Info *pInf, A &arr, smart_pointer<B> pnt) {
   arr.push_back(ASSP<B>(pInf, pnt));
 }
 

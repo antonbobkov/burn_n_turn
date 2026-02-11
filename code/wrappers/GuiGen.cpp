@@ -194,7 +194,8 @@ void GuiSaveImage(std::ostream *pStr, const Image *pImg) {
 }
 
 FontWriter::FontWriter(FilePath *fp, std::string sFont,
-                       SP<GraphicalInterface<Index>> pGr_, unsigned nZoom)
+                       smart_pointer<GraphicalInterface<Index>> pGr_,
+                       unsigned nZoom)
     : vImgIndx(256, -1), pGr(pGr_) {
   sFont = fp->GetRelativePath(sFont);
 

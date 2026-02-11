@@ -45,7 +45,7 @@ struct Dragon : public Critter {
 
   DragonLeash leash;
 
-  SP<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime);
+  smart_pointer<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime);
 
   void FlushBonuses();
 
@@ -80,16 +80,16 @@ struct Dragon : public Critter {
 
   ButtonSet bt;
 
-  Dragon(SP<Castle> pCs_, SP<AdvancedController> pAd_, ImageSequence imgStable_,
-         ImageSequence imgFly_, ButtonSet bt_);
+  Dragon(smart_pointer<Castle> pCs_, smart_pointer<AdvancedController> pAd_,
+         ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
   /*vrtual*/ void Update();
 
   /*vrtual*/ Point GetPosition();
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
-  void AddBonus(SP<TimedFireballBonus> pBonus, bool bSilent = false);
+  void AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent = false);
 
   void Fire(fPoint fDir);
 

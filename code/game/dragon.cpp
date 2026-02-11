@@ -55,42 +55,46 @@ Point ButtonSet::GetPoint(int nCode) {
   return p;
 }
 
-SP<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
+smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
   if (pAd->nLvl > 6)
     nTime = unsigned(nTime * fBonusTimeMutiplierTwo);
   else if (pAd->nLvl > 3)
     nTime = unsigned(nTime * fBonusTimeMutiplierOne);
 
-  SP<TimedFireballBonus> pBonus;
+  smart_pointer<TimedFireballBonus> pBonus;
 
   if (n == 0)
-    pBonus =
-        new TimedFireballBonus(FireballBonus(n, "regenerate", 2U), nTime * 2);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "regenerate", 2U), nTime * 2));
   else if (n == 1)
-    pBonus = new TimedFireballBonus(FireballBonus(n, "pershot", 1U), nTime);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "pershot", 1U), nTime));
   else if (n == 2) {
-    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
+    pBonus = make_smart(new TimedFireballBonus(FireballBonus(n, false), nTime));
     pBonus->Add("through", 1U);
     pBonus->Add("laser", true);
   } else if (n == 3)
-    pBonus = new TimedFireballBonus(FireballBonus(n, "big", 1U), nTime);
+    pBonus =
+        make_smart(new TimedFireballBonus(FireballBonus(n, "big", 1U), nTime));
   else if (n == 4) {
-    pBonus = new TimedFireballBonus(
-        FireballBonus(n, "total", nFireballsPerBonus), nTime * 2);
+    pBonus = make_smart(new TimedFireballBonus(
+        FireballBonus(n, "total", nFireballsPerBonus), nTime * 2));
   } else if (n == 5)
-    pBonus = new TimedFireballBonus(FireballBonus(n, "explode", 1U), nTime);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "explode", 1U), nTime));
   else if (n == 6) {
-    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime);
+    pBonus = make_smart(new TimedFireballBonus(FireballBonus(n, false), nTime));
     pBonus->Add("fireballchainnum", 1U);
     pBonus->Add("through_flag", true);
   } else if (n == 7)
-    pBonus = new TimedFireballBonus(FireballBonus(n, "setonfire", 1U), nTime);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "setonfire", 1U), nTime));
   else if (n == 8) {
     FireballBonus fb = GetAllBonuses();
 
     Point p = GetPosition();
 
-    if (pCs != 0)
+    if (pCs.GetRawPointer() != 0)
       p = pCs->GetPosition();
 
     int nNumCirc = fb.uMap["pershot"] + 1;
@@ -98,14 +102,15 @@ SP<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
     fPoint fVel = RandomAngle();
 
     for (int i = 0; i < nNumCirc; ++i) {
-      SP<CircularFireball> pFb = new CircularFireball(
+      smart_pointer<CircularFireball> pFb = make_smart(new CircularFireball(
           Fireball(p, GetWedgeAngle(fVel, 1.F, i, nNumCirc + 1), pAd, fb,
                    Chain(), GetFireballChainNum(fb)),
-          35, nTime * 2);
+          35, nTime * 2));
       pAd->AddBoth(pFb);
     }
 
-    pBonus = new TimedFireballBonus(FireballBonus(n, false), nTime * 2);
+    pBonus =
+        make_smart(new TimedFireballBonus(FireballBonus(n, false), nTime * 2));
   } else if (n == 9) {
     CleanUp(pAd->lsPpl);
 
@@ -119,11 +124,11 @@ SP<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
         if ((*itr)->GetType() == 'K' &&
             GetAllBonuses().uMap["setonfire"] != 0) {
           (*itr)->bExist = false;
-          SP<KnightOnFire> pKn = new KnightOnFire(
+          smart_pointer<KnightOnFire> pKn = make_smart(new KnightOnFire(
               Critter((*itr)->GetRadius(), (*itr)->GetPosition(), fPoint(),
                       rBound, 1.F, ImageSequence(), true),
               pAd, 15 * nFramesInSecond,
-              Chain(GetAllBonuses().uMap["setonfire"]));
+              Chain(GetAllBonuses().uMap["setonfire"])));
           pAd->AddBoth(pKn);
         } else
           (*itr)->OnHit('F');
@@ -131,9 +136,11 @@ SP<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 
     nSlimeMax /= 2;
   } else if (n == 10) {
-    pBonus = new TimedFireballBonus(FireballBonus(n, "speed", 2.5F), nTime);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "speed", 2.5F), nTime));
   } else {
-    pBonus = new TimedFireballBonus(FireballBonus(n, "frequency", .5F), nTime);
+    pBonus = make_smart(
+        new TimedFireballBonus(FireballBonus(n, "frequency", .5F), nTime));
   }
 
   return pBonus;
@@ -147,7 +154,7 @@ void Dragon::FlushBonuses() {
 }
 
 void Dragon::RecoverBonuses() {
-  for (std::list<SP<TimedFireballBonus>>::iterator
+  for (std::list<smart_pointer<TimedFireballBonus>>::iterator
            itr = pAd->pGl->lsBonusesToCarryOver.begin(),
            etr = pAd->pGl->lsBonusesToCarryOver.end();
        itr != etr; ++itr) {
@@ -169,10 +176,13 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(SP<Castle> pCs_, SP<AdvancedController> pAd_,
-               ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
+Dragon::Dragon(smart_pointer<Castle> pCs_,
+               smart_pointer<AdvancedController> pAd_, ImageSequence imgStable_,
+               ImageSequence imgFly_, ButtonSet bt_)
     : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
-      Critter(13, pCs_ == 0 ? pAd_->vCs[0]->GetPosition() : pCs_->GetPosition(),
+      Critter(13,
+              pCs_.GetRawPointer() == 0 ? pAd_->vCs[0]->GetPosition()
+                                        : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(this, pCs_), bt(bt_),
       nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
@@ -180,7 +190,7 @@ Dragon::Dragon(SP<Castle> pCs_, SP<AdvancedController> pAd_,
       tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
-  if (pCs != 0 && pCs->pDrag == 0) {
+  if (pCs.GetRawPointer() != 0 && pCs->pDrag.GetRawPointer() == 0) {
     pCs->pDrag = this;
     bFly = false;
     Critter::dPriority = 3;
@@ -229,7 +239,7 @@ void Dragon::Update() {
 
     for (unsigned i = 0; i < pAd->vCs.size(); ++i)
       if (this->HitDetection(pAd->vCs[i])) {
-        if (pAd->vCs[i]->pDrag != 0)
+        if (pAd->vCs[i]->pDrag.GetRawPointer() != 0)
           continue;
         bHitCastle = true;
         break;
@@ -286,12 +296,12 @@ void Dragon::Update() {
 }
 
 Point Dragon::GetPosition() {
-  if (pCs != 0)
+  if (pCs.GetRawPointer() != 0)
     return (fPos + fPoint(0, -1)).ToPnt();
   return fPos.ToPnt();
 }
 
-void Dragon::Draw(SP<ScalingDrawer> pDr) {
+void Dragon::Draw(smart_pointer<ScalingDrawer> pDr) {
   if (bCarry)
     pDr->Draw(imgCarry, GetPosition(), true);
 
@@ -311,11 +321,11 @@ void Dragon::Draw(SP<ScalingDrawer> pDr) {
     --nTimer;
 }
 
-void Dragon::AddBonus(SP<TimedFireballBonus> pBonus, bool bSilent) {
+void Dragon::AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent) {
   if (!bSilent)
     pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("powerup"));
 
-  if (pBonus == 0)
+  if (pBonus.GetRawPointer() == 0)
     return;
 
   PushBackASSP(this, lsBonuses, pBonus);
@@ -383,8 +393,8 @@ void Dragon::Fire(fPoint fDir) {
                      Crd(pPos.y + fNormalized.x * 6));
     }
 
-    SP<Fireball> pFb =
-        new Fireball(pPos, fShoot, pAd, fb, Chain(), GetFireballChainNum(fb));
+    smart_pointer<Fireball> pFb = make_smart(
+        new Fireball(pPos, fShoot, pAd, fb, Chain(), GetFireballChainNum(fb)));
     pAd->AddBoth(pFb);
     if (i == nNumber / 2)
       PushBackASSP(this, lsBalls, pFb);
@@ -422,7 +432,8 @@ void Dragon::Toggle() {
 
   for (unsigned i = 0; i < pAd->vCs.size(); ++i)
     if (this->HitDetection(pAd->vCs[i])) {
-      if (pAd->vCs[i]->pDrag != 0 || bTookOff || pAd->vCs[i]->bBroken)
+      if (pAd->vCs[i]->pDrag.GetRawPointer() != 0 || bTookOff ||
+          pAd->vCs[i]->bBroken)
         continue;
 
       pAd->pt.Off();

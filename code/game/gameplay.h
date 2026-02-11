@@ -38,11 +38,12 @@ struct BonusScore : public EventEntity, public VisualEntity {
   unsigned nC;
   Color c;
 
-  BonusScore(SP<AdvancedController> pAc_, Point p_, unsigned nScore_);
+  BonusScore(smart_pointer<AdvancedController> pAc_, Point p_,
+             unsigned nScore_);
 
   /*virtual*/ void Update();
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return 5; }
 
@@ -120,7 +121,9 @@ struct AdvancedController : public BasicController {
 
   KnightGenerator *pGr;
   MageGenerator *pMgGen;
-  SP<SoundControls> pSc;
+  smart_pointer<SoundControls> pSc;
+
+  smart_pointer<AdvancedController> pSelf;
 
   PositionTracker pt;
   bool bTakeOffToggle;
@@ -131,8 +134,11 @@ struct AdvancedController : public BasicController {
 
   AdvancedController(const AdvancedController &a);
 
-  AdvancedController(SP<TwrGlobalController> pGl_, Rectangle rBound, Color c,
-                     const LevelLayout &lvl);
+  AdvancedController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
+                     Color c, const LevelLayout &lvl);
+
+  void Init(smart_pointer<AdvancedController> pSelf,
+            const LevelLayout &lvl);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
@@ -158,20 +164,20 @@ struct HighScoreShower : public VisualEntity {
   SSP<TwrGlobalController> pGl;
   Rectangle rBound;
 
-  HighScoreShower(SP<TwrGlobalController> pGl_, Rectangle rBound_)
+  HighScoreShower(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_)
       : pGl(this, pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
 struct IntroTextShower : public VisualEntity {
   SSP<TwrGlobalController> pGl;
   Rectangle rBound;
 
-  IntroTextShower(SP<TwrGlobalController> pGl_, Rectangle rBound_)
+  IntroTextShower(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_)
       : pGl(this, pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(SP<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
 #endif

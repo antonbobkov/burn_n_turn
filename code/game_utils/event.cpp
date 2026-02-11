@@ -1,7 +1,7 @@
 #include "event.h"
 
-void Trigger(SP<Event> pE) {
-  if (pE != 0)
+void Trigger(smart_pointer<Event> pE) {
+  if (pE.GetRawPointer() != 0)
     pE->Trigger();
 }
 
@@ -10,7 +10,8 @@ void SequenceOfEvents::Trigger() {
     ::Trigger(vEv[i]);
 }
 
-SequenceOfEvents *TwoEvents(SP<Event> pEv1, SP<Event> pEv2) {
+SequenceOfEvents *TwoEvents(smart_pointer<Event> pEv1,
+                            smart_pointer<Event> pEv2) {
   SequenceOfEvents *pRet = new SequenceOfEvents();
   pRet->vEv.push_back(pEv1);
   pRet->vEv.push_back(pEv2);

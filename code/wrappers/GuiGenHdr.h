@@ -14,10 +14,10 @@
 
 #include <fstream>
 
-#include "SmartPointer.h"
 #include "exception.h"
 #include "file_utils.h"
 #include "index.h"
+#include "smart_pointer.h"
 
 namespace Gui {
 typedef int Crd;
@@ -500,7 +500,7 @@ template <class ImageHndl>
 struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
                                   public IndexRemover {
   // okay, no need for SSP as GraphicalInterface is not going to point to us
-  SP<GraphicalInterface<ImageHndl>> pGr;
+  smart_pointer<GraphicalInterface<ImageHndl>> pGr;
 
   IndexKeeper<ImageHndl> kp;
 
@@ -513,7 +513,7 @@ struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
   }
 
 public:
-  SimpleGraphicalInterface(SP<GraphicalInterface<ImageHndl>> pGr_)
+  SimpleGraphicalInterface(smart_pointer<GraphicalInterface<ImageHndl>> pGr_)
       : pGr(pGr_) {}
 
   /*virtual*/ void DeleteImage(Index pImg);
@@ -567,9 +567,10 @@ template <class ImageHndl> class CameraControl {
   Scale sCurr;
 
 public:
-  SP<GraphicalInterface<ImageHndl>> pGr;
+  smart_pointer<GraphicalInterface<ImageHndl>> pGr;
 
-  CameraControl(SP<GraphicalInterface<ImageHndl>> pGr_ = 0, Scale s = Scale())
+  CameraControl(smart_pointer<GraphicalInterface<ImageHndl>> pGr_ = 0,
+                Scale s = Scale())
       : pGr(pGr_), sCurr(s) {}
 
   Point GetOffset() { return sCurr.pOffset; }
@@ -622,14 +623,14 @@ public:
 struct FontWriter : virtual public SP_Info {
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
-  SP<GraphicalInterface<Index>> pGr;
+  smart_pointer<GraphicalInterface<Index>> pGr;
 
   Size szSymbol;
   Color clSymbol;
   int nGap;
 
   FontWriter(FilePath *fp, std::string sFont,
-             SP<GraphicalInterface<Index>> pGr_, unsigned nZoom = 1);
+             smart_pointer<GraphicalInterface<Index>> pGr_, unsigned nZoom = 1);
 
   Size GetSize(std::string s);
 
@@ -649,7 +650,7 @@ struct FontWriter : virtual public SP_Info {
 };
 
 template <class T>
-void ConvertImage(SP<GraphicalInterface<T>> pGr, std::string strImg,
+void ConvertImage(smart_pointer<GraphicalInterface<T>> pGr, std::string strImg,
                   std::string strExtFrom, std::string strExtTo) {
   T img = pGr->LoadImage(strImg + "." + strExtFrom);
   pGr->SaveImage(strImg + "." + strExtTo, img);

@@ -14,9 +14,9 @@ int main(int argc, char **args) {
 
   const char *imageFile = (argc > 1) ? args[1] : "test_image.bmp";
 
-  SP<Gui::SdlGraphicalInterface> pGr;
+  smart_pointer<Gui::SdlGraphicalInterface> pGr;
   try {
-    pGr = new Gui::SdlGraphicalInterface(Gui::Size(640, 480));
+    pGr = make_smart(new Gui::SdlGraphicalInterface(Gui::Size(640, 480)));
   } catch (Gui::GraphicalInterfaceException &e) {
     std::cerr << "SdlGraphicalInterface init failed: " << e.GetDescription(true)
               << "\n";
@@ -60,7 +60,8 @@ int main(int argc, char **args) {
   if (pImg)
     pGr->DeleteImage(pImg);
 
-  pGr = 0; /* Destructor calls SDL_Quit(). */
+  pGr = smart_pointer<Gui::SdlGraphicalInterface>();
+  /* Destructor calls SDL_Quit(). */
 
   std::cout << "[gui_sdl_example] Exiting.\n";
   return 0;

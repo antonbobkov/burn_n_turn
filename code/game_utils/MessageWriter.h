@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include "SmartPointer.h"
+#include "smart_pointer.h"
 
 namespace Gui {
 enum WriteType { WT_DEBUG, WT_ERROR };
