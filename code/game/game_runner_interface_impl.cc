@@ -1,6 +1,7 @@
 #include "core.h"
 #include "game.h"
 #include "game_runner_interface.h"
+#include "smart_pointer.h"
 
 #include <fstream>
 

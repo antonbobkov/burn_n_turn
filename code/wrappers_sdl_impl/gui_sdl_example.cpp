@@ -7,6 +7,7 @@
  */
 
 #include "GuiSdl.h"
+#include "smart_pointer.h"
 #include <iostream>
 
 int main(int argc, char **args) {

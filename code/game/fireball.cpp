@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
   if (bDef) {

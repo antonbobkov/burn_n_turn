@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 void DragonLeash::ModifyTilt(Point trackball) {
   tilt -= tilt * naturalScaleFactor;
@@ -94,7 +95,7 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 
     Point p = GetPosition();
 
-    if (pCs.GetRawPointer() != 0)
+    if (!pCs.is_null())
       p = pCs->GetPosition();
 
     int nNumCirc = fb.uMap["pershot"] + 1;
@@ -181,7 +182,7 @@ Dragon::Dragon(smart_pointer<Castle> pCs_,
                ImageSequence imgFly_, ButtonSet bt_)
     : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,
-              pCs_.GetRawPointer() == 0 ? pAd_->vCs[0]->GetPosition()
+              pCs_.is_null() ? pAd_->vCs[0]->GetPosition()
                                         : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(this, pCs_), bt(bt_),
@@ -190,7 +191,7 @@ Dragon::Dragon(smart_pointer<Castle> pCs_,
       tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
-  if (pCs.GetRawPointer() != 0 && pCs->pDrag.GetRawPointer() == 0) {
+  if (!pCs.is_null() && pCs->pDrag.is_null()) {
     pCs->pDrag = this;
     bFly = false;
     Critter::dPriority = 3;
@@ -239,7 +240,7 @@ void Dragon::Update() {
 
     for (unsigned i = 0; i < pAd->vCs.size(); ++i)
       if (this->HitDetection(pAd->vCs[i])) {
-        if (pAd->vCs[i]->pDrag.GetRawPointer() != 0)
+        if (!pAd->vCs[i]->pDrag.is_null())
           continue;
         bHitCastle = true;
         break;
@@ -296,7 +297,7 @@ void Dragon::Update() {
 }
 
 Point Dragon::GetPosition() {
-  if (pCs.GetRawPointer() != 0)
+  if (!pCs.is_null())
     return (fPos + fPoint(0, -1)).ToPnt();
   return fPos.ToPnt();
 }
@@ -325,7 +326,7 @@ void Dragon::AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent) {
   if (!bSilent)
     pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("powerup"));
 
-  if (pBonus.GetRawPointer() == 0)
+  if (pBonus.is_null())
     return;
 
   PushBackASSP(this, lsBonuses, pBonus);
@@ -432,7 +433,7 @@ void Dragon::Toggle() {
 
   for (unsigned i = 0; i < pAd->vCs.size(); ++i)
     if (this->HitDetection(pAd->vCs[i])) {
-      if (pAd->vCs[i]->pDrag.GetRawPointer() != 0 || bTookOff ||
+      if (!pAd->vCs[i]->pDrag.is_null() || bTookOff ||
           pAd->vCs[i]->bBroken)
         continue;
 

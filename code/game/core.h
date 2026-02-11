@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_CORE_H
 
 #include "common.h"
+#include "smart_pointer.h"
 
 namespace Gui {
 class FilePath;

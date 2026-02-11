@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_CRITTERS_H
 
 #include "entities.h"
+#include "smart_pointer.h"
 
 struct AdvancedController;
 struct Dragon;

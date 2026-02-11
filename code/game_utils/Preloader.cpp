@@ -1,4 +1,5 @@
 #include "Preloader.h"
+#include "smart_pointer.h"
 
 #include "General.h"
 #include "exception.h"

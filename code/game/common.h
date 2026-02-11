@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "Preloader.h"
+#include "smart_pointer.h"
 
 #include "game_runner_interface.h"
 

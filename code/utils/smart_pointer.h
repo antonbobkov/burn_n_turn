@@ -151,7 +151,9 @@ public:
     return pPointTo != pSmPnt.pPointTo;
   }
 
-  T *GetRawPointer() { return pPointTo; }
+  T *get() { return pPointTo; }
+
+  bool is_null() const { return pPointTo == 0; }
 };
 
 template <class T> smart_pointer<T> make_smart(T *pPointTo_) {
@@ -268,7 +270,9 @@ public:
     return pPointTo != pSmPnt.pPointTo;
   }
 
-  T *GetRawPointer() { return pPointTo; }
+  T *get() { return pPointTo; }
+
+  bool is_null() const { return pPointTo == 0; }
 };
 
 template <class T>

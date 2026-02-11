@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_ENTITIES_H
 
 #include "core.h"
+#include "smart_pointer.h"
 
 /** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {

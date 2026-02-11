@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_FIREBALL_H
 
 #include "entities.h"
+#include "smart_pointer.h"
 
 struct BasicController;
 struct AdvancedController;

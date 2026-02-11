@@ -2,6 +2,7 @@
 #define EVENT_HEADER_08_27_10_06_16
 
 #include "Preloader.h"
+#include "smart_pointer.h"
 #include <iostream>
 
 using namespace Gui;
@@ -95,7 +96,7 @@ class MakeSoundEvent : public Event {
 
 public:
   MakeSoundEvent(smart_pointer<SoundInterface<Index>> pSn_, Index Snd_)
-      : pSn(pSn_.GetRawPointer()), Snd(Snd_) {}
+      : pSn(pSn_.get()), Snd(Snd_) {}
   MakeSoundEvent(SoundInterface<Index> *pSn_, Index Snd_)
       : pSn(pSn_), Snd(Snd_) {}
 

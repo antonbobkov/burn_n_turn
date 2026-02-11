@@ -14,12 +14,12 @@ struct TestObj : SP_Info {
 
 TEST_CASE("smart_pointer default construction", "[smart_pointer]") {
   smart_pointer<TestObj> p;
-  REQUIRE(p.GetRawPointer() == nullptr);
+  REQUIRE(p.is_null());
 }
 
 TEST_CASE("smart_pointer construction via make_smart", "[smart_pointer]") {
   smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(42));
-  REQUIRE(p.GetRawPointer() != nullptr);
+  REQUIRE(!p.is_null());
   REQUIRE(p->value == 42);
   REQUIRE((*p).value == 42);
 }
@@ -27,7 +27,7 @@ TEST_CASE("smart_pointer construction via make_smart", "[smart_pointer]") {
 TEST_CASE("smart_pointer copy constructor", "[smart_pointer]") {
   smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(7));
   smart_pointer<TestObj> q(p);
-  REQUIRE(q.GetRawPointer() == p.GetRawPointer());
+  REQUIRE(q.get() == p.get());
   REQUIRE(q->value == 7);
 }
 
@@ -36,7 +36,7 @@ TEST_CASE("smart_pointer assignment from another smart_pointer",
   smart_pointer<TestObj> a = make_smart<TestObj>(new TestObj(1));
   smart_pointer<TestObj> b;
   b = a;
-  REQUIRE(b.GetRawPointer() == a.GetRawPointer());
+  REQUIRE(b.get() == a.get());
   REQUIRE(b->value == 1);
 }
 
@@ -45,8 +45,8 @@ TEST_CASE("smart_pointer assign empty releases; other copy still valid",
   smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(3));
   smart_pointer<TestObj> q = p;
   p = smart_pointer<TestObj>();
-  REQUIRE(p.GetRawPointer() == nullptr);
-  REQUIRE(q.GetRawPointer() != nullptr);
+  REQUIRE(p.is_null());
+  REQUIRE(!q.is_null());
   REQUIRE(q->value == 3);
 }
 

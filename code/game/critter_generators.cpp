@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 SkellyGenerator::SkellyGenerator(Point p_,
                                  smart_pointer<AdvancedController> pAdv_)
@@ -64,7 +65,7 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   pBc->AddBoth(pCr);
-  PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+  PushBackASSP(pBc.get(), pBc->lsPpl, pCr);
 }
 
 void KnightGenerator::Update() {
@@ -110,7 +111,7 @@ void PrincessGenerator::Update() {
       bFirst = false;
     }
     pBc->AddBoth(pCr);
-    PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+    PushBackASSP(pBc.get(), pBc->lsPpl, pCr);
     pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("princess_arrive"));
 
     pBc->tutOne.PrincessGenerate();
@@ -153,7 +154,7 @@ void MageGenerator::MageGenerate() {
               vel.x < 0 ? pBc->pGl->pr("mage_f") : pBc->pGl->pr("mage"), true),
       pBc, pBc->pGl->bAngry));
   pBc->AddBoth(pCr);
-  PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+  PushBackASSP(pBc.get(), pBc->lsPpl, pCr);
 }
 
 float TraderGenerator::GetRate() {
@@ -205,7 +206,7 @@ void TraderGenerator::Update() {
     }
 
     pBc->AddBoth(pCr);
-    PushBackASSP(pBc.GetRawPointer(), pBc->lsPpl, pCr);
+    PushBackASSP(pBc.get(), pBc->lsPpl, pCr);
 
     pBc->tutTwo.TraderGenerate();
   }
@@ -224,6 +225,6 @@ void TraderGenerator::Update() {
         Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->pr("skelly"), true), pAdv,
         'S'));
     pAdv->AddBoth(pCr);
-    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pCr);
+    PushBackASSP(pAdv.get(), pAdv->lsPpl, pCr);
   }
 }

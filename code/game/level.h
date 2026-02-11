@@ -3,6 +3,7 @@
 
 #include "entities.h"
 #include "exception.h"
+#include "smart_pointer.h"
 
 namespace Gui {
 class FilePath;

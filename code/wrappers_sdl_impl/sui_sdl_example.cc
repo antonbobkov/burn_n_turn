@@ -8,6 +8,7 @@
  */
 
 #include "SuiSdl.h"
+#include "smart_pointer.h"
 
 #include "exception.h"
 

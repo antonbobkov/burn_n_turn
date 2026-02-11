@@ -4,6 +4,7 @@
 /* Include after GameController and TwrGlobalController are defined (e.g. from
  * tower_defense.h). */
 #include "entities.h"
+#include "smart_pointer.h"
 
 /** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {

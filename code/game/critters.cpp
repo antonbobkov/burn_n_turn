@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 void SummonSkeletons(smart_pointer<AdvancedController> pAc, Point p) {
   int nNum = 4;
@@ -147,7 +148,7 @@ void Trader::OnHit(char cWhat) {
     bFirstBns = false;
   }
   pAc->AddBoth(pFb);
-  PushBackASSP(pAc.GetRawPointer(), pAc->lsBonus, pFb);
+  PushBackASSP(pAc.get(), pAc->lsBonus, pFb);
 }
 
 void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -379,7 +380,7 @@ void Ghostiness::Update() {
     pCr->nGhostHit = nGhostHit - 1;
 
     pAdv->AddBoth(pCr);
-    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pCr);
+    PushBackASSP(pAdv.get(), pAdv->lsPpl, pCr);
   }
 }
 
@@ -401,7 +402,7 @@ void Slime::RandomizeVelocity() {
 }
 
 Slime::~Slime() {
-  if (pAc.GetRawPointer() != 0) {
+  if (!pAc.is_null()) {
     --pAc->nSlimeNum;
   }
 }
@@ -503,7 +504,7 @@ void Slime::OnHit(char cWhat) {
     smart_pointer<Sliminess> pSlm = make_smart(
         new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
     pAc->AddE(pSlm);
-    PushBackASSP(pAc.GetRawPointer(), pAc->lsSliminess, pSlm);
+    PushBackASSP(pAc.get(), pAc->lsSliminess, pSlm);
   }
 }
 
@@ -532,8 +533,8 @@ void Sliminess::Update() {
     smart_pointer<Slime> pSlm =
         make_smart(new Slime(p, pAdv->rBound, pAdv, nGeneration));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
-    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsSlimes, pSlm);
+    PushBackASSP(pAdv.get(), pAdv->lsPpl, pSlm);
+    PushBackASSP(pAdv.get(), pAdv->lsSlimes, pSlm);
   }
 }
 
@@ -543,7 +544,7 @@ void Sliminess::Kill() {
 }
 
 Sliminess::~Sliminess() {
-  if (pAdv.GetRawPointer() != 0)
+  if (!pAdv.is_null())
     --pAdv->nSlimeNum;
 }
 
@@ -566,7 +567,7 @@ void MegaSliminess::Update() {
     smart_pointer<MegaSlime> pSlm =
         make_smart(new MegaSlime(p, pAdv->rBound, pAdv));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv.GetRawPointer(), pAdv->lsPpl, pSlm);
+    PushBackASSP(pAdv.get(), pAdv->lsPpl, pSlm);
   }
 }
 
@@ -656,7 +657,7 @@ void Castle::OnKnight(char cWhat) {
     bBroken = true;
     nPrincesses = 0;
 
-    if (pDrag.GetRawPointer() != 0) {
+    if (!pDrag.is_null()) {
 
       pDrag->bFly = true;
       pDrag->bTookOff = true;
@@ -677,7 +678,7 @@ void Castle::OnKnight(char cWhat) {
     return;
   }
 
-  if (pDrag.GetRawPointer() != 0) {
+  if (!pDrag.is_null()) {
     pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("one_princess"));
 
     --nPrincesses;
@@ -693,7 +694,7 @@ void Castle::OnKnight(char cWhat) {
                                           true),
                                   pAv));
       pAv->AddBoth(pCr);
-      PushBackASSP(pAv.GetRawPointer(), pAv->lsPpl, pCr);
+      PushBackASSP(pAv.get(), pAv->lsPpl, pCr);
     }
   } else {
     pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("all_princess_escape"));
@@ -713,7 +714,7 @@ void Castle::OnKnight(char cWhat) {
                                             true),
                                     pAv));
         pAv->AddBoth(pCr);
-        PushBackASSP(pAv.GetRawPointer(), pAv->lsPpl, pCr);
+        PushBackASSP(pAv.get(), pAv->lsPpl, pCr);
       }
     }
 

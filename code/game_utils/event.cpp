@@ -1,7 +1,8 @@
 #include "event.h"
+#include "smart_pointer.h"
 
 void Trigger(smart_pointer<Event> pE) {
-  if (pE.GetRawPointer() != 0)
+  if (!pE.is_null())
     pE->Trigger();
 }
 

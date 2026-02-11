@@ -5,6 +5,7 @@
 
 #include "file_utils.h"
 #include "game_runner_interface.h"
+#include "smart_pointer.h"
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"

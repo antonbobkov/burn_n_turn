@@ -1,5 +1,6 @@
 #include "core.h"
 #include "game.h"
+#include "smart_pointer.h"
 
 Polar::Polar(fPoint p) : r(p.Length()) {
   if (p.y == 0 && p.x == 0)
@@ -808,7 +809,7 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
   smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(
       pr["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
   smart_pointer<VisualEntity> pSlimeUpd =
-      make_smart(new SlimeUpdater(pBuy.GetRawPointer()));
+      make_smart(new SlimeUpdater(pBuy.get()));
 
   pBuy->AddV(pL);
   pBuy->AddV(pSlimeUpd);
@@ -873,7 +874,7 @@ TowerGameGlobalController::TowerGameGlobalController(ProgramEngine pe) {
 }
 
 TowerGameGlobalController::~TowerGameGlobalController() {
-  SP_Info *pCleanUp = pData->pCnt.GetRawPointer();
+  SP_Info *pCleanUp = pData->pCnt.get();
   delete pData;
   CleanIslandSeeded(pCleanUp);
 }
@@ -882,7 +883,7 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 
   pExitProgram = pe.pExitProgram;
 
-  pWr = pe.pMsg.GetRawPointer();
+  pWr = pe.pMsg.get();
 
   p_fm_ = pe.GetFileManager();
   {
@@ -929,7 +930,7 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 }
 
 TwrGlobalController *TowerGameGlobalController::GetTowerController() const {
-  return pData ? pData->pCnt.GetRawPointer() : nullptr;
+  return pData ? pData->pCnt.get() : nullptr;
 }
 
 unsigned TowerGameGlobalController::GetActiveControllerIndex() const {

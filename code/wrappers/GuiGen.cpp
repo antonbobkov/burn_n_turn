@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include "GuiGen.h"
+#include "smart_pointer.h"
 
 #include "General.h"
 

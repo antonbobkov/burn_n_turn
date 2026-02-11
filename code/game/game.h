@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_GAME_H
 
 #include "common.h"
+#include "smart_pointer.h"
 #include "core.h"
 #include "entities.h"
 #include "file_utils.h"

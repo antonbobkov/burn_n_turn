@@ -10,6 +10,7 @@
 #include "file_utils.h"
 #include "game.h"
 #include "game_runner_interface.h"
+#include "smart_pointer.h"
 
 
 #include <catch2/catch.hpp>

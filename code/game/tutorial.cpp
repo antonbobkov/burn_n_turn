@@ -1,4 +1,5 @@
 #include "tutorial.h"
+#include "smart_pointer.h"
 
 namespace {
 
@@ -113,7 +114,7 @@ std::vector<std::string> TutorialLevelOne::GetText() {
 }
 
 void TutorialLevelOne::Update() {
-  if (pTexter.GetRawPointer() != 0)
+  if (!pTexter.is_null())
     pTexter->SetText(GetText());
 }
 
@@ -169,7 +170,7 @@ std::vector<std::string> TutorialLevelTwo::GetText() {
 }
 
 void TutorialLevelTwo::Update() {
-  if (pTexter.GetRawPointer() != 0)
+  if (!pTexter.is_null())
     pTexter->SetText(GetText());
 }
 

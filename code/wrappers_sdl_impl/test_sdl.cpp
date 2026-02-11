@@ -5,6 +5,7 @@
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"
+#include "smart_pointer.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>

@@ -3,6 +3,7 @@
 
 #include "entities.h"
 #include "level.h"
+#include "smart_pointer.h"
 
 struct AdvancedController;
 

@@ -1,4 +1,5 @@
 #include "simulation.h"
+#include "smart_pointer.h"
 
 #include "General.h"
 #include "MessageWriter.h"
@@ -149,7 +150,7 @@ void RunSimulation() {
     p_gl->Update();
 
     if (i == 0 || (i + 1) % 200 == 0 || i == kSimulationFrames - 1)
-      LogState(p_gl.GetRawPointer());
+      LogState(p_gl.get());
   }
   if (sound_toggle_verified)
     std::cout << "[sim] Verified: sound toggle wrote to file (cache).\n";

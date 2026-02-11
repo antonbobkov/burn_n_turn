@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 SimpleController::SimpleController(smart_pointer<TwrGlobalController> pGraph,
                                    std::string strFileName)
@@ -208,7 +209,7 @@ void MouseCursor::SetCursorPos(Point pPos) { pCursorPos = pPos; }
 MenuController::MenuController(smart_pointer<TwrGlobalController> pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : BasicController(pGl_, rBound, c), nResumePosition(nResumePosition_),
-      pMenuDisplay(this, 0), mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()),
+      pMenuDisplay(this, 0), mc(pGl->pr("claw"), Point(), pGl.get()),
       pHintText(this, 0), pOptionText(this, 0) {
   bNoRefresh = true;
 }
@@ -236,10 +237,10 @@ void MenuController::Update() {
   BasicController::Update();
 
   if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
-    if (pOptionText.GetRawPointer() != 0)
+    if (!pOptionText.is_null())
       pOptionText->Draw(pGl->pDr);
   } else {
-    if (pHintText.GetRawPointer() != 0)
+    if (!pHintText.is_null())
       pHintText->Draw(pGl->pDr);
   }
 
@@ -323,7 +324,7 @@ void MenuDisplay::PositionIncrement(bool bUp) {
       break;
   }
 
-  if (pMenuController->pOptionText.GetRawPointer() != 0)
+  if (!pMenuController->pOptionText.is_null())
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }
@@ -412,7 +413,7 @@ void MenuDisplay::UpdateMenuEntries() {
   memLoadChapter.vEntries.at(2).bDisabled =
       (pMenuController->pGl->snProgress.Get() < 2);
 
-  if (pMenuController->pOptionText.GetRawPointer() != 0)
+  if (!pMenuController->pOptionText.is_null())
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }

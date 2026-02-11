@@ -7,4 +7,6 @@ To make and build, run `cd c:\coding\dragongame_git\build; cmake ../code -G "Min
 
 To build, run `cd c:\coding\dragongame_git\build; mingw32-make`
 
+To run all tests, run `cd c:\coding\dragongame_git\build; ctest --output-on-failure`
+
 Important: don't run cmake command outside of this build directory.

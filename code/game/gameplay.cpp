@@ -1,4 +1,5 @@
 #include "game.h"
+#include "smart_pointer.h"
 
 void BackgroundMusicPlayer::ToggleOff() {
   if (!bOff) {
@@ -253,7 +254,7 @@ AdvancedController::AdvancedController(smart_pointer<TwrGlobalController> pGl_,
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
       bTakeOffToggle(false), pTutorialText(this, 0),
-      mc(pGl->pr("claw"), Point(), pGl.GetRawPointer()), bTimerFlash(false) {}
+      mc(pGl->pr("claw"), Point(), pGl.get()), bTimerFlash(false) {}
 
 void AdvancedController::Init(smart_pointer<AdvancedController> pSelf_,
                               const LevelLayout &lvl) {
@@ -263,11 +264,11 @@ void AdvancedController::Init(smart_pointer<AdvancedController> pSelf_,
   tLoseTimer.nPeriod = 0;
 
   smart_pointer<AdNumberDrawer> pNm = make_smart(new AdNumberDrawer());
-  pNm->pAd = pSelf.GetRawPointer();
+  pNm->pAd = pSelf.get();
   AddV(pNm);
 
   smart_pointer<BonusDrawer> pBd = make_smart(new BonusDrawer());
-  pBd->pAd = pSelf.GetRawPointer();
+  pBd->pAd = pSelf.get();
   AddV(pBd);
 
   smart_pointer<KnightGenerator> pGen = make_smart(
@@ -279,22 +280,22 @@ void AdvancedController::Init(smart_pointer<AdvancedController> pSelf_,
   smart_pointer<MageGenerator> pMGen = make_smart(
       new MageGenerator(lvl.vFreq.at(3), lvl.vFreq.at(4), rBound, pSelf));
 
-  pGr = pGen.GetRawPointer();
-  pMgGen = pMGen.GetRawPointer();
+  pGr = pGen.get();
+  pMgGen = pMGen.get();
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    PushBackASSP(pSelf.GetRawPointer(), vRd,
+    PushBackASSP(pSelf.get(), vRd,
                  make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
-    PushBackASSP(pSelf.GetRawPointer(), vCs,
+    PushBackASSP(pSelf.get(), vCs,
                  make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
 
   t = Timer(lvl.nTimer);
 
   PushBackASSP(
-      pSelf.GetRawPointer(), vDr,
+      pSelf.get(), vDr,
       make_smart(new Dragon(
           vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
           ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));

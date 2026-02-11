@@ -3,6 +3,7 @@
 
 #include "General.h"
 #include "event.h"
+#include "smart_pointer.h"
 
 #include "GuiGen.h"
 #include "MessageWriter.h"
