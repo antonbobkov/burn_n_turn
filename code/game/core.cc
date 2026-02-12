@@ -1,5 +1,6 @@
 #include "core.h"
 #include "game.h"
+#include "controller/level_controller.h"
 #include "smart_pointer.h"
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
@@ -766,8 +767,8 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 #endif
 
   for (unsigned i = 0; i < vLvl.size(); ++i) {
-    smart_pointer<AdvancedController> pAd = make_smart(
-        new AdvancedController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    smart_pointer<LevelController> pAd = make_smart(
+        new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd, vLvl[i]);
 
     pAd->AddE(pBckgMusic);

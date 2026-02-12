@@ -4,17 +4,17 @@
 #include "entities.h"
 #include "smart_pointer.h"
 
-struct AdvancedController;
+struct LevelController;
 struct Dragon;
 
 struct Castle : public Critter {
   unsigned nPrincesses;
-  SSP<AdvancedController> pAv;
+  SSP<LevelController> pAv;
   SSP<Dragon> pDrag;
 
   bool bBroken;
 
-  Castle(Point p, Rectangle rBound_, smart_pointer<AdvancedController> pAv_);
+  Castle(Point p, Rectangle rBound_, smart_pointer<LevelController> pAv_);
 
   void OnKnight(char cWhat);
 
@@ -23,9 +23,9 @@ struct Castle : public Critter {
 
 /** Princess unit: Critter + ConsumableEntity, captured by dragon. */
 struct Princess : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
 
-  Princess(const Critter &cr, smart_pointer<AdvancedController> pAc_)
+  Princess(const Critter &cr, smart_pointer<LevelController> pAc_)
       : Critter(cr), pAc(this, pAc_) {}
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
@@ -39,7 +39,7 @@ struct Princess : public Critter, public ConsumableEntity {
 };
 
 struct Mage : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
 
   bool bAngry;
   bool bCasting;
@@ -49,7 +49,7 @@ struct Mage : public Critter, public ConsumableEntity {
 
   fPoint fMvVel;
 
-  Mage(const Critter &cr, smart_pointer<AdvancedController> pAc_, bool bAngry_);
+  Mage(const Critter &cr, smart_pointer<LevelController> pAc_, bool bAngry_);
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
@@ -68,10 +68,10 @@ ImageSequence GetBonusImage(int n, Preloader &pr);
 
 /** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
 struct Trader : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
   bool &bFirstBns;
 
-  Trader(const Critter &cr, smart_pointer<AdvancedController> pAc_,
+  Trader(const Critter &cr, smart_pointer<LevelController> pAc_,
          bool &bFirstBns_)
       : Critter(cr), pAc(this, pAc_), bFirstBns(bFirstBns_) {}
 
@@ -86,14 +86,14 @@ struct Trader : public Critter, public ConsumableEntity {
 
 /** Knight unit: chases princess/castle, can become ghost (Ghostiness). */
 struct Knight : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
 
   char cType;
 
   int nGhostHit;
   int nGolemHealth;
 
-  Knight(const Critter &cr, smart_pointer<AdvancedController> pAc_, char cType_)
+  Knight(const Critter &cr, smart_pointer<LevelController> pAc_, char cType_)
       : Critter(cr), pAc(this, pAc_), cType(cType_), nGhostHit(1),
         nGolemHealth(nGolemHealthMax) {}
 
@@ -120,12 +120,12 @@ struct Knight : public Critter, public ConsumableEntity {
 
 /** Large slime unit: splits or merges (MegaSlime logic). */
 struct MegaSlime : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
 
   int nHealth;
 
   MegaSlime(fPoint fPos, Rectangle rBound,
-            smart_pointer<AdvancedController> pAc_);
+            smart_pointer<LevelController> pAc_);
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     Critter::Draw(pDr);
@@ -152,12 +152,12 @@ struct Ghostiness : public EventEntity {
   Timer t;
   Point p;
 
-  SSP<AdvancedController> pAdv;
+  SSP<LevelController> pAdv;
 
   Critter knCp;
   int nGhostHit;
 
-  Ghostiness(Point p_, smart_pointer<AdvancedController> pAdv_, Critter knCp_,
+  Ghostiness(Point p_, smart_pointer<LevelController> pAdv_, Critter knCp_,
              int nGhostHit_);
 
   /*virutal*/ void Update();
@@ -165,11 +165,11 @@ struct Ghostiness : public EventEntity {
 
 /** Slime unit: moves toward target, timer for behavior. */
 struct Slime : public Critter, public ConsumableEntity {
-  SSP<AdvancedController> pAc;
+  SSP<LevelController> pAc;
   Timer t;
   int nGeneration;
 
-  Slime(fPoint fPos, Rectangle rBound, smart_pointer<AdvancedController> pAc_,
+  Slime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_,
         int nGeneration_);
 
   int GetGeneration() { return nGeneration; }
@@ -194,10 +194,10 @@ struct Sliminess : public EventEntity {
 
   bool bFast;
   int nGeneration;
-  SSP<AdvancedController> pAdv;
+  SSP<LevelController> pAdv;
   SSP<AnimationOnce> pSlm;
 
-  Sliminess(Point p_, smart_pointer<AdvancedController> pAdv_, bool bFast_,
+  Sliminess(Point p_, smart_pointer<LevelController> pAdv_, bool bFast_,
             int nGeneration_);
 
   /*virutal*/ void Update();
@@ -213,10 +213,10 @@ struct Sliminess : public EventEntity {
 /** Spawns MegaSlimes; holds position and controller. */
 struct MegaSliminess : public EventEntity {
   Point p;
-  SSP<AdvancedController> pAdv;
+  SSP<LevelController> pAdv;
   SSP<AnimationOnce> pSlm;
 
-  MegaSliminess(Point p_, smart_pointer<AdvancedController> pAdv_);
+  MegaSliminess(Point p_, smart_pointer<LevelController> pAdv_);
 
   /*virutal*/ void Update();
 };
@@ -234,7 +234,7 @@ struct FloatingSlime : public SimpleVisualEntity {
   /*virtual*/ void Update();
 };
 
-void SummonSkeletons(smart_pointer<AdvancedController> pAc, Point p);
+void SummonSkeletons(smart_pointer<LevelController> pAc, Point p);
 
 inline unsigned GetTimeUntillSpell() {
   return 8 * nFramesInSecond + rand() % (3 * nFramesInSecond);

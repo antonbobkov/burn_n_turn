@@ -1,7 +1,8 @@
 #include "game.h"
+#include "controller/level_controller.h"
 #include "smart_pointer.h"
 
-void SummonSkeletons(smart_pointer<AdvancedController> pAc, Point p) {
+void SummonSkeletons(smart_pointer<LevelController> pAc, Point p) {
   int nNum = 4;
 
   if (pAc->nLvl > 6)
@@ -47,7 +48,7 @@ void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
 #endif
 }
 
-Mage::Mage(const Critter &cr, smart_pointer<AdvancedController> pAc_,
+Mage::Mage(const Critter &cr, smart_pointer<LevelController> pAc_,
            bool bAngry_)
     : Critter(cr), pAc(this, pAc_), bAngry(bAngry_), bCasting(false),
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
@@ -282,7 +283,7 @@ void Knight::OnHit(char cWhat) {
 }
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound,
-                     smart_pointer<AdvancedController> pAc_)
+                     smart_pointer<LevelController> pAc_)
     : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("megaslime"),
               nFramesInSecond / 5),
       pAc(this, pAc_), nHealth(nSlimeHealthMax) {
@@ -349,7 +350,7 @@ void MegaSlime::OnHit(char cWhat) {
   pAc->AddBoth(pAn);
 }
 
-Ghostiness::Ghostiness(Point p_, smart_pointer<AdvancedController> pAdv_,
+Ghostiness::Ghostiness(Point p_, smart_pointer<LevelController> pAdv_,
                        Critter knCp_, int nGhostHit_)
     : p(p_), pAdv(this, pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
   ImageSequence seq = pAdv->pGl->pr("ghost_knight_burn");
@@ -385,7 +386,7 @@ void Ghostiness::Update() {
 }
 
 Slime::Slime(fPoint fPos, Rectangle rBound,
-             smart_pointer<AdvancedController> pAc_, int nGeneration_)
+             smart_pointer<LevelController> pAc_, int nGeneration_)
     : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
       pAc(this, pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
@@ -508,7 +509,7 @@ void Slime::OnHit(char cWhat) {
   }
 }
 
-Sliminess::Sliminess(Point p_, smart_pointer<AdvancedController> pAdv_,
+Sliminess::Sliminess(Point p_, smart_pointer<LevelController> pAdv_,
                      bool bFast_, int nGeneration_)
     : p(p_), pAdv(this, pAdv_), bFast(bFast_), nGeneration(nGeneration_),
       pSlm(this, 0) {
@@ -548,7 +549,7 @@ Sliminess::~Sliminess() {
     --pAdv->nSlimeNum;
 }
 
-MegaSliminess::MegaSliminess(Point p_, smart_pointer<AdvancedController> pAdv_)
+MegaSliminess::MegaSliminess(Point p_, smart_pointer<LevelController> pAdv_)
     : p(p_), pAdv(this, pAdv_), pSlm(this, 0) {
   ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
 
@@ -636,7 +637,7 @@ void Mage::SummonSlimes() {
 }
 
 Castle::Castle(Point p, Rectangle rBound_,
-               smart_pointer<AdvancedController> pAv_)
+               smart_pointer<LevelController> pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
       nPrincesses(0), pAv(this, pAv_), pDrag(this, 0), bBroken(false) {}
 

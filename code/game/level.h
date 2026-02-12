@@ -81,15 +81,15 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
   return ifs >> r.bVertical >> r.nCoord;
 }
 
-struct AdvancedController;
+struct LevelController;
 struct ScalingDrawer;
 
-/** Fancy road: draws tiled road image; needs AdvancedController for resources.
+/** Fancy road: draws tiled road image; needs LevelController for resources.
  */
 struct FancyRoad : public Road {
-  FancyRoad(const Road &rd, smart_pointer<AdvancedController> pAd_)
+  FancyRoad(const Road &rd, smart_pointer<LevelController> pAd_)
       : Road(rd), pAd(this, pAd_) {}
-  SSP<AdvancedController> pAd;
+  SSP<LevelController> pAd;
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };

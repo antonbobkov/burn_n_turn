@@ -1,4 +1,5 @@
 #include "game.h"
+#include "controller/level_controller.h"
 #include "smart_pointer.h"
 
 void DragonLeash::ModifyTilt(Point trackball) {
@@ -178,7 +179,7 @@ FireballBonus Dragon::GetAllBonuses() {
 }
 
 Dragon::Dragon(smart_pointer<Castle> pCs_,
-               smart_pointer<AdvancedController> pAd_, ImageSequence imgStable_,
+               smart_pointer<LevelController> pAd_, ImageSequence imgStable_,
                ImageSequence imgFly_, ButtonSet bt_)
     : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,

@@ -5,7 +5,7 @@
 #include "smart_pointer.h"
 
 struct EntityListController;
-struct AdvancedController;
+struct LevelController;
 
 /** Power-up state: named float/unsigned/bool maps, nNum; += merges, Add
  * accumulates. */
@@ -92,7 +92,7 @@ struct KnightOnFire : public Critter {
 /** Player fireball Critter; bThrough for passthrough, hits ConsumableEntities.
  */
 struct Fireball : public Critter {
-  SSP<AdvancedController> pBc;
+  SSP<LevelController> pBc;
   bool bThrough;
   FireballBonus fb;
 
@@ -103,7 +103,7 @@ struct Fireball : public Critter {
       : pBc(this, f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
         nChain(f.nChain), Critter(f) {}
 
-  Fireball(Point p, fPoint v, smart_pointer<AdvancedController> pBc_,
+  Fireball(Point p, fPoint v, smart_pointer<LevelController> pBc_,
            FireballBonus &fb_, Chain ch_ = Chain(), unsigned nChain_ = 1);
 
   /*virtual*/ void Update();
@@ -140,12 +140,12 @@ struct FireballBonusAnimation : public Animation,
   unsigned n;
   Timer tm;
   bool bBlink;
-  SSP<AdvancedController> pAd;
+  SSP<LevelController> pAd;
   std::string sUnderText;
   ImageSequence coronaSeq;
 
   FireballBonusAnimation(Point p_, unsigned n_,
-                         smart_pointer<AdvancedController> pAd_);
+                         smart_pointer<LevelController> pAd_);
 
   /*virtual*/ unsigned GetRadius() { return 20U; }
 

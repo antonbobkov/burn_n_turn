@@ -1,8 +1,9 @@
 #include "game.h"
+#include "controller/level_controller.h"
 #include "smart_pointer.h"
 
 SkellyGenerator::SkellyGenerator(Point p_,
-                                 smart_pointer<AdvancedController> pAdv_)
+                                 smart_pointer<LevelController> pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(this, pAdv_) {
   smart_pointer<AnimationOnce> pSlm =
       make_smart(new AnimationOnce(2.F, pAdv->pGl->pr("skelly_summon"),
@@ -23,7 +24,7 @@ float KnightGenerator::GetRate() {
 }
 
 KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
-                                 smart_pointer<AdvancedController> pBc_,
+                                 smart_pointer<LevelController> pBc_,
                                  const BrokenLine &bl_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       seq(pBc_->pGl->pr("knight")), bl(bl_), tm(1), bFirst(false) {
@@ -76,7 +77,7 @@ void KnightGenerator::Update() {
 }
 
 PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
-                                     smart_pointer<AdvancedController> pBc_)
+                                     smart_pointer<LevelController> pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
   if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
@@ -119,7 +120,7 @@ void PrincessGenerator::Update() {
 }
 
 MageGenerator::MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
-                             smart_pointer<AdvancedController> pBc_)
+                             smart_pointer<LevelController> pBc_)
     : rBound(rBound_), pBc(this, pBc_) {
   if (pBc->pGl->bAngry)
     dRate = dAngryRate_;
@@ -167,7 +168,7 @@ float TraderGenerator::GetRate() {
 }
 
 TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
-                                 smart_pointer<AdvancedController> pBc_)
+                                 smart_pointer<LevelController> pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(this, pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false), bFirstBns(false) {
   if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0) {

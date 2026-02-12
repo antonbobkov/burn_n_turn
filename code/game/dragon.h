@@ -5,7 +5,7 @@
 #include "fireball.h"
 #include "smart_pointer.h"
 
-struct AdvancedController;
+struct LevelController;
 
 struct DragonLeash {
   fPoint lastVel;
@@ -72,7 +72,7 @@ struct Dragon : public Critter {
   bool bRegenLocked;
   Timer tRegenUnlock;
 
-  SSP<AdvancedController> pAd;
+  SSP<LevelController> pAd;
 
   SSP<Castle> pCs;
 
@@ -81,7 +81,7 @@ struct Dragon : public Critter {
 
   ButtonSet bt;
 
-  Dragon(smart_pointer<Castle> pCs_, smart_pointer<AdvancedController> pAd_,
+  Dragon(smart_pointer<Castle> pCs_, smart_pointer<LevelController> pAd_,
          ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
   /*vrtual*/ void Update();

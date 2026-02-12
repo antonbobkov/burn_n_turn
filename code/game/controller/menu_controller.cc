@@ -47,28 +47,10 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   }
 }
 
-void MouseCursor::DrawCursor() {
-  Index img;
-  if (bPressed)
-    img = imgCursor.vImage.at(1);
-  else
-    img = imgCursor.vImage.at(0);
-
-  Size sz = pGl->pGraph->GetImage(img)->GetSize();
-  Point p = pCursorPos;
-
-  p.x -= sz.x / 2;
-  p.y -= sz.y / 2;
-
-  pGl->pGraph->DrawImage(p, img, false);
-}
-
-void MouseCursor::SetCursorPos(Point pPos) { pCursorPos = pPos; }
-
 MenuController::MenuController(smart_pointer<TwrGlobalController> pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
-      pMenuDisplay(this, nullptr), mc(pGl_->pr("claw"), Point(), pGl_.get()),
+      pMenuDisplay(this, nullptr), mc(pGl_->pr("claw"), Point()),
       pHintText(this, nullptr), pOptionText(this, nullptr) {
   bNoRefresh = true;
 }

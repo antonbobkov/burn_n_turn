@@ -106,6 +106,7 @@ struct TwrGlobalController : virtual public SP_Info {
 #include "critters.h"
 #include "dragon.h"
 #include "gameplay.h"
+#include "controller/level_controller.h"
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {

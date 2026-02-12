@@ -8,6 +8,7 @@ add_library(GameCore STATIC
   level.cc
   tutorial.cc
   controller/basic_controllers.cc
+  controller/level_controller.cc
   controller/menu_controller.cc
   fireball.cc
   critters.cc

@@ -8,6 +8,7 @@
 #include "controller/basic_controllers.h"
 #include "entities.h"
 #include "gui_key_type.h"
+#include "mouse_utils.h"
 
 struct MenuDisplay;
 struct MenuController;
@@ -102,22 +103,6 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   void Chapter1();
   void Chapter2();
   void Chapter3();
-};
-
-/** Cursor image and position; Draw/Update for rendering and click state. */
-struct MouseCursor {
-  bool bPressed;
-  ImageSequence imgCursor;
-  Point pCursorPos;
-  TwrGlobalController *pGl;
-
-  MouseCursor(ImageSequence imgCursor_, Point pCursorPos_,
-              TwrGlobalController *pGl_)
-      : imgCursor(imgCursor_), pCursorPos(pCursorPos_), pGl(pGl_),
-        bPressed(false) {}
-
-  void DrawCursor();
-  void SetCursorPos(Point pPos);
 };
 
 /** Controller for pause/main menu: MenuDisplay, resume position. */

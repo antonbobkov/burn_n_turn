@@ -5,16 +5,16 @@
 #include "level.h"
 #include "smart_pointer.h"
 
-struct AdvancedController;
+struct LevelController;
 
 /** Spawns skeleton knights on a timer at a position. */
 struct SkellyGenerator : public EventEntity {
   Timer t;
   Point p;
 
-  SSP<AdvancedController> pAdv;
+  SSP<LevelController> pAdv;
 
-  SkellyGenerator(Point p_, smart_pointer<AdvancedController> pAdv_);
+  SkellyGenerator(Point p_, smart_pointer<LevelController> pAdv_);
 
   /*virutal*/ void Update();
 };
@@ -25,7 +25,7 @@ struct KnightGenerator : virtual public EventEntity {
 
   float dRate;
   Rectangle rBound;
-  SSP<AdvancedController> pBc;
+  SSP<LevelController> pBc;
   ImageSequence seq;
 
   Timer tm;
@@ -36,7 +36,7 @@ struct KnightGenerator : virtual public EventEntity {
   float GetRate();
 
   KnightGenerator(float dRate_, Rectangle rBound_,
-                  smart_pointer<AdvancedController> pBc_,
+                  smart_pointer<LevelController> pBc_,
                   const BrokenLine &bl_);
 
   /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
@@ -49,12 +49,12 @@ struct KnightGenerator : virtual public EventEntity {
 struct PrincessGenerator : virtual public EventEntity {
   float dRate;
   Rectangle rBound;
-  SSP<AdvancedController> pBc;
+  SSP<LevelController> pBc;
   Timer tm;
   bool bFirst;
 
   PrincessGenerator(float dRate_, Rectangle rBound_,
-                    smart_pointer<AdvancedController> pBc_);
+                    smart_pointer<LevelController> pBc_);
 
   /**
    * When the timer fires: pick a random road and spawn a princess there,
@@ -67,11 +67,11 @@ struct PrincessGenerator : virtual public EventEntity {
 struct MageGenerator : virtual public EventEntity {
   float dRate;
   Rectangle rBound;
-  SSP<AdvancedController> pBc;
+  SSP<LevelController> pBc;
   Timer tm;
 
   MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
-                smart_pointer<AdvancedController> pBc_);
+                smart_pointer<LevelController> pBc_);
 
   /*virtual*/ void Update();
 
@@ -83,7 +83,7 @@ struct MageGenerator : virtual public EventEntity {
 struct TraderGenerator : virtual public EventEntity {
   float dRate;
   Rectangle rBound;
-  SSP<AdvancedController> pBc;
+  SSP<LevelController> pBc;
   Timer tm;
   bool bFirst;
   bool bFirstBns;
@@ -91,7 +91,7 @@ struct TraderGenerator : virtual public EventEntity {
   float GetRate();
 
   TraderGenerator(float dRate_, Rectangle rBound_,
-                  smart_pointer<AdvancedController> pBc_);
+                  smart_pointer<LevelController> pBc_);
 
   /*virtual*/ void Update();
 };

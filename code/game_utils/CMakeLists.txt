@@ -7,6 +7,7 @@ add_library(GameUtils
   game_runner_interface.h
   MessageWriter.cc
   MessageWriter.h
+  mouse_utils.cc
   Preloader.cc
   Preloader.h
 )

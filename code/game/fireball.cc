@@ -1,4 +1,5 @@
 #include "game.h"
+#include "controller/level_controller.h"
 #include "smart_pointer.h"
 
 FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
@@ -190,7 +191,7 @@ unsigned GetFireballChainNum(FireballBonus &fb) {
   return nRet;
 }
 
-Fireball::Fireball(Point p, fPoint v, smart_pointer<AdvancedController> pBc_,
+Fireball::Fireball(Point p, fPoint v, smart_pointer<LevelController> pBc_,
                    FireballBonus &fb_, Chain ch_, unsigned nChain_)
     : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
               nFramesInSecond / 10),
@@ -327,7 +328,7 @@ void CircularFireball::Update() {
 }
 
 FireballBonusAnimation::FireballBonusAnimation(
-    Point p_, unsigned n_, smart_pointer<AdvancedController> pAd_)
+    Point p_, unsigned n_, smart_pointer<LevelController> pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       bBlink(false), pAd(this, pAd_), tm(nBonusOnGroundTime), sUnderText("") {
   seq = GetBonusImage(n, pAd->pGl->pr);
