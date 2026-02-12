@@ -3,9 +3,19 @@
 
 /* Include after GameController and TwrGlobalController are defined (e.g. from
  * game.h). */
-#include "entities.h"
+#include "geometry.h"
 #include "gui_key_type.h"
 #include "smart_pointer.h"
+#include "timer.h"
+
+struct Animation;
+struct ConsumableEntity;
+struct EventEntity;
+struct FancyCritter;
+struct VisualEntity;
+
+using Gui::fPoint;
+using Gui::Timer;
 
 /** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {
