@@ -2,6 +2,20 @@
 #include "game.h"
 #include "smart_pointer.h"
 
+/** VisualEntity that draws slime animations for the buy-now screen. */
+struct SlimeUpdater : public VisualEntity {
+  BuyNowController *pBuy;
+
+  SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
+
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ float GetPriority() { return 0; }
+};
+
+void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
+  pBuy->DrawSlimes();
+}
+
 Polar::Polar(fPoint p) : r(p.Length()) {
   if (p.y == 0 && p.x == 0)
     a = 0;

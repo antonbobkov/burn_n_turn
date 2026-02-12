@@ -37,6 +37,7 @@ struct GameController : virtual public SP_Info {
 };
 
 #include "controller/basic_controllers.h"
+#include "controller/menu_controller.h"
 
 struct TowerDataWrap;
 
@@ -104,7 +105,6 @@ struct TwrGlobalController : virtual public SP_Info {
 #include "critters.h"
 #include "dragon.h"
 #include "gameplay.h"
-#include "controller/basic_controllers.h"
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {

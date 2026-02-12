@@ -34,118 +34,6 @@ struct FlashingController : public GameController {
   /*virtual*/ std::string GetControllerName() const { return "basic"; }
 };
 
-struct MenuDisplay;
-
-typedef void (MenuDisplay::*EvntPntr)();
-
-struct MenuController;
-
-/** One menu item: size, label, callback (EvntPntr), disabled flag. */
-struct MenuEntry : virtual public SP_Info {
-  Size szSize;
-  std::string sText;
-  EvntPntr pTriggerEvent;
-  bool bDisabled;
-
-  MenuEntry(Size szSize_, std::string sText_, EvntPntr pTriggerEvent_,
-            bool bDisabled_ = false)
-      : szSize(szSize_), sText(sText_), pTriggerEvent(pTriggerEvent_),
-        bDisabled(bDisabled_) {}
-};
-
-/** Return "on" or "off" for menu toggles. */
-std::string OnOffString(bool b);
-
-inline std::string SoundString() { return "sound: "; }
-inline std::string MusicString() { return "music: "; }
-inline std::string TutorialString() { return "tutorial: "; }
-inline std::string FullTextString() { return "full screen: "; }
-
-/** Holds menu entries and current selection index (nMenuPosition). */
-struct MenuEntryManager {
-  std::vector<MenuEntry> vEntries;
-  int nMenuPosition;
-
-  MenuEntryManager() : nMenuPosition(0) {}
-};
-
-/** In-game menu: draws entries, caret, handles mouse/key; submenus and option
- * toggles. */
-struct MenuDisplay : virtual public EventEntity, public VisualEntity {
-  MenuEntryManager *pCurr;
-
-  MenuEntryManager memMain;
-  MenuEntryManager memLoadChapter;
-  MenuEntryManager memOptions;
-  std::vector<std::string> vOptionText;
-
-  int nMusic, nSound, nTutorial, nFullScreen, nCheats;
-  bool bCheatsUnlocked;
-
-  Point pLeftTop;
-  SSP<NumberDrawer> pNum;
-
-  SSP<Animation> pMenuCaret;
-
-  SSP<MenuController> pMenuController;
-
-  MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
-              smart_pointer<Animation> pMenuCaret_,
-              smart_pointer<MenuController> pMenuController_,
-              bool bCheatsUnlocked_);
-
-  /** Draws the menu entries and the caret at the current selection. */
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
-
-  /*virtual*/ float GetPriority() { return 0; }
-
-  /*virtual*/ void Update() { pCurr->vEntries.at(0).bDisabled = false; }
-
-  /** Updates which menu item is highlighted from the mouse position. */
-  void OnMouseMove(Point pMouse);
-
-  void PositionIncrement(bool bUp);
-
-  void Boop();
-
-  void Restart();
-  void Continue();
-  void MusicToggle();
-  void SoundToggle();
-  void TutorialToggle();
-  void FullScreenToggle();
-  void CheatsToggle();
-  void Exit();
-
-  void Escape();
-  void LoadChapterSubmenu();
-  void OptionsSubmenu();
-  void UpdateMenuEntries();
-
-  void Chapter1();
-  void Chapter2();
-  void Chapter3();
-};
-
-/** VisualEntity that draws a countdown number and sets bExist false when it
- * reaches 0. */
-struct Countdown : public VisualEntity, public EventEntity {
-  SSP<NumberDrawer> pNum;
-  unsigned nTime, nCount;
-
-  Countdown(smart_pointer<NumberDrawer> pNum_, unsigned nTime_)
-      : pNum(this, pNum_), nTime(nTime_), nCount(0) {}
-
-  /** Decrements the countdown every second; removes this when it reaches zero.
-   */
-  /*virtual*/ void Update();
-
-  /** Draws the remaining countdown at a fixed screen position. */
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
-
-  /*virtual*/ Point GetPosition() { return Point(0, 0); }
-};
-
 /** GameController with draw/update/consumable lists; Update runs Move, Update,
  * then draws by priority. */
 struct EntityListController : public GameController {
@@ -184,43 +72,6 @@ struct EntityListController : public GameController {
   /*virtual*/ std::string GetControllerName() const { return "basic"; }
 };
 
-/** Cursor image and position; Draw/Update for rendering and click state. */
-struct MouseCursor {
-  bool bPressed;
-  ImageSequence imgCursor;
-  Point pCursorPos;
-  TwrGlobalController *pGl;
-
-  MouseCursor(ImageSequence imgCursor_, Point pCursorPos_,
-              TwrGlobalController *pGl_)
-      : imgCursor(imgCursor_), pCursorPos(pCursorPos_), pGl(pGl_),
-        bPressed(false) {}
-
-  void DrawCursor();
-  void SetCursorPos(Point pPos);
-};
-
-/** Controller for pause/main menu: MenuDisplay, resume position. */
-struct MenuController : public EntityListController {
-  int nResumePosition;
-  SSP<MenuDisplay> pMenuDisplay;
-
-  MouseCursor mc;
-
-  SSP<TextDrawEntity> pHintText;
-  SSP<TextDrawEntity> pOptionText;
-
-  MenuController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
-                 Color c, int nResumePosition_);
-
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ void OnMouse(Point pPos);
-  /*virtual*/ void OnMouseDown(Point pPos);
-
-  /*virtual*/ void Update();
-  /*virtual*/ std::string GetControllerName() const { return "menu"; }
-};
-
 struct StartScreenController : public EntityListController {
   StartScreenController(smart_pointer<TwrGlobalController> pGl_,
                         Rectangle rBound, Color c)
@@ -236,15 +87,6 @@ struct StartScreenController : public EntityListController {
 };
 
 struct BuyNowController;
-
-struct SlimeUpdater : public VisualEntity {
-  BuyNowController *pBuy;
-
-  SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
-
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
-  /*virtual*/ float GetPriority() { return 0; }
-};
 
 /** Controller for buy-now screen: slime animations and timer. */
 struct BuyNowController : public EntityListController {
