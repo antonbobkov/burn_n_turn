@@ -3,7 +3,7 @@ project(WrappersSDL LANGUAGES CXX)
 
 add_library(GuiSdl
   GuiSdl.h
-  GuiSdl.cpp
+  GuiSdl.cc
 )
 
 target_include_directories(GuiSdl PRIVATE
@@ -22,7 +22,7 @@ target_link_libraries(GuiSdl PRIVATE Utils GuiGen SDL2 SDL2_image)
 
 add_library(SuiSdl
   SuiSdl.h
-  SuiSdl.cpp
+  SuiSdl.cc
 )
 
 target_include_directories(SuiSdl PRIVATE
@@ -40,7 +40,7 @@ target_link_directories(SuiSdl PRIVATE
 target_link_libraries(SuiSdl PRIVATE Utils SuiGen SDL2 SDL2_mixer)
 
 # gui_sdl_example: load and display image via SdlGraphicalInterface (like SDL_ex3_image)
-add_executable(gui_sdl_example gui_sdl_example.cpp)
+add_executable(gui_sdl_example gui_sdl_example.cc)
 target_include_directories(gui_sdl_example PRIVATE
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2
@@ -68,7 +68,7 @@ target_link_directories(sui_sdl_example PRIVATE
 target_link_libraries(sui_sdl_example PRIVATE SuiSdl mingw32 SDL2main SDL2 SDL2_mixer)
 
 # test_sdl: Catch2 tests for SDL loaders and SdlGraphicalInterface/SdlSoundInterface
-add_executable(test_sdl test_sdl.cpp)
+add_executable(test_sdl test_sdl.cc)
 target_include_directories(test_sdl PRIVATE
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(Simulation LANGUAGES CXX)
 
-add_library(Simulation simulation.cpp)
+add_library(Simulation simulation.cc)
 target_include_directories(Simulation PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/game
@@ -18,7 +18,7 @@ target_link_libraries(Simulation PUBLIC
   GameUtils
 )
 
-add_executable(simulation_test simulation_test.cpp)
+add_executable(simulation_test simulation_test.cc)
 target_include_directories(simulation_test PRIVATE
   ${CMAKE_SOURCE_DIR}/game
   ${CMAKE_SOURCE_DIR}/game_utils

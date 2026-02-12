@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.14)
 project(TowerDefense LANGUAGES CXX)
 
 add_library(GameCore STATIC
-  core.cpp
+  core.cc
   game_runner_interface_impl.cc
-  entities.cpp
-  level.cpp
-  tutorial.cpp
-  screen_controllers.cpp
-  fireball.cpp
-  critters.cpp
-  critter_generators.cpp
-  dragon.cpp
-  gameplay.cpp
+  entities.cc
+  level.cc
+  tutorial.cc
+  screen_controllers.cc
+  fireball.cc
+  critters.cc
+  critter_generators.cc
+  dragon.cc
+  gameplay.cc
 )
 target_include_directories(GameCore PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -23,7 +23,7 @@ target_include_directories(GameCore PUBLIC
 target_link_libraries(GameCore PUBLIC GameUtils)
 
 add_executable(tower_defense
-  ${CMAKE_SOURCE_DIR}/wrappers_sdl_impl/sdl_game_runner_main.cpp)
+  ${CMAKE_SOURCE_DIR}/wrappers_sdl_impl/sdl_game_runner_main.cc)
 target_include_directories(tower_defense PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/game_utils

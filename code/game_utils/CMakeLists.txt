@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 project(GameUtils LANGUAGES CXX)
 
 add_library(GameUtils
-  event.cpp
+  event.cc
   event.h
   game_runner_interface.h
-  MessageWriter.cpp
+  MessageWriter.cc
   MessageWriter.h
-  Preloader.cpp
+  Preloader.cc
   Preloader.h
 )
 

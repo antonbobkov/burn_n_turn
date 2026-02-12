@@ -4,7 +4,7 @@ project(Wrappers LANGUAGES CXX)
 add_library(GuiGen
   GuiGenHdr.h
   GuiGen.h
-  GuiGen.cpp
+  GuiGen.cc
 )
 
 target_include_directories(GuiGen PRIVATE ${CMAKE_SOURCE_DIR}/utils)
@@ -12,7 +12,7 @@ target_link_libraries(GuiGen PRIVATE Utils)
 
 add_library(SuiGen
   SuiGen.h
-  SuiGen.cpp
+  SuiGen.cc
 )
 
 target_include_directories(SuiGen PRIVATE ${CMAKE_SOURCE_DIR}/utils)
