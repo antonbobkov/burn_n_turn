@@ -82,6 +82,17 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
 }
 
 struct AdvancedController;
+struct ScalingDrawer;
+
+/** Fancy road: draws tiled road image; needs AdvancedController for resources.
+ */
+struct FancyRoad : public Road {
+  FancyRoad(const Road &rd, smart_pointer<AdvancedController> pAd_)
+      : Road(rd), pAd(this, pAd_) {}
+  SSP<AdvancedController> pAd;
+
+  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+};
 
 /** One level: bounds, knight spawn line, castle positions, roads, timer, spawn
  * freqs; Convert scales coords. */

@@ -23,5 +23,5 @@
   - prefer pointers to non-const references
 
 - non-standard-library includes
-  - in .h files: don't have includes for pointer/smart-pointer classes; just forward declare them. Have explicit includes for other classes used. Move function definition to c++ file, if it means fewer includes
+  - in .h files: don't have includes for pointer/smart-pointer classes; just forward declare them. Have explicit includes for other classes used. Move function definition to c++ file, if it results in fewer includes
   - in .cpp file: have a explicit include for each external class/function used

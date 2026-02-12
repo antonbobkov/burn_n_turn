@@ -42,7 +42,7 @@ Gui::ProgramInfo GetProgramInfo() {
   return inf;
 }
 
-smart_pointer<Gui::GlobalController>
-GetGlobalController(Gui::ProgramEngine pe) {
+smart_pointer<Gui::GameRunner>
+GetGameRunner(Gui::ProgramEngine pe) {
   return make_smart(new TowerGameGlobalController(pe));
 }

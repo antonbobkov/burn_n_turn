@@ -4,7 +4,7 @@
 #include "entities.h"
 #include "smart_pointer.h"
 
-struct BasicController;
+struct EntityListController;
 struct AdvancedController;
 
 /** Power-up state: named float/unsigned/bool maps, nNum; += merges, Add
@@ -55,10 +55,10 @@ struct ChainExplosion : virtual public AnimationOnce,
 
   Chain ch;
 
-  SSP<BasicController> pBc;
+  SSP<EntityListController> pBc;
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
-                 smart_pointer<BasicController> pBc_, Chain ch_ = Chain())
+                 smart_pointer<EntityListController> pBc_, Chain ch_ = Chain())
       : AnimationOnce(av), r(r_), r_in(r_), delta(delta_), pBc(this, pBc_),
         ch(ch_) {}
 
@@ -75,7 +75,7 @@ struct ChainExplosion : virtual public AnimationOnce,
 };
 
 struct KnightOnFire : public Critter {
-  SSP<BasicController> pBc;
+  SSP<EntityListController> pBc;
   unsigned nTimer, nTimer_i;
   Timer t;
   Chain c;
@@ -83,7 +83,7 @@ struct KnightOnFire : public Critter {
   /** Set fVel to random direction, scaled by fKnightFireSpeed. */
   void RandomizeVelocity();
 
-  KnightOnFire(const Critter &cr, smart_pointer<BasicController> pBc_,
+  KnightOnFire(const Critter &cr, smart_pointer<EntityListController> pBc_,
                unsigned nTimer_, Chain c_);
 
   /*virtual*/ void Update();

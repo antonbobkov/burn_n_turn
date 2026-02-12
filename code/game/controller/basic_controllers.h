@@ -1,8 +1,8 @@
-#ifndef TOWER_DEFENSE_SCREEN_CONTROLLERS_H
-#define TOWER_DEFENSE_SCREEN_CONTROLLERS_H
+#ifndef TOWER_DEFENSE_BASIC_CONTROLLERS_H
+#define TOWER_DEFENSE_BASIC_CONTROLLERS_H
 
 /* Include after GameController and TwrGlobalController are defined (e.g. from
- * tower_defense.h). */
+ * game.h). */
 #include "entities.h"
 #include "smart_pointer.h"
 
@@ -148,7 +148,7 @@ struct Countdown : public VisualEntity, public EventEntity {
 
 /** GameController with draw/update/consumable lists; Update runs Move, Update,
  * then draws by priority. */
-struct BasicController : public GameController {
+struct EntityListController : public GameController {
   std::list<ASSP<VisualEntity>> lsDraw;
   std::list<ASSP<EventEntity>> lsUpdate;
   std::list<ASSP<ConsumableEntity>> lsPpl;
@@ -166,9 +166,9 @@ struct BasicController : public GameController {
   /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
   void AddBackground(Color c);
 
-  BasicController(const BasicController &b);
+  EntityListController(const EntityListController &b);
   bool bNoRefresh;
-  BasicController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
+  EntityListController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                   Color c);
 
   /**
@@ -201,7 +201,7 @@ struct MouseCursor {
 };
 
 /** Controller for pause/main menu: MenuDisplay, resume position. */
-struct MenuController : public BasicController {
+struct MenuController : public EntityListController {
   int nResumePosition;
   SSP<MenuDisplay> pMenuDisplay;
 
@@ -221,10 +221,10 @@ struct MenuController : public BasicController {
   /*virtual*/ std::string GetControllerName() const { return "menu"; }
 };
 
-struct StartScreenController : public BasicController {
+struct StartScreenController : public EntityListController {
   StartScreenController(smart_pointer<TwrGlobalController> pGl_,
                         Rectangle rBound, Color c)
-      : BasicController(pGl_, rBound, c) {}
+      : EntityListController(pGl_, rBound, c) {}
 
   /** Advance to next screen and play start_game sound. */
   void Next();
@@ -247,7 +247,7 @@ struct SlimeUpdater : public VisualEntity {
 };
 
 /** Controller for buy-now screen: slime animations and timer. */
-struct BuyNowController : public BasicController {
+struct BuyNowController : public EntityListController {
   int t;
   std::vector<smart_pointer<Animation>> mSlimes;
   std::vector<fPoint> mSlimeVel;
@@ -278,7 +278,7 @@ struct BuyNowController : public BasicController {
   /*virtual*/ std::string GetControllerName() const { return "buy"; }
 };
 
-struct Cutscene : public BasicController {
+struct Cutscene : public EntityListController {
   SSP<FancyCritter> pCrRun;
   SSP<FancyCritter> pCrFollow;
 
@@ -302,7 +302,7 @@ struct Cutscene : public BasicController {
 };
 
 /** Controller that shows dragon score and exits on click or timer. */
-struct DragonScoreController : public BasicController {
+struct DragonScoreController : public EntityListController {
   Timer t;
   bool bClickToExit;
 
@@ -317,10 +317,11 @@ struct DragonScoreController : public BasicController {
   /*virtual*/ std::string GetControllerName() const { return "score"; }
 };
 
-/** BasicController that advances (Next) when only background is left or on
- * input. */
-struct AlmostBasicController : public BasicController {
-  AlmostBasicController(const BasicController &b) : BasicController(b) {}
+/** EntityListController that advances (Next) when only background is left or
+ * on input. */
+struct AutoAdvanceController : public EntityListController {
+  AutoAdvanceController(const EntityListController &b)
+      : EntityListController(b) {}
 
   /*virtual*/ void Update();
 

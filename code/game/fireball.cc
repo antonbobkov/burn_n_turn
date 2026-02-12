@@ -75,7 +75,7 @@ void KnightOnFire::RandomizeVelocity() {
 }
 
 KnightOnFire::KnightOnFire(const Critter &cr,
-                           smart_pointer<BasicController> pBc_,
+                           smart_pointer<EntityListController> pBc_,
                            unsigned nTimer_, Chain c_)
     : Critter(cr), pBc(this, pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
       t(nFramesInSecond / 5) {

@@ -36,7 +36,7 @@ struct GameController : virtual public SP_Info {
   virtual std::string GetControllerName() const { return "basic"; }
 };
 
-#include "screen_controllers.h"
+#include "controller/basic_controllers.h"
 
 struct TowerDataWrap;
 
@@ -104,17 +104,7 @@ struct TwrGlobalController : virtual public SP_Info {
 #include "critters.h"
 #include "dragon.h"
 #include "gameplay.h"
-#include "screen_controllers.h"
-
-/** Fancy road: draws tiled road image; needs AdvancedController for resources.
- */
-struct FancyRoad : public Road {
-  FancyRoad(const Road &rd, smart_pointer<AdvancedController> pAd_)
-      : Road(rd), pAd(this, pAd_) {}
-  SSP<AdvancedController> pAd;
-
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
-};
+#include "controller/basic_controllers.h"
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {
@@ -143,7 +133,7 @@ public:
 };
 
 /** Top-level tower game: owns TowerDataWrap, builds and runs level flow. */
-class TowerGameGlobalController : public GlobalController {
+class TowerGameGlobalController : public GameRunner {
   TowerDataWrap *pData;
 
 public:

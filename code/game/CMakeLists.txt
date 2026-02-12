@@ -7,7 +7,7 @@ add_library(GameCore STATIC
   entities.cc
   level.cc
   tutorial.cc
-  screen_controllers.cc
+  controller/basic_controllers.cc
   fireball.cc
   critters.cc
   critter_generators.cc

@@ -599,20 +599,20 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
   pMenu = pMenuHolder;
 
   // logo 1
-  smart_pointer<BasicController> pCnt0_1 = make_smart(new AlmostBasicController(
-      BasicController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt0_1 = make_smart(new AutoAdvanceController(
+      EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // logo 2
-  smart_pointer<BasicController> pCnt0_2 = make_smart(new AlmostBasicController(
-      BasicController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt0_2 = make_smart(new AutoAdvanceController(
+      EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // press start screen
-  smart_pointer<BasicController> pCnt1 =
+  smart_pointer<EntityListController> pCnt1 =
       make_smart(new StartScreenController(pSelf, rBound, Color(0, 0, 0)));
   // game over
-  smart_pointer<BasicController> pCnt2 = make_smart(new AlmostBasicController(
-      BasicController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt2 = make_smart(new AutoAdvanceController(
+      EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // you win!
-  smart_pointer<BasicController> pCnt3 =
-      make_smart(new BasicController(pSelf, rBound, Color(0, 0, 0)));
+  smart_pointer<EntityListController> pCnt3 =
+      make_smart(new EntityListController(pSelf, rBound, Color(0, 0, 0)));
   // score
   smart_pointer<DragonScoreController> pScore = make_smart(
       new DragonScoreController(pSelf, rBound, Color(0, 0, 0), true));
@@ -621,11 +621,11 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
       new DragonScoreController(pSelf, rBound, Color(0, 0, 0), false));
 
   // cutscenes
-  smart_pointer<BasicController> pCut1 =
+  smart_pointer<EntityListController> pCut1 =
       make_smart(new Cutscene(pSelf, rBound, "princess", "knight"));
-  smart_pointer<BasicController> pCut2 =
+  smart_pointer<EntityListController> pCut2 =
       make_smart(new Cutscene(pSelf, rBound, "knight", "dragon_walk_f", true));
-  smart_pointer<BasicController> pCut3 =
+  smart_pointer<EntityListController> pCut3 =
       make_smart(new Cutscene(pSelf, rBound, "dragon_walk", "mage"));
 
   smart_pointer<SoundControls> pBckgMusic =

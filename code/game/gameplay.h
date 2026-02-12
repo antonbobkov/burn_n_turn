@@ -83,7 +83,7 @@ struct PositionTracker {
 
 /** Main game controller: castles, roads, dragon, generators, bonuses, input.
  */
-struct AdvancedController : public BasicController {
+struct AdvancedController : public EntityListController {
   std::vector<ASSP<Castle>> vCs;
   std::vector<ASSP<Road>> vRd;
   std::vector<ASSP<Dragon>> vDr;

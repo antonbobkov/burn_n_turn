@@ -123,7 +123,7 @@ fPoint PositionTracker::GetFlightDirection(fPoint fDragonPos) {
 }
 
 AdvancedController::AdvancedController(const AdvancedController &a)
-    : BasicController(a), tr(a.tr), t(a.t), bCh(a.bCh), nLvl(a.nLvl),
+    : EntityListController(a), tr(a.tr), t(a.t), bCh(a.bCh), nLvl(a.nLvl),
       nSlimeNum(a.nSlimeNum), bPaused(a.bPaused), tLoseTimer(a.tLoseTimer),
       bGhostTime(a.bGhostTime), tBlink(a.tBlink), bBlink(a.bBlink), pGr(a.pGr),
       tStep(a.tStep), bLeft(a.bLeft), pSc(a.pSc), bLeftDown(a.bLeftDown),
@@ -249,7 +249,7 @@ struct BonusDrawer : public VisualEntity {
 AdvancedController::AdvancedController(smart_pointer<TwrGlobalController> pGl_,
                                        Rectangle rBound, Color c,
                                        const LevelLayout &lvl)
-    : BasicController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
+    : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
@@ -679,7 +679,7 @@ void AdvancedController::MegaGeneration(Point p) {
     }
   }
 
-  BasicController::Update();
+  EntityListController::Update();
 
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS

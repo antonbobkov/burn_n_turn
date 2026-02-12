@@ -71,7 +71,7 @@ struct ProgramEngine {
   FileManager *GetFileManager() const { return p_fm; }
 };
 
-class GlobalController : virtual public SP_Info {
+class GameRunner : virtual public SP_Info {
 public:
   virtual void Update() = 0;
 
@@ -87,6 +87,6 @@ public:
 
 } // namespace Gui
 
-smart_pointer<Gui::GlobalController> GetGlobalController(Gui::ProgramEngine pe);
+smart_pointer<Gui::GameRunner> GetGameRunner(Gui::ProgramEngine pe);
 
 #endif // GAME_RUNNER_INTERFACE_H

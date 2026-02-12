@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);
 
-    smart_pointer<GlobalController> pGl = GetGlobalController(pe);
+    smart_pointer<GameRunner> pGl = GetGameRunner(pe);
 
     std::map<int, GuiKeyType> vSdlMapper;
     SdlMapKeys(vSdlMapper);

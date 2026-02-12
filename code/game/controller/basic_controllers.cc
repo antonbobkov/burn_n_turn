@@ -104,15 +104,15 @@ void Countdown::Draw(smart_pointer<ScalingDrawer> pDr) {
   pNum->DrawNumber(nTime, Point(22, 2));
 }
 
-void BasicController::AddV(smart_pointer<VisualEntity> pVs) {
+void EntityListController::AddV(smart_pointer<VisualEntity> pVs) {
   lsDraw.push_back(ASSP<VisualEntity>(this, pVs));
 }
 
-void BasicController::AddE(smart_pointer<EventEntity> pEv) {
+void EntityListController::AddE(smart_pointer<EventEntity> pEv) {
   lsUpdate.push_back(ASSP<EventEntity>(this, pEv));
 }
 
-void BasicController::AddBackground(Color c) {
+void EntityListController::AddBackground(Color c) {
   Rectangle r = rBound.sz;
   r.sz.x *= pGl->pDr->nFactor;
   r.sz.y *= pGl->pDr->nFactor;
@@ -123,20 +123,20 @@ void BasicController::AddBackground(Color c) {
   AddV(pBkg);
 }
 
-BasicController::BasicController(const BasicController &b)
+EntityListController::EntityListController(const EntityListController &b)
     : GameController(b), bNoRefresh(b.bNoRefresh) {
   CopyArrayASSP(this, b.lsDraw, lsDraw);
   CopyArrayASSP(this, b.lsUpdate, lsUpdate);
   CopyArrayASSP(this, b.lsPpl, lsPpl);
 }
 
-BasicController::BasicController(smart_pointer<TwrGlobalController> pGl_,
+EntityListController::EntityListController(smart_pointer<TwrGlobalController> pGl_,
                                  Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
 }
 
-void BasicController::Update() {
+void EntityListController::Update() {
   CleanUp(lsUpdate);
   CleanUp(lsDraw);
   CleanUp(lsPpl);
@@ -179,14 +179,14 @@ void BasicController::Update() {
     pGl->pGraph->RefreshAll();
 }
 
-void BasicController::OnKey(GuiKeyType c, bool bUp) {
+void EntityListController::OnKey(GuiKeyType c, bool bUp) {
   if (bUp)
     return;
 
   pGl->Next();
 }
 
-void BasicController::OnMouseDown(Point pPos) { pGl->Next(); }
+void EntityListController::OnMouseDown(Point pPos) { pGl->Next(); }
 
 void MouseCursor::DrawCursor() {
   Index img;
@@ -208,7 +208,7 @@ void MouseCursor::SetCursorPos(Point pPos) { pCursorPos = pPos; }
 
 MenuController::MenuController(smart_pointer<TwrGlobalController> pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
-    : BasicController(pGl_, rBound, c), nResumePosition(nResumePosition_),
+    : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
       pMenuDisplay(this, 0), mc(pGl->pr("claw"), Point(), pGl.get()),
       pHintText(this, 0), pOptionText(this, 0) {
   bNoRefresh = true;
@@ -234,7 +234,7 @@ void MenuController::OnMouse(Point pPos) {}
 void MenuController::OnMouseDown(Point pPos) {}
 
 void MenuController::Update() {
-  BasicController::Update();
+  EntityListController::Update();
 
   if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
     if (!pOptionText.is_null())
@@ -447,7 +447,7 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
 
 BuyNowController::BuyNowController(smart_pointer<TwrGlobalController> pGl_,
                                    Rectangle rBound, Color c)
-    : BasicController(pGl_, rBound, c), t(120), nSlimeCount(50),
+    : EntityListController(pGl_, rBound, c), t(120), nSlimeCount(50),
       tVel(nFramesInSecond / 2) {
   for (int i = 0; i < nSlimeCount; i++) {
     mSlimes.push_back(make_smart(
@@ -475,7 +475,7 @@ void BuyNowController::DrawSlimes() {
 }
 
 void BuyNowController::Update() {
-  BasicController::Update();
+  EntityListController::Update();
 
   if (tVel.Tick()) {
     for (unsigned i = 0; i < mSlimes.size(); i++)
@@ -497,12 +497,12 @@ void BuyNowController::Update() {
 
 void BuyNowController::OnKey(GuiKeyType c, bool bUp) {
   if (t < 0)
-    BasicController::OnKey(c, bUp);
+    EntityListController::OnKey(c, bUp);
 }
 
 void BuyNowController::OnMouseDown(Point pPos) {
   if (t < 0)
-    BasicController::OnMouseDown(pPos);
+    EntityListController::OnMouseDown(pPos);
 }
 
 void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -511,7 +511,7 @@ void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
 
 Cutscene::Cutscene(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
-    : BasicController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
+    : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
       pCrFollow(this, 0), bRelease(false), tm(nFramesInSecond / 5),
       Beepy(true) {
   ImageSequence seq1 = pGl_->pr(sRun);
@@ -561,7 +561,7 @@ void Cutscene::Update() {
     Beepy = !Beepy;
   }
 
-  BasicController::Update();
+  EntityListController::Update();
 }
 
 void Cutscene::OnKey(GuiKeyType c, bool bUp) {
@@ -577,7 +577,7 @@ void DragonScoreController::OnMouseDown(Point pPos) {
 DragonScoreController::DragonScoreController(
     smart_pointer<TwrGlobalController> pGl_, Rectangle rBound, Color c,
     bool bScoreShow)
-    : BasicController(pGl_, rBound, c), t(5 * nFramesInSecond),
+    : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {
     AddV(make_smart(new HighScoreShower(pGl, rBound)));
@@ -604,10 +604,10 @@ void DragonScoreController::Update() {
     }
   }
 
-  BasicController::Update();
+  EntityListController::Update();
 }
 
-void AlmostBasicController::Update() {
+void AutoAdvanceController::Update() {
   CleanUp(lsUpdate);
   CleanUp(lsDraw);
 
@@ -616,12 +616,12 @@ void AlmostBasicController::Update() {
     return;
   }
 
-  BasicController::Update();
+  EntityListController::Update();
 }
 
-void AlmostBasicController::OnKey(GuiKeyType c, bool bUp) {
+void AutoAdvanceController::OnKey(GuiKeyType c, bool bUp) {
   if (!bUp)
     pGl->Next();
 }
 
-void AlmostBasicController::OnMouseDown(Point pPos) { pGl->Next(); }
+void AutoAdvanceController::OnMouseDown(Point pPos) { pGl->Next(); }
