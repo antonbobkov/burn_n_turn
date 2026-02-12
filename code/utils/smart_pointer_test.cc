@@ -62,6 +62,79 @@ TEST_CASE("smart_pointer operator== and operator!=", "[smart_pointer]") {
 /* Raw-pointer construction is disallowed: smart_pointer<T> p(new T())
  * does not compile; use make_smart(new T()) instead. */
 
+/* Helper: get ref count for a smart_pointer's pointee (TestObj inherits
+ * SP_Info so the raw pointer is the SP_Info). */
+static unsigned ref_count(smart_pointer<TestObj> &p) {
+  if (p.is_null())
+    return 0;
+  return Inspector::GetCounter(static_cast<SP_Info *>(p.get()));
+}
+
+TEST_CASE("smart_pointer ref count is 1 after make_smart", "[smart_pointer]") {
+  smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(10));
+  REQUIRE(ref_count(p) == 1);
+}
+
+TEST_CASE("smart_pointer ref count increases on copy, decreases on release",
+          "[smart_pointer]") {
+  smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(20));
+  REQUIRE(ref_count(p) == 1);
+  {
+    smart_pointer<TestObj> q(p);
+    REQUIRE(ref_count(p) == 2);
+    REQUIRE(ref_count(q) == 2);
+  }
+  REQUIRE(ref_count(p) == 1);
+}
+
+TEST_CASE("smart_pointer ref count updates on assignment", "[smart_pointer]") {
+  smart_pointer<TestObj> a = make_smart<TestObj>(new TestObj(1));
+  smart_pointer<TestObj> b = make_smart<TestObj>(new TestObj(2));
+  REQUIRE(ref_count(a) == 1);
+  REQUIRE(ref_count(b) == 1);
+  b = a;
+  REQUIRE(ref_count(a) == 2);
+  REQUIRE(ref_count(b) == 2);
+  a = smart_pointer<TestObj>();
+  REQUIRE(ref_count(b) == 1);
+}
+
+TEST_CASE("smart_pointer object cleaned up when last reference goes away",
+          "[smart_pointer]") {
+  int before = nGlobalSuperMegaCounter;
+  {
+    smart_pointer<TestObj> p =
+        make_smart<TestObj>(new TestObj(100));
+    REQUIRE(nGlobalSuperMegaCounter == before + 1);
+  }
+  REQUIRE(nGlobalSuperMegaCounter == before);
+}
+
+TEST_CASE("smart_pointer multiple copies all released then object deleted",
+          "[smart_pointer]") {
+  int before = nGlobalSuperMegaCounter;
+  {
+    smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(5));
+    smart_pointer<TestObj> q = p;
+    smart_pointer<TestObj> r = q;
+    REQUIRE(ref_count(p) == 3);
+    REQUIRE(nGlobalSuperMegaCounter == before + 1);
+    p = smart_pointer<TestObj>();
+    q = smart_pointer<TestObj>();
+    REQUIRE(nGlobalSuperMegaCounter == before + 1);
+  }
+  REQUIRE(nGlobalSuperMegaCounter == before);
+}
+
+TEST_CASE("smart_pointer self-assign leaves ref count one", "[smart_pointer]") {
+  smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(9));
+  REQUIRE(ref_count(p) == 1);
+  p = p;
+  REQUIRE(ref_count(p) == 1);
+  REQUIRE(!p.is_null());
+  REQUIRE(p->value == 9);
+}
+
 /* Forward declaration: smart_pointer now supports incomplete types by storing
  * SP_Info* separately; only make_smart and SSP copy need the complete type. */
 struct Incomplete;

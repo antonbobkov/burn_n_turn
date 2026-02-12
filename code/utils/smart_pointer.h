@@ -101,6 +101,9 @@ template <class T> class smart_pointer {
   }
 
   smart_pointer<T> &EQUAL(T *pPointTo_, SP_Info *pInfo) {
+    if (pPointToSPInfo == pInfo)
+      return *this;
+
     if (pPointToSPInfo)
       DELETE_REGULAR_POINTER(pPointToSPInfo);
 
