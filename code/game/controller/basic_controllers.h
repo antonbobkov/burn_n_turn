@@ -4,6 +4,7 @@
 /* Include after GameController and TwrGlobalController are defined (e.g. from
  * game.h). */
 #include "entities.h"
+#include "gui_key_type.h"
 #include "smart_pointer.h"
 
 /** Controller that draws a single full-screen image and advances on key. */

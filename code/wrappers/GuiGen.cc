@@ -3,62 +3,11 @@
 #include "GuiGen.h"
 #include "smart_pointer.h"
 
-#include "General.h"
-
 namespace Gui {
-void fPoint::Normalize(float f) {
-  if (x == 0 && y == 0)
-    return;
-
-  (*this) *= f / Length();
-}
-
-bool InsideRectangle(Rectangle r, Point p) // is the point inside the rectangle?
-{
-  return r.p.x <= p.x && p.x < r.p.x + r.sz.x && r.p.y <= p.y &&
-         p.y < r.p.y + r.sz.y;
-}
-
-Point Center(Rectangle r) {
-  return Point(r.p.x + r.sz.x / 2, r.p.y + r.sz.y / 2);
-}
-
-Point RandomPnt(Rectangle r) {
-  return Point(r.p.x + rand() % (r.sz.x), r.p.y + rand() % (r.sz.y));
-}
-
-Rectangle operator+(const Rectangle &r, const Point &p) // displace
-{
-  return Rectangle(r.p + p, r.sz);
-}
-
-Rectangle operator+(const Rectangle &r1, const Rectangle &r2) {
-  return Rectangle(r1.p + r2.p, Size(r1.sz.x + r2.sz.x, r1.sz.y + r2.sz.y));
-}
-
-Rectangle
-Intersect(const Rectangle &r1,
-          const Rectangle &r2) // return intersection of two rectangles
-{
-  Crd l = Gmax(r1.Left(), r2.Left());
-  Crd r = Gmin(r1.Right(), r2.Right());
-  Crd t = Gmax(r1.Top(), r2.Top());
-  Crd b = Gmin(r1.Bottom(), r2.Bottom());
-
-  return Rectangle(l, t, r, b);
-}
-
 std::string ColorToString(Color c) {
   std::ostringstream ostr;
   ostr << "(" << c.R << ", " << c.G << ", " << c.B
        << ")"; // Looks like (255, 0, 77)
-  return ostr.str();
-}
-
-std::string RectangleToString(Rectangle r) {
-  std::ostringstream ostr;
-  ostr << "(" << r.p.x << ", " << r.p.y << ", " << r.sz.x << ", " << r.sz.y
-       << ")"; // Looks like (10, 0, 5, 5)
   return ostr.str();
 }
 

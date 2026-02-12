@@ -1,8 +1,8 @@
 #ifndef GAME_RUNNER_INTERFACE_H
 #define GAME_RUNNER_INTERFACE_H
 
-#include "General.h"
 #include "event.h"
+#include "gui_key_type.h"
 #include "smart_pointer.h"
 
 #include "GuiGen.h"

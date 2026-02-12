@@ -1,8 +1,9 @@
 #ifndef TOWER_DEFENSE_GAMEPLAY_H
 #define TOWER_DEFENSE_GAMEPLAY_H
 
-#include "smart_pointer.h"
 #include "controller/menu_controller.h"
+#include "gui_key_type.h"
+#include "smart_pointer.h"
 
 /** Included after critter_generators.h and dragon.h from tower_defense.h. */
 struct AdvancedController;

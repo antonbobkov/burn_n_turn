@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(Wrappers LANGUAGES CXX)
 
 add_library(GuiGen
+  geometry.cc
+  geometry.h
   GuiGenHdr.h
   GuiGen.h
   GuiGen.cc

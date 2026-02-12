@@ -1,5 +1,6 @@
 #include "game.h"
 #include "smart_pointer.h"
+#include "string_utils.h"
 
 void BackgroundMusicPlayer::ToggleOff() {
   if (!bOff) {

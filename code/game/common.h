@@ -1,8 +1,8 @@
 #ifndef TOWER_DEFENSE_COMMON_H
 #define TOWER_DEFENSE_COMMON_H
 
-#include "General.h"
 #include "GuiGen.h"
+#include "gui_key_type.h"
 #include "SuiGen.h"
 
 #include <algorithm>

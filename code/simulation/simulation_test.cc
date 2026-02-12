@@ -3,8 +3,8 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "General.h"
 #include "GuiMock.h"
+#include "gui_key_type.h"
 #include "MessageWriter.h"
 #include "SuiMock.h"
 #include "file_utils.h"

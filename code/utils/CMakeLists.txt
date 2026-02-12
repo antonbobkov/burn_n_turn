@@ -12,8 +12,8 @@ add_library(Utils
   timer.cc
   index.h
   index.cc
-  General.h
-  General.cc
+  math_utils.h
+  string_utils.h
   smart_pointer.h
   smart_pointer.cc
 )

@@ -5,8 +5,9 @@
  * submenus; MenuController ties MenuDisplay and cursor to EntityListController.
  */
 
-#include "entities.h"
 #include "controller/basic_controllers.h"
+#include "entities.h"
+#include "gui_key_type.h"
 
 struct MenuDisplay;
 struct MenuController;

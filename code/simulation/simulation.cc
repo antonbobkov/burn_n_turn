@@ -1,8 +1,8 @@
 #include "simulation.h"
 #include "smart_pointer.h"
 
-#include "General.h"
 #include "MessageWriter.h"
+#include "gui_key_type.h"
 #include "file_utils.h"
 #include "game.h"
 #include "game_runner_interface.h"
