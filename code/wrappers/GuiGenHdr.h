@@ -3,8 +3,12 @@
  * Declares: Color, Point, fPoint, Size, Rectangle;
  * Matrix/Image/GraphicalInterface exceptions; Image and
  * GraphicalInterface<ImageHndl>; SimpleGraphicalInterface, CameraControl,
- * Scale; FontWriter, MouseTracker; helpers (InsideRectangle, etc.).
+ * Scale; helpers (InsideRectangle, etc.).
+ * FontWriter is in font_writer.h; MouseTracker is in mouse_utils.h.
  */
+
+#ifndef TOWER_DEFENSE_GUIGENHDR_H
+#define TOWER_DEFENSE_GUIGENHDR_H
 
 #include <cmath>
 #include <list>
@@ -414,38 +418,6 @@ public:
   Rectangle fromR(Rectangle r);
 };
 
-/* Renders text using a font (FilePath + name), bitmap symbols, and a
- * GraphicalInterface<Index>; GetSize, DrawWord/DrawColorWord, Recolor, SetGap.
- */
-struct FontWriter : virtual public SP_Info {
-  std::vector<int> vImgIndx;
-  std::vector<Index> vImg;
-  smart_pointer<GraphicalInterface<Index>> pGr;
-
-  Size szSymbol;
-  Color clSymbol;
-  int nGap;
-
-  FontWriter(FilePath *fp, std::string sFont,
-             smart_pointer<GraphicalInterface<Index>> pGr_, unsigned nZoom = 1);
-
-  Size GetSize(std::string s);
-
-  std::string GetNumber(int n, unsigned nDigits = 0);
-
-  // NOTE: bug - colored words have non-transparent background
-  void DrawColorWord(std::string s, Point p, Color c = Color(0, 0, 0, 0),
-                     bool bCenter = false, bool bRefresh = false);
-
-  void DrawWord(std::string s, Point p, bool bCenter = false,
-                bool bRefresh = false) {
-    DrawColorWord(s, p, Color(0, 0, 0, 0), bCenter, bRefresh);
-  }
-
-  void Recolor(Color c);
-  void SetGap(int nG);
-};
-
 template <class T>
 void ConvertImage(smart_pointer<GraphicalInterface<T>> pGr, std::string strImg,
                   std::string strExtFrom, std::string strExtTo) {
@@ -454,31 +426,6 @@ void ConvertImage(smart_pointer<GraphicalInterface<T>> pGr, std::string strImg,
   pGr->DeleteImage(img);
 }
 
-/* Tracks mouse position and relative movement: OnMouse(Point),
- * GetRelMovement(). */
-struct MouseTracker {
-  Point pLastRead;
-  Point pCurPos;
-
-  bool bInitialized;
-
-  MouseTracker() : bInitialized(false) {}
-
-  void OnMouse(Point p) {
-    pCurPos = p;
-    if (!bInitialized) {
-      bInitialized = true;
-      pLastRead = p;
-    }
-  }
-
-  Point GetRelMovement() {
-    if (!bInitialized)
-      return Point(0, 0);
-
-    Point pRet = pCurPos - pLastRead;
-    pLastRead = pCurPos;
-    return pRet;
-  }
-};
 } // namespace Gui
+
+#endif

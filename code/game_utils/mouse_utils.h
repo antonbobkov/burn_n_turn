@@ -3,8 +3,7 @@
 
 /* MouseCursor, PositionTracker, TrackballTracker: cursor image/position,
  * position tracking for camera/flight, trackball-style steering.
- * Uses geometry.h for Point, fPoint. Includer must have MouseTracker in
- * scope (e.g. common.h or full Gui headers) before this header. */
+ * Uses geometry.h for Point, fPoint. Defines MouseTracker. */
 
 #include "Preloader.h"
 #include "geometry.h"
@@ -13,9 +12,39 @@
 #include <list>
 
 namespace Gui {
+
 template <class T>
 class GraphicalInterface;
-}
+
+/* Tracks mouse position and relative movement: OnMouse(Point),
+ * GetRelMovement(). */
+struct MouseTracker {
+  Point pLastRead;
+  Point pCurPos;
+
+  bool bInitialized;
+
+  MouseTracker() : bInitialized(false) {}
+
+  void OnMouse(Point p) {
+    pCurPos = p;
+    if (!bInitialized) {
+      bInitialized = true;
+      pLastRead = p;
+    }
+  }
+
+  Point GetRelMovement() {
+    if (!bInitialized)
+      return Point(0, 0);
+
+    Point pRet = pCurPos - pLastRead;
+    pLastRead = pCurPos;
+    return pRet;
+  }
+};
+
+} // namespace Gui
 
 using Gui::fPoint;
 using Gui::MouseTracker;

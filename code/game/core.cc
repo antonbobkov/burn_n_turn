@@ -1,6 +1,7 @@
 #include "core.h"
 #include "game.h"
 #include "controller/level_controller.h"
+#include "font_writer.h"
 #include "smart_pointer.h"
 
 /** VisualEntity that draws slime animations for the buy-now screen. */

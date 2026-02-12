@@ -2,13 +2,14 @@
 #define TOWER_DEFENSE_GAME_H
 
 #include "common.h"
-#include "gui_key_type.h"
-#include "smart_pointer.h"
 #include "core.h"
 #include "entities.h"
 #include "file_utils.h"
 #include "fireball.h"
+#include "font_writer.h"
+#include "gui_key_type.h"
 #include "level.h"
+#include "smart_pointer.h"
 #include "tutorial.h"
 
 /** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
