@@ -92,37 +92,28 @@ template <class T> class smart_pointer {
   T *pPointTo;
   SP_Info *pPointToSPInfo;
 
-  void CONSTRUCT(T *pPointTo_, SP_Info *pInfo) {
+  void CONSTRUCT(T *pPointTo_, SP_Info *pInfo_) {
     pPointTo = pPointTo_;
-    pPointToSPInfo = pInfo;
+    pPointToSPInfo = pInfo_;
 
     if (pPointToSPInfo)
       ++pPointToSPInfo->_SP_INFO_COUNTER;
   }
 
-  smart_pointer<T> &ASSIGN_TO(T *pPointTo_, SP_Info *pInfo) {
-    if (pPointToSPInfo == pInfo)
+  smart_pointer<T> &ASSIGN_TO(T *pPointTo_, SP_Info *pInfo_) {
+    if (pPointToSPInfo == pInfo_)
       return *this;
 
     if (pPointToSPInfo)
       DELETE_REGULAR_POINTER(pPointToSPInfo);
 
-    pPointTo = pPointTo_;
-    pPointToSPInfo = pInfo;
-
-    if (pPointToSPInfo)
-      ++pPointToSPInfo->_SP_INFO_COUNTER;
+    CONSTRUCT(pPointTo_, pInfo_);
 
     return *this;
   }
 
-  /* Only make_smart calls this; T is complete there so T* -> SP_Info* is ok.
-   */
-  explicit smart_pointer(T *pPointTo_)
-      : pPointTo(pPointTo_), pPointToSPInfo(pPointTo_) {
-    if (pPointToSPInfo)
-      ++pPointToSPInfo->_SP_INFO_COUNTER;
-  }
+  /* Only make_smart calls this */
+  smart_pointer(T *pPointTo_, SP_Info *pInfo_) { CONSTRUCT(pPointTo_, pInfo_); }
 
 public:
   smart_pointer() : pPointTo(0), pPointToSPInfo(0) {}
@@ -171,7 +162,7 @@ public:
 };
 
 template <class T> smart_pointer<T> make_smart(T *pPointTo_) {
-  return smart_pointer<T>(pPointTo_);
+  return smart_pointer<T>(pPointTo_, static_cast<SP_Info *>(pPointTo_));
 }
 
 /* Base for "permanent" (non-owning) smart pointers: registered in the pointee's
@@ -255,7 +246,9 @@ public:
   }
 
   SSP<T> &operator=(T *pPointTo_) { return ASSIGN_TO(pPointTo_); }
-  SSP<T> &operator=(const SSP<T> &pPermPnt) { return ASSIGN_TO(pPermPnt.pPointTo); }
+  SSP<T> &operator=(const SSP<T> &pPermPnt) {
+    return ASSIGN_TO(pPermPnt.pPointTo);
+  }
 
   template <class N> SSP<T> &operator=(const SSP<N> &pPermPnt) {
     return ASSIGN_TO(pPermPnt.pPointTo);
