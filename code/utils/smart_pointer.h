@@ -9,6 +9,7 @@
  */
 
 #include <list>
+#include <map>
 #include <set>
 #include <string>
 
@@ -29,6 +30,8 @@ inline void DELETE_REGULAR_POINTER(SP_Info *);
 inline void DELETE_PERMANENT_POINTER(SP_Info *, SSP_Base *);
 
 extern int nGlobalSuperMegaCounter;
+
+extern std::map<std::string, int> g_smart_pointer_count;
 
 /* Mix-in base for reference-counted objects: holds ref count, mark, and sets of
  * SSP_Base pointers that reference this object. smart_pointer/SSP use it. */
@@ -63,6 +66,8 @@ public:
     ++nGlobalSuperMegaCounter;
   }
 
+  virtual std::string get_class_name() { return ""; }
+
   virtual ~SP_Info() { --nGlobalSuperMegaCounter; }
 };
 
@@ -72,6 +77,7 @@ inline void CHECK_DELETION(SP_Info *pThis) {
 }
 
 inline void DELETE_REGULAR_POINTER(SP_Info *pThis) {
+  --g_smart_pointer_count[pThis->get_class_name()];
   --(pThis->_SP_INFO_COUNTER);
   CHECK_DELETION(pThis);
 }
@@ -96,8 +102,10 @@ template <class T> class smart_pointer {
     pPointTo = pPointTo_;
     pPointToSPInfo = pInfo_;
 
-    if (pPointToSPInfo)
+    if (pPointToSPInfo) {
+      ++g_smart_pointer_count[pPointToSPInfo->get_class_name()];
       ++pPointToSPInfo->_SP_INFO_COUNTER;
+    }
   }
 
   smart_pointer<T> &ASSIGN_TO(T *pPointTo_, SP_Info *pInfo_) {

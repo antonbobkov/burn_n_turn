@@ -13,8 +13,11 @@
 #include "smart_pointer.h"
 
 #include <catch2/catch.hpp>
+#include <algorithm>
+#include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace Gui;
 
@@ -156,5 +159,14 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     REQUIRE(b_exit);
   }
 
-  // REQUIRE(nGlobalSuperMegaCounter == counter_before);
+  std::vector<std::pair<std::string, int>> nonzero;
+  for (const auto &entry : g_smart_pointer_count) {
+    if (entry.second != 0)
+      nonzero.push_back({entry.first, entry.second});
+  }
+  std::sort(nonzero.begin(), nonzero.end(),
+            [](const auto &a, const auto &b) { return a.second > b.second; });
+  for (const auto &p : nonzero)
+    std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
+              << "\n";
 }

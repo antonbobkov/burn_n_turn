@@ -4,6 +4,8 @@
 
 int nGlobalSuperMegaCounter = 0;
 
+std::map<std::string, int> g_smart_pointer_count;
+
 void CleanIslandSeeded(SP_Info *pHd) {
   std::vector<SP_Info *> v;
   v.push_back(pHd);

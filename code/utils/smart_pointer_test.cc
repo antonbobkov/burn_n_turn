@@ -10,6 +10,7 @@ struct TestObj : SP_Info {
   int value;
   TestObj() : SP_Info(), value(0) {}
   explicit TestObj(int v) : SP_Info(), value(v) {}
+  std::string get_class_name() override { return "TestObj"; }
 };
 
 TEST_CASE("smart_pointer default construction", "[smart_pointer]") {
@@ -132,6 +133,32 @@ TEST_CASE("smart_pointer self-assign leaves ref count one", "[smart_pointer]") {
   REQUIRE(ref_count(p) == 1);
   REQUIRE(!p.is_null());
   REQUIRE(p->value == 9);
+}
+
+TEST_CASE("smart_pointer class name count increments on construct",
+          "[smart_pointer][class_name]") {
+  REQUIRE(g_smart_pointer_count["TestObj"] == 0);
+  smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(1));
+  REQUIRE(g_smart_pointer_count["TestObj"] == 1);
+  {
+    smart_pointer<TestObj> q(p);
+    REQUIRE(g_smart_pointer_count["TestObj"] == 2);
+  }
+  REQUIRE(g_smart_pointer_count["TestObj"] == 1);
+  p = smart_pointer<TestObj>();
+  REQUIRE(g_smart_pointer_count["TestObj"] == 0);
+}
+
+TEST_CASE("smart_pointer class name count on assignment", "[smart_pointer][class_name]") {
+  smart_pointer<TestObj> a = make_smart<TestObj>(new TestObj(1));
+  smart_pointer<TestObj> b = make_smart<TestObj>(new TestObj(2));
+  REQUIRE(g_smart_pointer_count["TestObj"] == 2);
+  b = a;
+  REQUIRE(g_smart_pointer_count["TestObj"] == 2);
+  a = smart_pointer<TestObj>();
+  REQUIRE(g_smart_pointer_count["TestObj"] == 1);
+  b = smart_pointer<TestObj>();
+  REQUIRE(g_smart_pointer_count["TestObj"] == 0);
 }
 
 /* Forward declaration: smart_pointer now supports incomplete types by storing
