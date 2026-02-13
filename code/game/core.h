@@ -33,12 +33,13 @@ struct Drawer : virtual public SP_Info {
   SSP<Graphic> pGr;
 
   Drawer() : pGr(this, 0) {}
-
+  std::string get_class_name() override { return "Drawer"; }
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
 
 /** Drawer that scales images by nFactor and uses cTr as transparency key. */
 struct ScalingDrawer : public Drawer {
+  std::string get_class_name() override { return "ScalingDrawer"; }
   unsigned nFactor;
   Color cTr;
 
@@ -58,6 +59,7 @@ struct ScalingDrawer : public Drawer {
 /** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for
  * recolored text. */
 struct NumberDrawer : virtual public SP_Info {
+  std::string get_class_name() override { return "NumberDrawer"; }
   SSP<ScalingDrawer> pDr;
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
@@ -90,6 +92,7 @@ class SoundInterfaceProxy : virtual public SP_Info {
   SSP<Soundic> pSndRaw;
 
 public:
+  std::string get_class_name() override { return "SoundInterfaceProxy"; }
   SoundInterfaceProxy(smart_pointer<Soundic> pSndRaw_)
       : pSndRaw(this, pSndRaw_), bSoundOn(true) {}
 

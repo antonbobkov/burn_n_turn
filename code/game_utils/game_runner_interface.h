@@ -73,6 +73,7 @@ struct ProgramEngine {
 
 class GameRunner : virtual public SP_Info {
 public:
+  std::string get_class_name() override { return "GameRunner"; }
   virtual void Update() = 0;
 
   virtual void KeyDown(GuiKeyType nCode) {}

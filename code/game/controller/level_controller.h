@@ -21,6 +21,7 @@ struct Sliminess;
 /** Main game controller: castles, roads, dragon, generators, bonuses, input.
  */
 struct LevelController : public EntityListController {
+  std::string get_class_name() override { return "LevelController"; }
   std::vector<ASSP<Castle>> vCs;
   std::vector<ASSP<Road>> vRd;
   std::vector<ASSP<Dragon>> vDr;

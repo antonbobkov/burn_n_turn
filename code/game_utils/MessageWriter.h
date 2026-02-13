@@ -16,6 +16,7 @@ class MessageWriter : virtual public SP_Info {
   WriteType wt_def;
 
 public:
+  std::string get_class_name() override { return "MessageWriter"; }
   MessageWriter(WriteType wt_def_ = WT_DEBUG) : wt_def(wt_def_) {}
 
   virtual void Write(WriteType wt, std::string strMsg) = 0;
@@ -26,11 +27,13 @@ public:
 
 class EmptyWriter : public MessageWriter {
 public:
+  std::string get_class_name() override { return "EmptyWriter"; }
   /*virtual*/ void Write(WriteType wt, std::string strMsg) {}
 };
 
 class IoWriter : public MessageWriter {
 public:
+  std::string get_class_name() override { return "IoWriter"; }
   /*virtual*/ void Write(WriteType wt, std::string strMsg);
 };
 
@@ -38,6 +41,7 @@ class FileWriter : public MessageWriter {
   std::map<WriteType, std::string> mFiles;
 
 public:
+  std::string get_class_name() override { return "FileWriter"; }
   void AddFile(WriteType wt, std::string sFile);
   /*virtual*/ void Write(WriteType wt, std::string strMsg);
 };

@@ -55,6 +55,7 @@ std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
 /** Level road segment: vertical/horizontal, coordinate, bounds; Draw renders
  * gray bar. */
 struct Road : virtual public VisualEntity {
+  std::string get_class_name() override { return "Road"; }
   bool bVertical;
   unsigned nCoord;
   Rectangle rBound;

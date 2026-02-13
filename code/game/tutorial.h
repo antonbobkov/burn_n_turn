@@ -7,6 +7,7 @@
 /** Scrolling tutorial text; SetText queues sNewText and Update scrolls between
  * sText and sNewText. */
 struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
+  std::string get_class_name() override { return "TutorialTextEntity"; }
   float dPriority;
   Point pos;
 

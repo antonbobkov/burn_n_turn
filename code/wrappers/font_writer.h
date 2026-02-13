@@ -12,6 +12,7 @@
 namespace Gui {
 
 struct FontWriter : virtual public SP_Info {
+  std::string get_class_name() override { return "FontWriter"; }
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
   smart_pointer<GraphicalInterface<Index>> pGr;

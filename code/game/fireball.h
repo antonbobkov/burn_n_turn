@@ -10,6 +10,7 @@ struct LevelController;
 /** Power-up state: named float/unsigned/bool maps, nNum; += merges, Add
  * accumulates. */
 struct FireballBonus : virtual public Entity {
+  std::string get_class_name() override { return "FireballBonus"; }
   std::map<std::string, float> fMap;
   std::map<std::string, unsigned> uMap;
   std::map<std::string, bool> bMap;
@@ -50,6 +51,7 @@ struct Chain {
  * ChainExplosions via ch. */
 struct ChainExplosion : virtual public AnimationOnce,
                         virtual public PhysicalEntity {
+  std::string get_class_name() override { return "ChainExplosion"; }
   float r_in, r;
   float delta;
 
@@ -75,6 +77,7 @@ struct ChainExplosion : virtual public AnimationOnce,
 };
 
 struct KnightOnFire : public Critter {
+  std::string get_class_name() override { return "KnightOnFire"; }
   SSP<EntityListController> pBc;
   unsigned nTimer, nTimer_i;
   Timer t;
@@ -92,6 +95,7 @@ struct KnightOnFire : public Critter {
 /** Player fireball Critter; bThrough for passthrough, hits ConsumableEntities.
  */
 struct Fireball : public Critter {
+  std::string get_class_name() override { return "Fireball"; }
   SSP<LevelController> pBc;
   bool bThrough;
   FireballBonus fb;
@@ -111,6 +115,7 @@ struct Fireball : public Critter {
 
 /** FireballBonus that updates on a timer (e.g. temporary power-up). */
 struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
+  std::string get_class_name() override { return "TimedFireballBonus"; }
   Timer t;
 
   TimedFireballBonus(const FireballBonus &fb, unsigned nPeriod)
@@ -122,6 +127,7 @@ struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
 /** Fireball that orbits at fRadius (circular motion). */
 struct CircularFireball : virtual public Fireball,
                           virtual public TimedFireballBonus {
+  std::string get_class_name() override { return "CircularFireball"; }
   float fRadius;
   fPoint i_pos;
   Timer t;
@@ -137,6 +143,7 @@ struct CircularFireball : virtual public Fireball,
  */
 struct FireballBonusAnimation : public Animation,
                                 virtual public PhysicalEntity {
+  std::string get_class_name() override { return "FireballBonusAnimation"; }
   unsigned n;
   Timer tm;
   bool bBlink;

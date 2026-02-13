@@ -10,6 +10,7 @@ struct LevelController;
 
 /** Floating "+N" score text at a point; animates then removes. */
 struct BonusScore : public EventEntity, public VisualEntity {
+  std::string get_class_name() override { return "BonusScore"; }
   SSP<LevelController> pAc;
   std::string sText;
   unsigned nScore;
@@ -32,6 +33,7 @@ struct BonusScore : public EventEntity, public VisualEntity {
 };
 
 struct SoundControls : public EventEntity {
+  std::string get_class_name() override { return "SoundControls"; }
   BackgroundMusicPlayer &plr;
   int nTheme;
 
@@ -43,6 +45,7 @@ struct SoundControls : public EventEntity {
 
 /** Draws high score in a rectangle. */
 struct HighScoreShower : public VisualEntity {
+  std::string get_class_name() override { return "HighScoreShower"; }
   SSP<TwrGlobalController> pGl;
   Rectangle rBound;
 
@@ -53,6 +56,7 @@ struct HighScoreShower : public VisualEntity {
 };
 
 struct IntroTextShower : public VisualEntity {
+  std::string get_class_name() override { return "IntroTextShower"; }
   SSP<TwrGlobalController> pGl;
   Rectangle rBound;
 

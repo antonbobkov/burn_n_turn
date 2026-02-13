@@ -8,6 +8,7 @@ namespace Gui {
 
 template <class SndHndl> class SoundInterface : virtual public SP_Info {
 public:
+  std::string get_class_name() override { return "SoundInterface"; }
   virtual ~SoundInterface() {}
 
   virtual void DeleteSound(SndHndl snd) = 0;
@@ -21,6 +22,7 @@ public:
 
 template <class SndHndl>
 class SimpleSoundInterface : public SoundInterface<Index>, public IndexRemover {
+  std::string get_class_name() override { return "SimpleSoundInterface"; }
   smart_pointer<SoundInterface<SndHndl>> pSn;
 
   IndexKeeper<SndHndl> kp;
@@ -40,6 +42,7 @@ public:
 };
 
 template <class T> class DummySoundInterface : public SoundInterface<T> {
+  std::string get_class_name() override { return "DummySoundInterface"; }
   /*virtual*/ void DeleteSound(T snd){};
   /*virtual*/ T LoadSound(std::string sFile) { return T(); }
 

@@ -19,6 +19,7 @@ using Gui::Timer;
 
 /** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {
+  std::string get_class_name() override { return "SimpleController"; }
   Index nImage;
 
   SimpleController(smart_pointer<TwrGlobalController> pGraph,
@@ -32,6 +33,7 @@ struct SimpleController : public GameController {
 
 /** Controller that draws background + text that flashes every second. */
 struct FlashingController : public GameController {
+  std::string get_class_name() override { return "FlashingController"; }
   Index nImage, nText;
   unsigned nTimer;
   bool bShow;
@@ -48,6 +50,7 @@ struct FlashingController : public GameController {
 /** GameController with draw/update/consumable lists; Update runs Move, Update,
  * then draws by priority. */
 struct EntityListController : public GameController {
+  std::string get_class_name() override { return "EntityListController"; }
   std::list<ASSP<VisualEntity>> lsDraw;
   std::list<ASSP<EventEntity>> lsUpdate;
   std::list<ASSP<ConsumableEntity>> lsPpl;
@@ -84,6 +87,7 @@ struct EntityListController : public GameController {
 };
 
 struct StartScreenController : public EntityListController {
+  std::string get_class_name() override { return "StartScreenController"; }
   StartScreenController(smart_pointer<TwrGlobalController> pGl_,
                         Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
@@ -101,6 +105,7 @@ struct BuyNowController;
 
 /** Controller for buy-now screen: slime animations and timer. */
 struct BuyNowController : public EntityListController {
+  std::string get_class_name() override { return "BuyNowController"; }
   int t;
   std::vector<smart_pointer<Animation>> mSlimes;
   std::vector<fPoint> mSlimeVel;
@@ -132,6 +137,7 @@ struct BuyNowController : public EntityListController {
 };
 
 struct Cutscene : public EntityListController {
+  std::string get_class_name() override { return "Cutscene"; }
   SSP<FancyCritter> pCrRun;
   SSP<FancyCritter> pCrFollow;
 
@@ -156,6 +162,7 @@ struct Cutscene : public EntityListController {
 
 /** Controller that shows dragon score and exits on click or timer. */
 struct DragonScoreController : public EntityListController {
+  std::string get_class_name() override { return "DragonScoreController"; }
   Timer t;
   bool bClickToExit;
 
@@ -173,6 +180,7 @@ struct DragonScoreController : public EntityListController {
 /** EntityListController that advances (Next) when only background is left or
  * on input. */
 struct AutoAdvanceController : public EntityListController {
+  std::string get_class_name() override { return "AutoAdvanceController"; }
   AutoAdvanceController(const EntityListController &b)
       : EntityListController(b) {}
 

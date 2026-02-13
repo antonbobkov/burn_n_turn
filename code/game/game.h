@@ -15,6 +15,7 @@
 /** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
  * Fire, etc.). */
 struct GameController : virtual public SP_Info {
+  std::string get_class_name() override { return "GameController"; }
   SSP<TwrGlobalController> pGl;
 
   Rectangle rBound;
@@ -46,6 +47,7 @@ struct TowerDataWrap;
 /** Global game state: level storage, active controller, graphics/sound, score,
  * savable options, music. */
 struct TwrGlobalController : virtual public SP_Info {
+  std::string get_class_name() override { return "TwrGlobalController"; }
   std::vector<ASSP<GameController>> vCnt;
   unsigned nActive;
 
@@ -141,6 +143,7 @@ class TowerGameGlobalController : public GameRunner {
   TowerDataWrap *pData;
 
 public:
+  std::string get_class_name() override { return "TowerGameGlobalController"; }
   TowerGameGlobalController(ProgramEngine pe);
   ~TowerGameGlobalController();
 

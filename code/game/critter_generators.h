@@ -9,6 +9,7 @@ struct LevelController;
 
 /** Spawns skeleton knights on a timer at a position. */
 struct SkellyGenerator : public EventEntity {
+  std::string get_class_name() override { return "SkellyGenerator"; }
   Timer t;
   Point p;
 
@@ -21,6 +22,7 @@ struct SkellyGenerator : public EventEntity {
 
 /** Spawns knights along a path on a timer. */
 struct KnightGenerator : virtual public EventEntity {
+  std::string get_class_name() override { return "KnightGenerator"; }
   bool bFirst;
 
   float dRate;
@@ -46,6 +48,7 @@ struct KnightGenerator : virtual public EventEntity {
 
 /** Spawns princesses at a rate within bounds. */
 struct PrincessGenerator : virtual public EventEntity {
+  std::string get_class_name() override { return "PrincessGenerator"; }
   float dRate;
   Rectangle rBound;
   SSP<LevelController> pBc;
@@ -64,6 +67,7 @@ struct PrincessGenerator : virtual public EventEntity {
 };
 
 struct MageGenerator : virtual public EventEntity {
+  std::string get_class_name() override { return "MageGenerator"; }
   float dRate;
   Rectangle rBound;
   SSP<LevelController> pBc;
@@ -80,6 +84,7 @@ struct MageGenerator : virtual public EventEntity {
 
 /** Spawns traders at a rate within bounds. */
 struct TraderGenerator : virtual public EventEntity {
+  std::string get_class_name() override { return "TraderGenerator"; }
   float dRate;
   Rectangle rBound;
   SSP<LevelController> pBc;

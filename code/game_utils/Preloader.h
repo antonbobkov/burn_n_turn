@@ -55,6 +55,7 @@ struct SoundSequence {
 /** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
  */
 struct ImageSequence : virtual public SP_Info {
+  std::string get_class_name() override { return "ImageSequence"; }
   std::vector<Index> vImage;
   std::vector<unsigned> vIntervals;
   unsigned nActive;
@@ -143,6 +144,7 @@ public:
 /** Loads and caches images, sequences, and sounds by string key. */
 class Preloader : virtual public SP_Info {
 public:
+  std::string get_class_name() override { return "Preloader"; }
   Preloader(smart_pointer<GraphicalInterface<Index>> pGr_,
             smart_pointer<SoundInterface<Index>> pSn_, FilePath *fp);
 

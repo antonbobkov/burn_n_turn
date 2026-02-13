@@ -101,6 +101,7 @@ class SdlGraphicalInterface : public GraphicalInterface<SdlImage *> {
   void RefreshScreen();
 
 public:
+  std::string get_class_name() override { return "SdlGraphicalInterface"; }
   SDL_Window *pScreenWindow;
 
   SdlGraphicalInterface(Size sz_, bool bFullScreen = false,

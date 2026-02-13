@@ -13,6 +13,7 @@ class Event : virtual public SP_Info {
   virtual void Trigger() = 0;
 
 public:
+  std::string get_class_name() override { return "Event"; }
   virtual ~Event() {}
 };
 
@@ -20,6 +21,7 @@ void Trigger(smart_pointer<Event> pE);
 
 class EmptyEvent : public Event {
 public:
+  std::string get_class_name() override { return "EmptyEvent"; }
   /*virtual*/ void Trigger(){};
 };
 
@@ -27,6 +29,7 @@ class WriteEvent : public Event {
   std::string sText;
 
 public:
+  std::string get_class_name() override { return "WriteEvent"; }
   WriteEvent(std::string sText_) : sText(sText_) {}
   /*virtual*/ void Trigger() { std::cout << sText << "\n"; };
 };
@@ -35,6 +38,7 @@ template <class T> class TerminatorEvent : public Event {
   T *pObject;
 
 public:
+  std::string get_class_name() override { return "TerminatorEvent"; }
   TerminatorEvent(T *pObject_) : pObject(pObject_) {}
   /*virtual*/ void Trigger() { pObject->Terminate(); }
 };
@@ -48,6 +52,7 @@ template <class A, class B> class SwitchEvent : public Event {
   B &objNew;
 
 public:
+  std::string get_class_name() override { return "SwitchEvent"; }
   SwitchEvent(A &objCurr_, B &objNew_) : objCurr(objCurr_), objNew(objNew_) {}
   /*virtual*/ void Trigger() { objCurr = objNew; }
 };
@@ -62,6 +67,7 @@ template <class A, class B> class CpSwitchEvent : public Event {
   B objNew;
 
 public:
+  std::string get_class_name() override { return "CpSwitchEvent"; }
   CpSwitchEvent(A &objCurr_, B objNew_) : objCurr(objCurr_), objNew(objNew_) {}
   /*virtual*/ void Trigger() { objCurr = objNew; }
 };
@@ -72,6 +78,7 @@ CpSwitchEvent<A, B> *NewCpSwitchEvent(A &objCurr_, B objNew_) {
 }
 
 struct SequenceOfEvents : public Event {
+  std::string get_class_name() override { return "SequenceOfEvents"; }
   std::vector<smart_pointer<Event>> vEv;
   /*virtual*/ void Trigger();
   SequenceOfEvents() {}
@@ -95,6 +102,7 @@ class MakeSoundEvent : public Event {
   Index Snd;
 
 public:
+  std::string get_class_name() override { return "MakeSoundEvent"; }
   MakeSoundEvent(smart_pointer<SoundInterface<Index>> pSn_, Index Snd_)
       : pSn(pSn_.get()), Snd(Snd_) {}
   MakeSoundEvent(SoundInterface<Index> *pSn_, Index Snd_)

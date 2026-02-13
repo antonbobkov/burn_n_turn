@@ -6,6 +6,7 @@
 
 /** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {
+  std::string get_class_name() override { return "Entity"; }
   bool bExist;
   Entity() : bExist(true) {}
   virtual ~Entity() {}
@@ -13,16 +14,19 @@ struct Entity : virtual public SP_Info {
 
 /** Entity that can Move and Update each frame. */
 struct EventEntity : virtual public Entity {
+  std::string get_class_name() override { return "EventEntity"; }
   virtual void Move() {}
   virtual void Update() {}
 };
 
 /** Entity with a screen position (GetPosition). */
 struct ScreenEntity : virtual public Entity {
+  std::string get_class_name() override { return "ScreenEntity"; }
   virtual Point GetPosition() { return Point(0, 0); }
 };
 
 struct VisualEntity : virtual public ScreenEntity {
+  std::string get_class_name() override { return "VisualEntity"; }
   virtual void Draw(smart_pointer<ScalingDrawer> pDr) {}
   virtual float GetPriority() { return 0; }
   VisualEntity() = default;
@@ -33,6 +37,7 @@ struct VisualEntity : virtual public ScreenEntity {
 
 /** VisualEntity that draws multi-line text via NumberDrawer at a position. */
 struct TextDrawEntity : virtual public VisualEntity {
+  std::string get_class_name() override { return "TextDrawEntity"; }
   float dPriority;
   Point pos;
   bool bCenter;
@@ -55,6 +60,7 @@ struct TextDrawEntity : virtual public VisualEntity {
 /** VisualEntity with an ImageSequence: draws current frame, Update toggles by
  * timer or on position change. */
 struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
+  std::string get_class_name() override { return "SimpleVisualEntity"; }
   float dPriority;
 
   unsigned nPeriod;
@@ -89,6 +95,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
 /** EventEntity that plays a SoundSequence on a timer; sets bExist false when
  * sequence ends. */
 struct SimpleSoundEntity : virtual public EventEntity {
+  std::string get_class_name() override { return "SimpleSoundEntity"; }
   unsigned nPeriod;
   Timer t;
 
@@ -105,6 +112,7 @@ struct SimpleSoundEntity : virtual public EventEntity {
 
 /** SimpleVisualEntity with fixed position (no movement). */
 struct Animation : public SimpleVisualEntity {
+  std::string get_class_name() override { return "Animation"; }
   Point pos;
 
   Animation(float dPriority_, const ImageSequence &seq, unsigned nTimeMeasure_,
@@ -116,6 +124,7 @@ struct Animation : public SimpleVisualEntity {
 
 /** Animation that runs once then sets bExist false (seq plays to end). */
 struct AnimationOnce : public SimpleVisualEntity {
+  std::string get_class_name() override { return "AnimationOnce"; }
   Point pos;
   bool bOnce;
 
@@ -130,6 +139,7 @@ struct AnimationOnce : public SimpleVisualEntity {
 
 /** VisualEntity that draws a single image at a fixed point. */
 struct StaticImage : public VisualEntity {
+  std::string get_class_name() override { return "StaticImage"; }
   Index img;
   float dPriority;
   Point p;
@@ -148,6 +158,7 @@ struct StaticImage : public VisualEntity {
 
 /** VisualEntity that draws a filled rectangle (no position). */
 struct StaticRectangle : public VisualEntity {
+  std::string get_class_name() override { return "StaticRectangle"; }
   float dPriority;
   Rectangle r;
   Color c;
@@ -164,6 +175,7 @@ struct StaticRectangle : public VisualEntity {
 
 /** ScreenEntity with radius for hit detection (HitDetection). */
 struct PhysicalEntity : virtual public ScreenEntity {
+  std::string get_class_name() override { return "PhysicalEntity"; }
   virtual unsigned GetRadius() { return 0; }
 
   bool HitDetection(smart_pointer<PhysicalEntity> pPh);
@@ -172,6 +184,7 @@ struct PhysicalEntity : virtual public ScreenEntity {
 /** PhysicalEntity that can be hit (OnHit), has type (GetType) and image
  * (GetImage). */
 struct ConsumableEntity : virtual public PhysicalEntity {
+  std::string get_class_name() override { return "ConsumableEntity"; }
   virtual char GetType() = 0;
   virtual void OnHit(char cWhat) = 0;
   virtual Index GetImage() = 0;
@@ -180,6 +193,7 @@ struct ConsumableEntity : virtual public PhysicalEntity {
 /** Moving unit: position, velocity, bounds, radius; Move() steps and clamps or
  * kills on exit. */
 struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
+  std::string get_class_name() override { return "Critter"; }
   unsigned nRadius;
   fPoint fPos;
   fPoint fVel;
@@ -208,6 +222,7 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
 
 /** Critter that advances position and toggles frame on a timer (tm). */
 struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
+  std::string get_class_name() override { return "FancyCritter"; }
   unsigned nRadius;
   fPoint fPos;
   fPoint fVel;

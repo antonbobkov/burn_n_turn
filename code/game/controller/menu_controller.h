@@ -18,6 +18,7 @@ typedef void (MenuDisplay::*EvntPntr)();
 
 /** One menu item: size, label, callback (EvntPntr), disabled flag. */
 struct MenuEntry : virtual public SP_Info {
+  std::string get_class_name() override { return "MenuEntry"; }
   Size szSize;
   std::string sText;
   EvntPntr pTriggerEvent;
@@ -49,6 +50,7 @@ struct MenuEntryManager {
 /** In-game menu: draws entries, caret, handles mouse/key; submenus and option
  * toggles. */
 struct MenuDisplay : virtual public EventEntity, public VisualEntity {
+  std::string get_class_name() override { return "MenuDisplay"; }
   MenuEntryManager *pCurr;
 
   MenuEntryManager memMain;
@@ -107,6 +109,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 
 /** Controller for pause/main menu: MenuDisplay, resume position. */
 struct MenuController : public EntityListController {
+  std::string get_class_name() override { return "MenuController"; }
   int nResumePosition;
   SSP<MenuDisplay> pMenuDisplay;
 

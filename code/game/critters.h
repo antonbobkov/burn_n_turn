@@ -8,6 +8,7 @@ struct LevelController;
 struct Dragon;
 
 struct Castle : public Critter {
+  std::string get_class_name() override { return "Castle"; }
   unsigned nPrincesses;
   SSP<LevelController> pAv;
   SSP<Dragon> pDrag;
@@ -23,6 +24,7 @@ struct Castle : public Critter {
 
 /** Princess unit: Critter + ConsumableEntity, captured by dragon. */
 struct Princess : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "Princess"; }
   SSP<LevelController> pAc;
 
   Princess(const Critter &cr, smart_pointer<LevelController> pAc_)
@@ -39,6 +41,7 @@ struct Princess : public Critter, public ConsumableEntity {
 };
 
 struct Mage : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "Mage"; }
   SSP<LevelController> pAc;
 
   bool bAngry;
@@ -68,6 +71,7 @@ ImageSequence GetBonusImage(int n, Preloader &pr);
 
 /** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
 struct Trader : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "Trader"; }
   SSP<LevelController> pAc;
   bool &bFirstBns;
 
@@ -86,6 +90,7 @@ struct Trader : public Critter, public ConsumableEntity {
 
 /** Knight unit: chases princess/castle, can become ghost (Ghostiness). */
 struct Knight : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "Knight"; }
   SSP<LevelController> pAc;
 
   char cType;
@@ -120,6 +125,7 @@ struct Knight : public Critter, public ConsumableEntity {
 
 /** Large slime unit: splits or merges (MegaSlime logic). */
 struct MegaSlime : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "MegaSlime"; }
   SSP<LevelController> pAc;
 
   int nHealth;
@@ -148,6 +154,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 
 /** Ghost knight effect: timed visual at a position. */
 struct Ghostiness : public EventEntity {
+  std::string get_class_name() override { return "Ghostiness"; }
   Timer t;
   Point p;
 
@@ -164,6 +171,7 @@ struct Ghostiness : public EventEntity {
 
 /** Slime unit: moves toward target, timer for behavior. */
 struct Slime : public Critter, public ConsumableEntity {
+  std::string get_class_name() override { return "Slime"; }
   SSP<LevelController> pAc;
   Timer t;
   int nGeneration;
@@ -188,6 +196,7 @@ struct Slime : public Critter, public ConsumableEntity {
 
 /** Spawns slimes on a timer at a position. */
 struct Sliminess : public EventEntity {
+  std::string get_class_name() override { return "Sliminess"; }
   Timer t;
   Point p;
 
@@ -211,6 +220,7 @@ struct Sliminess : public EventEntity {
 
 /** Spawns MegaSlimes; holds position and controller. */
 struct MegaSliminess : public EventEntity {
+  std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
   SSP<LevelController> pAdv;
   SSP<AnimationOnce> pSlm;
@@ -222,6 +232,7 @@ struct MegaSliminess : public EventEntity {
 
 /** SimpleVisualEntity that moves with fPos/fVel (e.g. menu slime). */
 struct FloatingSlime : public SimpleVisualEntity {
+  std::string get_class_name() override { return "FloatingSlime"; }
   fPoint fPos;
   fPoint fVel;
 
