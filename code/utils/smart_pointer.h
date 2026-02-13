@@ -100,7 +100,7 @@ template <class T> class smart_pointer {
       ++pPointToSPInfo->_SP_INFO_COUNTER;
   }
 
-  smart_pointer<T> &EQUAL(T *pPointTo_, SP_Info *pInfo) {
+  smart_pointer<T> &ASSIGN_TO(T *pPointTo_, SP_Info *pInfo) {
     if (pPointToSPInfo == pInfo)
       return *this;
 
@@ -138,12 +138,12 @@ public:
   template <class N> smart_pointer(const SSP<N> &pPrmPnt);
 
   smart_pointer<T> &operator=(const smart_pointer<T> &pSmPnt) {
-    return EQUAL(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
+    return ASSIGN_TO(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
   }
 
   template <class N>
   smart_pointer<T> &operator=(const smart_pointer<N> &pSmPnt) {
-    return EQUAL(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
+    return ASSIGN_TO(pSmPnt.pPointTo, pSmPnt.pPointToSPInfo);
   }
 
   template <class N> smart_pointer<T> &operator=(const SSP<N> &pPrmPnt);
@@ -216,7 +216,7 @@ template <class T> class SSP : public SSP_Base {
       pPointTo->_SP_INFO_POINT_TO_ME.insert(this);
   }
 
-  SSP<T> &EQUAL(T *pPointTo_) {
+  SSP<T> &ASSIGN_TO(T *pPointTo_) {
     if (pPointTo)
       DELETE_PERMANENT_POINTER(pPointTo, this);
 
@@ -254,15 +254,15 @@ public:
     CONSTRUCT(pSmrtPnt.pPointTo);
   }
 
-  SSP<T> &operator=(T *pPointTo_) { return EQUAL(pPointTo_); }
-  SSP<T> &operator=(const SSP<T> &pPermPnt) { return EQUAL(pPermPnt.pPointTo); }
+  SSP<T> &operator=(T *pPointTo_) { return ASSIGN_TO(pPointTo_); }
+  SSP<T> &operator=(const SSP<T> &pPermPnt) { return ASSIGN_TO(pPermPnt.pPointTo); }
 
   template <class N> SSP<T> &operator=(const SSP<N> &pPermPnt) {
-    return EQUAL(pPermPnt.pPointTo);
+    return ASSIGN_TO(pPermPnt.pPointTo);
   }
 
   template <class N> SSP<T> &operator=(const smart_pointer<N> &pSmrtPnt) {
-    return EQUAL(pSmrtPnt.pPointTo);
+    return ASSIGN_TO(pSmrtPnt.pPointTo);
   }
 
   ~SSP() {
@@ -298,7 +298,7 @@ smart_pointer<T>::smart_pointer(const SSP<N> &pPrmPnt) {
 template <class T>
 template <class N>
 smart_pointer<T> &smart_pointer<T>::operator=(const SSP<N> &pPrmPnt) {
-  return EQUAL(pPrmPnt.pPointTo, static_cast<SP_Info *>(pPrmPnt.pPointTo));
+  return ASSIGN_TO(pPrmPnt.pPointTo, static_cast<SP_Info *>(pPrmPnt.pPointTo));
 }
 
 /* Copyable SSP for use in containers (e.g. arrays); otherwise same as SSP. */
