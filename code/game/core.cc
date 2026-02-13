@@ -1,8 +1,9 @@
 #include "core.h"
-#include "game.h"
 #include "controller/level_controller.h"
 #include "font_writer.h"
+#include "game.h"
 #include "smart_pointer.h"
+
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
 struct SlimeUpdater : public VisualEntity {
@@ -615,17 +616,20 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
   pMenu = pMenuHolder;
 
   // logo 1
-  smart_pointer<EntityListController> pCnt0_1 = make_smart(new AutoAdvanceController(
-      EntityListController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt0_1 =
+      make_smart(new AutoAdvanceController(
+          EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // logo 2
-  smart_pointer<EntityListController> pCnt0_2 = make_smart(new AutoAdvanceController(
-      EntityListController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt0_2 =
+      make_smart(new AutoAdvanceController(
+          EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // press start screen
   smart_pointer<EntityListController> pCnt1 =
       make_smart(new StartScreenController(pSelf, rBound, Color(0, 0, 0)));
   // game over
-  smart_pointer<EntityListController> pCnt2 = make_smart(new AutoAdvanceController(
-      EntityListController(pSelf, rBound, Color(0, 0, 0))));
+  smart_pointer<EntityListController> pCnt2 =
+      make_smart(new AutoAdvanceController(
+          EntityListController(pSelf, rBound, Color(0, 0, 0))));
   // you win!
   smart_pointer<EntityListController> pCnt3 =
       make_smart(new EntityListController(pSelf, rBound, Color(0, 0, 0)));
@@ -768,8 +772,8 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 #endif
 
   for (unsigned i = 0; i < vLvl.size(); ++i) {
-    smart_pointer<LevelController> pAd = make_smart(
-        new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    smart_pointer<LevelController> pAd =
+        make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd, vLvl[i]);
 
     pAd->AddE(pBckgMusic);

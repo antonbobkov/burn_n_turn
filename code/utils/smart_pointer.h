@@ -119,8 +119,7 @@ template <class T> class smart_pointer {
   /* Only make_smart calls this; T is complete there so T* -> SP_Info* is ok.
    */
   explicit smart_pointer(T *pPointTo_)
-      : pPointTo(pPointTo_),
-        pPointToSPInfo(pPointTo_) {
+      : pPointTo(pPointTo_), pPointToSPInfo(pPointTo_) {
     if (pPointToSPInfo)
       ++pPointToSPInfo->_SP_INFO_COUNTER;
   }
@@ -299,8 +298,7 @@ smart_pointer<T>::smart_pointer(const SSP<N> &pPrmPnt) {
 template <class T>
 template <class N>
 smart_pointer<T> &smart_pointer<T>::operator=(const SSP<N> &pPrmPnt) {
-  return EQUAL(pPrmPnt.pPointTo,
-               static_cast<SP_Info *>(pPrmPnt.pPointTo));
+  return EQUAL(pPrmPnt.pPointTo, static_cast<SP_Info *>(pPrmPnt.pPointTo));
 }
 
 /* Copyable SSP for use in containers (e.g. arrays); otherwise same as SSP. */

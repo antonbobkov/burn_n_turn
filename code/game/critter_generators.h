@@ -36,8 +36,7 @@ struct KnightGenerator : virtual public EventEntity {
   float GetRate();
 
   KnightGenerator(float dRate_, Rectangle rBound_,
-                  smart_pointer<LevelController> pBc_,
-                  const BrokenLine &bl_);
+                  smart_pointer<LevelController> pBc_, const BrokenLine &bl_);
 
   /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
   void Generate(bool bGolem = false);

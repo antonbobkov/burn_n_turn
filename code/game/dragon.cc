@@ -1,6 +1,7 @@
-#include "game.h"
 #include "controller/level_controller.h"
+#include "game.h"
 #include "smart_pointer.h"
+
 
 void DragonLeash::ModifyTilt(Point trackball) {
   tilt -= tilt * naturalScaleFactor;
@@ -178,13 +179,12 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(smart_pointer<Castle> pCs_,
-               smart_pointer<LevelController> pAd_, ImageSequence imgStable_,
-               ImageSequence imgFly_, ButtonSet bt_)
+Dragon::Dragon(smart_pointer<Castle> pCs_, smart_pointer<LevelController> pAd_,
+               ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
     : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,
               pCs_.is_null() ? pAd_->vCs[0]->GetPosition()
-                                        : pCs_->GetPosition(),
+                             : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(this, pCs_), bt(bt_),
       nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
@@ -434,8 +434,7 @@ void Dragon::Toggle() {
 
   for (unsigned i = 0; i < pAd->vCs.size(); ++i)
     if (this->HitDetection(pAd->vCs[i])) {
-      if (!pAd->vCs[i]->pDrag.is_null() || bTookOff ||
-          pAd->vCs[i]->bBroken)
+      if (!pAd->vCs[i]->pDrag.is_null() || bTookOff || pAd->vCs[i]->bBroken)
         continue;
 
       pAd->pt.Off();

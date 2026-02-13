@@ -1,9 +1,9 @@
-#include "game.h"
 #include "controller/level_controller.h"
+#include "game.h"
 #include "smart_pointer.h"
 
-SkellyGenerator::SkellyGenerator(Point p_,
-                                 smart_pointer<LevelController> pAdv_)
+
+SkellyGenerator::SkellyGenerator(Point p_, smart_pointer<LevelController> pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(this, pAdv_) {
   smart_pointer<AnimationOnce> pSlm =
       make_smart(new AnimationOnce(2.F, pAdv->pGl->pr("skelly_summon"),

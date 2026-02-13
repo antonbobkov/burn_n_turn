@@ -103,8 +103,7 @@ TEST_CASE("smart_pointer object cleaned up when last reference goes away",
           "[smart_pointer]") {
   int before = nGlobalSuperMegaCounter;
   {
-    smart_pointer<TestObj> p =
-        make_smart<TestObj>(new TestObj(100));
+    smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(100));
     REQUIRE(nGlobalSuperMegaCounter == before + 1);
   }
   REQUIRE(nGlobalSuperMegaCounter == before);

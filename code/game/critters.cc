@@ -1,6 +1,7 @@
-#include "game.h"
 #include "controller/level_controller.h"
+#include "game.h"
 #include "smart_pointer.h"
+
 
 void SummonSkeletons(smart_pointer<LevelController> pAc, Point p) {
   int nNum = 4;
@@ -48,8 +49,7 @@ void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
 #endif
 }
 
-Mage::Mage(const Critter &cr, smart_pointer<LevelController> pAc_,
-           bool bAngry_)
+Mage::Mage(const Critter &cr, smart_pointer<LevelController> pAc_, bool bAngry_)
     : Critter(cr), pAc(this, pAc_), bAngry(bAngry_), bCasting(false),
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
       tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
@@ -385,8 +385,8 @@ void Ghostiness::Update() {
   }
 }
 
-Slime::Slime(fPoint fPos, Rectangle rBound,
-             smart_pointer<LevelController> pAc_, int nGeneration_)
+Slime::Slime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_,
+             int nGeneration_)
     : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
       pAc(this, pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
@@ -636,8 +636,7 @@ void Mage::SummonSlimes() {
   }
 }
 
-Castle::Castle(Point p, Rectangle rBound_,
-               smart_pointer<LevelController> pAv_)
+Castle::Castle(Point p, Rectangle rBound_, smart_pointer<LevelController> pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
       nPrincesses(0), pAv(this, pAv_), pDrag(this, 0), bBroken(false) {}
 

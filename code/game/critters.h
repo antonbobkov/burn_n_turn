@@ -124,8 +124,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 
   int nHealth;
 
-  MegaSlime(fPoint fPos, Rectangle rBound,
-            smart_pointer<LevelController> pAc_);
+  MegaSlime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_);
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     Critter::Draw(pDr);
