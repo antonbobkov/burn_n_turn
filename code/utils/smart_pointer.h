@@ -83,6 +83,7 @@ inline void DELETE_REGULAR_POINTER(SP_Info *pThis) {
 }
 
 inline void DELETE_PERMANENT_POINTER(SP_Info *pThis, SSP_Base *pPermPnt) {
+  --g_smart_pointer_count["SSP:" + pThis->get_class_name()];
   pThis->_SP_INFO_POINT_TO_ME.erase(pPermPnt);
   CHECK_DELETION(pThis);
 }
@@ -211,18 +212,20 @@ template <class T> class SSP : public SSP_Base {
   void CONSTRUCT(T *pPointTo_) {
     pPointTo = pPointTo_;
 
-    if (pPointTo)
+    if (pPointTo) {
+      ++g_smart_pointer_count["SSP:" + pPointTo->get_class_name()];
       pPointTo->_SP_INFO_POINT_TO_ME.insert(this);
+    }
   }
 
   SSP<T> &ASSIGN_TO(T *pPointTo_) {
+    if (pPointTo == pPointTo_)
+      return *this;
+
     if (pPointTo)
       DELETE_PERMANENT_POINTER(pPointTo, this);
 
-    pPointTo = pPointTo_;
-
-    if (pPointTo)
-      pPointTo->_SP_INFO_POINT_TO_ME.insert(this);
+    CONSTRUCT(pPointTo_);
 
     return *this;
   }

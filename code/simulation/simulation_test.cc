@@ -12,12 +12,13 @@
 #include "gui_key_type.h"
 #include "smart_pointer.h"
 
-#include <catch2/catch.hpp>
 #include <algorithm>
+#include <catch2/catch.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
 
 using namespace Gui;
 
@@ -169,4 +170,5 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
   for (const auto &p : nonzero)
     std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
               << "\n";
+  std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter << "\n";
 }
