@@ -1,4 +1,5 @@
 #include "core.h"
+#include "game.h"
 #include "controller/level_controller.h"
 #include "font_writer.h"
 #include "game.h"
