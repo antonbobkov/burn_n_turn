@@ -880,8 +880,6 @@ void TwrGlobalController::Restart(int nActive_ /* = -1*/) {
 
   vCnt.clear();
 
-  CleanIslandSeeded(this);
-
   StartUp(pSelf);
 }
 
@@ -895,9 +893,7 @@ TowerGameGlobalController::TowerGameGlobalController(ProgramEngine pe) {
 }
 
 TowerGameGlobalController::~TowerGameGlobalController() {
-  SP_Info *pCleanUp = pData->pCnt.get();
   delete pData;
-  CleanIslandSeeded(pCleanUp);
 }
 TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   szActualRez = pe.szActualRez;

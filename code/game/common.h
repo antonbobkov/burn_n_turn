@@ -129,16 +129,8 @@ template <class T> void CleanUp(std::list<T> &ar) {
   }
 }
 
-/** Copy smart pointer (no rebinding; same as assignment). */
-template <class T>
-smart_pointer<T> CopyASSP(SP_Info *pInf, smart_pointer<T> pAsp) {
-  (void)pInf;
-  return pAsp;
-}
-
 /** Copy each smart pointer from from into to. */
-template <class T> void CopyArrayASSP(SP_Info *pInf, const T &from, T &to) {
-  (void)pInf;
+template <class T> void CopyArrayASSP(const T &from, T &to) {
   for (typename T::const_iterator itr = from.begin(), etr = from.end();
        itr != etr; ++itr)
     to.push_back(*itr);

@@ -302,7 +302,6 @@ template <class ImageHndl>
 struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
                                   public IndexRemover {
   std::string get_class_name() override { return "SimpleGraphicalInterface"; }
-  // okay, no need for SSP as GraphicalInterface is not going to point to us
   smart_pointer<GraphicalInterface<ImageHndl>> pGr;
 
   IndexKeeper<ImageHndl> kp;

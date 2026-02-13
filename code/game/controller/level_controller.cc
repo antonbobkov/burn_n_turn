@@ -129,12 +129,12 @@ LevelController::LevelController(const LevelController &a)
       bFirstUpdate(true), pTutorialText(a.pTutorialText),
       tutOne(a.tutOne), tutTwo(a.tutTwo), bTimerFlash(a.bTimerFlash),
       pMgGen(a.pMgGen) {
-  CopyArrayASSP(this, a.vCs, vCs);
-  CopyArrayASSP(this, a.vRd, vRd);
-  CopyArrayASSP(this, a.vDr, vDr);
-  CopyArrayASSP(this, a.lsBonus, lsBonus);
-  CopyArrayASSP(this, a.lsSlimes, lsSlimes);
-  CopyArrayASSP(this, a.lsSliminess, lsSliminess);
+  CopyArrayASSP(a.vCs, vCs);
+  CopyArrayASSP(a.vRd, vRd);
+  CopyArrayASSP(a.vDr, vDr);
+  CopyArrayASSP(a.lsBonus, lsBonus);
+  CopyArrayASSP(a.lsSlimes, lsSlimes);
+  CopyArrayASSP(a.lsSliminess, lsSliminess);
 }
 
 LevelController::LevelController(smart_pointer<TwrGlobalController> pGl_,

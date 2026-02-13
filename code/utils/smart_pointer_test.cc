@@ -68,7 +68,7 @@ TEST_CASE("smart_pointer operator== and operator!=", "[smart_pointer]") {
 static unsigned ref_count(smart_pointer<TestObj> &p) {
   if (p.is_null())
     return 0;
-  return Inspector::GetCounter(static_cast<SP_Info *>(p.get()));
+  return static_cast<SP_Info *>(p.get())->get_counter();
 }
 
 TEST_CASE("smart_pointer ref count is 1 after make_smart", "[smart_pointer]") {
@@ -161,8 +161,8 @@ TEST_CASE("smart_pointer class name count on assignment", "[smart_pointer][class
   REQUIRE(g_smart_pointer_count["TestObj"] == 0);
 }
 
-/* Forward declaration: smart_pointer now supports incomplete types by storing
- * SP_Info* separately; only make_smart and SSP copy need the complete type. */
+/* Forward declaration: smart_pointer supports incomplete types by storing
+ * SP_Info* separately; only make_smart needs the complete type. */
 struct Incomplete;
 TEST_CASE("smart_pointer with incomplete type (default construct and destroy)",
           "[smart_pointer][incomplete]") {
