@@ -13,9 +13,9 @@
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
 struct AdNumberDrawer : public VisualEntity {
-  SSP<LevelController> pAd;
+  LevelController *pAd;
 
-  AdNumberDrawer() : pAd(this, 0) {}
+  AdNumberDrawer() : pAd(0) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     unsigned n = pDr->nFactor;
@@ -63,14 +63,13 @@ struct AdNumberDrawer : public VisualEntity {
 struct BonusDrawer : public VisualEntity {
   typedef std::list<ASSP<TimedFireballBonus>> BonusList;
 
-  SSP<LevelController> pAd;
+  LevelController *pAd;
 
   Timer t;
   int nAnimationCounter;
 
   BonusDrawer()
-      : pAd(this, 0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {
-  }
+      : pAd(0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     if (t.Tick())
@@ -148,19 +147,18 @@ LevelController::LevelController(smart_pointer<TwrGlobalController> pGl_,
       bTakeOffToggle(false), pTutorialText(this, 0),
       mc(pGl->pr("claw"), Point()), bTimerFlash(false) {}
 
-void LevelController::Init(smart_pointer<LevelController> pSelf_,
-                           const LevelLayout &lvl) {
+void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   pSelf = pSelf_;
   bNoRefresh = true;
 
   tLoseTimer.nPeriod = 0;
 
   smart_pointer<AdNumberDrawer> pNm = make_smart(new AdNumberDrawer());
-  pNm->pAd = pSelf.get();
+  pNm->pAd = pSelf;
   AddV(pNm);
 
   smart_pointer<BonusDrawer> pBd = make_smart(new BonusDrawer());
-  pBd->pAd = pSelf.get();
+  pBd->pAd = pSelf;
   AddV(pBd);
 
   smart_pointer<KnightGenerator> pGen = make_smart(
@@ -177,17 +175,17 @@ void LevelController::Init(smart_pointer<LevelController> pSelf_,
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    PushBackASSP(pSelf.get(), vRd,
+    PushBackASSP(pSelf, vRd,
                  make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
-    PushBackASSP(pSelf.get(), vCs,
+    PushBackASSP(pSelf, vCs,
                  make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
 
   t = Timer(lvl.nTimer);
 
   PushBackASSP(
-      pSelf.get(), vDr,
+      pSelf, vDr,
       make_smart(new Dragon(
           vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
           ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
@@ -426,7 +424,8 @@ void LevelController::MegaGeneration() {
 }
 
 void LevelController::MegaGeneration(Point p) {
-  smart_pointer<MegaSliminess> pSlm = make_smart(new MegaSliminess(p, pSelf));
+  smart_pointer<MegaSliminess> pSlm =
+      make_smart(new MegaSliminess(p, pSelf));
   AddE(pSlm);
 }
 

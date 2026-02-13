@@ -88,9 +88,8 @@ struct ScalingDrawer;
 /** Fancy road: draws tiled road image; needs LevelController for resources.
  */
 struct FancyRoad : public Road {
-  FancyRoad(const Road &rd, smart_pointer<LevelController> pAd_)
-      : Road(rd), pAd(this, pAd_) {}
-  SSP<LevelController> pAd;
+  FancyRoad(const Road &rd, LevelController *pAd_) : Road(rd), pAd(pAd_) {}
+  LevelController *pAd;
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };

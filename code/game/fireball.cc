@@ -76,10 +76,9 @@ void KnightOnFire::RandomizeVelocity() {
   fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
 }
 
-KnightOnFire::KnightOnFire(const Critter &cr,
-                           smart_pointer<EntityListController> pBc_,
+KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
                            unsigned nTimer_, Chain c_)
-    : Critter(cr), pBc(this, pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
+    : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
       t(nFramesInSecond / 5) {
   Critter::seq = pBc->pGl->pr("knight_fire");
   RandomizeVelocity();
@@ -192,11 +191,11 @@ unsigned GetFireballChainNum(FireballBonus &fb) {
   return nRet;
 }
 
-Fireball::Fireball(Point p, fPoint v, smart_pointer<LevelController> pBc_,
-                   FireballBonus &fb_, Chain ch_, unsigned nChain_)
+Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
+                   Chain ch_, unsigned nChain_)
     : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
               nFramesInSecond / 10),
-      pBc(this, pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
+      pBc(pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
   Critter::fVel.Normalize(fb.fMap["speed"]);
 
   if (!fb.bMap["laser"])
@@ -328,10 +327,10 @@ void CircularFireball::Update() {
   }
 }
 
-FireballBonusAnimation::FireballBonusAnimation(
-    Point p_, unsigned n_, smart_pointer<LevelController> pAd_)
+FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
+                                                LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
-      bBlink(false), pAd(this, pAd_), tm(nBonusOnGroundTime), sUnderText("") {
+      bBlink(false), pAd(pAd_), tm(nBonusOnGroundTime), sUnderText("") {
   seq = GetBonusImage(n, pAd->pGl->pr);
   coronaSeq = pAd->pGl->pr("corona");
 }

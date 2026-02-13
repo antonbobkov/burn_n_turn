@@ -13,9 +13,9 @@ struct SkellyGenerator : public EventEntity {
   Timer t;
   Point p;
 
-  SSP<LevelController> pAdv;
+  LevelController *pAdv;
 
-  SkellyGenerator(Point p_, smart_pointer<LevelController> pAdv_);
+  SkellyGenerator(Point p_, LevelController *pAdv_);
 
   /*virutal*/ void Update();
 };
@@ -27,7 +27,7 @@ struct KnightGenerator : virtual public EventEntity {
 
   float dRate;
   Rectangle rBound;
-  SSP<LevelController> pBc;
+  LevelController *pBc;
   ImageSequence seq;
 
   Timer tm;
@@ -37,8 +37,8 @@ struct KnightGenerator : virtual public EventEntity {
   /** Returns the current spawn rate (depends on completion and ghost mode). */
   float GetRate();
 
-  KnightGenerator(float dRate_, Rectangle rBound_,
-                  smart_pointer<LevelController> pBc_, const BrokenLine &bl_);
+  KnightGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_,
+                  const BrokenLine &bl_);
 
   /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
   void Generate(bool bGolem = false);
@@ -51,12 +51,11 @@ struct PrincessGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "PrincessGenerator"; }
   float dRate;
   Rectangle rBound;
-  SSP<LevelController> pBc;
+  LevelController *pBc;
   Timer tm;
   bool bFirst;
 
-  PrincessGenerator(float dRate_, Rectangle rBound_,
-                    smart_pointer<LevelController> pBc_);
+  PrincessGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
   /**
    * When the timer fires: pick a random road and spawn a princess there,
@@ -70,11 +69,11 @@ struct MageGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "MageGenerator"; }
   float dRate;
   Rectangle rBound;
-  SSP<LevelController> pBc;
+  LevelController *pBc;
   Timer tm;
 
   MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
-                smart_pointer<LevelController> pBc_);
+                 LevelController *pBc_);
 
   /*virtual*/ void Update();
 
@@ -87,15 +86,14 @@ struct TraderGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "TraderGenerator"; }
   float dRate;
   Rectangle rBound;
-  SSP<LevelController> pBc;
+  LevelController *pBc;
   Timer tm;
   bool bFirst;
   bool bFirstBns;
 
   float GetRate();
 
-  TraderGenerator(float dRate_, Rectangle rBound_,
-                  smart_pointer<LevelController> pBc_);
+  TraderGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
   /*virtual*/ void Update();
 };

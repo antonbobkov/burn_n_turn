@@ -11,7 +11,7 @@ struct LevelController;
 /** Floating "+N" score text at a point; animates then removes. */
 struct BonusScore : public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "BonusScore"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
   std::string sText;
   unsigned nScore;
   unsigned nScoreSoFar;
@@ -20,8 +20,7 @@ struct BonusScore : public EventEntity, public VisualEntity {
   unsigned nC;
   Color c;
 
-  BonusScore(smart_pointer<LevelController> pAc_, Point p_,
-            unsigned nScore_);
+  BonusScore(LevelController *pAc_, Point p_, unsigned nScore_);
 
   /*virtual*/ void Update();
 

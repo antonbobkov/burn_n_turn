@@ -57,12 +57,11 @@ struct ChainExplosion : virtual public AnimationOnce,
 
   Chain ch;
 
-  SSP<EntityListController> pBc;
+  EntityListController *pBc;
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
-                 smart_pointer<EntityListController> pBc_, Chain ch_ = Chain())
-      : AnimationOnce(av), r(r_), r_in(r_), delta(delta_), pBc(this, pBc_),
-        ch(ch_) {}
+                 EntityListController *pBc_, Chain ch_ = Chain())
+      : AnimationOnce(av), r(r_), r_in(r_), delta(delta_), pBc(pBc_), ch(ch_) {}
 
   /*virtual*/ unsigned GetRadius() { return unsigned(r); }
   /**
@@ -78,7 +77,7 @@ struct ChainExplosion : virtual public AnimationOnce,
 
 struct KnightOnFire : public Critter {
   std::string get_class_name() override { return "KnightOnFire"; }
-  SSP<EntityListController> pBc;
+  EntityListController *pBc;
   unsigned nTimer, nTimer_i;
   Timer t;
   Chain c;
@@ -86,8 +85,8 @@ struct KnightOnFire : public Critter {
   /** Set fVel to random direction, scaled by fKnightFireSpeed. */
   void RandomizeVelocity();
 
-  KnightOnFire(const Critter &cr, smart_pointer<EntityListController> pBc_,
-               unsigned nTimer_, Chain c_);
+  KnightOnFire(const Critter &cr, EntityListController *pBc_,
+                unsigned nTimer_, Chain c_);
 
   /*virtual*/ void Update();
 };
@@ -96,7 +95,7 @@ struct KnightOnFire : public Critter {
  */
 struct Fireball : public Critter {
   std::string get_class_name() override { return "Fireball"; }
-  SSP<LevelController> pBc;
+  LevelController *pBc;
   bool bThrough;
   FireballBonus fb;
 
@@ -104,11 +103,11 @@ struct Fireball : public Critter {
   unsigned nChain;
 
   Fireball(const Fireball &f)
-      : pBc(this, f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
-        nChain(f.nChain), Critter(f) {}
+      : pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch), nChain(f.nChain),
+        Critter(f) {}
 
-  Fireball(Point p, fPoint v, smart_pointer<LevelController> pBc_,
-           FireballBonus &fb_, Chain ch_ = Chain(), unsigned nChain_ = 1);
+  Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
+           Chain ch_ = Chain(), unsigned nChain_ = 1);
 
   /*virtual*/ void Update();
 };
@@ -147,12 +146,11 @@ struct FireballBonusAnimation : public Animation,
   unsigned n;
   Timer tm;
   bool bBlink;
-  SSP<LevelController> pAd;
+  LevelController *pAd;
   std::string sUnderText;
   ImageSequence coronaSeq;
 
-  FireballBonusAnimation(Point p_, unsigned n_,
-                         smart_pointer<LevelController> pAd_);
+  FireballBonusAnimation(Point p_, unsigned n_, LevelController *pAd_);
 
   /*virtual*/ unsigned GetRadius() { return 20U; }
 

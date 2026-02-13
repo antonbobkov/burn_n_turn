@@ -63,7 +63,7 @@ struct LevelController : public EntityListController {
   MageGenerator *pMgGen;
   smart_pointer<SoundControls> pSc;
 
-  smart_pointer<LevelController> pSelf;
+  LevelController *pSelf;
 
   PositionTracker pt;
   bool bTakeOffToggle;
@@ -77,8 +77,7 @@ struct LevelController : public EntityListController {
   LevelController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                   Color c, const LevelLayout &lvl);
 
-  void Init(smart_pointer<LevelController> pSelf,
-            const LevelLayout &lvl);
+  void Init(LevelController *pSelf, const LevelLayout &lvl);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 

@@ -3,7 +3,7 @@
 #include "smart_pointer.h"
 
 
-void SummonSkeletons(smart_pointer<LevelController> pAc, Point p) {
+void SummonSkeletons(LevelController *pAc, Point p) {
   int nNum = 4;
 
   if (pAc->nLvl > 6)
@@ -49,8 +49,8 @@ void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
 #endif
 }
 
-Mage::Mage(const Critter &cr, smart_pointer<LevelController> pAc_, bool bAngry_)
-    : Critter(cr), pAc(this, pAc_), bAngry(bAngry_), bCasting(false),
+Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
+    : Critter(cr), pAc(pAc_), bAngry(bAngry_), bCasting(false),
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
       tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
   fMvVel = Critter::fVel;
@@ -149,7 +149,7 @@ void Trader::OnHit(char cWhat) {
     bFirstBns = false;
   }
   pAc->AddBoth(pFb);
-  PushBackASSP(pAc.get(), pAc->lsBonus, pFb);
+  PushBackASSP(pAc, pAc->lsBonus, pFb);
 }
 
 void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -282,11 +282,10 @@ void Knight::OnHit(char cWhat) {
   }
 }
 
-MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound,
-                     smart_pointer<LevelController> pAc_)
+MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
     : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("megaslime"),
               nFramesInSecond / 5),
-      pAc(this, pAc_), nHealth(nSlimeHealthMax) {
+      pAc(pAc_), nHealth(nSlimeHealthMax) {
   bDieOnExit = false;
 }
 
@@ -350,9 +349,9 @@ void MegaSlime::OnHit(char cWhat) {
   pAc->AddBoth(pAn);
 }
 
-Ghostiness::Ghostiness(Point p_, smart_pointer<LevelController> pAdv_,
-                       Critter knCp_, int nGhostHit_)
-    : p(p_), pAdv(this, pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
+Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
+                       int nGhostHit_)
+    : p(p_), pAdv(pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
   ImageSequence seq = pAdv->pGl->pr("ghost_knight_burn");
   if (nGhostHit == 0)
     seq = pAdv->pGl->pr("ghost_burn");
@@ -381,14 +380,14 @@ void Ghostiness::Update() {
     pCr->nGhostHit = nGhostHit - 1;
 
     pAdv->AddBoth(pCr);
-    PushBackASSP(pAdv.get(), pAdv->lsPpl, pCr);
+    PushBackASSP(pAdv, pAdv->lsPpl, pCr);
   }
 }
 
-Slime::Slime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_,
+Slime::Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
              int nGeneration_)
     : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
-      pAc(this, pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
+      pAc(pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
   ++pAc->nSlimeNum;
 }
@@ -403,7 +402,7 @@ void Slime::RandomizeVelocity() {
 }
 
 Slime::~Slime() {
-  if (!pAc.is_null()) {
+  if (pAc) {
     --pAc->nSlimeNum;
   }
 }
@@ -505,13 +504,13 @@ void Slime::OnHit(char cWhat) {
     smart_pointer<Sliminess> pSlm = make_smart(
         new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
     pAc->AddE(pSlm);
-    PushBackASSP(pAc.get(), pAc->lsSliminess, pSlm);
+    PushBackASSP(pAc, pAc->lsSliminess, pSlm);
   }
 }
 
-Sliminess::Sliminess(Point p_, smart_pointer<LevelController> pAdv_,
-                     bool bFast_, int nGeneration_)
-    : p(p_), pAdv(this, pAdv_), bFast(bFast_), nGeneration(nGeneration_),
+Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
+                     int nGeneration_)
+    : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_),
       pSlm(this, 0) {
   ImageSequence seq = bFast ? pAdv->pGl->pr("slime_reproduce_fast")
                             : pAdv->pGl->pr("slime_reproduce");
@@ -534,8 +533,8 @@ void Sliminess::Update() {
     smart_pointer<Slime> pSlm =
         make_smart(new Slime(p, pAdv->rBound, pAdv, nGeneration));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv.get(), pAdv->lsPpl, pSlm);
-    PushBackASSP(pAdv.get(), pAdv->lsSlimes, pSlm);
+    PushBackASSP(pAdv, pAdv->lsPpl, pSlm);
+    PushBackASSP(pAdv, pAdv->lsSlimes, pSlm);
   }
 }
 
@@ -545,12 +544,12 @@ void Sliminess::Kill() {
 }
 
 Sliminess::~Sliminess() {
-  if (!pAdv.is_null())
+  if (pAdv)
     --pAdv->nSlimeNum;
 }
 
-MegaSliminess::MegaSliminess(Point p_, smart_pointer<LevelController> pAdv_)
-    : p(p_), pAdv(this, pAdv_), pSlm(this, 0) {
+MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
+    : p(p_), pAdv(pAdv_), pSlm(this, 0) {
   ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
 
   smart_pointer<AnimationOnce> pSlmTmp = make_smart(
@@ -568,7 +567,7 @@ void MegaSliminess::Update() {
     smart_pointer<MegaSlime> pSlm =
         make_smart(new MegaSlime(p, pAdv->rBound, pAdv));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv.get(), pAdv->lsPpl, pSlm);
+    PushBackASSP(pAdv, pAdv->lsPpl, pSlm);
   }
 }
 
@@ -636,9 +635,9 @@ void Mage::SummonSlimes() {
   }
 }
 
-Castle::Castle(Point p, Rectangle rBound_, smart_pointer<LevelController> pAv_)
+Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
-      nPrincesses(0), pAv(this, pAv_), pDrag(this, 0), bBroken(false) {}
+      nPrincesses(0), pAv(pAv_), pDrag(this, 0), bBroken(false) {}
 
 void Castle::OnKnight(char cWhat) {
   if (pAv->bCh)
@@ -694,7 +693,7 @@ void Castle::OnKnight(char cWhat) {
                                           true),
                                   pAv));
       pAv->AddBoth(pCr);
-      PushBackASSP(pAv.get(), pAv->lsPpl, pCr);
+      PushBackASSP(pAv, pAv->lsPpl, pCr);
     }
   } else {
     pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("all_princess_escape"));
@@ -714,7 +713,7 @@ void Castle::OnKnight(char cWhat) {
                                             true),
                                     pAv));
         pAv->AddBoth(pCr);
-        PushBackASSP(pAv.get(), pAv->lsPpl, pCr);
+        PushBackASSP(pAv, pAv->lsPpl, pCr);
       }
     }
 

@@ -35,10 +35,9 @@ void BackgroundMusicPlayer::StopMusic() {
   nCurrTheme = -1;
 }
 
-BonusScore::BonusScore(smart_pointer<LevelController> pAc_, Point p_,
-                       unsigned nScore_)
+BonusScore::BonusScore(LevelController *pAc_, Point p_, unsigned nScore_)
     : p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0),
-      pAc(this, pAc_), c(255, 255, 0), nScore(nScore_), nScoreSoFar(0) {
+      pAc(pAc_), c(255, 255, 0), nScore(nScore_), nScoreSoFar(0) {
   std::ostringstream ostr(sText);
   ostr << '+' << nScore;
   sText = ostr.str();

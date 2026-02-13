@@ -73,7 +73,7 @@ struct Dragon : public Critter {
   bool bRegenLocked;
   Timer tRegenUnlock;
 
-  SSP<LevelController> pAd;
+  LevelController *pAd;
 
   SSP<Castle> pCs;
 
@@ -82,7 +82,7 @@ struct Dragon : public Critter {
 
   ButtonSet bt;
 
-  Dragon(smart_pointer<Castle> pCs_, smart_pointer<LevelController> pAd_,
+  Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
          ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
   /*vrtual*/ void Update();

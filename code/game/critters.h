@@ -10,12 +10,12 @@ struct Dragon;
 struct Castle : public Critter {
   std::string get_class_name() override { return "Castle"; }
   unsigned nPrincesses;
-  SSP<LevelController> pAv;
+  LevelController *pAv;
   SSP<Dragon> pDrag;
 
   bool bBroken;
 
-  Castle(Point p, Rectangle rBound_, smart_pointer<LevelController> pAv_);
+  Castle(Point p, Rectangle rBound_, LevelController *pAv_);
 
   void OnKnight(char cWhat);
 
@@ -25,10 +25,10 @@ struct Castle : public Critter {
 /** Princess unit: Critter + ConsumableEntity, captured by dragon. */
 struct Princess : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Princess"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
 
-  Princess(const Critter &cr, smart_pointer<LevelController> pAc_)
-      : Critter(cr), pAc(this, pAc_) {}
+  Princess(const Critter &cr, LevelController *pAc_)
+      : Critter(cr), pAc(pAc_) {}
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
@@ -42,7 +42,7 @@ struct Princess : public Critter, public ConsumableEntity {
 
 struct Mage : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Mage"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
 
   bool bAngry;
   bool bCasting;
@@ -52,7 +52,7 @@ struct Mage : public Critter, public ConsumableEntity {
 
   fPoint fMvVel;
 
-  Mage(const Critter &cr, smart_pointer<LevelController> pAc_, bool bAngry_);
+  Mage(const Critter &cr, LevelController *pAc_, bool bAngry_);
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
@@ -72,12 +72,11 @@ ImageSequence GetBonusImage(int n, Preloader &pr);
 /** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
 struct Trader : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Trader"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
   bool &bFirstBns;
 
-  Trader(const Critter &cr, smart_pointer<LevelController> pAc_,
-         bool &bFirstBns_)
-      : Critter(cr), pAc(this, pAc_), bFirstBns(bFirstBns_) {}
+  Trader(const Critter &cr, LevelController *pAc_, bool &bFirstBns_)
+      : Critter(cr), pAc(pAc_), bFirstBns(bFirstBns_) {}
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
@@ -91,15 +90,15 @@ struct Trader : public Critter, public ConsumableEntity {
 /** Knight unit: chases princess/castle, can become ghost (Ghostiness). */
 struct Knight : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Knight"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
 
   char cType;
 
   int nGhostHit;
   int nGolemHealth;
 
-  Knight(const Critter &cr, smart_pointer<LevelController> pAc_, char cType_)
-      : Critter(cr), pAc(this, pAc_), cType(cType_), nGhostHit(1),
+  Knight(const Critter &cr, LevelController *pAc_, char cType_)
+      : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(1),
         nGolemHealth(nGolemHealthMax) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
@@ -126,11 +125,11 @@ struct Knight : public Critter, public ConsumableEntity {
 /** Large slime unit: splits or merges (MegaSlime logic). */
 struct MegaSlime : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "MegaSlime"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
 
   int nHealth;
 
-  MegaSlime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_);
+  MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_);
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
     Critter::Draw(pDr);
@@ -158,13 +157,12 @@ struct Ghostiness : public EventEntity {
   Timer t;
   Point p;
 
-  SSP<LevelController> pAdv;
+  LevelController *pAdv;
 
   Critter knCp;
   int nGhostHit;
 
-  Ghostiness(Point p_, smart_pointer<LevelController> pAdv_, Critter knCp_,
-             int nGhostHit_);
+  Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_, int nGhostHit_);
 
   /*virutal*/ void Update();
 };
@@ -172,11 +170,11 @@ struct Ghostiness : public EventEntity {
 /** Slime unit: moves toward target, timer for behavior. */
 struct Slime : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Slime"; }
-  SSP<LevelController> pAc;
+  LevelController *pAc;
   Timer t;
   int nGeneration;
 
-  Slime(fPoint fPos, Rectangle rBound, smart_pointer<LevelController> pAc_,
+  Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
         int nGeneration_);
 
   int GetGeneration() { return nGeneration; }
@@ -202,11 +200,10 @@ struct Sliminess : public EventEntity {
 
   bool bFast;
   int nGeneration;
-  SSP<LevelController> pAdv;
+  LevelController *pAdv;
   SSP<AnimationOnce> pSlm;
 
-  Sliminess(Point p_, smart_pointer<LevelController> pAdv_, bool bFast_,
-            int nGeneration_);
+  Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
   /*virutal*/ void Update();
 
@@ -222,10 +219,10 @@ struct Sliminess : public EventEntity {
 struct MegaSliminess : public EventEntity {
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
-  SSP<LevelController> pAdv;
+  LevelController *pAdv;
   SSP<AnimationOnce> pSlm;
 
-  MegaSliminess(Point p_, smart_pointer<LevelController> pAdv_);
+  MegaSliminess(Point p_, LevelController *pAdv_);
 
   /*virutal*/ void Update();
 };
@@ -244,7 +241,7 @@ struct FloatingSlime : public SimpleVisualEntity {
   /*virtual*/ void Update();
 };
 
-void SummonSkeletons(smart_pointer<LevelController> pAc, Point p);
+void SummonSkeletons(LevelController *pAc, Point p);
 
 inline unsigned GetTimeUntillSpell() {
   return 8 * nFramesInSecond + rand() % (3 * nFramesInSecond);

@@ -179,9 +179,9 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(smart_pointer<Castle> pCs_, smart_pointer<LevelController> pAd_,
+Dragon::Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
                ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
-    : pAd(this, pAd_), imgStable(imgStable_), imgFly(imgFly_),
+    : pAd(pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,
               pCs_.is_null() ? pAd_->vCs[0]->GetPosition()
                              : pCs_->GetPosition(),
