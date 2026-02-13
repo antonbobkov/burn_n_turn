@@ -45,22 +45,22 @@ struct SoundControls : public EventEntity {
 /** Draws high score in a rectangle. */
 struct HighScoreShower : public VisualEntity {
   std::string get_class_name() override { return "HighScoreShower"; }
-  SSP<TwrGlobalController> pGl;
+  smart_pointer<TwrGlobalController> pGl;
   Rectangle rBound;
 
   HighScoreShower(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_)
-      : pGl(this, pGl_), rBound(rBound_) {}
+      : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
 struct IntroTextShower : public VisualEntity {
   std::string get_class_name() override { return "IntroTextShower"; }
-  SSP<TwrGlobalController> pGl;
+  smart_pointer<TwrGlobalController> pGl;
   Rectangle rBound;
 
   IntroTextShower(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_)
-      : pGl(this, pGl_), rBound(rBound_) {}
+      : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };

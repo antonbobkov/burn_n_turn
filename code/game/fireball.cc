@@ -44,7 +44,7 @@ void ChainExplosion::Update() {
 
   CleanUp(pBc->lsPpl);
 
-  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -87,7 +87,7 @@ KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
 void KnightOnFire::Update() {
   Critter::Update();
 
-  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -213,7 +213,7 @@ void Fireball::Update() {
 
   bool bMultiHit = false;
 
-  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;

@@ -3,7 +3,6 @@
 #include "controller/level_controller.h"
 #include "smart_pointer.h"
 
-
 #include "file_utils.h"
 
 void Road::Draw(smart_pointer<ScalingDrawer> pDr) {

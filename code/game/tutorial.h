@@ -14,7 +14,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   std::vector<std::string> sText;
   std::vector<std::string> sNewText;
 
-  SSP<NumberDrawer> pNum;
+  smart_pointer<NumberDrawer> pNum;
 
   Timer t;
   int nOffset;
@@ -27,7 +27,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   TutorialTextEntity(float dPriority_, Point pos_,
                      smart_pointer<NumberDrawer> pNum_,
                      const bool *pIsTutorialOn_)
-      : dPriority(dPriority_), pos(pos_), pNum(this, pNum_), t(1), nOffset(0),
+      : dPriority(dPriority_), pos(pos_), pNum(pNum_), t(1), nOffset(0),
         nTextVerticalSpacing(7), nDelta(1), pIsTutorialOn(pIsTutorialOn_) {}
 
   /** Set content to v; scrolls from sText to v or sets sText if empty. */

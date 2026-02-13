@@ -22,13 +22,13 @@ struct Sliminess;
  */
 struct LevelController : public EntityListController {
   std::string get_class_name() override { return "LevelController"; }
-  std::vector<ASSP<Castle>> vCs;
-  std::vector<ASSP<Road>> vRd;
-  std::vector<ASSP<Dragon>> vDr;
+  std::vector<smart_pointer<Castle>> vCs;
+  std::vector<smart_pointer<Road>> vRd;
+  std::vector<smart_pointer<Dragon>> vDr;
 
-  std::list<ASSP<FireballBonusAnimation>> lsBonus;
-  std::list<ASSP<Slime>> lsSlimes;
-  std::list<ASSP<Sliminess>> lsSliminess;
+  std::list<smart_pointer<FireballBonusAnimation>> lsBonus;
+  std::list<smart_pointer<Slime>> lsSlimes;
+  std::list<smart_pointer<Sliminess>> lsSliminess;
 
   TrackballTracker tr;
 
@@ -70,7 +70,7 @@ struct LevelController : public EntityListController {
 
   TutorialLevelOne tutOne;
   TutorialLevelTwo tutTwo;
-  SSP<TutorialTextEntity> pTutorialText;
+  smart_pointer<TutorialTextEntity> pTutorialText;
 
   LevelController(const LevelController &a);
 
@@ -78,6 +78,9 @@ struct LevelController : public EntityListController {
                   Color c, const LevelLayout &lvl);
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
+
+  /** Return the smart_pointer in vDr that wraps p, or null. */
+  smart_pointer<Dragon> FindDragon(Dragon *p);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 

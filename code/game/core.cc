@@ -133,7 +133,7 @@ void NumberDrawer::CacheColor(Color c) {
 
 NumberDrawer::NumberDrawer(smart_pointer<ScalingDrawer> pDr_, Gui::FilePath *fp,
                            std::string sFontPath, std::string sFontName)
-    : pDr(this, pDr_), vImgIndx(256, -1) {
+    : pDr(pDr_), vImgIndx(256, -1) {
   std::string txtPath = fp->GetRelativePath(sFontPath + sFontName + ".txt");
   std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile(txtPath);
   std::istream &ifs = ih->GetStream();
@@ -324,11 +324,11 @@ TwrGlobalController::TwrGlobalController(
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
     smart_pointer<Soundic> pSndRaw_, const LevelStorage &vLvl_,
     Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
-    : nActive(1), pDr(this, pDr_), pGraph(this, pDr_->pGr), pNum(this, pNum_),
-      pBigNum(this, pBigNum_), pr(pDr_->pGr, pSndRaw_, fp),
-      pSndRaw(this, pSndRaw_), pSnd(this, new SoundInterfaceProxy(pSndRaw)),
+    : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_),
+      pBigNum(pBigNum_), pr(pDr_->pGr, pSndRaw_, fp),
+      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
-      pFancyNum(this, pFancyNum_), pWrp(pWrp_), pMenu(this, 0),
+      pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(),
       vLevelPointers(3), sbTutorialOn(fp, "tutorial_on.txt", true, true),
       snProgress(fp, "stuff.txt", 0, true),
       sbFullScreen(fp, sFullScreenPath, false, true),
@@ -764,24 +764,24 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
   pCnt2->AddE(pNoMusic);
   pCnt3->AddE(pNoMusic);
 
-  PushBackASSP(this, vCnt, pMenuHolder); // menu
-  PushBackASSP(this, vCnt, pCnt0_1);     // logo 1
-  PushBackASSP(this, vCnt, pCnt0_2);     // logo 2
-  PushBackASSP(this, vCnt, pCnt1);       // press start screen
+  vCnt.push_back(pMenuHolder); // menu
+  vCnt.push_back(pCnt0_1);     // logo 1
+  vCnt.push_back(pCnt0_2);     // logo 2
+  vCnt.push_back(pCnt1);       // press start screen
 #ifndef PC_VERSION
-  PushBackASSP(this, vCnt, pIntro); // tutorial screen
+  vCnt.push_back(pIntro); // tutorial screen
 #endif
 
   for (unsigned i = 0; i < vLvl.size(); ++i) {
-    LevelController *pAd =
-        new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]);
-    pAd->Init(pAd, vLvl[i]);
+    smart_pointer<LevelController> pAd = make_smart(
+        new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    pAd->Init(pAd.get(), vLvl[i]);
 
     pAd->AddE(pBckgMusic);
     pAd->pSc = pBckgMusic;
 
     // game level
-    PushBackASSP(this, vCnt, pAd);
+    vCnt.push_back(pAd);
 
     // chapters
     if (i == 0)
@@ -793,11 +793,11 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 
     // cutscene
     if (i == 2)
-      PushBackASSP(this, vCnt, pCut1);
+      vCnt.push_back(pCut1);
     if (i == 5)
-      PushBackASSP(this, vCnt, pCut2);
+      vCnt.push_back(pCut2);
     if (i == 8)
-      PushBackASSP(this, vCnt, pCut3);
+      vCnt.push_back(pCut3);
   }
 
 #ifdef TRIAL_VERSION
@@ -848,12 +848,12 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 #endif
 
 #ifdef FULL_VERSION
-  PushBackASSP(this, vCnt, pCnt3);  // you win
-  PushBackASSP(this, vCnt, pCnt2);  // game over
-  PushBackASSP(this, vCnt, pScore); // score
+  vCnt.push_back(pCnt3);  // you win
+  vCnt.push_back(pCnt2);  // game over
+  vCnt.push_back(pScore); // score
 #else
-  PushBackASSP(this, vCnt, pCnt2);
-  PushBackASSP(this, vCnt, pBuy);
+  vCnt.push_back(pCnt2);
+  vCnt.push_back(pBuy);
 #endif
 }
 

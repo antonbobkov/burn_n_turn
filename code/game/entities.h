@@ -42,11 +42,11 @@ struct TextDrawEntity : virtual public VisualEntity {
   Point pos;
   bool bCenter;
   std::vector<std::string> vText;
-  SSP<NumberDrawer> pNum;
+  smart_pointer<NumberDrawer> pNum;
 
   TextDrawEntity(float dPriority_, Point pos_, bool bCenter_, std::string sText,
                  smart_pointer<NumberDrawer> pNum_)
-      : dPriority(dPriority_), pos(pos_), bCenter(bCenter_), pNum(this, pNum_) {
+      : dPriority(dPriority_), pos(pos_), bCenter(bCenter_), pNum(pNum_) {
     SetText(sText);
   }
 
@@ -100,12 +100,12 @@ struct SimpleSoundEntity : virtual public EventEntity {
   Timer t;
 
   SoundSequence seq;
-  SSP<SoundInterfaceProxy> pSnd;
+  smart_pointer<SoundInterfaceProxy> pSnd;
 
   SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
                     smart_pointer<SoundInterfaceProxy> pSnd_)
       : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()),
-        pSnd(this, pSnd_) {}
+        pSnd(pSnd_) {}
 
   /*virtual*/ void Update();
 };

@@ -62,9 +62,9 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   bool bCheatsUnlocked;
 
   Point pLeftTop;
-  SSP<NumberDrawer> pNum;
+  smart_pointer<NumberDrawer> pNum;
 
-  SSP<Animation> pMenuCaret;
+  smart_pointer<Animation> pMenuCaret;
 
   /** Non-owning pointer; menu is owned by MenuController. */
   MenuController *pMenuController;
@@ -111,12 +111,12 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 struct MenuController : public EntityListController {
   std::string get_class_name() override { return "MenuController"; }
   int nResumePosition;
-  SSP<MenuDisplay> pMenuDisplay;
+  smart_pointer<MenuDisplay> pMenuDisplay;
 
   MouseCursor mc;
 
-  SSP<TextDrawEntity> pHintText;
-  SSP<TextDrawEntity> pOptionText;
+  smart_pointer<TextDrawEntity> pHintText;
+  smart_pointer<TextDrawEntity> pOptionText;
 
   MenuController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                  Color c, int nResumePosition_);

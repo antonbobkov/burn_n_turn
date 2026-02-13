@@ -11,7 +11,7 @@ struct Castle : public Critter {
   std::string get_class_name() override { return "Castle"; }
   unsigned nPrincesses;
   LevelController *pAv;
-  SSP<Dragon> pDrag;
+  smart_pointer<Dragon> pDrag;
 
   bool bBroken;
 
@@ -201,7 +201,7 @@ struct Sliminess : public EventEntity {
   bool bFast;
   int nGeneration;
   LevelController *pAdv;
-  SSP<AnimationOnce> pSlm;
+  smart_pointer<AnimationOnce> pSlm;
 
   Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
@@ -220,7 +220,7 @@ struct MegaSliminess : public EventEntity {
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
   LevelController *pAdv;
-  SSP<AnimationOnce> pSlm;
+  smart_pointer<AnimationOnce> pSlm;
 
   MegaSliminess(Point p_, LevelController *pAdv_);
 

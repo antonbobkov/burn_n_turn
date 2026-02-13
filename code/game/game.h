@@ -16,16 +16,16 @@
  * Fire, etc.). */
 struct GameController : virtual public SP_Info {
   std::string get_class_name() override { return "GameController"; }
-  SSP<TwrGlobalController> pGl;
+  smart_pointer<TwrGlobalController> pGl;
 
   Rectangle rBound;
 
   GameController(const GameController &gc)
-      : pGl(this, gc.pGl), rBound(gc.rBound) {}
+      : pGl(gc.pGl), rBound(gc.rBound) {}
 
   GameController(smart_pointer<TwrGlobalController> pGl_,
                  Rectangle rBound_ = Rectangle())
-      : pGl(this, pGl_), rBound(rBound_) {}
+      : pGl(pGl_), rBound(rBound_) {}
 
   virtual void Update() {}
   virtual void OnKey(GuiKeyType c, bool bUp) {}
@@ -48,21 +48,21 @@ struct TowerDataWrap;
  * savable options, music. */
 struct TwrGlobalController : virtual public SP_Info {
   std::string get_class_name() override { return "TwrGlobalController"; }
-  std::vector<ASSP<GameController>> vCnt;
+  std::vector<smart_pointer<GameController>> vCnt;
   unsigned nActive;
 
   std::vector<int> vLevelPointers;
 
-  SSP<MenuController> pMenu;
+  smart_pointer<MenuController> pMenu;
 
-  SSP<Graphic> pGraph;
-  SSP<ScalingDrawer> pDr;
-  SSP<NumberDrawer> pNum;
-  SSP<NumberDrawer> pBigNum;
-  SSP<FontWriter> pFancyNum;
+  smart_pointer<Graphic> pGraph;
+  smart_pointer<ScalingDrawer> pDr;
+  smart_pointer<NumberDrawer> pNum;
+  smart_pointer<NumberDrawer> pBigNum;
+  smart_pointer<FontWriter> pFancyNum;
 
-  SSP<Soundic> pSndRaw;
-  SSP<SoundInterfaceProxy> pSnd;
+  smart_pointer<Soundic> pSndRaw;
+  smart_pointer<SoundInterfaceProxy> pSnd;
 
   LevelStorage vLvl;
 

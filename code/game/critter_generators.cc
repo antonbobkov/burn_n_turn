@@ -66,7 +66,7 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   pBc->AddBoth(pCr);
-  PushBackASSP(pBc, pBc->lsPpl, pCr);
+  pBc->lsPpl.push_back(pCr);
 }
 
 void KnightGenerator::Update() {
@@ -112,7 +112,7 @@ void PrincessGenerator::Update() {
       bFirst = false;
     }
     pBc->AddBoth(pCr);
-    PushBackASSP(pBc, pBc->lsPpl, pCr);
+    pBc->lsPpl.push_back(pCr);
     pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("princess_arrive"));
 
     pBc->tutOne.PrincessGenerate();
@@ -155,7 +155,7 @@ void MageGenerator::MageGenerate() {
               vel.x < 0 ? pBc->pGl->pr("mage_f") : pBc->pGl->pr("mage"), true),
       pBc, pBc->pGl->bAngry));
   pBc->AddBoth(pCr);
-  PushBackASSP(pBc, pBc->lsPpl, pCr);
+  pBc->lsPpl.push_back(pCr);
 }
 
 float TraderGenerator::GetRate() {
@@ -207,7 +207,7 @@ void TraderGenerator::Update() {
     }
 
     pBc->AddBoth(pCr);
-    PushBackASSP(pBc, pBc->lsPpl, pCr);
+    pBc->lsPpl.push_back(pCr);
 
     pBc->tutTwo.TraderGenerate();
   }
@@ -226,6 +226,6 @@ void TraderGenerator::Update() {
         Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->pr("skelly"), true), pAdv,
         'S'));
     pAdv->AddBoth(pCr);
-    PushBackASSP(pAdv, pAdv->lsPpl, pCr);
+    pAdv->lsPpl.push_back(pCr);
   }
 }

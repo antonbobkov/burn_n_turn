@@ -55,11 +55,11 @@ void FlashingController::OnKey(GuiKeyType c, bool bUp) {
 }
 
 void EntityListController::AddV(smart_pointer<VisualEntity> pVs) {
-  lsDraw.push_back(ASSP<VisualEntity>(this, pVs));
+  lsDraw.push_back(pVs);
 }
 
 void EntityListController::AddE(smart_pointer<EventEntity> pEv) {
-  lsUpdate.push_back(ASSP<EventEntity>(this, pEv));
+  lsUpdate.push_back(pEv);
 }
 
 void EntityListController::AddBackground(Color c) {
@@ -91,7 +91,7 @@ void EntityListController::Update() {
   CleanUp(lsDraw);
   CleanUp(lsPpl);
 
-  std::list<ASSP<EventEntity>>::iterator itr;
+  std::list<smart_pointer<EventEntity>>::iterator itr;
   for (itr = lsUpdate.begin(); itr != lsUpdate.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -106,7 +106,7 @@ void EntityListController::Update() {
   }
 
   {
-    std::list<ASSP<VisualEntity>>::iterator itr;
+    std::list<smart_pointer<VisualEntity>>::iterator itr;
 
     std::multimap<ScreenPos, smart_pointer<VisualEntity>> mmp;
 
@@ -215,8 +215,8 @@ void BuyNowController::OnMouseDown(Point pPos) {
 
 Cutscene::Cutscene(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
-    : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(this, 0),
-      pCrFollow(this, 0), bRelease(false), tm(nFramesInSecond / 5),
+    : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
+      pCrFollow(), bRelease(false), tm(nFramesInSecond / 5),
       Beepy(true) {
   ImageSequence seq1 = pGl_->pr(sRun);
 

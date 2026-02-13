@@ -119,7 +119,7 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 
     nSlimeMax *= 2;
 
-    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin(),
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin(),
                                                      etr = pAd->lsPpl.end();
          itr != etr; ++itr)
       if ((*itr)->GetType() == 'K' || (*itr)->GetType() == 'S' ||
@@ -150,7 +150,7 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 }
 
 void Dragon::FlushBonuses() {
-  for (std::list<ASSP<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
+  for (std::list<smart_pointer<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
                                                      etr = lsBonuses.end();
        itr != etr; ++itr)
     pAd->pGl->lsBonusesToCarryOver.push_back(*itr);
@@ -169,7 +169,7 @@ FireballBonus Dragon::GetAllBonuses() {
   CleanUp(lsBonuses);
   FireballBonus fbRet(-1, true);
 
-  for (std::list<ASSP<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
+  for (std::list<smart_pointer<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
                                                      etr = lsBonuses.end();
        itr != etr; ++itr)
     fbRet += **itr;
@@ -186,14 +186,14 @@ Dragon::Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
               pCs_.is_null() ? pAd_->vCs[0]->GetPosition()
                              : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
-      bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(this, pCs_), bt(bt_),
+      bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(pCs_), bt(bt_),
       nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
       nExtraFireballs(0), bRegenLocked(false),
       tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
   if (!pCs.is_null() && pCs->pDrag.is_null()) {
-    pCs->pDrag = this;
+    pCs->pDrag = pAd->FindDragon(this);
     bFly = false;
     Critter::dPriority = 3;
     Critter::fPos = pCs->GetPosition();
@@ -257,7 +257,7 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
          itr != pAd->lsPpl.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -279,7 +279,7 @@ void Dragon::Update() {
   if (bFly) {
     CleanUp(pAd->lsBonus);
 
-    for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+    for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
              pAd->lsBonus.begin();
          itr != pAd->lsBonus.end(); ++itr) {
       if (!(*itr)->bExist)
@@ -330,7 +330,7 @@ void Dragon::AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent) {
   if (pBonus.is_null())
     return;
 
-  PushBackASSP(this, lsBonuses, pBonus);
+  lsBonuses.push_back(pBonus);
   pAd->AddE(pBonus);
 }
 
@@ -399,7 +399,7 @@ void Dragon::Fire(fPoint fDir) {
         new Fireball(pPos, fShoot, pAd, fb, Chain(), GetFireballChainNum(fb)));
     pAd->AddBoth(pFb);
     if (i == nNumber / 2)
-      PushBackASSP(this, lsBalls, pFb);
+      lsBalls.push_back(pFb);
   }
 
   if (fb.bMap["laser"])
@@ -420,8 +420,8 @@ void Dragon::Toggle() {
     SimpleVisualEntity::seq = imgFly;
     SimpleVisualEntity::dPriority = 5;
 
-    pCs->pDrag = 0;
-    pCs = 0;
+    pCs->pDrag = smart_pointer<Dragon>();
+    pCs = smart_pointer<Castle>();
 
     fVel = pAd->pt.GetFlightDirection(GetPosition());
 
@@ -444,7 +444,7 @@ void Dragon::Toggle() {
       pAd->tutOne.FlyOff();
 
       pCs = pAd->vCs[i];
-      pCs->pDrag = this;
+      pCs->pDrag = pAd->FindDragon(this);
 
       if (cCarry == 'P') {
         pAd->tutOne.PrincessCaptured();
@@ -487,7 +487,7 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
        itr != pAd->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;

@@ -51,9 +51,9 @@ struct FlashingController : public GameController {
  * then draws by priority. */
 struct EntityListController : public GameController {
   std::string get_class_name() override { return "EntityListController"; }
-  std::list<ASSP<VisualEntity>> lsDraw;
-  std::list<ASSP<EventEntity>> lsUpdate;
-  std::list<ASSP<ConsumableEntity>> lsPpl;
+  std::list<smart_pointer<VisualEntity>> lsDraw;
+  std::list<smart_pointer<EventEntity>> lsUpdate;
+  std::list<smart_pointer<ConsumableEntity>> lsPpl;
 
   /** Add visual entity to lsDraw. */
   void AddV(smart_pointer<VisualEntity> pVs);
@@ -61,8 +61,8 @@ struct EntityListController : public GameController {
   void AddE(smart_pointer<EventEntity> pEv);
 
   template <class T> void AddBoth(T &t) {
-    lsDraw.push_back(ASSP<VisualEntity>(this, t));
-    lsUpdate.push_back(ASSP<EventEntity>(this, t));
+    lsDraw.push_back(t);
+    lsUpdate.push_back(t);
   }
 
   /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
@@ -138,8 +138,8 @@ struct BuyNowController : public EntityListController {
 
 struct Cutscene : public EntityListController {
   std::string get_class_name() override { return "Cutscene"; }
-  SSP<FancyCritter> pCrRun;
-  SSP<FancyCritter> pCrFollow;
+  smart_pointer<FancyCritter> pCrRun;
+  smart_pointer<FancyCritter> pCrFollow;
 
   Timer tm;
   bool Beepy;

@@ -61,7 +61,7 @@ struct AdNumberDrawer : public VisualEntity {
 };
 
 struct BonusDrawer : public VisualEntity {
-  typedef std::list<ASSP<TimedFireballBonus>> BonusList;
+  typedef std::list<smart_pointer<TimedFireballBonus>> BonusList;
 
   LevelController *pAd;
 
@@ -126,7 +126,7 @@ LevelController::LevelController(const LevelController &a)
       tStep(a.tStep), bLeft(a.bLeft), pSc(a.pSc), bLeftDown(a.bLeftDown),
       bRightDown(a.bRightDown), nLastDir(a.nLastDir),
       bWasDirectionalInput(a.bWasDirectionalInput), pt(a.pt), mc(a.mc),
-      bFirstUpdate(true), pTutorialText(this, a.pTutorialText),
+      bFirstUpdate(true), pTutorialText(a.pTutorialText),
       tutOne(a.tutOne), tutTwo(a.tutTwo), bTimerFlash(a.bTimerFlash),
       pMgGen(a.pMgGen) {
   CopyArrayASSP(this, a.vCs, vCs);
@@ -144,8 +144,15 @@ LevelController::LevelController(smart_pointer<TwrGlobalController> pGl_,
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
-      bTakeOffToggle(false), pTutorialText(this, 0),
+      bTakeOffToggle(false), pTutorialText(),
       mc(pGl->pr("claw"), Point()), bTimerFlash(false) {}
+
+smart_pointer<Dragon> LevelController::FindDragon(Dragon *p) {
+  for (size_t i = 0; i < vDr.size(); ++i)
+    if (vDr[i].get() == p)
+      return vDr[i];
+  return smart_pointer<Dragon>();
+}
 
 void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   pSelf = pSelf_;
@@ -175,20 +182,20 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    PushBackASSP(pSelf, vRd,
-                 make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
+    vRd.push_back(
+        make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
-    PushBackASSP(pSelf, vCs,
-                 make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
+    vCs.push_back(
+        make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
 
   t = Timer(lvl.nTimer);
 
-  PushBackASSP(
-      pSelf, vDr,
-      make_smart(new Dragon(
-          vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
-          ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
+  vDr.push_back(make_smart(new Dragon(
+      vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
+      ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
+  if (!vDr.back()->pCs.is_null())
+    vDr.back()->pCs->pDrag = vDr.back();
 
   Point pos(pGl->rBound.sz.x / 2, pGl->rBound.sz.y);
   smart_pointer<TutorialTextEntity> pTT = make_smart(new TutorialTextEntity(

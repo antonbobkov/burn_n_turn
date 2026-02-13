@@ -149,7 +149,7 @@ void Trader::OnHit(char cWhat) {
     bFirstBns = false;
   }
   pAc->AddBoth(pFb);
-  PushBackASSP(pAc, pAc->lsBonus, pFb);
+  pAc->lsBonus.push_back(pFb);
 }
 
 void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -191,7 +191,7 @@ void Knight::Update() {
   if (cType == 'S') {
     CleanUp(pAc->lsPpl);
 
-    for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
          itr != pAc->lsPpl.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -207,7 +207,7 @@ void Knight::Update() {
 
     CleanUp(pAc->lsBonus);
 
-    for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+    for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
              pAc->lsBonus.begin();
          itr != pAc->lsBonus.end(); ++itr) {
       if (!(*itr)->bExist)
@@ -301,7 +301,7 @@ void MegaSlime::RandomizeVelocity() {
 void MegaSlime::Update() {
   CleanUp(pAc->lsBonus);
 
-  for (std::list<ASSP<FireballBonusAnimation>>::iterator itr =
+  for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
            pAc->lsBonus.begin();
        itr != pAc->lsBonus.end(); ++itr) {
     if (!(*itr)->bExist)
@@ -380,7 +380,7 @@ void Ghostiness::Update() {
     pCr->nGhostHit = nGhostHit - 1;
 
     pAdv->AddBoth(pCr);
-    PushBackASSP(pAdv, pAdv->lsPpl, pCr);
+    pAdv->lsPpl.push_back(pCr);
   }
 }
 
@@ -411,7 +411,7 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (std::list<ASSP<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
        itr != pAc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -439,7 +439,7 @@ void Slime::OnHit(char cWhat) {
   if (pAc->nSlimeNum >= nSlimeMax && cWhat != 'M') {
     std::vector<Point> vDeadSlimes;
 
-    for (std::list<ASSP<Slime>>::iterator itr = pAc->lsSlimes.begin();
+    for (std::list<smart_pointer<Slime>>::iterator itr = pAc->lsSlimes.begin();
          itr != pAc->lsSlimes.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -448,7 +448,7 @@ void Slime::OnHit(char cWhat) {
       (*itr)->OnHit('M');
     }
 
-    for (std::list<ASSP<Sliminess>>::iterator itr = pAc->lsSliminess.begin();
+    for (std::list<smart_pointer<Sliminess>>::iterator itr = pAc->lsSliminess.begin();
          itr != pAc->lsSliminess.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -504,14 +504,14 @@ void Slime::OnHit(char cWhat) {
     smart_pointer<Sliminess> pSlm = make_smart(
         new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
     pAc->AddE(pSlm);
-    PushBackASSP(pAc, pAc->lsSliminess, pSlm);
+    pAc->lsSliminess.push_back(pSlm);
   }
 }
 
 Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
     : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_),
-      pSlm(this, 0) {
+      pSlm() {
   ImageSequence seq = bFast ? pAdv->pGl->pr("slime_reproduce_fast")
                             : pAdv->pGl->pr("slime_reproduce");
 
@@ -533,8 +533,8 @@ void Sliminess::Update() {
     smart_pointer<Slime> pSlm =
         make_smart(new Slime(p, pAdv->rBound, pAdv, nGeneration));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv, pAdv->lsPpl, pSlm);
-    PushBackASSP(pAdv, pAdv->lsSlimes, pSlm);
+    pAdv->lsPpl.push_back(pSlm);
+    pAdv->lsSlimes.push_back(pSlm);
   }
 }
 
@@ -549,7 +549,7 @@ Sliminess::~Sliminess() {
 }
 
 MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
-    : p(p_), pAdv(pAdv_), pSlm(this, 0) {
+    : p(p_), pAdv(pAdv_), pSlm() {
   ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
 
   smart_pointer<AnimationOnce> pSlmTmp = make_smart(
@@ -567,7 +567,7 @@ void MegaSliminess::Update() {
     smart_pointer<MegaSlime> pSlm =
         make_smart(new MegaSlime(p, pAdv->rBound, pAdv));
     pAdv->AddBoth(pSlm);
-    PushBackASSP(pAdv, pAdv->lsPpl, pSlm);
+    pAdv->lsPpl.push_back(pSlm);
   }
 }
 
@@ -637,7 +637,7 @@ void Mage::SummonSlimes() {
 
 Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
-      nPrincesses(0), pAv(pAv_), pDrag(this, 0), bBroken(false) {}
+      nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
 void Castle::OnKnight(char cWhat) {
   if (pAv->bCh)
@@ -664,14 +664,14 @@ void Castle::OnKnight(char cWhat) {
       pDrag->SimpleVisualEntity::seq = pDrag->imgFly;
       pDrag->SimpleVisualEntity::dPriority = 5;
 
-      pDrag->pCs = 0;
+      pDrag->pCs = smart_pointer<Castle>();
 
       pDrag->fVel = pAv->pt.GetDirection(GetPosition());
       if (pDrag->fVel.Length() == 0)
         pDrag->fVel = fPoint(0, -1);
       pDrag->fVel.Normalize(pDrag->leash.speed);
 
-      pDrag = 0;
+      pDrag = smart_pointer<Dragon>();
     }
 
     return;
@@ -693,7 +693,7 @@ void Castle::OnKnight(char cWhat) {
                                           true),
                                   pAv));
       pAv->AddBoth(pCr);
-      PushBackASSP(pAv, pAv->lsPpl, pCr);
+      pAv->lsPpl.push_back(pCr);
     }
   } else {
     pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("all_princess_escape"));
@@ -713,7 +713,7 @@ void Castle::OnKnight(char cWhat) {
                                             true),
                                     pAv));
         pAv->AddBoth(pCr);
-        PushBackASSP(pAv, pAv->lsPpl, pCr);
+        pAv->lsPpl.push_back(pCr);
       }
     }
 

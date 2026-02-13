@@ -129,16 +129,19 @@ template <class T> void CleanUp(std::list<T> &ar) {
   }
 }
 
-/** Copy ASSP so the new pointer is owned by pInf. */
-template <class T> ASSP<T> CopyASSP(SP_Info *pInf, ASSP<T> pAsp) {
-  return ASSP<T>(pInf, pAsp);
+/** Copy smart pointer (no rebinding; same as assignment). */
+template <class T>
+smart_pointer<T> CopyASSP(SP_Info *pInf, smart_pointer<T> pAsp) {
+  (void)pInf;
+  return pAsp;
 }
 
-/** Copy each ASSP from from into to, rebinding each to pInf. */
+/** Copy each smart pointer from from into to. */
 template <class T> void CopyArrayASSP(SP_Info *pInf, const T &from, T &to) {
+  (void)pInf;
   for (typename T::const_iterator itr = from.begin(), etr = from.end();
        itr != etr; ++itr)
-    to.push_back(CopyASSP(pInf, *itr));
+    to.push_back(*itr);
 }
 
 template <class T>
@@ -167,15 +170,6 @@ std::ostream &Out(std::ostream &ofs, const std::map<std::string, T> &srcMap) {
        itr != etr; ++itr)
     ofs << itr->first << " = " << itr->second << "; ";
   return ofs;
-}
-
-template <class A, class B> void PushBackASSP(SP_Info *pInf, A &arr, B *pnt) {
-  arr.push_back(ASSP<B>(pInf, pnt));
-}
-
-template <class A, class B>
-void PushBackASSP(SP_Info *pInf, A &arr, smart_pointer<B> pnt) {
-  arr.push_back(ASSP<B>(pInf, pnt));
 }
 
 #endif

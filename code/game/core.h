@@ -30,9 +30,9 @@ fPoint RandomAngle(fPoint fDir = fPoint(1, 0), float fRange = 1.F);
 /** Base for drawing an image at a point; ScalingDrawer adds scale and color
  * key. */
 struct Drawer : virtual public SP_Info {
-  SSP<Graphic> pGr;
+  smart_pointer<Graphic> pGr;
 
-  Drawer() : pGr(this, 0) {}
+  Drawer() : pGr() {}
   std::string get_class_name() override { return "Drawer"; }
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
@@ -60,7 +60,7 @@ struct ScalingDrawer : public Drawer {
  * recolored text. */
 struct NumberDrawer : virtual public SP_Info {
   std::string get_class_name() override { return "NumberDrawer"; }
-  SSP<ScalingDrawer> pDr;
+  smart_pointer<ScalingDrawer> pDr;
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
 
@@ -89,12 +89,12 @@ struct NumberDrawer : virtual public SP_Info {
 /** Wraps Soundic and gates playback on bSoundOn (Toggle/Get). */
 class SoundInterfaceProxy : virtual public SP_Info {
   bool bSoundOn;
-  SSP<Soundic> pSndRaw;
+  smart_pointer<Soundic> pSndRaw;
 
 public:
   std::string get_class_name() override { return "SoundInterfaceProxy"; }
   SoundInterfaceProxy(smart_pointer<Soundic> pSndRaw_)
-      : pSndRaw(this, pSndRaw_), bSoundOn(true) {}
+      : pSndRaw(pSndRaw_), bSoundOn(true) {}
 
   void PlaySound(Index i, int nChannel = -1, bool bLoop = false);
 

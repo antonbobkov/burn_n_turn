@@ -50,8 +50,8 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
 MenuController::MenuController(smart_pointer<TwrGlobalController> pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
-      pMenuDisplay(this, nullptr), mc(pGl_->pr("claw"), Point()),
-      pHintText(this, nullptr), pOptionText(this, nullptr) {
+      pMenuDisplay(), mc(pGl_->pr("claw"), Point()),
+      pHintText(), pOptionText() {
   bNoRefresh = true;
 }
 
@@ -92,7 +92,7 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
                          smart_pointer<Animation> pMenuCaret_,
                          smart_pointer<MenuController> pMenuController_,
                          bool bCheatsUnlocked_)
-    : pLeftTop(pLeftTop_), pNum(this, pNum_), pMenuCaret(this, pMenuCaret_),
+    : pLeftTop(pLeftTop_), pNum(pNum_), pMenuCaret(pMenuCaret_),
       pMenuController(pMenuController_.get()), pCurr(&memMain),
       bCheatsUnlocked(bCheatsUnlocked_) {
   Size szSpacing(50, 10);

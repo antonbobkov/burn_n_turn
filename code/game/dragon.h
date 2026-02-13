@@ -42,8 +42,8 @@ struct ButtonSet {
 /** Player dragon: carries bonuses and fireballs, steer/shoot, collision. */
 struct Dragon : public Critter {
   std::string get_class_name() override { return "Dragon"; }
-  std::list<ASSP<TimedFireballBonus>> lsBonuses;
-  std::list<ASSP<Fireball>> lsBalls;
+  std::list<smart_pointer<TimedFireballBonus>> lsBonuses;
+  std::list<smart_pointer<Fireball>> lsBalls;
 
   DragonLeash leash;
 
@@ -75,7 +75,7 @@ struct Dragon : public Critter {
 
   LevelController *pAd;
 
-  SSP<Castle> pCs;
+  smart_pointer<Castle> pCs;
 
   ImageSequence imgStable;
   ImageSequence imgFly;
