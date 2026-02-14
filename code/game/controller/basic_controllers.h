@@ -87,6 +87,7 @@ struct EntityListController : public GameController {
   /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
   void AddBackground(Color c);
 
+  EntityListController(const EntityListController &) = delete;
   bool bNoRefresh;
   EntityListController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                   Color c);
