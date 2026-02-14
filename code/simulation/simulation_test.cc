@@ -171,4 +171,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
               << "\n";
   std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter << "\n";
+
+  REQUIRE(nGlobalSuperMegaCounter == 0);
+  REQUIRE(nonzero.empty());
 }
