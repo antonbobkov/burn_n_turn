@@ -1,6 +1,7 @@
 #include "Preloader.h"
 #include "smart_pointer.h"
 
+#include "color.h"
 #include "exception.h"
 #include "string_utils.h"
 

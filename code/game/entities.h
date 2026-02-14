@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_ENTITIES_H
 #define TOWER_DEFENSE_ENTITIES_H
 
+#include "color.h"
 #include "core.h"
 #include "smart_pointer.h"
 

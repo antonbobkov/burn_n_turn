@@ -1,5 +1,7 @@
 #include "game.h"
 #include "controller/menu_controller.h"
+
+#include "color.h"
 #include "file_utils.h"
 #include "game_runner_interface.h"
 #include "event.h"

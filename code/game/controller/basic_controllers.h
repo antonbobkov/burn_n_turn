@@ -3,6 +3,7 @@
 
 /* Include after GameController and DragonGameControllerList are defined (e.g. from
  * game.h). */
+#include "color.h"
 #include "geometry.h"
 #include "gui_key_type.h"
 #include "smart_pointer.h"

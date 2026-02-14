@@ -3,6 +3,8 @@ alwaysApply: true
 ---
 After modifying CMake files, run cmake and build. After modifying code, make sure project builds and all tests pass. Even if the build/test issues are unrelated to modified code, fix them anyway.
 
+After finishing requested changes, generate short summary string which can be used as a commit description.
+
 To make and build, run `cd c:\coding\dragongame_git\build; cmake ../code -G "MinGW Makefiles"; mingw32-make`
 
 To build, run `cd c:\coding\dragongame_git\build; mingw32-make`

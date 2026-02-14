@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 project(Wrappers LANGUAGES CXX)
 
 add_library(GuiGen
+  color.cc
+  color.h
   font_writer.cc
   font_writer.h
   geometry.cc
   geometry.h
-  GuiGenHdr.h
   GuiGen.h
   GuiGen.cc
 )

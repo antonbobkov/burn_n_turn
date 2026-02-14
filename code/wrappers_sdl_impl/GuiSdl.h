@@ -7,6 +7,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
+#include "color.h"
 #include "GuiGen.h"
 
 namespace Gui {

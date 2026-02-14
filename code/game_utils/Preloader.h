@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "color.h"
 #include "GuiGen.h"
 #include "SuiGen.h"
 #include "file_utils.h"

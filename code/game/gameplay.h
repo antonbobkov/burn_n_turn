@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_GAMEPLAY_H
 #define TOWER_DEFENSE_GAMEPLAY_H
 
+#include "color.h"
 #include "controller/menu_controller.h"
 #include "gui_key_type.h"
 #include "smart_pointer.h"

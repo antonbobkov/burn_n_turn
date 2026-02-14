@@ -1,15 +1,10 @@
 #include <sstream>
 
+#include "color.h"
 #include "GuiGen.h"
 #include "smart_pointer.h"
 
 namespace Gui {
-std::string ColorToString(Color c) {
-  std::ostringstream ostr;
-  ostr << "(" << c.R << ", " << c.G << ", " << c.B
-       << ")"; // Looks like (255, 0, 77)
-  return ostr.str();
-}
 
 std::string MatrixErrorInfo::GetErrorMessage() const {
   std::ostringstream ostr;

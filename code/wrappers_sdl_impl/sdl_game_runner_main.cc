@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>
 
+#include "color.h"
 #include "file_utils.h"
 #include "game_runner_interface.h"
 #include "gui_key_type.h"

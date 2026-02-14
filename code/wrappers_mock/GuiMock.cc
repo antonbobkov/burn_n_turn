@@ -1,5 +1,7 @@
 #include "GuiMock.h"
 
+#include "color.h"
+
 namespace Gui {
 
 MockImage::MockImage(std::string name, Size sz) : Image(sz), name_(name) {}

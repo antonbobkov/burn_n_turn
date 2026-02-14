@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include "color.h"
 #include "GuiGen.h"
 
 namespace Gui {

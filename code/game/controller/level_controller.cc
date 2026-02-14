@@ -1,6 +1,7 @@
 #include "game.h"
 #include "controller/level_controller.h"
 
+#include "color.h"
 #include "common.h"
 #include "core.h"
 #include "critters.h"

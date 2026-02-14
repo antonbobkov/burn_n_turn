@@ -1,5 +1,6 @@
 #include "font_writer.h"
 
+#include "color.h"
 #include "GuiGen.h"
 #include "file_utils.h"
 

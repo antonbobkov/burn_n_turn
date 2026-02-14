@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_LEVEL_CONTROLLER_H
 #define TOWER_DEFENSE_LEVEL_CONTROLLER_H
 
+#include "color.h"
 #include "controller/basic_controllers.h"
 #include "controller/menu_controller.h"
 #include "gameplay.h"

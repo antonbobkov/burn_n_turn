@@ -7,7 +7,8 @@
 #ifndef TOWER_DEFENSE_FONT_WRITER_H
 #define TOWER_DEFENSE_FONT_WRITER_H
 
-#include "GuiGenHdr.h"
+#include "color.h"
+#include "GuiGen.h"
 
 namespace Gui {
 
