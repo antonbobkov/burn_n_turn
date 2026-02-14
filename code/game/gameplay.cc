@@ -1,41 +1,9 @@
+#include "game_utils/draw_utils.h"
 #include "game.h"
 #include "game/controller/level_controller.h"
 #include "dragon_constants.h"
 #include "dragon_macros.h"
 #include "utils/smart_pointer.h"
-#include "utils/string_utils.h"
-
-void BackgroundMusicPlayer::ToggleOff() {
-  if (!bOff) {
-    bOff = true;
-    StopMusic();
-  } else {
-    bOff = false;
-  }
-}
-
-void BackgroundMusicPlayer::SwitchTheme(int nTheme) {
-  if (bOff)
-    return;
-
-  if (nCurrTheme == nTheme)
-    return;
-
-  if (nTheme < 0 || nTheme >= int(vThemes.size()))
-    throw SimpleException("BackgroundMusicPlayer", "SwitchTheme",
-                          "Bad theme index " + S(nTheme));
-
-  StopMusic();
-  pSnd->PlaySound(vThemes[nTheme], BG_MUSIC_CHANNEL, true);
-
-  nCurrTheme = nTheme;
-}
-
-void BackgroundMusicPlayer::StopMusic() {
-  if (nCurrTheme != -1)
-    pSnd->StopSound(BG_MUSIC_CHANNEL);
-  nCurrTheme = -1;
-}
 
 BonusScore::BonusScore(LevelController *pAc_, Point p_, unsigned nScore_)
     : p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0),

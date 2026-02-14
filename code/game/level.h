@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_LEVEL_H
 #define TOWER_DEFENSE_LEVEL_H
 
+#include "game_utils/draw_utils.h"
 #include "entities.h"
 #include "utils/exception.h"
 #include "utils/smart_pointer.h"
@@ -81,7 +82,6 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
 }
 
 struct LevelController;
-struct ScalingDrawer;
 
 /** Fancy road: draws tiled road image; needs LevelController for resources.
  */

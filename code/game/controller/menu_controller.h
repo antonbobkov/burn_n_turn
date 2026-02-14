@@ -7,6 +7,7 @@
 
 #include "wrappers/color.h"
 #include "game/controller/basic_controllers.h"
+#include "game_utils/draw_utils.h"
 #include "game/entities.h"
 #include "wrappers/gui_key_type.h"
 #include "game_utils/mouse_utils.h"

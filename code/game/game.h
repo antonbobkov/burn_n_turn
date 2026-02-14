@@ -3,7 +3,9 @@
 
 #include "common.h"
 #include "core.h"
+#include "game_utils/draw_utils.h"
 #include "entities.h"
+#include "game_utils/sound_utils.h"
 #include "utils/file_utils.h"
 #include "fireball.h"
 #include "wrappers/font_writer.h"

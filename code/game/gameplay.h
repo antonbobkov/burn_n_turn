@@ -1,10 +1,12 @@
 #ifndef TOWER_DEFENSE_GAMEPLAY_H
 #define TOWER_DEFENSE_GAMEPLAY_H
 
-#include "wrappers/color.h"
 #include "game/controller/menu_controller.h"
-#include "wrappers/gui_key_type.h"
+#include "game_utils/draw_utils.h"
+#include "game_utils/sound_utils.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+#include "wrappers/gui_key_type.h"
 
 /** Included after critter_generators.h and dragon.h from game.h. */
 struct LevelController;

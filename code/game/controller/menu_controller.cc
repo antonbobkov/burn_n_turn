@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/controller/menu_controller.h"
+#include "game_utils/draw_utils.h"
 
 #include "wrappers/color.h"
 #include "utils/file_utils.h"

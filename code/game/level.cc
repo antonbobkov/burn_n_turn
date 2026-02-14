@@ -1,3 +1,4 @@
+#include "game_utils/draw_utils.h"
 #include "level.h"
 #include "dragon_constants.h"
 #include "game.h"

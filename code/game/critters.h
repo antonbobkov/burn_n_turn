@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_CRITTERS_H
 #define TOWER_DEFENSE_CRITTERS_H
 
+#include "game_utils/draw_utils.h"
 #include "dragon_constants.h"
 #include "game_utils/image_sequence.h"
 #include "entities.h"

@@ -1,5 +1,6 @@
 #include "entities.h"
 #include "core.h"
+#include "game_utils/draw_utils.h"
 
 void TextDrawEntity::SetText(std::string sText) {
   vText = BreakUpString(sText);
