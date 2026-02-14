@@ -599,7 +599,7 @@ DragonGameControllerList::DragonGameControllerList(
   pNum->CacheColor(Color(5, 5, 0));
 }
 
-void DragonGameControllerList::StartUp(smart_pointer<DragonGameControllerList> pSelf_) {
+void DragonGameControllerList::StartUp(DragonGameControllerList *pSelf_) {
   pSelf = pSelf_;
   nScore = 0;
   bAngry = false;
@@ -933,9 +933,9 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 #endif
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
-  pCnt = make_smart(new DragonGameControllerList(pDr, pNum, pBigNum, pFancyNum, pSm,
-                                            vLvl, rBound, this, fp_.get()));
-  pCnt->StartUp(pCnt);
+  pCnt = std::make_unique<DragonGameControllerList>(pDr, pNum, pBigNum,
+      pFancyNum, pSm, vLvl, rBound, this, fp_.get());
+  pCnt->StartUp(pCnt.get());
 }
 
 DragonGameControllerList *DragonGameRunner::GetTowerController() const {

@@ -47,7 +47,7 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   }
 }
 
-MenuController::MenuController(smart_pointer<DragonGameControllerList> pGl_,
+MenuController::MenuController(DragonGameControllerList *pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
       pMenuDisplay(), mc(pGl_->pr("claw"), Point()),

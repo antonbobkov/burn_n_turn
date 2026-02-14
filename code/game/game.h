@@ -11,19 +11,20 @@
 #include "level.h"
 #include "smart_pointer.h"
 #include "tutorial.h"
+#include <memory>
 
 /** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
  * Fire, etc.). */
 struct GameController : virtual public SP_Info {
   std::string get_class_name() override { return "GameController"; }
-  smart_pointer<DragonGameControllerList> pGl;
+  DragonGameControllerList *pGl;
 
   Rectangle rBound;
 
   GameController(const GameController &gc)
       : pGl(gc.pGl), rBound(gc.rBound) {}
 
-  GameController(smart_pointer<DragonGameControllerList> pGl_,
+  GameController(DragonGameControllerList *pGl_,
                  Rectangle rBound_ = Rectangle())
       : pGl(pGl_), rBound(rBound_) {}
 
@@ -46,8 +47,7 @@ struct TowerDataWrap;
 
 /** Global game state: level storage, active controller, graphics/sound, score,
  * savable options, music. */
-struct DragonGameControllerList : virtual public SP_Info {
-  std::string get_class_name() override { return "DragonGameControllerList"; }
+struct DragonGameControllerList {
   std::vector<smart_pointer<GameController>> vCnt;
   unsigned nActive;
 
@@ -97,9 +97,9 @@ struct DragonGameControllerList : virtual public SP_Info {
 
   TowerDataWrap *pWrp;
 
-  smart_pointer<DragonGameControllerList> pSelf;
+  DragonGameControllerList *pSelf;
 
-  void StartUp(smart_pointer<DragonGameControllerList> pSelf);
+  void StartUp(DragonGameControllerList *pSelf);
   void Next();
   void Restart(int nActive_ = -1);
   void Menu();
@@ -133,7 +133,7 @@ public:
   std::unique_ptr<FilePath> fp_;
 
   LevelStorage vLvl;
-  smart_pointer<DragonGameControllerList> pCnt;
+  std::unique_ptr<DragonGameControllerList> pCnt;
 
   Size szActualRez;
 };

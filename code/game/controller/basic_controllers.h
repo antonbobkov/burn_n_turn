@@ -26,7 +26,7 @@ struct SimpleController : public GameController {
   std::string get_class_name() override { return "SimpleController"; }
   Index nImage;
 
-  SimpleController(smart_pointer<DragonGameControllerList> pGraph,
+  SimpleController(DragonGameControllerList *pGraph,
                    std::string strFileName);
   ~SimpleController();
 
@@ -42,7 +42,7 @@ struct FlashingController : public GameController {
   unsigned nTimer;
   bool bShow;
 
-  FlashingController(smart_pointer<DragonGameControllerList> pGraph,
+  FlashingController(DragonGameControllerList *pGraph,
                      std::string strFileName, std::string strTextName);
   ~FlashingController();
 
@@ -89,7 +89,7 @@ struct EntityListController : public GameController {
 
   EntityListController(const EntityListController &) = delete;
   bool bNoRefresh;
-  EntityListController(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound,
+  EntityListController(DragonGameControllerList *pGl_, Rectangle rBound,
                   Color c);
 
   /**
@@ -111,7 +111,7 @@ struct EntityListController : public GameController {
 
 struct StartScreenController : public EntityListController {
   std::string get_class_name() override { return "StartScreenController"; }
-  StartScreenController(smart_pointer<DragonGameControllerList> pGl_,
+  StartScreenController(DragonGameControllerList *pGl_,
                         Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
@@ -137,7 +137,7 @@ struct BuyNowController : public EntityListController {
 
   Timer tVel;
 
-  BuyNowController(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound,
+  BuyNowController(DragonGameControllerList *pGl_, Rectangle rBound,
                    Color c);
 
   /** Set fVel to random direction, sometimes toward center; scale by speed. */
@@ -174,7 +174,7 @@ struct Cutscene : public EntityListController {
    * Runner starts left or right depending on flip; when the runner reaches the
    * middle, the chaser is released. Beep/boop timer for sound.
    */
-  Cutscene(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound_,
+  Cutscene(DragonGameControllerList *pGl_, Rectangle rBound_,
            std::string sRun, std::string sChase, bool bFlip = false);
 
   /*virtual*/ void Update();
@@ -189,7 +189,7 @@ struct DragonScoreController : public EntityListController {
   Timer t;
   bool bClickToExit;
 
-  DragonScoreController(smart_pointer<DragonGameControllerList> pGl_,
+  DragonScoreController(DragonGameControllerList *pGl_,
                         Rectangle rBound, Color c, bool bScoreShow);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
@@ -204,7 +204,7 @@ struct DragonScoreController : public EntityListController {
  * on input. */
 struct AutoAdvanceController : public EntityListController {
   std::string get_class_name() override { return "AutoAdvanceController"; }
-  AutoAdvanceController(smart_pointer<DragonGameControllerList> pGl_,
+  AutoAdvanceController(DragonGameControllerList *pGl_,
                         Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 

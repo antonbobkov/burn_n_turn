@@ -118,7 +118,7 @@ struct MenuController : public EntityListController {
   smart_pointer<TextDrawEntity> pHintText;
   smart_pointer<TextDrawEntity> pOptionText;
 
-  MenuController(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound,
+  MenuController(DragonGameControllerList *pGl_, Rectangle rBound,
                  Color c, int nResumePosition_);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);

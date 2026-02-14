@@ -74,7 +74,7 @@ struct LevelController : public EntityListController {
   smart_pointer<TutorialTextEntity> pTutorialText;
 
   LevelController(const LevelController &) = delete;
-  LevelController(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound,
+  LevelController(DragonGameControllerList *pGl_, Rectangle rBound,
                   Color c, const LevelLayout &lvl);
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);

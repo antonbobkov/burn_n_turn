@@ -45,10 +45,10 @@ struct SoundControls : public EventEntity {
 /** Draws high score in a rectangle. */
 struct HighScoreShower : public VisualEntity {
   std::string get_class_name() override { return "HighScoreShower"; }
-  smart_pointer<DragonGameControllerList> pGl;
+  DragonGameControllerList *pGl;
   Rectangle rBound;
 
-  HighScoreShower(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound_)
+  HighScoreShower(DragonGameControllerList *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
@@ -56,10 +56,10 @@ struct HighScoreShower : public VisualEntity {
 
 struct IntroTextShower : public VisualEntity {
   std::string get_class_name() override { return "IntroTextShower"; }
-  smart_pointer<DragonGameControllerList> pGl;
+  DragonGameControllerList *pGl;
   Rectangle rBound;
 
-  IntroTextShower(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound_)
+  IntroTextShower(DragonGameControllerList *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);

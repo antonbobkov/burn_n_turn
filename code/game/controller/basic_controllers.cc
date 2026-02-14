@@ -2,7 +2,7 @@
 #include "smart_pointer.h"
 #include <memory>
 
-SimpleController::SimpleController(smart_pointer<DragonGameControllerList> pGraph,
+SimpleController::SimpleController(DragonGameControllerList *pGraph,
                                    std::string strFileName)
     : GameController(pGraph) {
   nImage = pGl->pGraph->LoadImage(strFileName);
@@ -22,7 +22,7 @@ void SimpleController::OnKey(GuiKeyType c, bool bUp) {
 }
 
 FlashingController::FlashingController(
-    smart_pointer<DragonGameControllerList> pGraph, std::string strFileName,
+    DragonGameControllerList *pGraph, std::string strFileName,
     std::string strTextName)
     : GameController(pGraph), nTimer(0), bShow(true) {
   nImage = pGl->pGraph->LoadImage(strFileName);
@@ -88,7 +88,7 @@ void EntityListController::AddBackground(Color c) {
 }
 
 EntityListController::EntityListController(
-    smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound, Color c)
+    DragonGameControllerList *pGl_, Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
 }
@@ -185,7 +185,7 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
     Next();
 }
 
-BuyNowController::BuyNowController(smart_pointer<DragonGameControllerList> pGl_,
+BuyNowController::BuyNowController(DragonGameControllerList *pGl_,
                                    Rectangle rBound, Color c)
     : EntityListController(pGl_, rBound, c), t(120), nSlimeCount(50),
       tVel(nFramesInSecond / 2) {
@@ -245,7 +245,7 @@ void BuyNowController::OnMouseDown(Point pPos) {
     EntityListController::OnMouseDown(pPos);
 }
 
-Cutscene::Cutscene(smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound_,
+Cutscene::Cutscene(DragonGameControllerList *pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
       pCrFollow(), bRelease(false), tm(nFramesInSecond / 5), Beepy(true) {
@@ -310,7 +310,7 @@ void DragonScoreController::OnMouseDown(Point pPos) {
 }
 
 DragonScoreController::DragonScoreController(
-    smart_pointer<DragonGameControllerList> pGl_, Rectangle rBound, Color c,
+    DragonGameControllerList *pGl_, Rectangle rBound, Color c,
     bool bScoreShow)
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
