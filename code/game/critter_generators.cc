@@ -1,6 +1,7 @@
 #include "game.h"
 #include "game/controller/level_controller.h"
 #include "dragon_constants.h"
+#include "dragon_macros.h"
 #include "utils/smart_pointer.h"
 
 

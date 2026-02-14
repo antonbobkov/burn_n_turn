@@ -3,3 +3,4 @@ alwaysApply: true
 ---
 - Keep lines under 80 characters
 - Comments should use simple non-technical language
+- After adding a new .h file, go through all the .h/.cc files that use its declarations and include it explicitly.

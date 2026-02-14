@@ -3,6 +3,7 @@
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
 #include "dragon_constants.h"
+#include "dragon_macros.h"
 
 #include <map>
 #include <ostream>

@@ -1,5 +1,6 @@
 #include "tutorial.h"
 #include "core.h"
+#include "dragon_macros.h"
 
 namespace {
 

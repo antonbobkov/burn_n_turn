@@ -1,8 +1,7 @@
 #ifndef TOWER_DEFENSE_DRAGON_CONSTANTS_H
 #define TOWER_DEFENSE_DRAGON_CONSTANTS_H
 
-// Same as in common.h; only affects nInitialFireballs / nFireballsPerBonus.
-//#define KEYBOARD_CONTROLS
+#include "dragon_macros.h"
 
 const unsigned nFramesInSecond = 30;
 
