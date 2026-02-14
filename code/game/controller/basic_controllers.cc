@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/dragon_constants.h"
 #include "utils/smart_pointer.h"
 #include "game_utils/image_sequence.h"
 

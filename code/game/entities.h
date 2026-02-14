@@ -9,6 +9,8 @@
 #include "wrappers/color.h"
 #include "utils/index.h"
 
+#include <list>
+
 struct ScalingDrawer;
 struct NumberDrawer;
 class SoundInterfaceProxy;
@@ -275,5 +277,16 @@ struct ScreenPos {
     return fPriority < sp.fPriority;
   }
 };
+
+/** Remove from list any element for which bExist is false. */
+template <class T> void CleanUp(std::list<T> &ar) {
+  for (typename std::list<T>::iterator itr = ar.begin(), etr = ar.end();
+       itr != etr;) {
+    if (!(*itr)->bExist)
+      ar.erase(itr++);
+    else
+      ++itr;
+  }
+}
 
 #endif

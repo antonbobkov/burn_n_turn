@@ -2,7 +2,38 @@
 #include "game/controller/level_controller.h"
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
+#include "dragon_constants.h"
 
+#include <map>
+#include <ostream>
+#include <string>
+
+template <class T>
+static void Union(std::map<std::string, T> &TarMap,
+                  const std::map<std::string, T> &srcMap) {
+  for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
+                                                          etr = srcMap.end();
+       itr != etr; ++itr)
+    TarMap[itr->first] += itr->second;
+}
+
+static void Union(std::map<std::string, bool> &TarMap,
+                  const std::map<std::string, bool> &srcMap) {
+  for (std::map<std::string, bool>::const_iterator itr = srcMap.begin(),
+                                                   etr = srcMap.end();
+       itr != etr; ++itr)
+    TarMap[itr->first] |= itr->second;
+}
+
+template <class T>
+static std::ostream &Out(std::ostream &ofs,
+                         const std::map<std::string, T> &srcMap) {
+  for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
+                                                         etr = srcMap.end();
+       itr != etr; ++itr)
+    ofs << itr->first << " = " << itr->second << "; ";
+  return ofs;
+}
 
 FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
   if (bDef) {

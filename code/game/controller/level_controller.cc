@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "game/controller/level_controller.h"
+#include "game/dragon_constants.h"
 
 #include "game_utils/image_sequence.h"
 #include "wrappers/color.h"

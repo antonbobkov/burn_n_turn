@@ -1,5 +1,6 @@
 #include "core.h"
 #include "game.h"
+#include "dragon_constants.h"
 #include "wrappers/font_writer.h"
 #include "utils/smart_pointer.h"
 #include "game_utils/image_sequence.h"
