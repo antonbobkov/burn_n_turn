@@ -1,7 +1,7 @@
-#include "game.h"
-#include "smart_pointer.h"
+#include "game/game.h"
+#include "utils/smart_pointer.h"
 
-#include "color.h"
+#include "wrappers/color.h"
 #include <memory>
 
 SimpleController::SimpleController(DragonGameControllerList *pGraph,

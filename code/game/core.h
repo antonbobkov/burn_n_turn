@@ -1,9 +1,9 @@
 #ifndef TOWER_DEFENSE_CORE_H
 #define TOWER_DEFENSE_CORE_H
 
-#include "color.h"
+#include "wrappers/color.h"
 #include "common.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 namespace Gui {
 class FilePath;

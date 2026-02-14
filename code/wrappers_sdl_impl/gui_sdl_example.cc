@@ -7,9 +7,9 @@
  */
 
 #include "GuiSdl.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
-#include "color.h"
+#include "wrappers/color.h"
 #include <iostream>
 
 int main(int argc, char **args) {

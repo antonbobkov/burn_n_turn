@@ -1,8 +1,8 @@
 #ifndef SUIGEN_ALREADY_INCLUDED_08_25
 #define SUIGEN_ALREADY_INCLUDED_08_25
 
-#include "index.h"
-#include "smart_pointer.h"
+#include "utils/index.h"
+#include "utils/smart_pointer.h"
 
 namespace Gui {
 

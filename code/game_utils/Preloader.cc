@@ -1,9 +1,9 @@
 #include "Preloader.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
-#include "color.h"
-#include "exception.h"
-#include "string_utils.h"
+#include "wrappers/color.h"
+#include "utils/exception.h"
+#include "utils/string_utils.h"
 
 namespace Gui {
 

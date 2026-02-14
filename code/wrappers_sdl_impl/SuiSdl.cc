@@ -1,6 +1,6 @@
 #include "SuiSdl.h"
 
-#include "exception.h"
+#include "utils/exception.h"
 
 namespace Gui {
 

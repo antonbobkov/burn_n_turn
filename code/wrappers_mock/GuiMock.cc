@@ -1,6 +1,6 @@
 #include "GuiMock.h"
 
-#include "color.h"
+#include "wrappers/color.h"
 
 namespace Gui {
 

@@ -2,7 +2,7 @@
 #define TOWER_DEFENSE_CRITTERS_H
 
 #include "entities.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 struct LevelController;
 struct Dragon;
@@ -27,8 +27,7 @@ struct Princess : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Princess"; }
   LevelController *pAc;
 
-  Princess(const Critter &cr, LevelController *pAc_)
-      : Critter(cr), pAc(pAc_) {}
+  Princess(const Critter &cr, LevelController *pAc_) : Critter(cr), pAc(pAc_) {}
 
   /*virtual*/ Index GetImage() { return seq.vImage[0]; }
 
@@ -174,8 +173,7 @@ struct Slime : public Critter, public ConsumableEntity {
   Timer t;
   int nGeneration;
 
-  Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
-        int nGeneration_);
+  Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_, int nGeneration_);
 
   int GetGeneration() { return nGeneration; }
 

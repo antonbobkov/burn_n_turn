@@ -2,12 +2,12 @@
 #define GAME_RUNNER_INTERFACE_H
 
 #include "event.h"
-#include "gui_key_type.h"
-#include "smart_pointer.h"
+#include "wrappers/gui_key_type.h"
+#include "utils/smart_pointer.h"
 
-#include "GuiGen.h"
+#include "wrappers/GuiGen.h"
 #include "MessageWriter.h"
-#include "SuiGen.h"
+#include "wrappers/SuiGen.h"
 
 namespace Gui {
 class FileManager;

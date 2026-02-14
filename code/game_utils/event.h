@@ -2,7 +2,7 @@
 #define EVENT_HEADER_08_27_10_06_16
 
 #include "Preloader.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 #include <iostream>
 
 using namespace Gui;

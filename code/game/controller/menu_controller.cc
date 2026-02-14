@@ -1,10 +1,10 @@
-#include "game.h"
-#include "controller/menu_controller.h"
+#include "game/game.h"
+#include "game/controller/menu_controller.h"
 
-#include "color.h"
-#include "file_utils.h"
-#include "game_runner_interface.h"
-#include "event.h"
+#include "wrappers/color.h"
+#include "utils/file_utils.h"
+#include "game_utils/game_runner_interface.h"
+#include "game_utils/event.h"
 
 std::string OnOffString(bool b) {
   if (b)

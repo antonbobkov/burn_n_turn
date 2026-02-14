@@ -1,9 +1,9 @@
 #ifndef TOWER_DEFENSE_COMMON_H
 #define TOWER_DEFENSE_COMMON_H
 
-#include "GuiGen.h"
-#include "SuiGen.h"
-#include "gui_key_type.h"
+#include "wrappers/GuiGen.h"
+#include "wrappers/SuiGen.h"
+#include "wrappers/gui_key_type.h"
 
 #include <algorithm>
 #include <iostream>
@@ -18,10 +18,10 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "Preloader.h"
-#include "smart_pointer.h"
+#include "game_utils/Preloader.h"
+#include "utils/smart_pointer.h"
 
-#include "game_runner_interface.h"
+#include "game_utils/game_runner_interface.h"
 
 #define FULL_VERSION
 #define PC_VERSION

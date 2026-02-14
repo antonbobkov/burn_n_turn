@@ -1,5 +1,5 @@
 #include "event.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 void Trigger(smart_pointer<Event> pE) {
   if (!pE.is_null())

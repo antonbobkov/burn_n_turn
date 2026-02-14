@@ -1,7 +1,7 @@
 #ifndef SUI_SDL_INCLUDE_GUARD_09_05_10_03_00_PM
 #define SUI_SDL_INCLUDE_GUARD_09_05_10_03_00_PM
 
-#include "SuiGen.h"
+#include "wrappers/SuiGen.h"
 
 #include "SDL_mixer.h"
 

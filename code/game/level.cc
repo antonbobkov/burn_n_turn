@@ -1,10 +1,10 @@
 #include "level.h"
 #include "game.h"
-#include "controller/level_controller.h"
-#include "smart_pointer.h"
+#include "game/controller/level_controller.h"
+#include "utils/smart_pointer.h"
 
-#include "color.h"
-#include "file_utils.h"
+#include "wrappers/color.h"
+#include "utils/file_utils.h"
 
 void Road::Draw(smart_pointer<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;

@@ -1,5 +1,5 @@
 #include "tutorial.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 namespace {
 

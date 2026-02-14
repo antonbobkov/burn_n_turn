@@ -1,6 +1,6 @@
 #include "game.h"
-#include "controller/level_controller.h"
-#include "smart_pointer.h"
+#include "game/controller/level_controller.h"
+#include "utils/smart_pointer.h"
 
 
 void SummonSkeletons(LevelController *pAc, Point p) {

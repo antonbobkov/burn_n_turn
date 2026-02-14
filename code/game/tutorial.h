@@ -2,7 +2,7 @@
 #define TOWER_DEFENSE_TUTORIAL_H
 
 #include "entities.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 /** Scrolling tutorial text; SetText queues sNewText and Update scrolls between
  * sText and sNewText. */

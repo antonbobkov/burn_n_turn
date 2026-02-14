@@ -12,9 +12,5 @@ add_library(GameUtils
   Preloader.h
 )
 
-target_include_directories(GameUtils PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/utils
-  ${CMAKE_SOURCE_DIR}/wrappers
-)
+target_include_directories(GameUtils PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(GameUtils PRIVATE Utils GuiGen SuiGen)

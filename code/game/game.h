@@ -4,12 +4,12 @@
 #include "common.h"
 #include "core.h"
 #include "entities.h"
-#include "file_utils.h"
+#include "utils/file_utils.h"
 #include "fireball.h"
-#include "font_writer.h"
-#include "gui_key_type.h"
+#include "wrappers/font_writer.h"
+#include "wrappers/gui_key_type.h"
 #include "level.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 #include "tutorial.h"
 #include <memory>
 
@@ -40,8 +40,8 @@ struct GameController : virtual public SP_Info {
   virtual std::string GetControllerName() const { return "basic"; }
 };
 
-#include "controller/basic_controllers.h"
-#include "controller/menu_controller.h"
+#include "game/controller/basic_controllers.h"
+#include "game/controller/menu_controller.h"
 
 struct TowerDataWrap;
 
@@ -105,7 +105,7 @@ struct DragonGameControllerList {
   void Menu();
 };
 
-#include "controller/level_controller.h"
+#include "game/controller/level_controller.h"
 #include "critter_generators.h"
 #include "critters.h"
 #include "dragon.h"

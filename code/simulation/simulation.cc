@@ -1,15 +1,15 @@
 #include "simulation.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
-#include "MessageWriter.h"
-#include "gui_key_type.h"
-#include "file_utils.h"
-#include "game.h"
-#include "game_runner_interface.h"
+#include "game_utils/MessageWriter.h"
+#include "wrappers/gui_key_type.h"
+#include "utils/file_utils.h"
+#include "game/game.h"
+#include "game_utils/game_runner_interface.h"
 
 
-#include "GuiMock.h"
-#include "SuiMock.h"
+#include "wrappers_mock/GuiMock.h"
+#include "wrappers_mock/SuiMock.h"
 
 #include <iostream>
 #include <memory>

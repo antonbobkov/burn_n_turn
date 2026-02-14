@@ -2,7 +2,7 @@
 #define TOWER_DEFENSE_FIREBALL_H
 
 #include "entities.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 struct EntityListController;
 struct LevelController;

@@ -3,11 +3,11 @@
 #include <time.h>
 #include <vector>
 
-#include "color.h"
-#include "file_utils.h"
-#include "game_runner_interface.h"
-#include "gui_key_type.h"
-#include "smart_pointer.h"
+#include "wrappers/color.h"
+#include "utils/file_utils.h"
+#include "game_utils/game_runner_interface.h"
+#include "wrappers/gui_key_type.h"
+#include "utils/smart_pointer.h"
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"

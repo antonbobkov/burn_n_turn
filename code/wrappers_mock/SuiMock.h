@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "SuiGen.h"
+#include "wrappers/SuiGen.h"
 
 namespace Gui {
 

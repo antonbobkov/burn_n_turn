@@ -1,9 +1,9 @@
 #include "core.h"
 #include "game.h"
-#include "font_writer.h"
-#include "smart_pointer.h"
+#include "wrappers/font_writer.h"
+#include "utils/smart_pointer.h"
 
-#include "color.h"
+#include "wrappers/color.h"
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
 struct SlimeUpdater : public VisualEntity {

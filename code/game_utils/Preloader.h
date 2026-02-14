@@ -26,13 +26,13 @@
 #include <string>
 #include <vector>
 
-#include "color.h"
-#include "GuiGen.h"
-#include "SuiGen.h"
-#include "file_utils.h"
-#include "index.h"
-#include "smart_pointer.h"
-#include "timer.h"
+#include "wrappers/color.h"
+#include "wrappers/GuiGen.h"
+#include "wrappers/SuiGen.h"
+#include "utils/file_utils.h"
+#include "utils/index.h"
+#include "utils/smart_pointer.h"
+#include "utils/timer.h"
 
 namespace Gui {
 

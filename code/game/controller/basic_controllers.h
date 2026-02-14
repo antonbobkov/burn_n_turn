@@ -3,11 +3,11 @@
 
 /* Include after GameController and DragonGameControllerList are defined (e.g. from
  * game.h). */
-#include "color.h"
-#include "geometry.h"
-#include "gui_key_type.h"
-#include "smart_pointer.h"
-#include "timer.h"
+#include "wrappers/color.h"
+#include "wrappers/geometry.h"
+#include "wrappers/gui_key_type.h"
+#include "utils/smart_pointer.h"
+#include "utils/timer.h"
 #include <list>
 #include <memory>
 #include <vector>

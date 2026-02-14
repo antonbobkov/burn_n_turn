@@ -1,5 +1,5 @@
 #include "entities.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 void TextDrawEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
   Point p = pos;

@@ -1,16 +1,16 @@
-#include "game.h"
-#include "controller/level_controller.h"
+#include "game/game.h"
+#include "game/controller/level_controller.h"
 
-#include "color.h"
-#include "common.h"
-#include "core.h"
-#include "critters.h"
-#include "dragon.h"
-#include "fireball.h"
-#include "game_runner_interface.h"
-#include "level.h"
-#include "smart_pointer.h"
-#include "tutorial.h"
+#include "wrappers/color.h"
+#include "game/common.h"
+#include "game/core.h"
+#include "game/critters.h"
+#include "game/dragon.h"
+#include "game/fireball.h"
+#include "game_utils/game_runner_interface.h"
+#include "game/level.h"
+#include "utils/smart_pointer.h"
+#include "game/tutorial.h"
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
 struct AdNumberDrawer : public VisualEntity {

@@ -3,14 +3,14 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "GuiMock.h"
-#include "MessageWriter.h"
-#include "SuiMock.h"
-#include "file_utils.h"
-#include "game.h"
-#include "game_runner_interface.h"
-#include "gui_key_type.h"
-#include "smart_pointer.h"
+#include "wrappers_mock/GuiMock.h"
+#include "game_utils/MessageWriter.h"
+#include "wrappers_mock/SuiMock.h"
+#include "utils/file_utils.h"
+#include "game/game.h"
+#include "game_utils/game_runner_interface.h"
+#include "wrappers/gui_key_type.h"
+#include "utils/smart_pointer.h"
 
 #include <algorithm>
 #include <catch2/catch.hpp>

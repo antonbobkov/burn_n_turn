@@ -5,8 +5,8 @@
 #include <memory>
 #include <string>
 
-#include "color.h"
-#include "GuiGen.h"
+#include "wrappers/color.h"
+#include "wrappers/GuiGen.h"
 
 namespace Gui {
 

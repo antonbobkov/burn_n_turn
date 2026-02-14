@@ -18,6 +18,8 @@ add_library(Utils
   smart_pointer.cc
 )
 
+target_include_directories(Utils PUBLIC ${CMAKE_SOURCE_DIR})
+
 add_executable(file_utils_test file_utils_test.cc)
 target_link_libraries(file_utils_test PRIVATE Utils Catch2::Catch2WithMain)
 add_test(NAME file_utils_test COMMAND $<TARGET_FILE:file_utils_test>)

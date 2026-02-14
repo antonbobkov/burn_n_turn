@@ -2,8 +2,8 @@
 #define TOWER_DEFENSE_LEVEL_H
 
 #include "entities.h"
-#include "exception.h"
-#include "smart_pointer.h"
+#include "utils/exception.h"
+#include "utils/smart_pointer.h"
 
 namespace Gui {
 class FilePath;

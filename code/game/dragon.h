@@ -3,7 +3,7 @@
 
 #include "critters.h"
 #include "fireball.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 struct LevelController;
 

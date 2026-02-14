@@ -2,7 +2,7 @@
 
 #include "color.h"
 #include "GuiGen.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
 namespace Gui {
 

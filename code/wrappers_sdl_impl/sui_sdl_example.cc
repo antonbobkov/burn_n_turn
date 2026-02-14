@@ -8,9 +8,9 @@
  */
 
 #include "SuiSdl.h"
-#include "smart_pointer.h"
+#include "utils/smart_pointer.h"
 
-#include "exception.h"
+#include "utils/exception.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>

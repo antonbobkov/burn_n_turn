@@ -1,6 +1,6 @@
 #include "GuiSdl.h"
 
-#include "color.h"
+#include "wrappers/color.h"
 
 namespace Gui {
 SDL_Rect ToSdl(Rectangle r) {

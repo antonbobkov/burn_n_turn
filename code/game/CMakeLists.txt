@@ -16,22 +16,13 @@ add_library(GameCore STATIC
   dragon.cc
   gameplay.cc
 )
-target_include_directories(GameCore PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/game_utils
-  ${CMAKE_SOURCE_DIR}/wrappers
-  ${CMAKE_SOURCE_DIR}/utils
-)
+target_include_directories(GameCore PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(GameCore PUBLIC GameUtils)
 
 add_executable(tower_defense
   ${CMAKE_SOURCE_DIR}/wrappers_sdl_impl/sdl_game_runner_main.cc)
 target_include_directories(tower_defense PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/game_utils
-  ${CMAKE_SOURCE_DIR}/wrappers_sdl_impl
-  ${CMAKE_SOURCE_DIR}/wrappers
-  ${CMAKE_SOURCE_DIR}/utils
+  ${CMAKE_SOURCE_DIR}
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2
   ${SDL_MIXER_PATH}/include/SDL2

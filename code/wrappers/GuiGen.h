@@ -19,11 +19,11 @@
 #include <fstream>
 
 #include "color.h"
-#include "exception.h"
-#include "file_utils.h"
+#include "utils/exception.h"
+#include "utils/file_utils.h"
 #include "geometry.h"
-#include "index.h"
-#include "smart_pointer.h"
+#include "utils/index.h"
+#include "utils/smart_pointer.h"
 
 namespace Gui {
 typedef unsigned char Byte;
