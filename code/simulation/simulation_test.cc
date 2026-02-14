@@ -154,10 +154,10 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
       p_gl->Update();
     }
 
-    REQUIRE(reached_level);
-    REQUIRE(reached_menu);
-    REQUIRE(sound_file_flipped);
-    REQUIRE(b_exit);
+    CHECK(reached_level);
+    CHECK(reached_menu);
+    CHECK(sound_file_flipped);
+    CHECK(b_exit);
   }
 
   std::vector<std::pair<std::string, int>> nonzero;
@@ -172,6 +172,6 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
               << "\n";
   std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter << "\n";
 
-  REQUIRE(nGlobalSuperMegaCounter == 0);
-  REQUIRE(nonzero.empty());
+  CHECK(nGlobalSuperMegaCounter == 0);
+  CHECK(nonzero.empty());
 }

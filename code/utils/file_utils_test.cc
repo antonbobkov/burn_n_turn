@@ -15,15 +15,15 @@ TEST_CASE("InMemoryFileManager FileExists is false for unknown path",
 TEST_CASE("GetFileContent returns empty string for unknown path",
           "[file_utils][GetFileContent]") {
   Gui::InMemoryFileManager mgr;
-  REQUIRE(Gui::GetFileContent(&mgr, "missing.txt") == "");
+  CHECK(Gui::GetFileContent(&mgr, "missing.txt") == "");
 }
 
 TEST_CASE("InMemoryFileManager WriteFile then GetFileContent",
           "[file_utils][InMemoryFileManager]") {
   Gui::InMemoryFileManager mgr;
   Gui::WriteContentToFile(&mgr, "a.txt", "hello");
-  REQUIRE(mgr.FileExists("a.txt"));
-  REQUIRE(Gui::GetFileContent(&mgr, "a.txt") == "hello");
+  CHECK(mgr.FileExists("a.txt"));
+  CHECK(Gui::GetFileContent(&mgr, "a.txt") == "hello");
 }
 
 TEST_CASE("InMemoryFileManager ReadFile returns stream with stored content",
@@ -33,16 +33,16 @@ TEST_CASE("InMemoryFileManager ReadFile returns stream with stored content",
   std::unique_ptr<Gui::InStreamHandler> in = mgr.ReadFile("b.txt");
   int x = 0;
   in->GetStream() >> x;
-  REQUIRE(x == 42);
+  CHECK(x == 42);
 }
 
 TEST_CASE("InMemoryFileManager overwrite same path",
           "[file_utils][InMemoryFileManager]") {
   Gui::InMemoryFileManager mgr;
   Gui::WriteContentToFile(&mgr, "c.txt", "first");
-  REQUIRE(Gui::GetFileContent(&mgr, "c.txt") == "first");
+  CHECK(Gui::GetFileContent(&mgr, "c.txt") == "first");
   Gui::WriteContentToFile(&mgr, "c.txt", "second");
-  REQUIRE(Gui::GetFileContent(&mgr, "c.txt") == "second");
+  CHECK(Gui::GetFileContent(&mgr, "c.txt") == "second");
 }
 
 TEST_CASE("InMemoryFileManager ReadFile for missing path throws",
@@ -57,7 +57,7 @@ TEST_CASE("FilePath GetRelativePath with empty base",
           "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
-  REQUIRE(fp->GetRelativePath("file.txt") == "file.txt");
+  CHECK(fp->GetRelativePath("file.txt") == "file.txt");
 }
 
 TEST_CASE("FilePath GetRelativePath with non-empty base",
@@ -66,29 +66,29 @@ TEST_CASE("FilePath GetRelativePath with non-empty base",
   std::unique_ptr<Gui::FilePath> fp =
       Gui::FilePath::Create(false, "data/", mgr);
   std::string result = fp->GetRelativePath("file.txt");
-  REQUIRE(result.find("file.txt") != std::string::npos);
-  REQUIRE(result.size() > 8u);
+  CHECK(result.find("file.txt") != std::string::npos);
+  CHECK(result.size() > 8u);
 }
 
 TEST_CASE("FilePath GetRelativePath dot and file adds slash Linux",
           "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, ".", mgr);
-  REQUIRE(fp->GetRelativePath("file") == "./file");
+  CHECK(fp->GetRelativePath("file") == "./file");
 }
 
 TEST_CASE("FilePath GetRelativePath dot and file adds slash Windows",
           "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, ".", mgr);
-  REQUIRE(fp->GetRelativePath("file") == ".\\file");
+  CHECK(fp->GetRelativePath("file") == ".\\file");
 }
 
 TEST_CASE("FilePath GetRelativePath base slash and leading slash in s",
           "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, "./", mgr);
-  REQUIRE(fp->GetRelativePath("/file") == "./file");
+  CHECK(fp->GetRelativePath("/file") == "./file");
 }
 
 TEST_CASE("FilePath GetRelativePath double slashes collapsed Linux",
@@ -96,7 +96,7 @@ TEST_CASE("FilePath GetRelativePath double slashes collapsed Linux",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp =
       Gui::FilePath::Create(true, "data//", mgr);
-  REQUIRE(fp->GetRelativePath("file") == "data/file");
+  CHECK(fp->GetRelativePath("file") == "data/file");
 }
 
 TEST_CASE("FilePath GetRelativePath double slashes collapsed Windows",
@@ -104,21 +104,21 @@ TEST_CASE("FilePath GetRelativePath double slashes collapsed Windows",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp =
       Gui::FilePath::Create(false, "data\\\\", mgr);
-  REQUIRE(fp->GetRelativePath("file") == "data\\file");
+  CHECK(fp->GetRelativePath("file") == "data\\file");
 }
 
 TEST_CASE("FilePath GetRelativePath empty base unchanged",
           "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(true, "", mgr);
-  REQUIRE(fp->GetRelativePath("a/b") == "a/b");
+  CHECK(fp->GetRelativePath("a/b") == "a/b");
 }
 
 TEST_CASE("FilePath Format strips disallowed chars", "[file_utils][FilePath]") {
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
   std::string out = fp->Format("a*b@c");
-  REQUIRE(out == "abc");
+  CHECK(out == "abc");
 }
 
 TEST_CASE("FilePath WriteFile ReadFile via InMemoryFileManager",
@@ -126,11 +126,11 @@ TEST_CASE("FilePath WriteFile ReadFile via InMemoryFileManager",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
   Gui::WriteContentToFile(mgr, "test.txt", "content");
-  REQUIRE(Gui::GetFileContent(mgr, "test.txt") == "content");
+  CHECK(Gui::GetFileContent(mgr, "test.txt") == "content");
   std::unique_ptr<Gui::InStreamHandler> in = fp->ReadFile("test.txt");
   std::string s;
   in->GetStream() >> s;
-  REQUIRE(s == "content");
+  CHECK(s == "content");
 }
 
 TEST_CASE(
@@ -147,7 +147,7 @@ TEST_CASE("CachingReadOnlyFileManager TestOnlyGetCacheMissCount starts at zero",
           "[file_utils][CachingReadOnlyFileManager]") {
   Gui::InMemoryFileManager underlying;
   Gui::CachingReadOnlyFileManager cache(&underlying);
-  REQUIRE(cache.TestOnlyGetCacheMissCount() == 0);
+  CHECK(cache.TestOnlyGetCacheMissCount() == 0);
 }
 
 TEST_CASE("CachingReadOnlyFileManager ReadFile populates cache and counts miss",
@@ -155,9 +155,9 @@ TEST_CASE("CachingReadOnlyFileManager ReadFile populates cache and counts miss",
   Gui::InMemoryFileManager underlying;
   Gui::WriteContentToFile(&underlying, "x.txt", "hello");
   Gui::CachingReadOnlyFileManager cache(&underlying);
-  REQUIRE(cache.TestOnlyGetCacheMissCount() == 0);
-  REQUIRE(Gui::GetFileContent(&cache, "x.txt") == "hello");
-  REQUIRE(cache.TestOnlyGetCacheMissCount() == 1);
+  CHECK(cache.TestOnlyGetCacheMissCount() == 0);
+  CHECK(Gui::GetFileContent(&cache, "x.txt") == "hello");
+  CHECK(cache.TestOnlyGetCacheMissCount() == 1);
 }
 
 TEST_CASE("CachingReadOnlyFileManager second read hits cache no extra miss",
@@ -167,7 +167,7 @@ TEST_CASE("CachingReadOnlyFileManager second read hits cache no extra miss",
   Gui::CachingReadOnlyFileManager cache(&underlying);
   cache.ReadFile("y.txt");
   cache.ReadFile("y.txt");
-  REQUIRE(cache.TestOnlyGetCacheMissCount() == 1);
+  CHECK(cache.TestOnlyGetCacheMissCount() == 1);
 }
 
 TEST_CASE("CachingReadOnlyFileManager WriteFile stores in cache only",
@@ -176,8 +176,8 @@ TEST_CASE("CachingReadOnlyFileManager WriteFile stores in cache only",
   Gui::WriteContentToFile(&underlying, "z.txt", "original");
   Gui::CachingReadOnlyFileManager cache(&underlying);
   Gui::WriteContentToFile(&cache, "z.txt", "written to cache");
-  REQUIRE(Gui::GetFileContent(&underlying, "z.txt") == "original");
-  REQUIRE(Gui::GetFileContent(&cache, "z.txt") == "written to cache");
+  CHECK(Gui::GetFileContent(&underlying, "z.txt") == "original");
+  CHECK(Gui::GetFileContent(&cache, "z.txt") == "written to cache");
 }
 
 TEST_CASE("CachingReadOnlyFileManager FileExists checks cache then underlying",
@@ -186,7 +186,7 @@ TEST_CASE("CachingReadOnlyFileManager FileExists checks cache then underlying",
   Gui::WriteContentToFile(&underlying, "u.txt", "u");
   Gui::CachingReadOnlyFileManager cache(&underlying);
   REQUIRE_FALSE(cache.FileExists("none.txt"));
-  REQUIRE(cache.FileExists("u.txt"));
+  CHECK(cache.FileExists("u.txt"));
 }
 
 TEST_CASE(
@@ -196,9 +196,9 @@ TEST_CASE(
   Gui::WriteContentToFile(&underlying, "a.txt", "txt content");
   Gui::WriteContentToFile(&underlying, "b.dat", "dat content");
   Gui::CachingReadOnlyFileManager cache(&underlying, ".txt");
-  REQUIRE(cache.FileExists("a.txt"));
+  CHECK(cache.FileExists("a.txt"));
   REQUIRE_FALSE(cache.FileExists("b.dat"));
-  REQUIRE(Gui::GetFileContent(&cache, "a.txt") == "txt content");
+  CHECK(Gui::GetFileContent(&cache, "a.txt") == "txt content");
   REQUIRE_THROWS(cache.ReadFile("b.dat"));
 }
 
@@ -207,8 +207,8 @@ TEST_CASE("CachingReadOnlyFileManager filter empty sees all underlying",
   Gui::InMemoryFileManager underlying;
   Gui::WriteContentToFile(&underlying, "any.dat", "data");
   Gui::CachingReadOnlyFileManager cache(&underlying, "");
-  REQUIRE(cache.FileExists("any.dat"));
-  REQUIRE(Gui::GetFileContent(&cache, "any.dat") == "data");
+  CHECK(cache.FileExists("any.dat"));
+  CHECK(Gui::GetFileContent(&cache, "any.dat") == "data");
 }
 
 TEST_CASE("CachingReadOnlyFileManager filter path in cache still visible",
@@ -216,8 +216,8 @@ TEST_CASE("CachingReadOnlyFileManager filter path in cache still visible",
   Gui::InMemoryFileManager underlying;
   Gui::CachingReadOnlyFileManager cache(&underlying, ".txt");
   Gui::WriteContentToFile(&cache, "no_ext", "from cache");
-  REQUIRE(cache.FileExists("no_ext"));
-  REQUIRE(Gui::GetFileContent(&cache, "no_ext") == "from cache");
+  CHECK(cache.FileExists("no_ext"));
+  CHECK(Gui::GetFileContent(&cache, "no_ext") == "from cache");
 }
 
 /* --- SavableVariable (using InMemoryFileManager via FilePath) --- */
@@ -227,9 +227,9 @@ TEST_CASE("SavableVariable int load false then Set and Save",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
   Gui::SavableVariable<int> sv(fp.get(), "int.txt", 0, false);
-  REQUIRE(sv.Get() == 0);
+  CHECK(sv.Get() == 0);
   sv.Set(42);
-  REQUIRE(Gui::GetFileContent(mgr, "int.txt") == "42");
+  CHECK(Gui::GetFileContent(mgr, "int.txt") == "42");
 }
 
 TEST_CASE("SavableVariable int round-trip via Save and reload",
@@ -241,7 +241,7 @@ TEST_CASE("SavableVariable int round-trip via Save and reload",
     sv.Set(99);
   }
   Gui::SavableVariable<int> sv2(fp.get(), "int2.txt", 0, true);
-  REQUIRE(sv2.Get() == 99);
+  CHECK(sv2.Get() == 99);
 }
 
 TEST_CASE("SavableVariable bool load false then Set and Save",
@@ -249,9 +249,9 @@ TEST_CASE("SavableVariable bool load false then Set and Save",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
   Gui::SavableVariable<bool> sv(fp.get(), "bool.txt", false, false);
-  REQUIRE(sv.Get() == false);
+  CHECK(sv.Get() == false);
   sv.Set(true);
-  REQUIRE(Gui::GetFileContent(mgr, "bool.txt") == "1");
+  CHECK(Gui::GetFileContent(mgr, "bool.txt") == "1");
 }
 
 TEST_CASE("SavableVariable bool round-trip via Save and reload",
@@ -263,7 +263,7 @@ TEST_CASE("SavableVariable bool round-trip via Save and reload",
     sv.Set(true);
   }
   Gui::SavableVariable<bool> sv2(fp.get(), "bool2.txt", false, true);
-  REQUIRE(sv2.Get() == true);
+  CHECK(sv2.Get() == true);
 }
 
 TEST_CASE("SavableVariable int load true when file missing uses default",
@@ -271,5 +271,5 @@ TEST_CASE("SavableVariable int load true when file missing uses default",
   Gui::InMemoryFileManager *mgr = new Gui::InMemoryFileManager();
   std::unique_ptr<Gui::FilePath> fp = Gui::FilePath::Create(false, "", mgr);
   Gui::SavableVariable<int> sv(fp.get(), "none.txt", 0, true);
-  REQUIRE(sv.Get() == 0);
+  CHECK(sv.Get() == 0);
 }
