@@ -7,8 +7,9 @@
 #ifndef TOWER_DEFENSE_FONT_WRITER_H
 #define TOWER_DEFENSE_FONT_WRITER_H
 
-#include "color.h"
 #include "GuiGen.h"
+#include "color.h"
+
 
 struct FontWriter : virtual public SP_Info {
   std::string get_class_name() override { return "FontWriter"; }

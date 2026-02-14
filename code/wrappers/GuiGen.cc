@@ -1,7 +1,7 @@
 #include <sstream>
 
-#include "color.h"
 #include "GuiGen.h"
+#include "color.h"
 #include "utils/smart_pointer.h"
 
 std::string MatrixErrorInfo::GetErrorMessage() const {

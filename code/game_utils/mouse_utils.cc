@@ -81,13 +81,13 @@ fPoint PositionTracker::GetFlightDirection(fPoint fDragonPos) {
 }
 
 void MouseCursor::DrawCursor(GraphicalInterface<Index> *pGr) {
-Index img;
+  Index img;
   if (bPressed)
     img = imgCursor.vImage.at(1);
   else
     img = imgCursor.vImage.at(0);
 
-Size sz = pGr->GetImage(img)->GetSize();
+  Size sz = pGr->GetImage(img)->GetSize();
   Point p = pCursorPos;
 
   p.x -= sz.x / 2;

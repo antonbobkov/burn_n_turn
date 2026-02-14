@@ -2,16 +2,14 @@
 
 #include "color.h"
 
-Color::Color()
-    : R(0), G(0), B(0), nTransparent(255) {}
+Color::Color() : R(0), G(0), B(0), nTransparent(255) {}
 
 Color::Color(unsigned char R_, unsigned char G_, unsigned char B_,
              unsigned char nTransparent_)
     : R(R_), G(G_), B(B_), nTransparent(nTransparent_) {}
 
 Color::Color(int R_, int G_, int B_, int nTransparent_)
-    : R(static_cast<unsigned char>(R_)),
-      G(static_cast<unsigned char>(G_)),
+    : R(static_cast<unsigned char>(R_)), G(static_cast<unsigned char>(G_)),
       B(static_cast<unsigned char>(B_)),
       nTransparent(static_cast<unsigned char>(nTransparent_)) {}
 

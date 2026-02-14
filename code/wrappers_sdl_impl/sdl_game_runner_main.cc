@@ -3,18 +3,18 @@
 #include <time.h>
 #include <vector>
 
-#include "wrappers/color.h"
-#include "utils/file_utils.h"
 #include "game_utils/game_runner_interface.h"
-#include "wrappers/gui_key_type.h"
+#include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+#include "wrappers/gui_key_type.h"
+
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"
 
 #define TRUE 1
 #define FALSE 0
-
 
 void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
   for (unsigned i = 0; i < 400; ++i)

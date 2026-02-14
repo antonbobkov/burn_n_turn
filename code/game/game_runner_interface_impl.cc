@@ -1,9 +1,10 @@
 #include "core.h"
-#include "game.h"
 #include "dragon_constants.h"
 #include "dragon_macros.h"
+#include "game.h"
 #include "game_utils/game_runner_interface.h"
 #include "utils/smart_pointer.h"
+
 
 #include <fstream>
 
@@ -21,7 +22,7 @@ bool AreWeFullScreen() {
 } // namespace
 
 ProgramInfo GetProgramInfo() {
-ProgramInfo inf;
+  ProgramInfo inf;
 
 #ifdef SMALL_SCREEN_VERSION
   inf.szScreenRez = Size(854, 480);
@@ -44,7 +45,6 @@ ProgramInfo inf;
   return inf;
 }
 
-smart_pointer<GameRunner>
-GetGameRunner(ProgramEngine pe) {
+smart_pointer<GameRunner> GetGameRunner(ProgramEngine pe) {
   return make_smart(new DragonGameRunner(pe));
 }

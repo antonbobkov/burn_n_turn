@@ -19,9 +19,9 @@
 #include <fstream>
 
 #include "color.h"
+#include "geometry.h"
 #include "utils/exception.h"
 #include "utils/file_utils.h"
-#include "geometry.h"
 #include "utils/index.h"
 #include "utils/smart_pointer.h"
 
@@ -130,7 +130,7 @@ public:
   std::string strPntName;
 
   ImageNullException(crefString strClsName_, crefString strFnName_,
-                    crefString strPntName_)
+                     crefString strPntName_)
       : ImageException("ImageNullException", strClsName_, strFnName_),
         strPntName(strPntName_) {}
 
@@ -199,7 +199,7 @@ public:
   std::string strPntName;
 
   NullPointerGIException(crefString strClsName_, crefString strFnName_,
-                        crefString strPntName_)
+                         crefString strPntName_)
       : GraphicalInterfaceException("NullPointerGIException", strClsName_,
                                     strFnName_),
         strPntName(strPntName_) {}

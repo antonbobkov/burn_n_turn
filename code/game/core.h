@@ -1,10 +1,11 @@
 #ifndef TOWER_DEFENSE_CORE_H
 #define TOWER_DEFENSE_CORE_H
 
-#include "game_utils/image_sequence.h"
-#include "wrappers/color.h"
 #include "common.h"
+#include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+
 
 class FilePath;
 
@@ -30,7 +31,7 @@ fPoint RandomAngle(fPoint fDir = fPoint(1, 0), float fRange = 1.F);
 /** Base for drawing an image at a point; ScalingDrawer adds scale and color
  * key. */
 struct Drawer : virtual public SP_Info {
-  smart_pointer<Graphic> pGr;
+  smart_pointer<GraphicalInterface<Index>> pGr;
 
   Drawer() : pGr() {}
   std::string get_class_name() override { return "Drawer"; }
@@ -43,7 +44,8 @@ struct ScalingDrawer : public Drawer {
   unsigned nFactor;
   Color cTr;
 
-  ScalingDrawer(smart_pointer<Graphic> pGr_, unsigned nFactor_,
+  ScalingDrawer(smart_pointer<GraphicalInterface<Index>> pGr_,
+               unsigned nFactor_,
                 Color cTr_ = Color(0, 255, 255))
       : nFactor(nFactor_), cTr(cTr_) {
     pGr = pGr_;
@@ -86,14 +88,15 @@ struct NumberDrawer : virtual public SP_Info {
   void DrawColorWord(std::string s, Point p, Color c, bool bCenter = false);
 };
 
-/** Wraps Soundic and gates playback on bSoundOn (Toggle/Get). */
+/** Wraps SoundInterface<Index> and gates playback on bSoundOn
+ * (Toggle/Get). */
 class SoundInterfaceProxy : virtual public SP_Info {
   bool bSoundOn;
-  smart_pointer<Soundic> pSndRaw;
+  smart_pointer<SoundInterface<Index>> pSndRaw;
 
 public:
   std::string get_class_name() override { return "SoundInterfaceProxy"; }
-  SoundInterfaceProxy(smart_pointer<Soundic> pSndRaw_)
+  SoundInterfaceProxy(smart_pointer<SoundInterface<Index>> pSndRaw_)
       : pSndRaw(pSndRaw_), bSoundOn(true) {}
 
   void PlaySound(Index i, int nChannel = -1, bool bLoop = false);
@@ -131,7 +134,7 @@ struct MenuController;
 struct BackgroundMusicPlayer {
   int nCurrTheme;
   std::vector<Index> vThemes;
-  smart_pointer<Soundic> pSnd;
+  smart_pointer<SoundInterface<Index>> pSnd;
 
   bool bOff;
 

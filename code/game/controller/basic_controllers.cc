@@ -1,7 +1,8 @@
-#include "game/game.h"
 #include "game/dragon_constants.h"
-#include "utils/smart_pointer.h"
+#include "game/game.h"
 #include "game_utils/image_sequence.h"
+#include "utils/smart_pointer.h"
+
 
 #include "wrappers/color.h"
 #include <memory>
@@ -14,9 +15,7 @@ SimpleController::SimpleController(DragonGameControllerList *pGraph,
 
 SimpleController::~SimpleController() { pGl->pGraph->DeleteImage(nImage); }
 
-void SimpleController::Update() {
-  pGl->pGraph->DrawImage(Point(0, 0), nImage);
-}
+void SimpleController::Update() { pGl->pGraph->DrawImage(Point(0, 0), nImage); }
 
 void SimpleController::OnKey(GuiKeyType c, bool bUp) {
   if (bUp)
@@ -25,9 +24,9 @@ void SimpleController::OnKey(GuiKeyType c, bool bUp) {
   pGl->Next();
 }
 
-FlashingController::FlashingController(
-    DragonGameControllerList *pGraph, std::string strFileName,
-    std::string strTextName)
+FlashingController::FlashingController(DragonGameControllerList *pGraph,
+                                       std::string strFileName,
+                                       std::string strTextName)
     : GameController(pGraph), nTimer(0), bShow(true) {
   nImage = pGl->pGraph->LoadImage(strFileName);
   nText = pGl->pGraph->LoadImage(strTextName);
@@ -91,8 +90,8 @@ void EntityListController::AddBackground(Color c) {
   AddV(pBkg);
 }
 
-EntityListController::EntityListController(
-    DragonGameControllerList *pGl_, Rectangle rBound, Color c)
+EntityListController::EntityListController(DragonGameControllerList *pGl_,
+                                           Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
 }
@@ -313,9 +312,9 @@ void DragonScoreController::OnMouseDown(Point pPos) {
     pGl->Next();
 }
 
-DragonScoreController::DragonScoreController(
-    DragonGameControllerList *pGl_, Rectangle rBound, Color c,
-    bool bScoreShow)
+DragonScoreController::DragonScoreController(DragonGameControllerList *pGl_,
+                                             Rectangle rBound, Color c,
+                                             bool bScoreShow)
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {

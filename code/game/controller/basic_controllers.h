@@ -1,16 +1,17 @@
 #ifndef TOWER_DEFENSE_BASIC_CONTROLLERS_H
 #define TOWER_DEFENSE_BASIC_CONTROLLERS_H
 
-/* Include after GameController and DragonGameControllerList are defined (e.g. from
- * game.h). */
+/* Include after GameController and DragonGameControllerList are defined (e.g.
+ * from game.h). */
+#include "utils/smart_pointer.h"
+#include "utils/timer.h"
 #include "wrappers/color.h"
 #include "wrappers/geometry.h"
 #include "wrappers/gui_key_type.h"
-#include "utils/smart_pointer.h"
-#include "utils/timer.h"
 #include <list>
 #include <memory>
 #include <vector>
+
 
 struct Animation;
 struct ConsumableEntity;
@@ -19,14 +20,12 @@ struct EventEntity;
 struct FancyCritter;
 struct VisualEntity;
 
-
 /** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {
   std::string get_class_name() override { return "SimpleController"; }
   Index nImage;
 
-  SimpleController(DragonGameControllerList *pGraph,
-                   std::string strFileName);
+  SimpleController(DragonGameControllerList *pGraph, std::string strFileName);
   ~SimpleController();
 
   /*virtual*/ void Update();
@@ -41,8 +40,8 @@ struct FlashingController : public GameController {
   unsigned nTimer;
   bool bShow;
 
-  FlashingController(DragonGameControllerList *pGraph,
-                     std::string strFileName, std::string strTextName);
+  FlashingController(DragonGameControllerList *pGraph, std::string strFileName,
+                     std::string strTextName);
   ~FlashingController();
 
   /*virtual*/ void Update();
@@ -70,8 +69,7 @@ struct EntityListController : public GameController {
 
   void AddOwnedVisualEntity(std::unique_ptr<VisualEntity> p);
   void AddOwnedEventEntity(std::unique_ptr<EventEntity> p);
-  template <class T>
-  void AddOwnedBoth(std::unique_ptr<T> p) {
+  template <class T> void AddOwnedBoth(std::unique_ptr<T> p) {
     T *raw = p.get();
     owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
     owned_visual_entities.push_back(raw);
@@ -89,7 +87,7 @@ struct EntityListController : public GameController {
   EntityListController(const EntityListController &) = delete;
   bool bNoRefresh;
   EntityListController(DragonGameControllerList *pGl_, Rectangle rBound,
-                  Color c);
+                       Color c);
 
   /**
    * Each frame: remove dead things from the lists, move everything that can
@@ -110,8 +108,8 @@ struct EntityListController : public GameController {
 
 struct StartScreenController : public EntityListController {
   std::string get_class_name() override { return "StartScreenController"; }
-  StartScreenController(DragonGameControllerList *pGl_,
-                        Rectangle rBound, Color c)
+  StartScreenController(DragonGameControllerList *pGl_, Rectangle rBound,
+                        Color c)
       : EntityListController(pGl_, rBound, c) {}
 
   /** Advance to next screen and play start_game sound. */
@@ -136,8 +134,7 @@ struct BuyNowController : public EntityListController {
 
   Timer tVel;
 
-  BuyNowController(DragonGameControllerList *pGl_, Rectangle rBound,
-                   Color c);
+  BuyNowController(DragonGameControllerList *pGl_, Rectangle rBound, Color c);
 
   /** Set fVel to random direction, sometimes toward center; scale by speed. */
   void RandomizeVelocity(fPoint &fVel, fPoint pPos);
@@ -173,8 +170,8 @@ struct Cutscene : public EntityListController {
    * Runner starts left or right depending on flip; when the runner reaches the
    * middle, the chaser is released. Beep/boop timer for sound.
    */
-  Cutscene(DragonGameControllerList *pGl_, Rectangle rBound_,
-           std::string sRun, std::string sChase, bool bFlip = false);
+  Cutscene(DragonGameControllerList *pGl_, Rectangle rBound_, std::string sRun,
+           std::string sChase, bool bFlip = false);
 
   /*virtual*/ void Update();
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
@@ -188,8 +185,8 @@ struct DragonScoreController : public EntityListController {
   Timer t;
   bool bClickToExit;
 
-  DragonScoreController(DragonGameControllerList *pGl_,
-                        Rectangle rBound, Color c, bool bScoreShow);
+  DragonScoreController(DragonGameControllerList *pGl_, Rectangle rBound,
+                        Color c, bool bScoreShow);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void Update();
@@ -203,8 +200,8 @@ struct DragonScoreController : public EntityListController {
  * on input. */
 struct AutoAdvanceController : public EntityListController {
   std::string get_class_name() override { return "AutoAdvanceController"; }
-  AutoAdvanceController(DragonGameControllerList *pGl_,
-                        Rectangle rBound, Color c)
+  AutoAdvanceController(DragonGameControllerList *pGl_, Rectangle rBound,
+                        Color c)
       : EntityListController(pGl_, rBound, c) {}
 
   /*virtual*/ void Update();

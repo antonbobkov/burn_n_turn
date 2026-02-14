@@ -25,10 +25,6 @@
 
 extern int nSlimeMax;
 
-
-typedef GraphicalInterface<Index> Graphic;
-typedef SoundInterface<Index> Soundic;
-
 extern MessageWriter *pWr;
 
 #endif

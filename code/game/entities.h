@@ -1,20 +1,20 @@
 #ifndef TOWER_DEFENSE_ENTITIES_H
 #define TOWER_DEFENSE_ENTITIES_H
 
-#include "utils/smart_pointer.h"
-#include "wrappers/geometry.h"
 #include "game_utils/image_sequence.h"
-#include "utils/timer.h"
 #include "game_utils/sound_sequence.h"
-#include "wrappers/color.h"
 #include "utils/index.h"
+#include "utils/smart_pointer.h"
+#include "utils/timer.h"
+#include "wrappers/color.h"
+#include "wrappers/geometry.h"
+
 
 #include <list>
 
 struct ScalingDrawer;
 struct NumberDrawer;
 class SoundInterfaceProxy;
-
 
 /** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {
@@ -116,8 +116,8 @@ struct SimpleSoundEntity : virtual public EventEntity {
 
   SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
                     smart_pointer<SoundInterfaceProxy> pSnd_)
-      : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()),
-        pSnd(pSnd_) {}
+      : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()), pSnd(pSnd_) {
+  }
 
   /*virtual*/ void Update();
 };

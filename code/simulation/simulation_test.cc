@@ -3,14 +3,15 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "wrappers_mock/GuiMock.h"
-#include "game_utils/MessageWriter.h"
-#include "wrappers_mock/SuiMock.h"
-#include "utils/file_utils.h"
 #include "game/game.h"
+#include "game_utils/MessageWriter.h"
 #include "game_utils/game_runner_interface.h"
-#include "wrappers/gui_key_type.h"
+#include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/gui_key_type.h"
+#include "wrappers_mock/GuiMock.h"
+#include "wrappers_mock/SuiMock.h"
+
 
 #include <algorithm>
 #include <catch2/catch.hpp>
@@ -18,8 +19,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-
 
 namespace {
 
@@ -59,8 +58,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     Size sz(kScreenW, kScreenH);
 
     ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-    smart_pointer<DragonGameRunner> p_gl =
-        make_smart(new DragonGameRunner(pe));
+    smart_pointer<DragonGameRunner> p_gl = make_smart(new DragonGameRunner(pe));
 
     bool reached_level = false;
     bool reached_menu = false;

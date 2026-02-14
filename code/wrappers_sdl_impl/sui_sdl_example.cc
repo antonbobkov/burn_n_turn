@@ -27,9 +27,8 @@ int main(int argc, char **args) {
     return 1;
   }
 
-  smart_pointer<SdlSoundInterface> pSnd =
-      make_smart(new SdlSoundInterface());
-SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
+  smart_pointer<SdlSoundInterface> pSnd = make_smart(new SdlSoundInterface());
+  SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
 
   SDL_Window *window =
       SDL_CreateWindow("sui_sdl_example", SDL_WINDOWPOS_UNDEFINED,
@@ -64,7 +63,7 @@ SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
     }
   }
 
-Index sndIndex;
+  Index sndIndex;
   bool soundLoaded = false;
   try {
     sndIndex = soundIf.LoadSound(soundFile);

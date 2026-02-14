@@ -5,15 +5,15 @@
  * position tracking for camera/flight, trackball-style steering.
  * Uses geometry.h for Point, fPoint. Defines MouseTracker. */
 
-#include "game_utils/image_sequence.h"
 #include "Preloader.h"
-#include "wrappers/geometry.h"
+#include "game_utils/image_sequence.h"
 #include "utils/index.h"
+#include "wrappers/geometry.h"
+
 
 #include <list>
 
-template <class T>
-class GraphicalInterface;
+template <class T> class GraphicalInterface;
 
 /* Tracks mouse position and relative movement: OnMouse(Point),
  * GetRelMovement(). */

@@ -7,8 +7,8 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
-#include "wrappers/color.h"
 #include "wrappers/GuiGen.h"
+#include "wrappers/color.h"
 
 class SdlGraphicalInterface;
 

@@ -28,7 +28,7 @@ int main(int argc, char **args) {
 
   pGr->SetTitle("gui_sdl_example");
 
-SdlImage *pImg = 0;
+  SdlImage *pImg = 0;
   try {
     pImg = pGr->LoadImage(imageFile);
   } catch (GraphicalInterfaceException &e) {
@@ -47,14 +47,13 @@ SdlImage *pImg = 0;
     }
 
     /* Clear with background color (matching SDL_ex3_image). */
-    pGr->DrawRectangle(Rectangle(Size(640, 480)),
-Color(40, 44, 52), false);
+    pGr->DrawRectangle(Rectangle(Size(640, 480)), Color(40, 44, 52), false);
     if (pImg) {
       pGr->DrawImage(Point(0, 0), pImg, pImg->GetRectangle(), true);
     } else {
       /* Fallback rectangle when image failed to load. */
-      pGr->DrawRectangle(Rectangle(100, 150, 540, 330),
-Color(200, 80, 80), true);
+      pGr->DrawRectangle(Rectangle(100, 150, 540, 330), Color(200, 80, 80),
+                         true);
     }
     pGr->RefreshAll();
     SDL_Delay(16);

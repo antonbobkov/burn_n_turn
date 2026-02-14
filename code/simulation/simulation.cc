@@ -1,12 +1,11 @@
 #include "simulation.h"
 #include "utils/smart_pointer.h"
 
-#include "game_utils/MessageWriter.h"
-#include "wrappers/gui_key_type.h"
-#include "utils/file_utils.h"
 #include "game/game.h"
+#include "game_utils/MessageWriter.h"
 #include "game_utils/game_runner_interface.h"
-
+#include "utils/file_utils.h"
+#include "wrappers/gui_key_type.h"
 
 #include "wrappers_mock/GuiMock.h"
 #include "wrappers_mock/SuiMock.h"
@@ -14,7 +13,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
 
 namespace {
 
@@ -73,8 +71,7 @@ void RunSimulation() {
 
   std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
   ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-  smart_pointer<DragonGameRunner> p_gl =
-      make_smart(new DragonGameRunner(pe));
+  smart_pointer<DragonGameRunner> p_gl = make_smart(new DragonGameRunner(pe));
 
   std::string sound_content_before;
   bool sound_toggle_verified = false;

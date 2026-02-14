@@ -1,9 +1,8 @@
 #include "font_writer.h"
 
-#include "color.h"
 #include "GuiGen.h"
+#include "color.h"
 #include "utils/file_utils.h"
-
 
 #include <fstream>
 #include <sstream>

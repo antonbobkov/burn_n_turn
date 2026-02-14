@@ -1,10 +1,11 @@
 #include "core.h"
-#include "game.h"
 #include "dragon_constants.h"
 #include "dragon_macros.h"
-#include "wrappers/font_writer.h"
-#include "utils/smart_pointer.h"
+#include "game.h"
 #include "game_utils/image_sequence.h"
+#include "utils/smart_pointer.h"
+#include "wrappers/font_writer.h"
+
 
 #include "wrappers/color.h"
 
@@ -281,8 +282,10 @@ MessageWriter *pWr = 0;
 
 int nSlimeMax = 100;
 
-void DrawStuff(Rectangle rBound, smart_pointer<Graphic> pGraph,
-               smart_pointer<Soundic> pSnd, Preloader &pr, int n) {
+void DrawStuff(Rectangle rBound,
+               smart_pointer<GraphicalInterface<Index>> pGraph,
+               smart_pointer<SoundInterface<Index>> pSnd, Preloader &pr,
+               int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;
@@ -324,7 +327,7 @@ const std::string sFullScreenPath = "fullscreen.txt";
 DragonGameControllerList::DragonGameControllerList(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
-    smart_pointer<Soundic> pSndRaw_, const LevelStorage &vLvl_,
+    smart_pointer<SoundInterface<Index>> pSndRaw_, const LevelStorage &vLvl_,
     Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
       pr(pDr_->pGr, pSndRaw_, fp), pSndRaw(pSndRaw_),
@@ -938,8 +941,8 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 #endif
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
-  pCnt = std::make_unique<DragonGameControllerList>(pDr, pNum, pBigNum,
-      pFancyNum, pSm, vLvl, rBound, this, fp_.get());
+  pCnt = std::make_unique<DragonGameControllerList>(
+      pDr, pNum, pBigNum, pFancyNum, pSm, vLvl, rBound, this, fp_.get());
   pCnt->StartUp(pCnt.get());
 }
 
