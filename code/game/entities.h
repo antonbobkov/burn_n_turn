@@ -1,9 +1,26 @@
 #ifndef TOWER_DEFENSE_ENTITIES_H
 #define TOWER_DEFENSE_ENTITIES_H
 
-#include "wrappers/color.h"
-#include "core.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/geometry.h"
+#include "game_utils/image_sequence.h"
+#include "utils/timer.h"
+#include "game_utils/sound_sequence.h"
+#include "wrappers/color.h"
+#include "utils/index.h"
+
+struct ScalingDrawer;
+struct NumberDrawer;
+class SoundInterfaceProxy;
+
+using Gui::Point;
+using Gui::Rectangle;
+using Gui::fPoint;
+using Gui::ImageSequence;
+using Gui::SoundSequence;
+using Gui::Timer;
+using Gui::Index;
+using Gui::Color;
 
 /** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {
@@ -51,7 +68,7 @@ struct TextDrawEntity : virtual public VisualEntity {
     SetText(sText);
   }
 
-  void SetText(std::string sText) { vText = BreakUpString(sText); }
+  void SetText(std::string sText);
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 

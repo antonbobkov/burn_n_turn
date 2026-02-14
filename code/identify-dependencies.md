@@ -6,5 +6,5 @@ Ignore std:: classes and standard library includes #include<...>
 - Typically we need includes for non-pointer variables and for class parents
 
 Produce a table
-- column 1: types that would require an include
-- column 2: .h file that explicitly declares this type
+- column 1: types that would require an include (just type name, nothing else)
+- column 2: .h file that explicitly declares this type (just file name, nothing else)

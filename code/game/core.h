@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_CORE_H
 #define TOWER_DEFENSE_CORE_H
 
+#include "game_utils/image_sequence.h"
 #include "wrappers/color.h"
 #include "common.h"
 #include "utils/smart_pointer.h"

@@ -1,6 +1,7 @@
 #include "game/game.h"
 #include "game/controller/level_controller.h"
 
+#include "game_utils/image_sequence.h"
 #include "wrappers/color.h"
 #include "game/common.h"
 #include "game/core.h"

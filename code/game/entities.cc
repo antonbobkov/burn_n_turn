@@ -1,5 +1,9 @@
 #include "entities.h"
-#include "utils/smart_pointer.h"
+#include "core.h"
+
+void TextDrawEntity::SetText(std::string sText) {
+  vText = BreakUpString(sText);
+}
 
 void TextDrawEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
   Point p = pos;

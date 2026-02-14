@@ -5,6 +5,9 @@
 #include "utils/exception.h"
 #include "utils/smart_pointer.h"
 
+using Gui::MyException;
+using Gui::crefString;
+
 namespace Gui {
 class FilePath;
 }

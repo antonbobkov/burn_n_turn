@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "utils/smart_pointer.h"
+#include "game_utils/image_sequence.h"
 
 #include "wrappers/color.h"
 #include <memory>

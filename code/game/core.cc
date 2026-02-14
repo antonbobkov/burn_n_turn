@@ -2,6 +2,7 @@
 #include "game.h"
 #include "wrappers/font_writer.h"
 #include "utils/smart_pointer.h"
+#include "game_utils/image_sequence.h"
 
 #include "wrappers/color.h"
 

@@ -1,5 +1,6 @@
 #include "game.h"
 #include "game/controller/level_controller.h"
+#include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
 
 

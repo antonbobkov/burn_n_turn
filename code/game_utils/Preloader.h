@@ -15,10 +15,10 @@
  * N is the frame duration. The same format is used for image sequences
  * (LoadSeq, LoadSeqT, etc.) and sound sequences (LoadSndSeq).
  *
- * Supporting types: SoundSequence and ImageSequence hold indices and timing for
- * multi-frame or multi-sound playback; ImageFlipper and ImagePainter are
- * functors for transforming images; PreloaderException and its subclasses
- * report missing keys or load failures.
+ * Supporting types: ImageSequence and SoundSequence are in image_sequence.h and
+ * sound_sequence.h. ImageFlipper and ImagePainter are functors for transforming
+ * images; PreloaderException and its subclasses report missing keys or load
+ * failures.
  */
 
 #include <map>
@@ -26,67 +26,16 @@
 #include <string>
 #include <vector>
 
+#include "game_utils/image_sequence.h"
+#include "game_utils/sound_sequence.h"
+#include "utils/file_utils.h"
 #include "wrappers/color.h"
 #include "wrappers/GuiGen.h"
 #include "wrappers/SuiGen.h"
-#include "utils/file_utils.h"
 #include "utils/index.h"
 #include "utils/smart_pointer.h"
-#include "utils/timer.h"
 
 namespace Gui {
-
-/** Sequence of sound indices with per-sound intervals; for multi-sound effects.
- */
-struct SoundSequence {
-  std::vector<Index> vSounds;
-  std::vector<unsigned> vIntervals;
-  unsigned nActive;
-
-  /** Advance to next sound; wraps to 0 at end. Returns true on wrap. */
-  bool Toggle();
-  Index GetSound();
-  /** Interval for current sound; 1 if none defined. */
-  unsigned GetTime() const;
-  void Add(Index iSnd, unsigned nTime = 1);
-
-  SoundSequence();
-};
-
-/** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
- */
-struct ImageSequence : virtual public SP_Info {
-  std::string get_class_name() override { return "ImageSequence"; }
-  std::vector<Index> vImage;
-  std::vector<unsigned> vIntervals;
-  unsigned nActive;
-
-  Timer t;
-
-  /** Advance to next frame; wraps to 0 at end. Returns true on wrap. */
-  bool Toggle();
-  /** Advance frame when timer expires; restarts timer for current interval. */
-  bool ToggleTimed();
-
-  Index GetImage();
-  unsigned GetTime() const;
-  /** Sum of all frame intervals; 1 if empty. */
-  unsigned GetTotalTime() const;
-
-  void Add(Index nImg, unsigned nTime = 1);
-  void INIT();
-
-  ImageSequence();
-  ImageSequence(Index img1);
-  ImageSequence(Index img1, Index img2);
-  ImageSequence(Index img1, Index img2, Index img3);
-};
-
-/** Applies a functor to each image index in an ImageSequence. */
-template <class T> void ForEachImage(ImageSequence &img, T t) {
-  for (unsigned i = 0; i < img.vImage.size(); ++i)
-    t(img.vImage[i]);
-}
 
 /** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {
