@@ -119,26 +119,6 @@ struct BonusDrawer : public VisualEntity {
 
 static const float fSpreadFactor = 2.0f;
 
-LevelController::LevelController(const LevelController &a)
-    : EntityListController(a), tr(a.tr), t(a.t), bCh(a.bCh), nLvl(a.nLvl),
-      nSlimeNum(a.nSlimeNum), bPaused(a.bPaused), tLoseTimer(a.tLoseTimer),
-      bGhostTime(a.bGhostTime), tBlink(a.tBlink), bBlink(a.bBlink), pGr(a.pGr),
-      tStep(a.tStep), bLeft(a.bLeft), pSc(a.pSc), bLeftDown(a.bLeftDown),
-      bRightDown(a.bRightDown), nLastDir(a.nLastDir),
-      bWasDirectionalInput(a.bWasDirectionalInput), pt(a.pt), mc(a.mc),
-      bFirstUpdate(true), pTutorialText(a.pTutorialText),
-      tutOne(a.tutOne), tutTwo(a.tutTwo), bTimerFlash(a.bTimerFlash),
-      pMgGen(a.pMgGen) {
-  for (size_t j = 0; j < a.vCs.size(); ++j)
-    vCs.push_back(std::make_unique<Castle>(
-        a.vCs[j]->GetPosition(), a.vCs[j]->rBound, this));
-  CopyArrayASSP(a.vRd, vRd);
-  CopyArrayASSP(a.vDr, vDr);
-  CopyArrayASSP(a.lsBonus, lsBonus);
-  CopyArrayASSP(a.lsSlimes, lsSlimes);
-  CopyArrayASSP(a.lsSliminess, lsSliminess);
-}
-
 LevelController::LevelController(smart_pointer<TwrGlobalController> pGl_,
                                  Rectangle rBound, Color c,
                                  const LevelLayout &lvl)

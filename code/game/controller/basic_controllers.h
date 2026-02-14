@@ -87,7 +87,6 @@ struct EntityListController : public GameController {
   /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
   void AddBackground(Color c);
 
-  EntityListController(const EntityListController &b);
   bool bNoRefresh;
   EntityListController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                   Color c);
@@ -204,8 +203,9 @@ struct DragonScoreController : public EntityListController {
  * on input. */
 struct AutoAdvanceController : public EntityListController {
   std::string get_class_name() override { return "AutoAdvanceController"; }
-  AutoAdvanceController(const EntityListController &b)
-      : EntityListController(b) {}
+  AutoAdvanceController(smart_pointer<TwrGlobalController> pGl_,
+                        Rectangle rBound, Color c)
+      : EntityListController(pGl_, rBound, c) {}
 
   /*virtual*/ void Update();
 

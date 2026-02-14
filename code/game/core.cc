@@ -1,7 +1,6 @@
 #include "core.h"
-#include "controller/level_controller.h"
-#include "font_writer.h"
 #include "game.h"
+#include "font_writer.h"
 #include "smart_pointer.h"
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
@@ -616,19 +615,16 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 
   // logo 1
   smart_pointer<EntityListController> pCnt0_1 =
-      make_smart(new AutoAdvanceController(
-          EntityListController(pSelf, rBound, Color(0, 0, 0))));
+      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
   // logo 2
   smart_pointer<EntityListController> pCnt0_2 =
-      make_smart(new AutoAdvanceController(
-          EntityListController(pSelf, rBound, Color(0, 0, 0))));
+      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
   // press start screen
   smart_pointer<EntityListController> pCnt1 =
       make_smart(new StartScreenController(pSelf, rBound, Color(0, 0, 0)));
   // game over
   smart_pointer<EntityListController> pCnt2 =
-      make_smart(new AutoAdvanceController(
-          EntityListController(pSelf, rBound, Color(0, 0, 0))));
+      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
   // you win!
   smart_pointer<EntityListController> pCnt3 =
       make_smart(new EntityListController(pSelf, rBound, Color(0, 0, 0)));

@@ -73,8 +73,6 @@ struct LevelController : public EntityListController {
   TutorialLevelTwo tutTwo;
   smart_pointer<TutorialTextEntity> pTutorialText;
 
-  LevelController(const LevelController &a);
-
   LevelController(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound,
                   Color c, const LevelLayout &lvl);
 

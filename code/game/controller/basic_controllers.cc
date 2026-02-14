@@ -87,13 +87,6 @@ void EntityListController::AddBackground(Color c) {
   AddV(pBkg);
 }
 
-EntityListController::EntityListController(const EntityListController &b)
-    : GameController(b), bNoRefresh(b.bNoRefresh) {
-  CopyArrayASSP(b.lsDraw, lsDraw);
-  CopyArrayASSP(b.lsUpdate, lsUpdate);
-  CopyArrayASSP(b.lsPpl, lsPpl);
-}
-
 EntityListController::EntityListController(
     smart_pointer<TwrGlobalController> pGl_, Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
