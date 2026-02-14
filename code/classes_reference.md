@@ -54,10 +54,10 @@ name, base types, and short description.
 | game/fireball.h | struct | CircularFireball | Fireball, TimedFireballBonus | Fireball that orbits at a radius. |
 | game/fireball.h | struct | FireballBonusAnimation | Animation, PhysicalEntity | Pick-up animation with radius; overlaps trigger collection. |
 | game/game.h | struct | GameController | SP_Info | Base controller: pGl, rBound; virtual input/Update. |
-| game/game.h | struct | TwrGlobalController | SP_Info | Global game state: levels, controller, graphics/sound, score, options. |
+| game/game.h | struct | DragonGameControllerList | SP_Info | Global game state: levels, controller, graphics/sound, score, options. |
 | game/game.h | struct | FancyRoad | Road | Road that draws tiled image; uses AdvancedController. |
 | game/game.h | class | TowerDataWrap | — | Holds exit event and graphics/sound interfaces for setup. |
-| game/game.h | class | TowerGameGlobalController | GlobalController | Top-level tower game; owns TowerDataWrap, runs level flow. |
+| game/game.h | class | DragonGameRunner | GlobalController | Top-level tower game; owns TowerDataWrap, runs level flow. |
 | game/gameplay.h | struct | TrackballTracker | — | Tracks trackball/touch input. |
 | game/gameplay.h | struct | BonusScore | EventEntity, VisualEntity | Displays bonus score popup. |
 | game/gameplay.h | struct | SoundControls | EventEntity | Sound on/off control entity. |

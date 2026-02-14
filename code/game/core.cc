@@ -316,7 +316,7 @@ void DrawStuff(Rectangle rBound, smart_pointer<Graphic> pGraph,
 
 const std::string sFullScreenPath = "fullscreen.txt";
 
-TwrGlobalController::TwrGlobalController(
+DragonGameControllerList::DragonGameControllerList(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
     smart_pointer<Soundic> pSndRaw_, const LevelStorage &vLvl_,
@@ -599,7 +599,7 @@ TwrGlobalController::TwrGlobalController(
   pNum->CacheColor(Color(5, 5, 0));
 }
 
-void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
+void DragonGameControllerList::StartUp(smart_pointer<DragonGameControllerList> pSelf_) {
   pSelf = pSelf_;
   nScore = 0;
   bAngry = false;
@@ -851,7 +851,7 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 #endif
 }
 
-void TwrGlobalController::Next() {
+void DragonGameControllerList::Next() {
   if (nActive == vCnt.size() - 1)
     Restart();
   else {
@@ -866,7 +866,7 @@ void TwrGlobalController::Next() {
   }
 }
 
-void TwrGlobalController::Restart(int nActive_ /* = -1*/) {
+void DragonGameControllerList::Restart(int nActive_ /* = -1*/) {
   if (nActive_ == -1)
     nActive = 3;
   else
@@ -877,16 +877,16 @@ void TwrGlobalController::Restart(int nActive_ /* = -1*/) {
   StartUp(pSelf);
 }
 
-void TwrGlobalController::Menu() {
+void DragonGameControllerList::Menu() {
   pMenu->nResumePosition = nActive;
   nActive = 0;
 }
 
-TowerGameGlobalController::TowerGameGlobalController(ProgramEngine pe) {
+DragonGameRunner::DragonGameRunner(ProgramEngine pe) {
   pData = new TowerDataWrap(pe);
 }
 
-TowerGameGlobalController::~TowerGameGlobalController() { delete pData; }
+DragonGameRunner::~DragonGameRunner() { delete pData; }
 TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   szActualRez = pe.szActualRez;
 
@@ -933,37 +933,37 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 #endif
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
-  pCnt = make_smart(new TwrGlobalController(pDr, pNum, pBigNum, pFancyNum, pSm,
+  pCnt = make_smart(new DragonGameControllerList(pDr, pNum, pBigNum, pFancyNum, pSm,
                                             vLvl, rBound, this, fp_.get()));
   pCnt->StartUp(pCnt);
 }
 
-TwrGlobalController *TowerGameGlobalController::GetTowerController() const {
+DragonGameControllerList *DragonGameRunner::GetTowerController() const {
   return pData ? pData->pCnt.get() : nullptr;
 }
 
-unsigned TowerGameGlobalController::GetActiveControllerIndex() const {
-  TwrGlobalController *twr = GetTowerController();
+unsigned DragonGameRunner::GetActiveControllerIndex() const {
+  DragonGameControllerList *twr = GetTowerController();
   return twr ? twr->nActive : 0;
 }
 
-unsigned TowerGameGlobalController::GetControllerCount() const {
-  TwrGlobalController *twr = GetTowerController();
+unsigned DragonGameRunner::GetControllerCount() const {
+  DragonGameControllerList *twr = GetTowerController();
   return twr ? twr->vCnt.size() : 0;
 }
 
-std::string TowerGameGlobalController::GetActiveControllerName() const {
-  TwrGlobalController *twr = GetTowerController();
+std::string DragonGameRunner::GetActiveControllerName() const {
+  DragonGameControllerList *twr = GetTowerController();
   if (!twr || twr->nActive >= twr->vCnt.size())
     return "";
   return twr->vCnt[twr->nActive]->GetControllerName();
 }
 
-void TowerGameGlobalController::Update() {
+void DragonGameRunner::Update() {
   pData->pCnt->vCnt[pData->pCnt->nActive]->Update();
 }
 
-void TowerGameGlobalController::KeyDown(GuiKeyType nCode) {
+void DragonGameRunner::KeyDown(GuiKeyType nCode) {
   pData->pCnt->vCnt[pData->pCnt->nActive]->OnKey(nCode, false);
 
 #ifndef PC_VERSION
@@ -972,11 +972,11 @@ void TowerGameGlobalController::KeyDown(GuiKeyType nCode) {
 #endif
 }
 
-void TowerGameGlobalController::KeyUp(GuiKeyType nCode) {
+void DragonGameRunner::KeyUp(GuiKeyType nCode) {
   pData->pCnt->vCnt[pData->pCnt->nActive]->OnKey(nCode, true);
 }
 
-void TowerGameGlobalController::MouseMove(Point pPos) {
+void DragonGameRunner::MouseMove(Point pPos) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
   pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouse(pPos);
@@ -984,7 +984,7 @@ void TowerGameGlobalController::MouseMove(Point pPos) {
 #endif
 }
 
-void TowerGameGlobalController::MouseDown(Point pPos) {
+void DragonGameRunner::MouseDown(Point pPos) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
   pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouseDown(pPos);
@@ -992,7 +992,7 @@ void TowerGameGlobalController::MouseDown(Point pPos) {
 #endif
 }
 
-void TowerGameGlobalController::MouseUp() {
+void DragonGameRunner::MouseUp() {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
   pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouseUp();
@@ -1000,10 +1000,10 @@ void TowerGameGlobalController::MouseUp() {
 #endif
 }
 
-void TowerGameGlobalController::DoubleClick() {
+void DragonGameRunner::DoubleClick() {
   pData->pCnt->vCnt[pData->pCnt->nActive]->DoubleClick();
 }
 
-void TowerGameGlobalController::Fire() {
+void DragonGameRunner::Fire() {
   pData->pCnt->vCnt[pData->pCnt->nActive]->Fire();
 }

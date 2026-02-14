@@ -60,8 +60,8 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     Size sz(kScreenW, kScreenH);
 
     ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-    smart_pointer<TowerGameGlobalController> p_gl =
-        make_smart(new TowerGameGlobalController(pe));
+    smart_pointer<DragonGameRunner> p_gl =
+        make_smart(new DragonGameRunner(pe));
 
     bool reached_level = false;
     bool reached_menu = false;

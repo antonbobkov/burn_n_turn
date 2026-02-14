@@ -35,8 +35,8 @@ const unsigned kKeyPressCount = 3;
 const Crd kTowerX = kScreenW / 2;
 const Crd kTowerY = kScreenH * 3 / 4;
 
-void LogState(TowerGameGlobalController *ctrl) {
-  TwrGlobalController *twr = ctrl->GetTowerController();
+void LogState(DragonGameRunner *ctrl) {
+  DragonGameControllerList *twr = ctrl->GetTowerController();
   if (!twr)
     return;
   std::cout << "[sim] screen " << ctrl->GetActiveControllerName() << " ("
@@ -74,8 +74,8 @@ void RunSimulation() {
 
   std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
   ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
-  smart_pointer<TowerGameGlobalController> p_gl =
-      make_smart(new TowerGameGlobalController(pe));
+  smart_pointer<DragonGameRunner> p_gl =
+      make_smart(new DragonGameRunner(pe));
 
   std::string sound_content_before;
   bool sound_toggle_verified = false;

@@ -44,5 +44,5 @@ Gui::ProgramInfo GetProgramInfo() {
 
 smart_pointer<Gui::GameRunner>
 GetGameRunner(Gui::ProgramEngine pe) {
-  return make_smart(new TowerGameGlobalController(pe));
+  return make_smart(new DragonGameRunner(pe));
 }

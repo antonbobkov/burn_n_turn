@@ -154,7 +154,7 @@ enum {
   BG_SLOW_BACKGROUND3 = 5
 };
 
-struct TwrGlobalController;
+struct DragonGameControllerList;
 struct GameController;
 
 extern const std::string sFullScreenPath;

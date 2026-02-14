@@ -16,14 +16,14 @@
  * Fire, etc.). */
 struct GameController : virtual public SP_Info {
   std::string get_class_name() override { return "GameController"; }
-  smart_pointer<TwrGlobalController> pGl;
+  smart_pointer<DragonGameControllerList> pGl;
 
   Rectangle rBound;
 
   GameController(const GameController &gc)
       : pGl(gc.pGl), rBound(gc.rBound) {}
 
-  GameController(smart_pointer<TwrGlobalController> pGl_,
+  GameController(smart_pointer<DragonGameControllerList> pGl_,
                  Rectangle rBound_ = Rectangle())
       : pGl(pGl_), rBound(rBound_) {}
 
@@ -46,8 +46,8 @@ struct TowerDataWrap;
 
 /** Global game state: level storage, active controller, graphics/sound, score,
  * savable options, music. */
-struct TwrGlobalController : virtual public SP_Info {
-  std::string get_class_name() override { return "TwrGlobalController"; }
+struct DragonGameControllerList : virtual public SP_Info {
+  std::string get_class_name() override { return "DragonGameControllerList"; }
   std::vector<smart_pointer<GameController>> vCnt;
   unsigned nActive;
 
@@ -87,7 +87,7 @@ struct TwrGlobalController : virtual public SP_Info {
 
   std::list<smart_pointer<TimedFireballBonus>> lsBonusesToCarryOver;
 
-  TwrGlobalController(smart_pointer<ScalingDrawer> pDr_,
+  DragonGameControllerList(smart_pointer<ScalingDrawer> pDr_,
                       smart_pointer<NumberDrawer> pNum_,
                       smart_pointer<NumberDrawer> pBigNum_,
                       smart_pointer<FontWriter> pFancyNum_,
@@ -97,9 +97,9 @@ struct TwrGlobalController : virtual public SP_Info {
 
   TowerDataWrap *pWrp;
 
-  smart_pointer<TwrGlobalController> pSelf;
+  smart_pointer<DragonGameControllerList> pSelf;
 
-  void StartUp(smart_pointer<TwrGlobalController> pSelf);
+  void StartUp(smart_pointer<DragonGameControllerList> pSelf);
   void Next();
   void Restart(int nActive_ = -1);
   void Menu();
@@ -133,19 +133,19 @@ public:
   std::unique_ptr<FilePath> fp_;
 
   LevelStorage vLvl;
-  smart_pointer<TwrGlobalController> pCnt;
+  smart_pointer<DragonGameControllerList> pCnt;
 
   Size szActualRez;
 };
 
 /** Top-level tower game: owns TowerDataWrap, builds and runs level flow. */
-class TowerGameGlobalController : public GameRunner {
+class DragonGameRunner : public GameRunner {
   TowerDataWrap *pData;
 
 public:
-  std::string get_class_name() override { return "TowerGameGlobalController"; }
-  TowerGameGlobalController(ProgramEngine pe);
-  ~TowerGameGlobalController();
+  std::string get_class_name() override { return "DragonGameRunner"; }
+  DragonGameRunner(ProgramEngine pe);
+  ~DragonGameRunner();
 
   /*virtual*/ void Update();
 
@@ -159,7 +159,7 @@ public:
 
   /** For simulation/inspection: current tower controller (levels, menu, etc.).
    */
-  TwrGlobalController *GetTowerController() const;
+  DragonGameControllerList *GetTowerController() const;
   /** Active screen index (0=menu, 1..=logos/start/levels). */
   unsigned GetActiveControllerIndex() const;
   /** Total number of screens. */

@@ -119,7 +119,7 @@ struct BonusDrawer : public VisualEntity {
 
 static const float fSpreadFactor = 2.0f;
 
-LevelController::LevelController(smart_pointer<TwrGlobalController> pGl_,
+LevelController::LevelController(smart_pointer<DragonGameControllerList> pGl_,
                                  Rectangle rBound, Color c,
                                  const LevelLayout &lvl)
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
