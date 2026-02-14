@@ -7,9 +7,13 @@
 #include "gui_key_type.h"
 #include "smart_pointer.h"
 #include "timer.h"
+#include <list>
+#include <memory>
+#include <vector>
 
 struct Animation;
 struct ConsumableEntity;
+struct Entity;
 struct EventEntity;
 struct FancyCritter;
 struct VisualEntity;
@@ -55,10 +59,25 @@ struct EntityListController : public GameController {
   std::list<smart_pointer<EventEntity>> lsUpdate;
   std::list<smart_pointer<ConsumableEntity>> lsPpl;
 
+  /** Owned entities (controller owns lifetime). Empty for now. */
+  std::list<std::unique_ptr<Entity>> owned_entities;
+  std::list<VisualEntity *> owned_visual_entities;
+  std::list<EventEntity *> owned_event_entities;
+
   /** Add visual entity to lsDraw. */
   void AddV(smart_pointer<VisualEntity> pVs);
   /** Adds an event entity to the update list. */
   void AddE(smart_pointer<EventEntity> pEv);
+
+  void AddOwnedVisualEntity(std::unique_ptr<VisualEntity> p);
+  void AddOwnedEventEntity(std::unique_ptr<EventEntity> p);
+  template <class T>
+  void AddOwnedBoth(std::unique_ptr<T> p) {
+    T *raw = p.get();
+    owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+    owned_visual_entities.push_back(raw);
+    owned_event_entities.push_back(raw);
+  }
 
   template <class T> void AddBoth(T &t) {
     lsDraw.push_back(t);
@@ -79,6 +98,10 @@ struct EntityListController : public GameController {
    * Refresh the screen unless refresh is disabled.
    */
   /*virtual*/ void Update();
+
+  /** Non-owned entities to update and draw (e.g. owned elsewhere). */
+  virtual std::vector<EventEntity *> GetNonOwnedUpdateEntities() { return {}; }
+  virtual std::vector<VisualEntity *> GetNonOwnedDrawEntities() { return {}; }
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 

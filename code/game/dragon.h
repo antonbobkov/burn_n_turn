@@ -75,14 +75,14 @@ struct Dragon : public Critter {
 
   LevelController *pAd;
 
-  smart_pointer<Castle> pCs;
+  Castle *pCs;
 
   ImageSequence imgStable;
   ImageSequence imgFly;
 
   ButtonSet bt;
 
-  Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
+  Dragon(Castle *pCs_, LevelController *pAd_,
          ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
   /*vrtual*/ void Update();

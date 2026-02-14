@@ -1,10 +1,8 @@
 #include "core.h"
-#include "game.h"
 #include "controller/level_controller.h"
 #include "font_writer.h"
 #include "game.h"
 #include "smart_pointer.h"
-
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
 struct SlimeUpdater : public VisualEntity {
@@ -324,12 +322,12 @@ TwrGlobalController::TwrGlobalController(
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
     smart_pointer<Soundic> pSndRaw_, const LevelStorage &vLvl_,
     Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
-    : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_),
-      pBigNum(pBigNum_), pr(pDr_->pGr, pSndRaw_, fp),
-      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))),
-      nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
-      pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(),
-      vLevelPointers(3), sbTutorialOn(fp, "tutorial_on.txt", true, true),
+    : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
+      pr(pDr_->pGr, pSndRaw_, fp), pSndRaw(pSndRaw_),
+      pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))), nScore(0),
+      vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
+      pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(), vLevelPointers(3),
+      sbTutorialOn(fp, "tutorial_on.txt", true, true),
       snProgress(fp, "stuff.txt", 0, true),
       sbFullScreen(fp, sFullScreenPath, false, true),
       sbSoundOn(fp, "soundon.txt", true, true),
@@ -773,8 +771,8 @@ void TwrGlobalController::StartUp(smart_pointer<TwrGlobalController> pSelf_) {
 #endif
 
   for (unsigned i = 0; i < vLvl.size(); ++i) {
-    smart_pointer<LevelController> pAd = make_smart(
-        new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    smart_pointer<LevelController> pAd =
+        make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd.get(), vLvl[i]);
 
     pAd->AddE(pBckgMusic);
@@ -892,9 +890,7 @@ TowerGameGlobalController::TowerGameGlobalController(ProgramEngine pe) {
   pData = new TowerDataWrap(pe);
 }
 
-TowerGameGlobalController::~TowerGameGlobalController() {
-  delete pData;
-}
+TowerGameGlobalController::~TowerGameGlobalController() { delete pData; }
 TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
   szActualRez = pe.szActualRez;
 

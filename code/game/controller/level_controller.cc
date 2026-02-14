@@ -129,7 +129,9 @@ LevelController::LevelController(const LevelController &a)
       bFirstUpdate(true), pTutorialText(a.pTutorialText),
       tutOne(a.tutOne), tutTwo(a.tutTwo), bTimerFlash(a.bTimerFlash),
       pMgGen(a.pMgGen) {
-  CopyArrayASSP(a.vCs, vCs);
+  for (size_t j = 0; j < a.vCs.size(); ++j)
+    vCs.push_back(std::make_unique<Castle>(
+        a.vCs[j]->GetPosition(), a.vCs[j]->rBound, this));
   CopyArrayASSP(a.vRd, vRd);
   CopyArrayASSP(a.vDr, vDr);
   CopyArrayASSP(a.lsBonus, lsBonus);
@@ -187,14 +189,14 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
     vCs.push_back(
-        make_smart(new Castle(lvl.vCastleLoc[i], rBound, pSelf)));
+        std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
 
   t = Timer(lvl.nTimer);
 
   vDr.push_back(make_smart(new Dragon(
-      vCs[0], pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
+      vCs[0].get(), pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
-  if (!vDr.back()->pCs.is_null())
+  if (vDr.back()->pCs != nullptr)
     vDr.back()->pCs->pDrag = vDr.back();
 
   Point pos(pGl->rBound.sz.x / 2, pGl->rBound.sz.y);
@@ -223,8 +225,6 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   AddE(pTGen);
   AddE(pMGen);
 
-  for (i = 0; i < vCs.size(); ++i)
-    AddBoth(vCs[i]);
   for (i = 0; i < vRd.size(); ++i)
     AddV(vRd[i]);
   for (i = 0; i < vDr.size(); ++i)
@@ -421,6 +421,20 @@ float LevelController::GetCompletionRate() {
   fCap /= (4 * vCs.size());
 
   return fCap;
+}
+
+std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
+  std::vector<EventEntity *> out;
+  for (size_t i = 0; i < vCs.size(); ++i)
+    out.push_back(vCs[i].get());
+  return out;
+}
+
+std::vector<VisualEntity *> LevelController::GetNonOwnedDrawEntities() {
+  std::vector<VisualEntity *> out;
+  for (size_t i = 0; i < vCs.size(); ++i)
+    out.push_back(vCs[i].get());
+  return out;
 }
 
 void LevelController::MegaGeneration() {

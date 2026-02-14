@@ -2,8 +2,8 @@
 #define TOWER_DEFENSE_COMMON_H
 
 #include "GuiGen.h"
-#include "gui_key_type.h"
 #include "SuiGen.h"
+#include "gui_key_type.h"
 
 #include <algorithm>
 #include <iostream>

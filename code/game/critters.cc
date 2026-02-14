@@ -181,7 +181,7 @@ void Knight::KnockBack() {
 
 void Knight::Update() {
   for (unsigned i = 0; i < pAc->vCs.size(); ++i)
-    if (this->HitDetection(pAc->vCs[i])) {
+    if (this->HitDetection(pAc->vCs[i].get())) {
       pAc->vCs[i]->OnKnight(GetType());
 
       bExist = false;
@@ -664,7 +664,7 @@ void Castle::OnKnight(char cWhat) {
       pDrag->SimpleVisualEntity::seq = pDrag->imgFly;
       pDrag->SimpleVisualEntity::dPriority = 5;
 
-      pDrag->pCs = smart_pointer<Castle>();
+      pDrag->pCs = nullptr;
 
       pDrag->fVel = pAv->pt.GetDirection(GetPosition());
       if (pDrag->fVel.Length() == 0)

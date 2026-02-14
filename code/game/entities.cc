@@ -65,6 +65,12 @@ void AnimationOnce::Update() {
 }
 
 bool PhysicalEntity::HitDetection(smart_pointer<PhysicalEntity> pPh) {
+  return HitDetection(pPh.get());
+}
+
+bool PhysicalEntity::HitDetection(PhysicalEntity *pPh) {
+  if (pPh == nullptr)
+    return false;
   Point d = GetPosition() - pPh->GetPosition();
   unsigned r1 = GetRadius(), r2 = pPh->GetRadius();
   return unsigned(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);

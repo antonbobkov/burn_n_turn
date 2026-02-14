@@ -97,7 +97,7 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 
     Point p = GetPosition();
 
-    if (!pCs.is_null())
+    if (pCs != nullptr)
       p = pCs->GetPosition();
 
     int nNumCirc = fb.uMap["pershot"] + 1;
@@ -179,11 +179,11 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
+Dragon::Dragon(Castle *pCs_, LevelController *pAd_,
                ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
     : pAd(pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,
-              pCs_.is_null() ? pAd_->vCs[0]->GetPosition()
+              pCs_ == nullptr ? pAd_->vCs[0]->GetPosition()
                              : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(pCs_), bt(bt_),
@@ -192,7 +192,7 @@ Dragon::Dragon(smart_pointer<Castle> pCs_, LevelController *pAd_,
       tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
-  if (!pCs.is_null() && pCs->pDrag.is_null()) {
+  if (pCs != nullptr && pCs->pDrag.is_null()) {
     pCs->pDrag = pAd->FindDragon(this);
     bFly = false;
     Critter::dPriority = 3;
@@ -240,7 +240,7 @@ void Dragon::Update() {
     bool bHitCastle = false;
 
     for (unsigned i = 0; i < pAd->vCs.size(); ++i)
-      if (this->HitDetection(pAd->vCs[i])) {
+      if (this->HitDetection(pAd->vCs[i].get())) {
         if (!pAd->vCs[i]->pDrag.is_null())
           continue;
         bHitCastle = true;
@@ -298,7 +298,7 @@ void Dragon::Update() {
 }
 
 Point Dragon::GetPosition() {
-  if (!pCs.is_null())
+  if (pCs != nullptr)
     return (fPos + fPoint(0, -1)).ToPnt();
   return fPos.ToPnt();
 }
@@ -421,7 +421,7 @@ void Dragon::Toggle() {
     SimpleVisualEntity::dPriority = 5;
 
     pCs->pDrag = smart_pointer<Dragon>();
-    pCs = smart_pointer<Castle>();
+    pCs = nullptr;
 
     fVel = pAd->pt.GetFlightDirection(GetPosition());
 
@@ -433,7 +433,7 @@ void Dragon::Toggle() {
   }
 
   for (unsigned i = 0; i < pAd->vCs.size(); ++i)
-    if (this->HitDetection(pAd->vCs[i])) {
+    if (this->HitDetection(pAd->vCs[i].get())) {
       if (!pAd->vCs[i]->pDrag.is_null() || bTookOff || pAd->vCs[i]->bBroken)
         continue;
 
@@ -443,7 +443,7 @@ void Dragon::Toggle() {
 
       pAd->tutOne.FlyOff();
 
-      pCs = pAd->vCs[i];
+      pCs = pAd->vCs[i].get();
       pCs->pDrag = pAd->FindDragon(this);
 
       if (cCarry == 'P') {

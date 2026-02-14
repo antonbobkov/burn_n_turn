@@ -179,6 +179,7 @@ struct PhysicalEntity : virtual public ScreenEntity {
   virtual unsigned GetRadius() { return 0; }
 
   bool HitDetection(smart_pointer<PhysicalEntity> pPh);
+  bool HitDetection(PhysicalEntity *pPh);
 };
 
 /** PhysicalEntity that can be hit (OnHit), has type (GetType) and image

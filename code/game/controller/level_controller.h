@@ -8,6 +8,7 @@
 #include "mouse_utils.h"
 #include "smart_pointer.h"
 #include "tutorial.h"
+#include <memory>
 
 struct Castle;
 struct Dragon;
@@ -22,7 +23,7 @@ struct Sliminess;
  */
 struct LevelController : public EntityListController {
   std::string get_class_name() override { return "LevelController"; }
-  std::vector<smart_pointer<Castle>> vCs;
+  std::vector<std::unique_ptr<Castle>> vCs;
   std::vector<smart_pointer<Road>> vRd;
   std::vector<smart_pointer<Dragon>> vDr;
 
@@ -94,6 +95,9 @@ struct LevelController : public EntityListController {
   /*virtual*/ std::string GetControllerName() const { return "level"; }
 
   float GetCompletionRate();
+
+  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
+  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
 
   MouseCursor mc;
 

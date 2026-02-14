@@ -149,7 +149,8 @@ TEST_CASE("smart_pointer class name count increments on construct",
   REQUIRE(g_smart_pointer_count["TestObj"] == 0);
 }
 
-TEST_CASE("smart_pointer class name count on assignment", "[smart_pointer][class_name]") {
+TEST_CASE("smart_pointer class name count on assignment",
+          "[smart_pointer][class_name]") {
   smart_pointer<TestObj> a = make_smart<TestObj>(new TestObj(1));
   smart_pointer<TestObj> b = make_smart<TestObj>(new TestObj(2));
   REQUIRE(g_smart_pointer_count["TestObj"] == 2);

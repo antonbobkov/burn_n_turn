@@ -37,8 +37,7 @@ public:
     ++nGlobalSuperMegaCounter;
   }
   SP_Info() : _SP_INFO_COUNTER(0) { ++nGlobalSuperMegaCounter; }
-  SP_Info(std::string sStr_)
-      : _SP_INFO_STRING(sStr_), _SP_INFO_COUNTER(0) {
+  SP_Info(std::string sStr_) : _SP_INFO_STRING(sStr_), _SP_INFO_COUNTER(0) {
     ++nGlobalSuperMegaCounter;
   }
 

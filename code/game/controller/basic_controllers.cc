@@ -1,5 +1,6 @@
 #include "game.h"
 #include "smart_pointer.h"
+#include <memory>
 
 SimpleController::SimpleController(smart_pointer<TwrGlobalController> pGraph,
                                    std::string strFileName)
@@ -62,6 +63,19 @@ void EntityListController::AddE(smart_pointer<EventEntity> pEv) {
   lsUpdate.push_back(pEv);
 }
 
+void EntityListController::AddOwnedVisualEntity(
+    std::unique_ptr<VisualEntity> p) {
+  VisualEntity *raw = p.get();
+  owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+  owned_visual_entities.push_back(raw);
+}
+
+void EntityListController::AddOwnedEventEntity(std::unique_ptr<EventEntity> p) {
+  EventEntity *raw = p.get();
+  owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+  owned_event_entities.push_back(raw);
+}
+
 void EntityListController::AddBackground(Color c) {
   Rectangle r = rBound.sz;
   r.sz.x *= pGl->pDr->nFactor;
@@ -80,8 +94,8 @@ EntityListController::EntityListController(const EntityListController &b)
   CopyArrayASSP(b.lsPpl, lsPpl);
 }
 
-EntityListController::EntityListController(smart_pointer<TwrGlobalController> pGl_,
-                                 Rectangle rBound, Color c)
+EntityListController::EntityListController(
+    smart_pointer<TwrGlobalController> pGl_, Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
 }
@@ -90,39 +104,64 @@ void EntityListController::Update() {
   CleanUp(lsUpdate);
   CleanUp(lsDraw);
   CleanUp(lsPpl);
+  CleanUp(owned_visual_entities);
+  CleanUp(owned_event_entities);
+  CleanUp(owned_entities);
 
-  std::list<smart_pointer<EventEntity>>::iterator itr;
-  for (itr = lsUpdate.begin(); itr != lsUpdate.end(); ++itr) {
-    if (!(*itr)->bExist)
-      continue;
-    (*itr)->Move();
+  for (auto &p : lsUpdate) {
+    if (p->bExist)
+      p->Move();
   }
 
-  for (itr = lsUpdate.begin(); itr != lsUpdate.end(); ++itr) {
-    if (!(*itr)->bExist)
-      continue;
+  for (EventEntity *pEx : owned_event_entities) {
+    if (pEx->bExist)
+      pEx->Move();
+  }
 
-    (*itr)->Update();
+  for (EventEntity *pEx : GetNonOwnedUpdateEntities()) {
+    if (pEx->bExist)
+      pEx->Move();
+  }
+
+  for (auto &p : lsUpdate) {
+    if (p->bExist)
+      p->Update();
+  }
+
+  for (EventEntity *pEx : owned_event_entities) {
+    if (pEx->bExist)
+      pEx->Update();
+  }
+
+  for (EventEntity *pEx : GetNonOwnedUpdateEntities()) {
+    if (pEx->bExist)
+      pEx->Update();
   }
 
   {
-    std::list<smart_pointer<VisualEntity>>::iterator itr;
+    typedef std::multimap<ScreenPos, VisualEntity *> DrawMap;
+    DrawMap mmp;
 
-    std::multimap<ScreenPos, smart_pointer<VisualEntity>> mmp;
-
-    for (itr = lsDraw.begin(); itr != lsDraw.end(); ++itr) {
-      if (!(*itr)->bExist)
-        continue;
-
-      mmp.insert(std::pair<ScreenPos, smart_pointer<VisualEntity>>(
-          ScreenPos((*itr)->GetPriority(), ((*itr)->GetPosition())), *itr));
+    for (auto &p : lsDraw) {
+      if (p->bExist)
+        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
+            ScreenPos(p->GetPriority(), p->GetPosition()), p.get()));
     }
 
-    for (std::multimap<ScreenPos, smart_pointer<VisualEntity>>::iterator
-             mitr = mmp.begin(),
-             metr = mmp.end();
-         mitr != metr; ++mitr)
-      mitr->second->Draw(pGl->pDr);
+    for (VisualEntity *pOw : owned_visual_entities) {
+      if (pOw->bExist)
+        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
+            ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw));
+    }
+
+    for (VisualEntity *pEx : GetNonOwnedDrawEntities()) {
+      if (pEx->bExist)
+        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
+            ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
+    }
+
+    for (auto &entry : mmp)
+      entry.second->Draw(pGl->pDr);
   }
 
   if (!bNoRefresh)
@@ -216,8 +255,7 @@ void BuyNowController::OnMouseDown(Point pPos) {
 Cutscene::Cutscene(smart_pointer<TwrGlobalController> pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
-      pCrFollow(), bRelease(false), tm(nFramesInSecond / 5),
-      Beepy(true) {
+      pCrFollow(), bRelease(false), tm(nFramesInSecond / 5), Beepy(true) {
   ImageSequence seq1 = pGl_->pr(sRun);
 
   int xPos = 5;
