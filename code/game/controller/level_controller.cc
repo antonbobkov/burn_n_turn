@@ -127,7 +127,8 @@ LevelController::LevelController(DragonGameControllerList *pGl_,
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
-      bTakeOffToggle(false), pTutorialText(),
+      bTakeOffToggle(false), tutOne(std::make_unique<TutorialLevelOne>()),
+      tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
       mc(pGl->pr("claw"), Point()), bTimerFlash(false) {}
 
 smart_pointer<Dragon> LevelController::FindDragon(Dragon *p) {
@@ -188,14 +189,14 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 #ifdef PC_VERSION
 
   if (nLvl == 1) {
-    tutOne.pTexter = pTT;
-    tutOne.Update();
+    tutOne->pTexter = pTT;
+    tutOne->Update();
     AddBoth(pTT);
   }
 
   if (nLvl == 2) {
-    tutTwo.pTexter = pTT;
-    tutTwo.Update();
+    tutTwo->pTexter = pTT;
+    tutTwo->Update();
     AddBoth(pTT);
   }
 

@@ -289,7 +289,7 @@ void Dragon::Update() {
         AddBonus(GetBonus((*itr)->n, nBonusPickUpTime));
         (*itr)->bExist = false;
 
-        pAd->tutTwo.BonusPickUp();
+        pAd->tutTwo->BonusPickUp();
       }
     }
   }
@@ -353,7 +353,7 @@ void Dragon::Fire(fPoint fDir) {
     return;
 
   if (!bFly)
-    pAd->tutOne.ShotFired();
+    pAd->tutOne->ShotFired();
 
   tFireballRegen.nTimer = 0;
   bRegenLocked = true;
@@ -415,7 +415,7 @@ void Dragon::Toggle() {
     bFly = true;
     bTookOff = true;
 
-    pAd->tutOne.FlyOn();
+    pAd->tutOne->FlyOn();
 
     SimpleVisualEntity::seq = imgFly;
     SimpleVisualEntity::dPriority = 5;
@@ -441,13 +441,13 @@ void Dragon::Toggle() {
 
       bFly = false;
 
-      pAd->tutOne.FlyOff();
+      pAd->tutOne->FlyOff();
 
       pCs = pAd->vCs[i].get();
       pCs->pDrag = pAd->FindDragon(this);
 
       if (cCarry == 'P') {
-        pAd->tutOne.PrincessCaptured();
+        pAd->tutOne->PrincessCaptured();
         pAd->vCs[i]->nPrincesses += nPrCr;
 
         unsigned j;

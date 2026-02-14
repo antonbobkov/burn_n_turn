@@ -3,22 +3,29 @@
 
 #include "color.h"
 #include "controller/basic_controllers.h"
-#include "controller/menu_controller.h"
-#include "gameplay.h"
+#include "geometry.h"
+#include "gui_key_type.h"
 #include "level.h"
 #include "mouse_utils.h"
 #include "smart_pointer.h"
-#include "tutorial.h"
+#include "timer.h"
 #include <memory>
+
+using Gui::Timer;
 
 struct Castle;
 struct Dragon;
+struct DragonGameControllerList;
 struct FireballBonusAnimation;
 struct KnightGenerator;
 struct MageGenerator;
 struct Road;
 struct Slime;
 struct Sliminess;
+struct SoundControls;
+struct TutorialLevelOne;
+struct TutorialLevelTwo;
+struct TutorialTextEntity;
 
 /** Main game controller: castles, roads, dragon, generators, bonuses, input.
  */
@@ -70,13 +77,13 @@ struct LevelController : public EntityListController {
   PositionTracker pt;
   bool bTakeOffToggle;
 
-  TutorialLevelOne tutOne;
-  TutorialLevelTwo tutTwo;
+  std::unique_ptr<TutorialLevelOne> tutOne;
+  std::unique_ptr<TutorialLevelTwo> tutTwo;
   smart_pointer<TutorialTextEntity> pTutorialText;
 
   LevelController(const LevelController &) = delete;
-  LevelController(DragonGameControllerList *pGl_, Rectangle rBound,
-                  Color c, const LevelLayout &lvl);
+  LevelController(DragonGameControllerList *pGl_, Rectangle rBound, Color c,
+                  const LevelLayout &lvl);
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
 

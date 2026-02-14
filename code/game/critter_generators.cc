@@ -115,7 +115,7 @@ void PrincessGenerator::Update() {
     pBc->lsPpl.push_back(pCr);
     pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("princess_arrive"));
 
-    pBc->tutOne.PrincessGenerate();
+    pBc->tutOne->PrincessGenerate();
   }
 }
 
@@ -209,7 +209,7 @@ void TraderGenerator::Update() {
     pBc->AddBoth(pCr);
     pBc->lsPpl.push_back(pCr);
 
-    pBc->tutTwo.TraderGenerate();
+    pBc->tutTwo->TraderGenerate();
   }
 }
 

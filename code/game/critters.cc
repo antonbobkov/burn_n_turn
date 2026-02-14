@@ -133,7 +133,7 @@ void Trader::OnHit(char cWhat) {
 
   bExist = false;
 
-  pAc->tutTwo.TraderKilled();
+  pAc->tutTwo->TraderKilled();
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
@@ -253,7 +253,7 @@ void Knight::OnHit(char cWhat) {
 
   bExist = false;
 
-  pAc->tutOne.KnightKilled();
+  pAc->tutOne->KnightKilled();
 
   if (cType != 'G') {
     smart_pointer<BonusScore> pB =
