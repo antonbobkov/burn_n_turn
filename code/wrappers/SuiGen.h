@@ -4,8 +4,6 @@
 #include "utils/index.h"
 #include "utils/smart_pointer.h"
 
-namespace Gui {
-
 template <class SndHndl> class SoundInterface : virtual public SP_Info {
 public:
   std::string get_class_name() override { return "SoundInterface"; }
@@ -81,6 +79,5 @@ void SimpleSoundInterface<SndHndl>::DeleteIndex(const Index &i) {
   pSn->DeleteSound(kp.GetElement(i.GetIndex()));
   kp.FreeElement(i.GetIndex());
 }
-} // namespace Gui
 
 #endif // SUIGEN_ALREADY_INCLUDED_08_25

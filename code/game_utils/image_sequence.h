@@ -13,8 +13,6 @@
 #include "utils/smart_pointer.h"
 #include "utils/timer.h"
 
-namespace Gui {
-
 /** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
  */
 struct ImageSequence : virtual public SP_Info {
@@ -49,7 +47,5 @@ template <class T> void ForEachImage(ImageSequence &img, T t) {
   for (unsigned i = 0; i < img.vImage.size(); ++i)
     t(img.vImage[i]);
 }
-
-} // namespace Gui
 
 #endif // IMAGE_SEQUENCE_HEADER

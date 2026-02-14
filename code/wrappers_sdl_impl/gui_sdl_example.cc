@@ -17,10 +17,10 @@ int main(int argc, char **args) {
 
   const char *imageFile = (argc > 1) ? args[1] : "test_image.bmp";
 
-  smart_pointer<Gui::SdlGraphicalInterface> pGr;
+  smart_pointer<SdlGraphicalInterface> pGr;
   try {
-    pGr = make_smart(new Gui::SdlGraphicalInterface(Gui::Size(640, 480)));
-  } catch (Gui::GraphicalInterfaceException &e) {
+    pGr = make_smart(new SdlGraphicalInterface(Size(640, 480)));
+  } catch (GraphicalInterfaceException &e) {
     std::cerr << "SdlGraphicalInterface init failed: " << e.GetDescription(true)
               << "\n";
     return 1;
@@ -28,10 +28,10 @@ int main(int argc, char **args) {
 
   pGr->SetTitle("gui_sdl_example");
 
-  Gui::SdlImage *pImg = 0;
+SdlImage *pImg = 0;
   try {
     pImg = pGr->LoadImage(imageFile);
-  } catch (Gui::GraphicalInterfaceException &e) {
+  } catch (GraphicalInterfaceException &e) {
     std::cerr << "LoadImage failed for " << imageFile << ": "
               << e.GetDescription(true) << "\n";
     std::cout << "[gui_sdl_example] Window open (no image). "
@@ -47,14 +47,14 @@ int main(int argc, char **args) {
     }
 
     /* Clear with background color (matching SDL_ex3_image). */
-    pGr->DrawRectangle(Gui::Rectangle(Gui::Size(640, 480)),
-                       Gui::Color(40, 44, 52), false);
+    pGr->DrawRectangle(Rectangle(Size(640, 480)),
+Color(40, 44, 52), false);
     if (pImg) {
-      pGr->DrawImage(Gui::Point(0, 0), pImg, pImg->GetRectangle(), true);
+      pGr->DrawImage(Point(0, 0), pImg, pImg->GetRectangle(), true);
     } else {
       /* Fallback rectangle when image failed to load. */
-      pGr->DrawRectangle(Gui::Rectangle(100, 150, 540, 330),
-                         Gui::Color(200, 80, 80), true);
+      pGr->DrawRectangle(Rectangle(100, 150, 540, 330),
+Color(200, 80, 80), true);
     }
     pGr->RefreshAll();
     SDL_Delay(16);
@@ -63,7 +63,7 @@ int main(int argc, char **args) {
   if (pImg)
     pGr->DeleteImage(pImg);
 
-  pGr = smart_pointer<Gui::SdlGraphicalInterface>();
+  pGr = smart_pointer<SdlGraphicalInterface>();
   /* Destructor calls SDL_Quit(). */
 
   std::cout << "[gui_sdl_example] Exiting.\n";

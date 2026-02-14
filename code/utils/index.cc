@@ -6,8 +6,6 @@
 
 #include "index.h"
 
-namespace Gui {
-
 Index::Index(const Index &i) : nI(i.nI), pCounter(0), pRm(i.pRm) {
   if (i.pCounter)
     pCounter = &++*i.pCounter;
@@ -36,5 +34,3 @@ Index &Index::operator=(const Index &i) {
 
   return *this;
 }
-
-} // namespace Gui

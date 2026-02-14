@@ -5,8 +5,6 @@
 #ifndef GUI_KEY_TYPE_HEADER_ALREADY_DEFINED
 #define GUI_KEY_TYPE_HEADER_ALREADY_DEFINED
 
-namespace Gui {
-
 /* Keyboard key identifiers: ASCII-like codes plus platform-mapped keys
  * (F-keys, arrows, modifiers, etc.). */
 enum GuiKeyType {
@@ -52,7 +50,5 @@ enum GuiKeyType {
 
   GUI_DELETE
 };
-
-} // namespace Gui
 
 #endif // GUI_KEY_TYPE_HEADER_ALREADY_DEFINED

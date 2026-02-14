@@ -1,7 +1,5 @@
 #include "game_utils/image_sequence.h"
 
-namespace Gui {
-
 void ImageSequence::INIT() {
   nActive = 0;
   t = Timer(0);
@@ -70,5 +68,3 @@ bool ImageSequence::ToggleTimed() {
   }
   return false;
 }
-
-} // namespace Gui

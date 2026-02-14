@@ -35,8 +35,6 @@
 #include "utils/index.h"
 #include "utils/smart_pointer.h"
 
-namespace Gui {
-
 /** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {
   smart_pointer<GraphicalInterface<Index>> pGr;
@@ -166,7 +164,5 @@ private:
   smart_pointer<GraphicalInterface<Index>> pGr;
   smart_pointer<SoundInterface<Index>> pSn;
 };
-
-} // namespace Gui
 
 #endif // PRELOADER_HEADER_02_20_10_09_09

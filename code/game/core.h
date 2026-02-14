@@ -6,9 +6,7 @@
 #include "common.h"
 #include "utils/smart_pointer.h"
 
-namespace Gui {
 class FilePath;
-}
 
 /** Polar coordinates (radius r, angle a); converts to/from fPoint, supports
  * multiply for rotation. */
@@ -70,7 +68,7 @@ struct NumberDrawer : virtual public SP_Info {
 
   void CacheColor(Color c);
 
-  NumberDrawer(smart_pointer<ScalingDrawer> pDr_, Gui::FilePath *fp,
+  NumberDrawer(smart_pointer<ScalingDrawer> pDr_, FilePath *fp,
                std::string sFontPath, std::string sFontName);
 
   std::string GetNumber(unsigned n, unsigned nDigits = 0);

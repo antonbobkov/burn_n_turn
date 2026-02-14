@@ -10,8 +10,6 @@
 
 #include "utils/index.h"
 
-namespace Gui {
-
 /** Sequence of sound indices with per-sound intervals; for multi-sound
  * effects. */
 struct SoundSequence {
@@ -28,7 +26,5 @@ struct SoundSequence {
 
   SoundSequence();
 };
-
-} // namespace Gui
 
 #endif // SOUND_SEQUENCE_HEADER

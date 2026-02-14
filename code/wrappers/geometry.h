@@ -9,7 +9,6 @@
 #include <iostream>
 #include <string>
 
-namespace Gui {
 typedef int Crd;
 
 /* 2D integer point (Crd x, y) with +=, -=, *= and free operators +, -, *, ==,
@@ -113,6 +112,5 @@ Rectangle operator+(const Rectangle &r, const Point &p);
 Rectangle operator+(const Rectangle &r1, const Rectangle &r2);
 Rectangle Intersect(const Rectangle &r1, const Rectangle &r2);
 std::string RectangleToString(Rectangle r);
-} // namespace Gui
 
 #endif // GUI_GEOMETRY_HEADER_ALREADY_DEFINED

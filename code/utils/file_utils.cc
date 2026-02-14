@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iterator>
 
-namespace Gui {
-
 namespace {
 
 /* On destruction copies ostream content into the given map at path. */
@@ -306,5 +304,3 @@ void Separate(std::string &strFile, std::string &strFolder) {
     }
   }
 }
-
-} // namespace Gui

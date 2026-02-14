@@ -8,8 +8,6 @@
  * period.
  */
 
-namespace Gui {
-
 /* Period-based timer: internal counter (nTimer) and period (nPeriod).
  * Tick() advances the counter and returns true once per period.
  * Check() returns true when the counter is on a period boundary.
@@ -33,7 +31,5 @@ struct Timer {
   /* Set counter so the next Tick() returns true. */
   void NextTick();
 };
-
-} // namespace Gui
 
 #endif // GUI_TIMER_HEADER_ALREADY_DEFINED

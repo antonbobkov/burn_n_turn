@@ -5,7 +5,6 @@
 
 #include "SDL_mixer.h"
 
-namespace Gui {
 class SdlSoundInterface : public SoundInterface<Mix_Chunk *> {
 public:
   std::string get_class_name() override { return "SdlSoundInterface"; }
@@ -19,6 +18,5 @@ public:
   /*virtual*/ void StopSound(int Channel = -1);
   /*virtual*/ void SetVolume(float fVolume);
 };
-} // namespace Gui
 
 #endif // SUI_SDL_INCLUDE_GUARD_09_05_10_03_00_PM

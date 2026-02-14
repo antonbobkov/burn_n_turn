@@ -7,8 +7,6 @@
 
 #include <string>
 
-namespace Gui {
-
 /* RGBA-style color: B, G, R bytes and transparency (0 = fully transparent).
  */
 struct Color {
@@ -26,7 +24,5 @@ bool operator==(const Color &c1, const Color &c2);
 bool operator<(const Color &c1, const Color &c2);
 
 std::string ColorToString(Color c);
-
-} // namespace Gui
 
 #endif

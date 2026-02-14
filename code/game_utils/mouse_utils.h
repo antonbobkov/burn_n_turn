@@ -12,8 +12,6 @@
 
 #include <list>
 
-namespace Gui {
-
 template <class T>
 class GraphicalInterface;
 
@@ -44,12 +42,6 @@ struct MouseTracker {
     return pRet;
   }
 };
-
-} // namespace Gui
-
-using Gui::fPoint;
-using Gui::MouseTracker;
-using Gui::Point;
 
 /** Tracks mouse for trackball-style steering (angle and fire). */
 struct TrackballTracker {
@@ -93,13 +85,13 @@ struct PositionTracker {
 /** Cursor image and position; Draw/Update for rendering and click state. */
 struct MouseCursor {
   bool bPressed;
-  Gui::ImageSequence imgCursor;
+  ImageSequence imgCursor;
   Point pCursorPos;
 
-  MouseCursor(Gui::ImageSequence imgCursor_, Point pCursorPos_)
+  MouseCursor(ImageSequence imgCursor_, Point pCursorPos_)
       : imgCursor(imgCursor_), pCursorPos(pCursorPos_), bPressed(false) {}
 
-  void DrawCursor(Gui::GraphicalInterface<Gui::Index> *pGr);
+  void DrawCursor(GraphicalInterface<Index> *pGr);
   void SetCursorPos(Point pPos);
 };
 

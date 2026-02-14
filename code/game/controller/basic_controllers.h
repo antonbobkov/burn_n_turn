@@ -19,8 +19,6 @@ struct EventEntity;
 struct FancyCritter;
 struct VisualEntity;
 
-using Gui::fPoint;
-using Gui::Timer;
 
 /** Controller that draws a single full-screen image and advances on key. */
 struct SimpleController : public GameController {

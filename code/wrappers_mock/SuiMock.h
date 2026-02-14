@@ -5,8 +5,6 @@
 
 #include "wrappers/SuiGen.h"
 
-namespace Gui {
-
 /* Sound backend that does no real sound. LoadSound returns the path string;
  * other ops are no-op. */
 class MockSoundInterface : public SoundInterface<std::string> {
@@ -18,7 +16,5 @@ public:
   /*virtual*/ void StopSound(int channel);
   /*virtual*/ void SetVolume(float fVolume);
 };
-
-} // namespace Gui
 
 #endif

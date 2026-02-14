@@ -9,8 +9,6 @@
 #include "geometry.h"
 #include "utils/math_utils.h"
 
-namespace Gui {
-
 /* Point */
 Point::Point() : x(0), y(0) {}
 Point::Point(Crd x_, Crd y_) : x(x_), y(y_) {}
@@ -218,5 +216,3 @@ std::string RectangleToString(Rectangle r) {
        << ")";
   return ostr.str();
 }
-
-} // namespace Gui

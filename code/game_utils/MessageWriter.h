@@ -9,7 +9,6 @@
 
 #include "utils/smart_pointer.h"
 
-namespace Gui {
 enum WriteType { WT_DEBUG, WT_ERROR };
 
 class MessageWriter : virtual public SP_Info {
@@ -45,6 +44,5 @@ public:
   void AddFile(WriteType wt, std::string sFile);
   /*virtual*/ void Write(WriteType wt, std::string strMsg);
 };
-}; // namespace Gui
 
 #endif // MESSAGE_WRITER_HDR_INCLUDE_GUARD_09_04_10_06_07_PM

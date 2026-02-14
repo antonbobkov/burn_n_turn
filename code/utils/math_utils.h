@@ -5,8 +5,6 @@
 #ifndef GUI_MATH_UTILS_HEADER_ALREADY_DEFINED
 #define GUI_MATH_UTILS_HEADER_ALREADY_DEFINED
 
-namespace Gui {
-
 /* Return the smaller of two values. */
 template <class T> inline T Gmin(T a, T b) { return a < b ? a : b; }
 
@@ -25,7 +23,5 @@ template <class T> inline T Gmax(T a, T b, T c) {
 
 /* Return the absolute value of a. */
 template <class T> inline T Gabs(T a) { return a >= 0 ? a : -a; }
-
-} // namespace Gui
 
 #endif // GUI_MATH_UTILS_HEADER_ALREADY_DEFINED

@@ -4,8 +4,6 @@
 
 #include "timer.h"
 
-namespace Gui {
-
 Timer::Timer(unsigned nPeriod_) : nTimer(0), nPeriod(nPeriod_) {}
 
 unsigned Timer::UntilTick() { return nPeriod - nTimer % nPeriod; }
@@ -23,5 +21,3 @@ bool Timer::Check() {
 }
 
 void Timer::NextTick() { nTimer = nPeriod - 1; }
-
-} // namespace Gui

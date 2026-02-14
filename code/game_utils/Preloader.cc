@@ -5,8 +5,6 @@
 #include "utils/string_utils.h"
 #include "wrappers/color.h"
 
-namespace Gui {
-
 // --- ImageFlipper ---
 
 ImageFlipper::ImageFlipper(smart_pointer<GraphicalInterface<Index>> pGr_)
@@ -355,5 +353,3 @@ void Preloader::LoadSndSeq(std::string fName, std::string key) {
     throw PreloaderExceptionLoad("LoadSnd", fName, true);
   mpSndSeq[key] = sndSeq;
 }
-
-} // namespace Gui

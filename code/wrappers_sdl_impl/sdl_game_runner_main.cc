@@ -15,7 +15,6 @@
 #define TRUE 1
 #define FALSE 0
 
-using namespace Gui;
 
 void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
   for (unsigned i = 0; i < 400; ++i)
@@ -94,7 +93,7 @@ int main(int argc, char *argv[]) {
       SDL_SetWindowGrab(pGraph->pScreenWindow, SDL_TRUE);
     }
 
-    std::unique_ptr<Gui::FileManager> fm(new Gui::StdFileManager());
+    std::unique_ptr<FileManager> fm(new StdFileManager());
     ProgramEngine pe(make_smart(NewSwitchEvent(bExit, bTrue)), pGr, pSndMng,
                      make_smart(new IoWriter()), inf.szScreenRez, fm.get());
 

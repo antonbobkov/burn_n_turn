@@ -15,7 +15,7 @@ SimpleController::SimpleController(DragonGameControllerList *pGraph,
 SimpleController::~SimpleController() { pGl->pGraph->DeleteImage(nImage); }
 
 void SimpleController::Update() {
-  pGl->pGraph->DrawImage(Gui::Point(0, 0), nImage);
+  pGl->pGraph->DrawImage(Point(0, 0), nImage);
 }
 
 void SimpleController::OnKey(GuiKeyType c, bool bUp) {
@@ -337,7 +337,7 @@ void DragonScoreController::Update() {
 
     FilePath *fp = pGl->pWrp->GetFilePath();
     if (fp) {
-      std::unique_ptr<Gui::OutStreamHandler> oh = fp->WriteFile("high.txt");
+      std::unique_ptr<OutStreamHandler> oh = fp->WriteFile("high.txt");
       if (oh)
         oh->GetStream() << pGl->nScore;
     }

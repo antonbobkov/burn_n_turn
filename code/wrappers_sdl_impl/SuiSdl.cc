@@ -2,8 +2,6 @@
 
 #include "utils/exception.h"
 
-namespace Gui {
-
 SdlSoundInterface::SdlSoundInterface() {
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 65536);
 }
@@ -36,4 +34,3 @@ void SdlSoundInterface::StopSound(int channel) {
 void SdlSoundInterface::SetVolume(float fVolume) {
   Mix_Volume(-1, 128 * fVolume);
 }
-} // namespace Gui

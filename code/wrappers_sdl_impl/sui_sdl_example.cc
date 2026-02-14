@@ -27,9 +27,9 @@ int main(int argc, char **args) {
     return 1;
   }
 
-  smart_pointer<Gui::SdlSoundInterface> pSnd =
-      make_smart(new Gui::SdlSoundInterface());
-  Gui::SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
+  smart_pointer<SdlSoundInterface> pSnd =
+      make_smart(new SdlSoundInterface());
+SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
 
   SDL_Window *window =
       SDL_CreateWindow("sui_sdl_example", SDL_WINDOWPOS_UNDEFINED,
@@ -64,12 +64,12 @@ int main(int argc, char **args) {
     }
   }
 
-  Gui::Index sndIndex;
+Index sndIndex;
   bool soundLoaded = false;
   try {
     sndIndex = soundIf.LoadSound(soundFile);
     soundLoaded = true;
-  } catch (Gui::SimpleException &e) {
+  } catch (SimpleException &e) {
     std::cerr << "LoadSound failed for " << soundFile << ": "
               << e.GetDescription() << "\n";
   }
@@ -109,7 +109,7 @@ int main(int argc, char **args) {
     Mix_FreeMusic(music);
   if (soundLoaded)
     soundIf.DeleteSound(sndIndex);
-  pSnd = smart_pointer<Gui::SdlSoundInterface>();
+  pSnd = smart_pointer<SdlSoundInterface>();
 
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);

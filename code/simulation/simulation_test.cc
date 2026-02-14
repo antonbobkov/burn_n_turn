@@ -20,7 +20,6 @@
 #include <vector>
 
 
-using namespace Gui;
 
 namespace {
 
@@ -49,9 +48,9 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     smart_pointer<SoundInterface<Index>> p_snd =
         make_smart(new SimpleSoundInterface<std::string>(p_mock_snd));
 
-    std::unique_ptr<Gui::StdFileManager> underlying(new Gui::StdFileManager());
-    std::unique_ptr<Gui::CachingReadOnlyFileManager> fm(
-        new Gui::CachingReadOnlyFileManager(underlying.get(), ".txt"));
+    std::unique_ptr<StdFileManager> underlying(new StdFileManager());
+    std::unique_ptr<CachingReadOnlyFileManager> fm(
+        new CachingReadOnlyFileManager(underlying.get(), ".txt"));
 
     bool b_exit = false;
     bool b_true = true;

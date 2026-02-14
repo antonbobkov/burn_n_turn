@@ -10,8 +10,6 @@
 #include "wrappers/color.h"
 #include "wrappers/GuiGen.h"
 
-namespace Gui {
-
 class SdlGraphicalInterface;
 
 class SdlImageException : public ImageException {
@@ -132,6 +130,5 @@ public:
   void SetIcon(std::string sPath);
   void SetTitle(std::string sName);
 };
-} // namespace Gui
 
 #endif // GUISDL_ALREADY_INCLUDED_GUI_0316

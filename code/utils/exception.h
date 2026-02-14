@@ -10,8 +10,6 @@
 
 #include <string>
 
-namespace Gui {
-
 typedef const std::string &crefString;
 
 /* Base exception: stores name, class, function stack, and inherited
@@ -57,7 +55,5 @@ public:
 
   /*virtual*/ std::string GetErrorMessage() const { return strProblem; }
 };
-
-} // namespace Gui
 
 #endif // GUI_EXCEPTION_HEADER_ALREADY_DEFINED

@@ -2,7 +2,6 @@
 
 #include "wrappers/color.h"
 
-namespace Gui {
 SDL_Rect ToSdl(Rectangle r) {
   SDL_Rect ret;
   ret.x = r.p.x;
@@ -363,5 +362,3 @@ void SdlGraphicalInterface::SetIcon(std::string sPath) {
 void SdlGraphicalInterface::SetTitle(std::string sName) {
   SDL_SetWindowTitle(pScreenWindow, sName.c_str());
 }
-
-} // namespace Gui

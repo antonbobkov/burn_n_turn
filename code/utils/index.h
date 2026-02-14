@@ -11,8 +11,6 @@
 #include <list>
 #include <vector>
 
-namespace Gui {
-
 class Index;
 
 /* Interface for objects that must be notified when an Index is destroyed.
@@ -96,7 +94,5 @@ template <class T> void IndexKeeper<T>::FreeElement(unsigned n) {
   vStuff.at(n) = T();
   lsFree.push_back(n);
 }
-
-} // namespace Gui
 
 #endif // GUI_INDEX_HEADER_ALREADY_DEFINED

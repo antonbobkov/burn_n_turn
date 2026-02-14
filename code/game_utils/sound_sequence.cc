@@ -1,7 +1,5 @@
 #include "game_utils/sound_sequence.h"
 
-namespace Gui {
-
 SoundSequence::SoundSequence() : nActive(0) {}
 
 bool SoundSequence::Toggle() {
@@ -25,5 +23,3 @@ void SoundSequence::Add(Index iSnd, unsigned nTime) {
   vSounds.push_back(iSnd);
   vIntervals.push_back(nTime);
 }
-
-} // namespace Gui

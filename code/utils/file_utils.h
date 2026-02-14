@@ -23,8 +23,6 @@
 #include <string>
 #include <vector>
 
-namespace Gui {
-
 /* --- Stream parsing (token-based) --- */
 
 /* Advance ifs until the next token equals sToken; return true if found. */
@@ -243,7 +241,5 @@ inline void BoolToggle(SavableVariable<bool> &sv) { sv.Set(!sv.Get()); }
 
 /* Split path in strFile into folder and file; folder part goes to strFolder. */
 void Separate(std::string &strFile, std::string &strFolder);
-
-} // namespace Gui
 
 #endif // GUI_FILE_UTILS_HEADER_ALREADY_DEFINED

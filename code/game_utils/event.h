@@ -5,8 +5,6 @@
 #include "utils/smart_pointer.h"
 #include <iostream>
 
-using namespace Gui;
-
 class Event : virtual public SP_Info {
   friend void Trigger(smart_pointer<Event> pE);
 

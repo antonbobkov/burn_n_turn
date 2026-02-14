@@ -4,8 +4,6 @@
 #include "GuiGen.h"
 #include "utils/smart_pointer.h"
 
-namespace Gui {
-
 std::string MatrixErrorInfo::GetErrorMessage() const {
   std::ostringstream ostr;
   ostr << "Point (" << p.x << ", " << p.y << ") is out of bounds in " << sz.x
@@ -137,5 +135,3 @@ void GuiSaveImage(std::ostream *pStr, const Image *pImg) {
     throw SimpleException("<global>", "GuiSaveImage",
                           "Failed to write into the provided stream");
 }
-
-} // namespace Gui

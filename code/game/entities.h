@@ -15,14 +15,6 @@ struct ScalingDrawer;
 struct NumberDrawer;
 class SoundInterfaceProxy;
 
-using Gui::Point;
-using Gui::Rectangle;
-using Gui::fPoint;
-using Gui::ImageSequence;
-using Gui::SoundSequence;
-using Gui::Timer;
-using Gui::Index;
-using Gui::Color;
 
 /** Root entity; bExist flag, virtual dtor. */
 struct Entity : virtual public SP_Info {

@@ -8,8 +8,6 @@
 #include <sstream>
 #include <string>
 
-namespace Gui {
-
 /* Convert a value to a string using stream output. */
 template <class T> std::string S(T t) {
   std::string s;
@@ -17,7 +15,5 @@ template <class T> std::string S(T t) {
   ostr << t;
   return ostr.str();
 }
-
-} // namespace Gui
 
 #endif // GUI_STRING_UTILS_HEADER_ALREADY_DEFINED

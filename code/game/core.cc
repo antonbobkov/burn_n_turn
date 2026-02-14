@@ -133,11 +133,11 @@ void NumberDrawer::CacheColor(Color c) {
   mpCachedRecolorings[c] = vNewColors;
 }
 
-NumberDrawer::NumberDrawer(smart_pointer<ScalingDrawer> pDr_, Gui::FilePath *fp,
+NumberDrawer::NumberDrawer(smart_pointer<ScalingDrawer> pDr_, FilePath *fp,
                            std::string sFontPath, std::string sFontName)
     : pDr(pDr_), vImgIndx(256, -1) {
   std::string txtPath = fp->GetRelativePath(sFontPath + sFontName + ".txt");
-  std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile(txtPath);
+  std::unique_ptr<InStreamHandler> ih = fp->ReadFile(txtPath);
   std::istream &ifs = ih->GetStream();
 
   unsigned n;
@@ -340,7 +340,7 @@ DragonGameControllerList::DragonGameControllerList(
       sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {
   {
     if (fp->FileExists("high.txt")) {
-      std::unique_ptr<Gui::InStreamHandler> ih = fp->ReadFile("high.txt");
+      std::unique_ptr<InStreamHandler> ih = fp->ReadFile("high.txt");
       ih->GetStream() >> nHighScore;
     }
   }
@@ -901,8 +901,8 @@ TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
 
   p_fm_ = pe.GetFileManager();
   {
-    std::unique_ptr<Gui::InStreamHandler> ih = p_fm_->ReadFile("config.txt");
-    fp_ = Gui::FilePath::CreateFromStream(ih->GetStream(), p_fm_);
+    std::unique_ptr<InStreamHandler> ih = p_fm_->ReadFile("config.txt");
+    fp_ = FilePath::CreateFromStream(ih->GetStream(), p_fm_);
   }
 
   Rectangle sBound = Rectangle(pe.szScreenRez);

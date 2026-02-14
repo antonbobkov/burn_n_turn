@@ -25,7 +25,6 @@
 #include "utils/index.h"
 #include "utils/smart_pointer.h"
 
-namespace Gui {
 typedef unsigned char Byte;
 
 /* Size and Point used to describe matrix/rectangle out-of-range errors. */
@@ -383,13 +382,9 @@ void ConvertImage(smart_pointer<GraphicalInterface<T>> pGr, std::string strImg,
   pGr->DeleteImage(img);
 }
 
-} // namespace Gui
-
 //-----------------------------------------------------------------------------
 // Implementation of various helper functions and template definitions
 //-----------------------------------------------------------------------------
-
-namespace Gui {
 
 // primarily used by ImageOnto - adjusts p and r so that we don't attempt to
 // write outside of pictures while drawing
@@ -898,6 +893,5 @@ template <class T> Rectangle CameraControl<T>::toR(Rectangle r) {
 template <class T> Rectangle CameraControl<T>::fromR(Rectangle r) {
   return Rectangle(fromR(r.p), fromR(r.sz));
 }
-} // namespace Gui
 
 #endif // GUIGEN_ALREADY_INCLUDED_GUI_0308

@@ -1,6 +1,5 @@
 #include "MessageWriter.h"
 
-namespace Gui {
 /*virtual*/ void IoWriter::Write(WriteType wt, std::string strMsg) {
   if (wt == WT_ERROR)
     std::cerr << strMsg;
@@ -21,4 +20,3 @@ void FileWriter::AddFile(WriteType wt, std::string sFile) {
                     std::ios_base::out | std::ios_base::app);
   ofs << strMsg;
 }
-} // namespace Gui

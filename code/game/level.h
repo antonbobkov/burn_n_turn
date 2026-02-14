@@ -5,12 +5,7 @@
 #include "utils/exception.h"
 #include "utils/smart_pointer.h"
 
-using Gui::MyException;
-using Gui::crefString;
-
-namespace Gui {
 class FilePath;
-}
 
 /** Exception for BrokenLine segment errors (e.g. invalid/empty segment). */
 class SegmentSimpleException : public MyException {
@@ -118,7 +113,7 @@ struct LevelLayout {
 
 typedef std::vector<LevelLayout> LevelStorage;
 
-void ReadLevels(Gui::FilePath *fp, std::string sFile, Rectangle rBound,
+void ReadLevels(FilePath *fp, std::string sFile, Rectangle rBound,
                 LevelStorage &vLvl);
 
 std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f);

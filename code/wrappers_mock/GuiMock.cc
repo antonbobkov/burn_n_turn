@@ -2,8 +2,6 @@
 
 #include "wrappers/color.h"
 
-namespace Gui {
-
 MockImage::MockImage(std::string name, Size sz) : Image(sz), name_(name) {}
 
 void MockImage::SetPixel(Point p, const Color &c) {
@@ -72,5 +70,3 @@ void MockGraphicalInterface::DrawRectangle(Rectangle p, Color c, bool bRedraw) {
 }
 
 void MockGraphicalInterface::RefreshAll() {}
-
-} // namespace Gui

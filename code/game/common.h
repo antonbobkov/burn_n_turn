@@ -25,10 +25,9 @@
 
 extern int nSlimeMax;
 
-using namespace Gui;
 
-typedef Gui::GraphicalInterface<Index> Graphic;
-typedef Gui::SoundInterface<Index> Soundic;
+typedef GraphicalInterface<Index> Graphic;
+typedef SoundInterface<Index> Soundic;
 
 extern MessageWriter *pWr;
 

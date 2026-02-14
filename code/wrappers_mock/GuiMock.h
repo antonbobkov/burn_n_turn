@@ -8,8 +8,6 @@
 #include "wrappers/color.h"
 #include "wrappers/GuiGen.h"
 
-namespace Gui {
-
 /* Fake image so GetImage can return a valid pointer. No real drawing.
  * GetPixelSafe returns default color when out of bounds (for small
  * placeholders). */
@@ -49,7 +47,5 @@ private:
   /* Unique suffix for LoadImage and GetBlankImage keys (_0, _1, ...). */
   unsigned next_id_;
 };
-
-} // namespace Gui
 
 #endif

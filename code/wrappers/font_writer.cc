@@ -8,8 +8,6 @@
 #include <fstream>
 #include <sstream>
 
-namespace Gui {
-
 FontWriter::FontWriter(FilePath *fp, std::string sFont,
                        smart_pointer<GraphicalInterface<Index>> pGr_,
                        unsigned nZoom)
@@ -123,5 +121,3 @@ void FontWriter::Recolor(Color c) {
 }
 
 void FontWriter::SetGap(int nG) { nGap = nG; }
-
-} // namespace Gui

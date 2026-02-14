@@ -11,7 +11,6 @@
 #include "utils/timer.h"
 #include <memory>
 
-using Gui::Timer;
 
 struct Castle;
 struct Dragon;

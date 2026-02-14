@@ -20,8 +20,8 @@ bool AreWeFullScreen() {
 
 } // namespace
 
-Gui::ProgramInfo GetProgramInfo() {
-  Gui::ProgramInfo inf;
+ProgramInfo GetProgramInfo() {
+ProgramInfo inf;
 
 #ifdef SMALL_SCREEN_VERSION
   inf.szScreenRez = Size(854, 480);
@@ -44,7 +44,7 @@ Gui::ProgramInfo GetProgramInfo() {
   return inf;
 }
 
-smart_pointer<Gui::GameRunner>
-GetGameRunner(Gui::ProgramEngine pe) {
+smart_pointer<GameRunner>
+GetGameRunner(ProgramEngine pe) {
   return make_smart(new DragonGameRunner(pe));
 }

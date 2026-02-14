@@ -9,7 +9,6 @@
 #include "MessageWriter.h"
 #include "wrappers/SuiGen.h"
 
-namespace Gui {
 class FileManager;
 struct ProgramInfo {
   Size szScreenRez;
@@ -30,11 +29,7 @@ struct ProgramInfo {
         bFullScreen(bFullScreen_), bFlexibleResolution(bFlexibleResolution_) {}
 };
 
-} // namespace Gui
-
-Gui::ProgramInfo GetProgramInfo();
-
-namespace Gui {
+ProgramInfo GetProgramInfo();
 
 struct ProgramEngine {
   smart_pointer<Event> pExitProgram;
@@ -86,8 +81,6 @@ public:
   virtual void Fire() {}
 };
 
-} // namespace Gui
-
-smart_pointer<Gui::GameRunner> GetGameRunner(Gui::ProgramEngine pe);
+smart_pointer<GameRunner> GetGameRunner(ProgramEngine pe);
 
 #endif // GAME_RUNNER_INTERFACE_H

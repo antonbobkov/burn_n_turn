@@ -1,5 +1,5 @@
 /*
- * font_writer.h - Gui::FontWriter: renders text using a font (FilePath + name),
+ * font_writer.h - FontWriter: renders text using a font (FilePath + name),
  * bitmap symbols, and a GraphicalInterface<Index>; GetSize, DrawWord/
  * DrawColorWord, Recolor, SetGap.
  */
@@ -9,8 +9,6 @@
 
 #include "color.h"
 #include "GuiGen.h"
-
-namespace Gui {
 
 struct FontWriter : virtual public SP_Info {
   std::string get_class_name() override { return "FontWriter"; }
@@ -41,7 +39,5 @@ struct FontWriter : virtual public SP_Info {
   void Recolor(Color c);
   void SetGap(int nG);
 };
-
-} // namespace Gui
 
 #endif

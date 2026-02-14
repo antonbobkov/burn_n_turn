@@ -1,6 +1,5 @@
 #include "exception.h"
 
-namespace Gui {
 // Known information about exception
 std::string MyException::GetHeader() const {
   return "Class " + strClsName + ": " + strExcName + " in " + strFnNameTrack;
@@ -33,5 +32,3 @@ std::string MyException::GetDescription(bool bDetailed /* = false*/) const {
   else
     return "Exception: " + GetErrorMessage() + "\n";
 }
-
-} // namespace Gui

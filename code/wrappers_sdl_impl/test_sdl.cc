@@ -41,17 +41,17 @@ TEST_CASE("SDL image and sound load", "[sdl]") {
 }
 
 TEST_CASE("SdlGraphicalInterface::LoadImage", "[sdl][gui]") {
-  smart_pointer<Gui::SdlGraphicalInterface> pGr =
-      make_smart(new Gui::SdlGraphicalInterface(Gui::Size(640, 480)));
-  Gui::SdlImage *pImg = pGr->LoadImage("test_image.bmp");
+  smart_pointer<SdlGraphicalInterface> pGr =
+      make_smart(new SdlGraphicalInterface(Size(640, 480)));
+SdlImage *pImg = pGr->LoadImage("test_image.bmp");
   REQUIRE(pImg != nullptr);
   pGr->DeleteImage(pImg);
 }
 
 TEST_CASE("SdlSoundInterface::LoadSound", "[sdl][sui]") {
   REQUIRE(SDL_Init(SDL_INIT_AUDIO) >= 0);
-  smart_pointer<Gui::SdlSoundInterface> pSnd =
-      make_smart(new Gui::SdlSoundInterface());
+  smart_pointer<SdlSoundInterface> pSnd =
+      make_smart(new SdlSoundInterface());
   Mix_Chunk *chunk = pSnd->LoadSound("test_sound.wav");
   REQUIRE(chunk != nullptr);
   pSnd->DeleteSound(chunk);

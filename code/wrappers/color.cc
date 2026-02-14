@@ -2,8 +2,6 @@
 
 #include "color.h"
 
-namespace Gui {
-
 Color::Color()
     : R(0), G(0), B(0), nTransparent(255) {}
 
@@ -49,5 +47,3 @@ std::string ColorToString(Color c) {
   ostr << "(" << c.R << ", " << c.G << ", " << c.B << ")";
   return ostr.str();
 }
-
-} // namespace Gui
