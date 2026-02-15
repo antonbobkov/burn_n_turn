@@ -13,7 +13,10 @@ add_library(Utils
   index.h
   index.cc
   math_utils.h
+  random_utils.h
+  random_utils.cc
   string_utils.h
+  string_utils.cc
   smart_pointer.h
   smart_pointer.cc
 )

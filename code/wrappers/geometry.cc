@@ -117,6 +117,68 @@ std::istream &operator>>(std::istream &ifs, fPoint &f) {
   return ifs;
 }
 
+/* Polar */
+Polar::Polar(fPoint p) : r(p.Length()) {
+  if (p.y == 0 && p.x == 0)
+    a = 0;
+  else
+    a = atan2(p.y, p.x);
+}
+
+fPoint ComposeDirection(int dir1, int dir2) {
+  fPoint r(0, 0);
+  switch (dir1) {
+  case 1:
+    r += fPoint(-1, 0);
+    break;
+  case 2:
+    r += fPoint(1, 0);
+    break;
+  case 3:
+    r += fPoint(0, 1);
+    break;
+  case 4:
+    r += fPoint(0, -1);
+    break;
+  default:
+    break;
+  }
+  switch (dir2) {
+  case 1:
+    r += fPoint(-1, 0);
+    break;
+  case 2:
+    r += fPoint(1, 0);
+    break;
+  case 3:
+    r += fPoint(0, 1);
+    break;
+  case 4:
+    r += fPoint(0, -1);
+    break;
+  default:
+    break;
+  }
+  r.Normalize();
+  return r;
+}
+
+fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
+                    unsigned nHowMany) {
+  if (nHowMany == 1)
+    return fDir;
+
+  float d = 3.1415F * 2 * dWidth / (nHowMany - 1) * nWhich;
+
+  return (Polar(fDir) * Polar(d - 3.1415F * dWidth, 1)).TofPoint();
+}
+
+fPoint RandomAngle(fPoint fDir, float fRange) {
+  return (Polar(fDir) *
+          Polar((float(rand()) / RAND_MAX - .5F) * fRange * 2 * 3.1415F, 1))
+      .TofPoint();
+}
+
 /* Size */
 Size::Size() : x(0), y(0) {}
 Size::Size(Crd x_, Crd y_) : x(x_), y(y_) {}

@@ -7,8 +7,6 @@
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/font_writer.h"
-
-
 #include "wrappers/color.h"
 
 /** VisualEntity that draws slime animations for the buy-now screen. */
@@ -23,107 +21,6 @@ struct SlimeUpdater : public VisualEntity {
 
 void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
   pBuy->DrawSlimes();
-}
-
-Polar::Polar(fPoint p) : r(p.Length()) {
-  if (p.y == 0 && p.x == 0)
-    a = 0;
-  else
-    a = atan2(p.y, p.x);
-}
-
-fPoint ComposeDirection(int dir1, int dir2) {
-  fPoint r(0, 0);
-  switch (dir1) {
-  case 1:
-    r += fPoint(-1, 0);
-    break;
-  case 2:
-    r += fPoint(1, 0);
-    break;
-  case 3:
-    r += fPoint(0, 1);
-    break;
-  case 4:
-    r += fPoint(0, -1);
-    break;
-  default:
-    break;
-  }
-  switch (dir2) {
-  case 1:
-    r += fPoint(-1, 0);
-    break;
-  case 2:
-    r += fPoint(1, 0);
-    break;
-  case 3:
-    r += fPoint(0, 1);
-    break;
-  case 4:
-    r += fPoint(0, -1);
-    break;
-  default:
-    break;
-  }
-  r.Normalize();
-  return r;
-}
-
-fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
-                     unsigned nHowMany) {
-  if (nHowMany == 1)
-    return fDir;
-
-  float d = 3.1415F * 2 * dWidth / (nHowMany - 1) * nWhich;
-
-  return (Polar(fDir) * Polar(d - 3.1415F * dWidth, 1)).TofPoint();
-}
-
-fPoint RandomAngle(fPoint fDir, float fRange) {
-  return (Polar(fDir) *
-          Polar((float(rand()) / RAND_MAX - .5F) * fRange * 2 * 3.1415F, 1))
-      .TofPoint();
-}
-
-std::vector<std::string> BreakUpString(std::string s) {
-  s += '\n';
-
-  std::vector<std::string> vRet;
-  std::string sCurr;
-
-  for (unsigned i = 0; i < s.size(); ++i) {
-    if (s[i] == '\n') {
-      vRet.push_back(sCurr);
-      sCurr = "";
-    } else
-      sCurr += s[i];
-  }
-
-  return vRet;
-}
-
-unsigned GetRandNum(unsigned nRange) {
-  return unsigned(float(rand()) / (float(RAND_MAX) + 1) * nRange);
-}
-
-unsigned GetRandFromDistribution(std::vector<float> vProb) {
-  float fSum = 0;
-
-  for (unsigned i = 0; i < vProb.size(); ++i)
-    fSum += vProb[i];
-
-  float fRand = float(rand()) / (float(RAND_MAX) + 1) * fSum;
-
-  fSum = 0;
-
-  for (unsigned i = 0; i < vProb.size(); ++i) {
-    fSum += vProb[i];
-    if (fSum > fRand)
-      return i;
-  }
-
-  throw std::string("bad range");
 }
 
 MessageWriter *pWr = 0;

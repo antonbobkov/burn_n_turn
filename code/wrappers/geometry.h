@@ -6,6 +6,7 @@
 #ifndef GUI_GEOMETRY_HEADER_ALREADY_DEFINED
 #define GUI_GEOMETRY_HEADER_ALREADY_DEFINED
 
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -62,6 +63,28 @@ float Dot(const fPoint &f1, const fPoint &f2);
 std::ostream &operator<<(std::ostream &ofs, fPoint f);
 std::istream &operator>>(std::istream &ifs, fPoint &f);
 
+/** Polar coordinates (radius r, angle a); converts to/from fPoint, supports
+ * multiply for rotation. */
+struct Polar {
+  float r, a;
+  Polar() : r(0), a(0) {}
+  Polar(float a_, float r_) : a(a_), r(r_) {}
+  Polar(fPoint p);
+  Polar operator*(Polar p) { return Polar(a + p.a, r * p.r); }
+
+  fPoint TofPoint() { return fPoint(r * cos(a), r * sin(a)); }
+};
+
+fPoint ComposeDirection(int dir1, int dir2);
+fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
+                    unsigned nHowMany);
+fPoint RandomAngle(fPoint fDir = fPoint(1, 0), float fRange = 1.F);
+
+inline unsigned DiscreetAngle(float a, unsigned nDiv) {
+  return unsigned((-a / 2 / 3.1415 + 2 - 1.0 / 4 + 1.0 / 2 / nDiv) * nDiv) %
+         nDiv;
+}
+
 /* 2D extent (Crd x, y); Area() = x * y. */
 struct Size {
   Crd x, y;
@@ -107,6 +130,7 @@ std::istream &operator>>(std::istream &ifs, Rectangle &r);
 
 bool InsideRectangle(Rectangle r, Point p);
 Point Center(Rectangle r);
+inline Point Center(Size sz) { return Point(sz.x / 2, sz.y / 2); }
 Point RandomPnt(Rectangle r);
 Rectangle operator+(const Rectangle &r, const Point &p);
 Rectangle operator+(const Rectangle &r1, const Rectangle &r2);

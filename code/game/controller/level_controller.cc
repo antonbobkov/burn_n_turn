@@ -4,8 +4,8 @@
 #include "game/dragon_constants.h"
 #include "game/dragon_macros.h"
 #include "game_utils/sound_utils.h"
-
 #include "game_utils/image_sequence.h"
+#include "utils/random_utils.h"
 #include "wrappers/color.h"
 #include "game/common.h"
 #include "game/core.h"

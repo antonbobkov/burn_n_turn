@@ -42,6 +42,12 @@ struct ImageSequence : virtual public SP_Info {
   ImageSequence(Index img1, Index img2, Index img3);
 };
 
+/** Reset sequence to first frame. */
+inline ImageSequence Reset(ImageSequence imgSeq) {
+  imgSeq.nActive = 0;
+  return imgSeq;
+}
+
 /** Applies a functor to each image index in an ImageSequence. */
 template <class T> void ForEachImage(ImageSequence &img, T t) {
   for (unsigned i = 0; i < img.vImage.size(); ++i)
