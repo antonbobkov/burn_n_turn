@@ -69,7 +69,7 @@ struct Mage : public Critter, public ConsumableEntity {
 
 unsigned RandomBonus(bool bInTower = true);
 
-ImageSequence GetBonusImage(int n, Preloader &pr);
+std::string GetBonusImage(int n);
 
 /** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
 struct Trader : public Critter, public ConsumableEntity {

@@ -1,23 +1,30 @@
 #ifndef TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 #define TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 
-struct DragonGameController;
-struct TimedFireballBonus;
-
-#include "game/controller/game_controller_interface.h"
-#include "game/controller/menu_controller.h"
-#include "game/level.h"
-#include "game_utils/draw_utils.h"
 #include "game_utils/sound_utils.h"
 #include "utils/file_utils.h"
-#include "wrappers/font_writer.h"
-#include "wrappers/GuiGen.h"
-#include "wrappers/geometry.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/geometry.h"
 #include <memory>
+#include <string>
 
+struct DragonGameController;
+struct GameController;
+struct LevelLayout;
+struct MenuController;
+class Preloader;
+struct ImageSequence;
+struct SoundSequence;
+struct TimedFireballBonus;
 struct TowerDataWrap;
 class FilePath;
+class Index;
+class ScalingDrawer;
+class NumberDrawer;
+class FontWriter;
+template <typename T> struct GraphicalInterface;
+template <typename T> struct SoundInterface;
+struct SoundInterfaceProxy;
 
 /** Global game state: level storage, active controller, graphics/sound, score,
  * savable options, music. */
@@ -38,9 +45,7 @@ struct DragonGameController {
   smart_pointer<SoundInterface<Index>> pSndRaw;
   smart_pointer<SoundInterfaceProxy> pSnd;
 
-  LevelStorage vLvl;
-
-  Preloader pr;
+  std::vector<LevelLayout> vLvl;
 
   int nScore;
   int nHighScore;
@@ -62,12 +67,12 @@ struct DragonGameController {
   std::list<smart_pointer<TimedFireballBonus>> lsBonusesToCarryOver;
 
   DragonGameController(smart_pointer<ScalingDrawer> pDr_,
-                      smart_pointer<NumberDrawer> pNum_,
-                      smart_pointer<NumberDrawer> pBigNum_,
-                      smart_pointer<FontWriter> pFancyNum_,
-                      smart_pointer<SoundInterface<Index>> pSndRaw_,
-                      const LevelStorage &vLvl_, Rectangle rBound_,
-                      TowerDataWrap *pWrp_, FilePath *fp);
+                       smart_pointer<NumberDrawer> pNum_,
+                       smart_pointer<NumberDrawer> pBigNum_,
+                       smart_pointer<FontWriter> pFancyNum_,
+                       smart_pointer<SoundInterface<Index>> pSndRaw_,
+                       const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
+                       TowerDataWrap *pWrp_, FilePath *fp);
 
   TowerDataWrap *pWrp;
 
@@ -77,6 +82,14 @@ struct DragonGameController {
   void Next();
   void Restart(int nActive_ = -1);
   void Menu();
+
+  Index &GetImg(std::string key);
+  ImageSequence &GetImgSeq(std::string key);
+  Index &GetSnd(std::string key);
+  SoundSequence &GetSndSeq(std::string key);
+
+private:
+  std::unique_ptr<Preloader> pr;
 };
 
 #endif

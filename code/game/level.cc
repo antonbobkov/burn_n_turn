@@ -304,21 +304,21 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
 
 void FancyRoad::Draw(smart_pointer<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;
-  Image *p = pDr->pGr->GetImage(pAd->pGl->pr["road"]);
+  Image *p = pDr->pGr->GetImage(pAd->pGl->GetImg("road"));
   Size sz = p->GetSize();
 
   if (bVertical)
     for (int i = 0; (i - 1) * sz.y < rBound.sz.y * int(n); ++i)
       pDr->pGr->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
-                          pAd->pGl->pr["road"], false);
+                          pAd->pGl->GetImg("road"), false);
   else
     for (int i = 0; (i - 1) * sz.x < rBound.sz.x * int(n); ++i)
       pDr->pGr->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
-                          pAd->pGl->pr["road"], false);
+                          pAd->pGl->GetImg("road"), false);
 }
 
 void ReadLevels(FilePath *fp, std::string sFile, Rectangle rBound,
-                LevelStorage &vLvl) {
+                std::vector<LevelLayout> &vLvl) {
   std::string path = fp->GetRelativePath(sFile);
   std::unique_ptr<InStreamHandler> ih = fp->ReadFile(path);
   std::istream &ifs = ih->GetStream();

@@ -10,7 +10,7 @@ BuyNowController::BuyNowController(DragonGameController *pGl_,
       tVel(nFramesInSecond / 2) {
   for (int i = 0; i < nSlimeCount; i++) {
     mSlimes.push_back(make_smart(
-        new Animation(0, pGl->pr("slime"), nFramesInSecond / 10,
+        new Animation(0, pGl->GetImgSeq("slime"), nFramesInSecond / 10,
                       Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true)));
     mSlimeVel.push_back(fPoint());
     mSlimePos.push_back(mSlimes.back()->pos);

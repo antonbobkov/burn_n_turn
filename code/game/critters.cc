@@ -1,4 +1,5 @@
 #include "game.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
 #include "game_utils/draw_utils.h"
 #include "game_utils/image_sequence.h"
@@ -20,7 +21,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
     fPoint f = GetWedgeAngle(Point(1, 1), 1, i, nNum + 1);
     f.Normalize(15);
 
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_summon"));
+    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("slime_summon"));
     smart_pointer<SkellyGenerator> pSkel =
         make_smart(new SkellyGenerator(p + f.ToPnt(), pAc));
     pAc->AddE(pSkel);
@@ -36,8 +37,8 @@ void Princess::OnHit(char cWhat) {
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->pr("princess_die_f")
-                 : pAc->pGl->pr("princess_die"),
+      fVel.x < 0 ? pAc->pGl->GetImgSeq("princess_die_f")
+                 : pAc->pGl->GetImgSeq("princess_die"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
@@ -69,7 +70,7 @@ void Mage::OnHit(char cWhat) {
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->pr("mage_die_f") : pAc->pGl->pr("mage_die"),
+      fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f") : pAc->pGl->GetImgSeq("mage_die"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
@@ -80,31 +81,30 @@ void Mage::OnHit(char cWhat) {
     SummonSlimes();
 }
 
-ImageSequence GetBonusImage(int n, Preloader &pr) {
+std::string GetBonusImage(int n) {
   if (n == 0)
-    return pr("void_bonus");
+    return "void_bonus";
   if (n == 1)
-    return pr("pershot_bonus");
+    return "pershot_bonus";
   if (n == 2)
-    return pr("laser_bonus");
+    return "laser_bonus";
   if (n == 3)
-    return pr("big_bonus");
+    return "big_bonus";
   if (n == 4)
-    return pr("totnum_bonus");
+    return "totnum_bonus";
   if (n == 5)
-    return pr("explode_bonus");
+    return "explode_bonus";
   if (n == 6)
-    return pr("split_bonus");
+    return "split_bonus";
   if (n == 7)
-    return pr("burning_bonus");
+    return "burning_bonus";
   if (n == 8)
-    return pr("ring_bonus");
+    return "ring_bonus";
   if (n == 9)
-    return pr("nuke_bonus");
+    return "nuke_bonus";
   if (n == 10)
-    return pr("speed_bonus");
-
-  return pr("void_bonus");
+    return "speed_bonus";
+  return "void_bonus";
 }
 
 unsigned RandomBonus(bool bInTower) {
@@ -142,7 +142,7 @@ void Trader::OnHit(char cWhat) {
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->pr("trader_die") : pAc->pGl->pr("trader_die_f"),
+      fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die") : pAc->pGl->GetImgSeq("trader_die_f"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
@@ -204,7 +204,7 @@ void Knight::Update() {
       if (this->HitDetection(*itr)) {
 
         if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
-          pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("death"));
+          pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("death"));
           (*itr)->OnHit('S');
         }
       }
@@ -219,7 +219,7 @@ void Knight::Update() {
         continue;
 
       if (this->HitDetection(*itr)) {
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("skeleton_bonus"));
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("skeleton_bonus"));
         (*itr)->bExist = false;
       }
     }
@@ -233,9 +233,9 @@ void Knight::Update() {
       seq.Toggle();
 
       if (seq.nActive == 3)
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("step_left"));
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("step_left"));
       else if (seq.nActive == 6)
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("step_right"));
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("step_right"));
     }
   }
   pPrev = p;
@@ -246,11 +246,11 @@ void Knight::OnHit(char cWhat) {
     KnockBack();
     if (nGolemHealth > 0) {
       --nGolemHealth;
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("hit_golem"));
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("hit_golem"));
       return;
     }
 
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("golem_death"));
+    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("golem_death"));
 
     smart_pointer<BonusScore> pB =
         make_smart(new BonusScore(pAc, GetPosition(), 5000));
@@ -265,15 +265,15 @@ void Knight::OnHit(char cWhat) {
         make_smart(new BonusScore(pAc, GetPosition(), 100));
     pAc->AddBoth(pB);
 
-    ImageSequence seqDead = pAc->pGl->pr("knight_die");
+    ImageSequence seqDead = pAc->pGl->GetImgSeq("knight_die");
 
     if (cType == 'S')
-      seqDead = pAc->pGl->pr("skelly_die");
+      seqDead = pAc->pGl->GetImgSeq("skelly_die");
     else if (cType == 'W') {
       if (this->fVel.x < 0)
-        seqDead = pAc->pGl->pr("golem_die");
+        seqDead = pAc->pGl->GetImgSeq("golem_die");
       else
-        seqDead = pAc->pGl->pr("golem_die_f");
+        seqDead = pAc->pGl->GetImgSeq("golem_die_f");
     }
 
     smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
@@ -288,7 +288,7 @@ void Knight::OnHit(char cWhat) {
 }
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
-    : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("megaslime"),
+    : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("megaslime"),
               nFramesInSecond / 5),
       pAc(pAc_), nHealth(nSlimeHealthMax) {
   bDieOnExit = false;
@@ -314,7 +314,7 @@ void MegaSlime::Update() {
 
     if (this->HitDetection(*itr)) {
       (*itr)->bExist = false;
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_bonus"));
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_bonus"));
     }
   }
 
@@ -323,11 +323,11 @@ void MegaSlime::Update() {
     t = Timer(nPeriod * seq.GetTime() + rand() % 2);
 
     if (seq.nActive == 11) {
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_jump"));
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_jump"));
       RandomizeVelocity();
     } else if (seq.nActive == 16) {
       fVel = fPoint(0, 0);
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_land"));
+      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_land"));
     }
   }
 }
@@ -335,7 +335,7 @@ void MegaSlime::Update() {
 void MegaSlime::OnHit(char cWhat) {
   if (nHealth > 0) {
     --nHealth;
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_hit"));
+    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_hit"));
     return;
   }
 
@@ -345,8 +345,8 @@ void MegaSlime::OnHit(char cWhat) {
       make_smart(new BonusScore(pAc, GetPosition(), 500));
   pAc->AddBoth(pB);
 
-  ImageSequence seqDead = pAc->pGl->pr("megaslime_die");
-  pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("megaslime_die"));
+  ImageSequence seqDead = pAc->pGl->GetImgSeq("megaslime_die");
+  pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_die"));
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
@@ -357,9 +357,9 @@ void MegaSlime::OnHit(char cWhat) {
 Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
                        int nGhostHit_)
     : p(p_), pAdv(pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
-  ImageSequence seq = pAdv->pGl->pr("ghost_knight_burn");
+  ImageSequence seq = pAdv->pGl->GetImgSeq("ghost_knight_burn");
   if (nGhostHit == 0)
-    seq = pAdv->pGl->pr("ghost_burn");
+    seq = pAdv->pGl->GetImgSeq("ghost_burn");
 
   unsigned n = unsigned(.2F * nFramesInSecond / fDeathMultiplier);
 
@@ -379,9 +379,9 @@ void Ghostiness::Update() {
 
     smart_pointer<Knight> pCr = make_smart(new Knight(knCp, pAdv, 'G'));
     if (nGhostHit == 1)
-      pCr->seq = pAdv->pGl->pr("ghost");
+      pCr->seq = pAdv->pGl->GetImgSeq("ghost");
     else
-      pCr->seq = pAdv->pGl->pr("ghost_knight");
+      pCr->seq = pAdv->pGl->GetImgSeq("ghost_knight");
     pCr->nGhostHit = nGhostHit - 1;
 
     pAdv->AddBoth(pCr);
@@ -391,7 +391,7 @@ void Ghostiness::Update() {
 
 Slime::Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
              int nGeneration_)
-    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->pr("slime"), true),
+    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("slime"), true),
       pAc(pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
   ++pAc->nSlimeNum;
@@ -423,12 +423,12 @@ void Slime::Update() {
 
     if (this->HitDetection(*itr)) {
       if ((*itr)->GetType() == 'K') {
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->pr.GetSnd("slime_poke"));
+        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("slime_poke"));
 
         bExist = false;
 
         smart_pointer<AnimationOnce> pAn = make_smart(
-            new AnimationOnce(dPriority, pAc->pGl->pr("slime_poke"),
+            new AnimationOnce(dPriority, pAc->pGl->GetImgSeq("slime_poke"),
                               nFramesInSecond / 5, GetPosition(), true));
         pAc->AddBoth(pAn);
 
@@ -476,7 +476,7 @@ void Slime::OnHit(char cWhat) {
 
     for (unsigned i = 0; i < vDeadSlimes.size(); ++i) {
       smart_pointer<FloatingSlime> pSlm = make_smart(
-          new FloatingSlime(pAc->pGl->pr("slime_cloud"), vDeadSlimes[i],
+          new FloatingSlime(pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
                             fAvg.ToPnt(), nFramesInSecond * 1));
       pAc->AddBoth(pSlm);
     }
@@ -495,7 +495,7 @@ void Slime::OnHit(char cWhat) {
   }
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
-      dPriority, pAc->pGl->pr(bRevive ? "slime_die" : "slime_poke"),
+      dPriority, pAc->pGl->GetImgSeq(bRevive ? "slime_die" : "slime_poke"),
       nFramesInSecond / 5, GetPosition(), true));
   pAc->AddBoth(pAn);
 
@@ -517,8 +517,8 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
     : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_),
       pSlm() {
-  ImageSequence seq = bFast ? pAdv->pGl->pr("slime_reproduce_fast")
-                            : pAdv->pGl->pr("slime_reproduce");
+  ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
+                            : pAdv->pGl->GetImgSeq("slime_reproduce");
 
   t = bFast ? Timer(unsigned(1.3F * nFramesInSecond))
             : Timer(unsigned(2.3F * nFramesInSecond));
@@ -555,14 +555,14 @@ Sliminess::~Sliminess() {
 
 MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
     : p(p_), pAdv(pAdv_), pSlm() {
-  ImageSequence seq = pAdv->pGl->pr("megaslime_reproduce");
+  ImageSequence seq = pAdv->pGl->GetImgSeq("megaslime_reproduce");
 
   smart_pointer<AnimationOnce> pSlmTmp = make_smart(
       new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true));
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
-  pAdv->pGl->pSnd->PlaySound(pAdv->pGl->pr.GetSnd("slime_spawn"));
+  pAdv->pGl->pSnd->PlaySound(pAdv->pGl->GetSnd("slime_spawn"));
 }
 
 void MegaSliminess::Update() {
@@ -605,7 +605,7 @@ void Mage::Update() {
       if (i == pAc->vCs.size())
         if (rand() % nSummonChance == 0) {
           bCasting = true;
-          Critter::seq = pAc->pGl->pr("mage_spell");
+          Critter::seq = pAc->pGl->GetImgSeq("mage_spell");
           Critter::fVel = fPoint(0, 0);
         }
     } else {
@@ -621,7 +621,7 @@ void Mage::Update() {
         bCasting = false;
         Critter::fVel = fMvVel;
         Critter::seq =
-            fMvVel.x < 0 ? pAc->pGl->pr("mage_f") : pAc->pGl->pr("mage");
+            fMvVel.x < 0 ? pAc->pGl->GetImgSeq("mage_f") : pAc->pGl->GetImgSeq("mage");
       }
     }
   }
@@ -641,7 +641,7 @@ void Mage::SummonSlimes() {
 }
 
 Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
-    : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->pr("castle")),
+    : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->GetImgSeq("castle")),
       nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
 void Castle::OnKnight(char cWhat) {
@@ -650,9 +650,9 @@ void Castle::OnKnight(char cWhat) {
 
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
-      pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("destroy_castle_sound"));
+      pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("destroy_castle_sound"));
       pAv->pSc->nTheme = -1;
-      Critter::seq = pAv->pGl->pr("destroy_castle");
+      Critter::seq = pAv->pGl->GetImgSeq("destroy_castle");
     }
 
     if (pAv->tLoseTimer.nPeriod == 0)
@@ -683,7 +683,7 @@ void Castle::OnKnight(char cWhat) {
   }
 
   if (!pDrag.is_null()) {
-    pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("one_princess"));
+    pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("one_princess"));
 
     --nPrincesses;
 
@@ -693,15 +693,15 @@ void Castle::OnKnight(char cWhat) {
 
       smart_pointer<Princess> pCr =
           make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                          v.x < 0 ? pAv->pGl->pr("princess_f")
-                                                  : pAv->pGl->pr("princess"),
+                                          v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                                                  : pAv->pGl->GetImgSeq("princess"),
                                           true),
                                   pAv));
       pAv->AddBoth(pCr);
       pAv->lsPpl.push_back(pCr);
     }
   } else {
-    pAv->pGl->pSnd->PlaySound(pAv->pGl->pr.GetSnd("all_princess_escape"));
+    pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("all_princess_escape"));
 
     if (cWhat == 'K') {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
@@ -713,8 +713,8 @@ void Castle::OnKnight(char cWhat) {
 
         smart_pointer<Princess> pCr =
             make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                            v.x < 0 ? pAv->pGl->pr("princess_f")
-                                                    : pAv->pGl->pr("princess"),
+                                            v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                                                    : pAv->pGl->GetImgSeq("princess"),
                                             true),
                                     pAv));
         pAv->AddBoth(pCr);

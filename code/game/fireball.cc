@@ -114,7 +114,7 @@ KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
                            unsigned nTimer_, Chain c_)
     : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
       t(nFramesInSecond / 5) {
-  Critter::seq = pBc->pGl->pr("knight_fire");
+  Critter::seq = pBc->pGl->GetImgSeq("knight_fire");
   RandomizeVelocity();
 }
 
@@ -149,7 +149,7 @@ void KnightOnFire::Update() {
     bExist = false;
 
     smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
-        dPriority, pBc->pGl->pr("knight_die"),
+        dPriority, pBc->pGl->GetImgSeq("knight_die"),
         unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
     pBc->AddBoth(pAn);
   }
@@ -233,12 +233,12 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
   Critter::fVel.Normalize(fb.fMap["speed"]);
 
   if (!fb.bMap["laser"])
-    Critter::seq = pBc->pGl->pr("fireball" + GetSizeSuffix(fb));
+    Critter::seq = pBc->pGl->GetImgSeq("fireball" + GetSizeSuffix(fb));
   else {
     Polar pol(Critter::fVel);
     unsigned n = DiscreetAngle(pol.a, 16);
     Critter::seq =
-        ImageSequence(pBc->pGl->pr("laser" + GetSizeSuffix(fb)).vImage[n]);
+        ImageSequence(pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
 }
 
@@ -261,7 +261,7 @@ void Fireball::Update() {
         bExist = false;
         return;
       } else
-        pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("death"));
+        pBc->pGl->pSnd->PlaySound(pBc->pGl->GetSnd("death"));
 
       if ((*itr)->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
         (*itr)->OnHit('F');
@@ -304,7 +304,7 @@ void Fireball::Update() {
           if (!fb.bMap["laser"]) {
             pEx = make_smart(new ChainExplosion(
                 AnimationOnce(GetPriority(),
-                              pBc->pGl->pr("explosion" + GetSizeSuffix(fb)),
+                              pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
                               nFramesInSecond / 10, (*itr)->GetPosition(),
                               true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
@@ -312,7 +312,7 @@ void Fireball::Update() {
           } else {
             pEx = make_smart(new ChainExplosion(
                 AnimationOnce(GetPriority(),
-                              pBc->pGl->pr("laser_expl" + GetSizeSuffix(fb)),
+                              pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
                               nFramesInSecond / 10, (*itr)->GetPosition(),
                               true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
@@ -321,7 +321,7 @@ void Fireball::Update() {
 
           pBc->AddBoth(pEx);
 
-          pBc->pGl->pSnd->PlaySound(pBc->pGl->pr.GetSnd("explosion"));
+          pBc->pGl->pSnd->PlaySound(pBc->pGl->GetSnd("explosion"));
         }
       }
 
@@ -357,7 +357,7 @@ void CircularFireball::Update() {
     Polar pol(Critter::fVel);
     unsigned n = DiscreetAngle(pol.a, 16);
     Critter::seq =
-        ImageSequence(pBc->pGl->pr("laser" + GetSizeSuffix(fb)).vImage[n]);
+        ImageSequence(pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
 }
 
@@ -365,8 +365,8 @@ FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
                                                 LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       bBlink(false), pAd(pAd_), tm(nBonusOnGroundTime), sUnderText("") {
-  seq = GetBonusImage(n, pAd->pGl->pr);
-  coronaSeq = pAd->pGl->pr("corona");
+  seq = pAd->pGl->GetImgSeq(GetBonusImage(n));
+  coronaSeq = pAd->pGl->GetImgSeq("corona");
 }
 
 void FireballBonusAnimation::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -404,7 +404,7 @@ void FireballBonusAnimation::Update() {
         nLm = 1;
       for (int j = 0; j < nLm; ++j) {
         img.Add(seq.vImage[i]);
-        img.Add(pAd->pGl->pr["empty"]);
+        img.Add(pAd->pGl->GetImg("empty"));
       }
     }
 

@@ -54,7 +54,7 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
 MenuController::MenuController(DragonGameController *pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
-      pMenuDisplay(), mc(pGl_->pr("claw"), Point()),
+      pMenuDisplay(), mc(pGl_->GetImgSeq("claw"), Point()),
       pHintText(), pOptionText() {
   bNoRefresh = true;
 }
@@ -155,7 +155,7 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
 }
 
 void MenuDisplay::PositionIncrement(bool bUp) {
-  pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->pr.GetSnd("B"));
+  pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->GetSnd("B"));
 
   int nDelta = bUp ? 1 : -1;
 
@@ -177,9 +177,9 @@ void MenuDisplay::PositionIncrement(bool bUp) {
 void MenuDisplay::Boop() {
   if (pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent ==
       &MenuDisplay::Escape)
-    pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->pr.GetSnd("C"));
+    pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->GetSnd("C"));
   else
-    pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->pr.GetSnd("A"));
+    pMenuController->pGl->pSnd->PlaySound(pMenuController->pGl->GetSnd("A"));
   (this->*(pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent))();
 }
 

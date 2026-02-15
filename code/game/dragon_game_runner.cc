@@ -1,10 +1,13 @@
 #include "common.h"
 #include "game/dragon_macros.h"
 #include "game/dragon_game_runner.h"
+#include "game/controller/dragon_game_controller.h"
+#include "game/controller/game_controller_interface.h"
 #include "game/fireball.h"
 #include "game/level.h"
 #include "game_utils/event.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/font_writer.h"
 
 DragonGameRunner::DragonGameRunner(ProgramEngine pe) {
   pData = new TowerDataWrap(pe);

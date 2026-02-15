@@ -111,10 +111,8 @@ struct LevelLayout {
   void Convert(int n = 24);
 };
 
-typedef std::vector<LevelLayout> LevelStorage;
-
 void ReadLevels(FilePath *fp, std::string sFile, Rectangle rBound,
-                LevelStorage &vLvl);
+                std::vector<LevelLayout> &vLvl);
 
 std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f);
 std::istream &operator>>(std::istream &ifs, LevelLayout &f);

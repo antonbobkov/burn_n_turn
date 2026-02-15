@@ -1,12 +1,16 @@
 #ifndef TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 #define TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 
-#include "game/controller/dragon_game_controller.h"
 #include "game/level.h"
 #include "game_utils/game_runner_interface.h"
-#include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
+#include "wrappers/geometry.h"
 #include <memory>
+
+struct DragonGameController;
+class FilePath;
+class FileManager;
+struct FontWriter;
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {
@@ -28,7 +32,7 @@ public:
   FileManager *p_fm_;
   std::unique_ptr<FilePath> fp_;
 
-  LevelStorage vLvl;
+  std::vector<LevelLayout> vLvl;
   std::unique_ptr<DragonGameController> pCnt;
 
   Size szActualRez;

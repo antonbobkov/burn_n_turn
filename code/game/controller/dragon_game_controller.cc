@@ -3,6 +3,8 @@
 #include "game/dragon_macros.h"
 #include "game/game.h"
 #include "game_utils/image_sequence.h"
+#include "game_utils/Preloader.h"
+#include "game_utils/sound_sequence.h"
 #include "game/controller/buy_now_controller.h"
 
 extern void DrawStuff(Rectangle rBound,
@@ -12,10 +14,10 @@ extern void DrawStuff(Rectangle rBound,
 DragonGameController::DragonGameController(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
-    smart_pointer<SoundInterface<Index>> pSndRaw_, const LevelStorage &vLvl_,
+    smart_pointer<SoundInterface<Index>> pSndRaw_, const std::vector<LevelLayout> &vLvl_,
     Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
-      pr(pDr_->pGr, pSndRaw_, fp), pSndRaw(pSndRaw_),
+      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)), pSndRaw(pSndRaw_),
       pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))), nScore(0),
       vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
       pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(), vLevelPointers(3),
@@ -43,239 +45,239 @@ DragonGameController::DragonGameController(
 
   unsigned nScale = 2;
 
-  pr.AddTransparent(Color(0, 0, 0));
-  pr.SetScale(nScale);
+  pr->AddTransparent(Color(0, 0, 0));
+  pr->SetScale(nScale);
 
-  pr.LoadTS("icons.bmp", "loading");
-  pr.LoadTS("robotbear.bmp", "splash");
-  pr.LoadSnd("beep.wav", "beep");
-  pr.LoadSnd("boop.wav", "boop");
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 0);
+  pr->LoadTS("icons.bmp", "loading");
+  pr->LoadTS("robotbear.bmp", "splash");
+  pr->LoadSnd("beep.wav", "beep");
+  pr->LoadSnd("boop.wav", "boop");
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 0);
 
-  pr.LoadTS("road.bmp", "road");
-  pr.LoadTS("turnandvorn.bmp", "logo");
+  pr->LoadTS("road.bmp", "road");
+  pr->LoadTS("turnandvorn.bmp", "logo");
 #ifdef TRIAL_VERSION
-  pr.LoadTS("trial.bmp", "trial");
-  pr.LoadTS("buy_now.bmp", "buy");
+  pr->LoadTS("trial.bmp", "trial");
+  pr->LoadTS("buy_now.bmp", "buy");
 #endif
-  pr.LoadSeqTS("burn\\burn.txt", "burn");
-  pr.LoadTS("empty.bmp", "empty");
+  pr->LoadSeqTS("burn\\burn.txt", "burn");
+  pr->LoadTS("empty.bmp", "empty");
 
-  pr.LoadSeqTS("arrow\\sword.txt", "arrow");
-  pr.LoadSeqTS("arrow\\claw.txt", "claw");
+  pr->LoadSeqTS("arrow\\sword.txt", "arrow");
+  pr->LoadSeqTS("arrow\\claw.txt", "claw");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 1);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 1);
 
-  pr.LoadSeqTS("corona\\crosshair.txt", "corona"); // (not used icon)
-  pr.LoadSeqTS("bonus\\void.txt", "void_bonus");
-  pr.LoadSeqTS("bonus\\pershot.txt", "pershot_bonus"); // 1 - pershot
-  pr.LoadSeqTS("bonus\\laser.txt", "laser_bonus");     // 2 - laser
-  pr.LoadSeqTS("bonus\\big.txt", "big_bonus");         // 3 - big
-  pr.LoadSeqTS("bonus\\totnum.txt", "totnum_bonus");   // 4 - totnum
-  pr.LoadSeqTS("bonus\\explode.txt", "explode_bonus"); // 5 - explode
-  pr.LoadSeqTS("bonus\\split.txt", "split_bonus");     // 6 - split
-  pr.LoadSeqTS("bonus\\burning.txt", "burning_bonus"); // 7 - burning
-  pr.LoadSeqTS("bonus\\ring.txt", "ring_bonus");       // 8 - ring
-  pr.LoadSeqTS("bonus\\nuke.txt", "nuke_bonus");       // 9 - nuke
-  pr.LoadSeqTS("bonus\\speed.txt", "speed_bonus");     // 10 - speed
+  pr->LoadSeqTS("corona\\crosshair.txt", "corona"); // (not used icon)
+  pr->LoadSeqTS("bonus\\void.txt", "void_bonus");
+  pr->LoadSeqTS("bonus\\pershot.txt", "pershot_bonus"); // 1 - pershot
+  pr->LoadSeqTS("bonus\\laser.txt", "laser_bonus");     // 2 - laser
+  pr->LoadSeqTS("bonus\\big.txt", "big_bonus");         // 3 - big
+  pr->LoadSeqTS("bonus\\totnum.txt", "totnum_bonus");   // 4 - totnum
+  pr->LoadSeqTS("bonus\\explode.txt", "explode_bonus"); // 5 - explode
+  pr->LoadSeqTS("bonus\\split.txt", "split_bonus");     // 6 - split
+  pr->LoadSeqTS("bonus\\burning.txt", "burning_bonus"); // 7 - burning
+  pr->LoadSeqTS("bonus\\ring.txt", "ring_bonus");       // 8 - ring
+  pr->LoadSeqTS("bonus\\nuke.txt", "nuke_bonus");       // 9 - nuke
+  pr->LoadSeqTS("bonus\\speed.txt", "speed_bonus");     // 10 - speed
   // pr.LoadSeqTS("bonus\\frequency.txt", "frequency");		// 11 -
   // frequency (not used)
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 2);
-  pr.LoadSeqTS("start.txt", "start");
-  pr.LoadSeqTS("win\\win.txt", "win");
-  pr.LoadSeqTS("win\\over.txt", "over");
-  pr.LoadSeqTS("logo\\pluanbo.txt", "pluanbo", Color(0, 0, 0), nScale * 2);
-  pr.LoadSeqTS("logo\\gengui.txt", "gengui", Color(0, 0, 0), nScale * 2);
-  pr.LoadSeqTS("castle\\castle.txt", "castle", Color(0, 0, 0));
-  pr.LoadSeqTS("castle\\destroy_castle_dust.txt", "destroy_castle",
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 2);
+  pr->LoadSeqTS("start.txt", "start");
+  pr->LoadSeqTS("win\\win.txt", "win");
+  pr->LoadSeqTS("win\\over.txt", "over");
+  pr->LoadSeqTS("logo\\pluanbo.txt", "pluanbo", Color(0, 0, 0), nScale * 2);
+  pr->LoadSeqTS("logo\\gengui.txt", "gengui", Color(0, 0, 0), nScale * 2);
+  pr->LoadSeqTS("castle\\castle.txt", "castle", Color(0, 0, 0));
+  pr->LoadSeqTS("castle\\destroy_castle_dust.txt", "destroy_castle",
                Color(0, 0, 0));
 
-  pr.LoadSeqTS("dragon_fly\\fly.txt", "dragon_fly");
-  pr.LoadSeqTS("dragon\\stable.txt", "dragon_stable");
-  pr.LoadSeqTS("dragon\\walk.txt", "dragon_walk");
+  pr->LoadSeqTS("dragon_fly\\fly.txt", "dragon_fly");
+  pr->LoadSeqTS("dragon\\stable.txt", "dragon_stable");
+  pr->LoadSeqTS("dragon\\walk.txt", "dragon_walk");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 3);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 3);
 
-  pr.AddSequence(pr("dragon_fly"), "bdragon_fly");
-  pr.AddSequence(pr("dragon_stable"), "bdragon_stable");
-  pr.AddSequence(pr("dragon_walk"), "dragon_walk_f");
+  pr->AddSequence((*pr)("dragon_fly"), "bdragon_fly");
+  pr->AddSequence((*pr)("dragon_stable"), "bdragon_stable");
+  pr->AddSequence((*pr)("dragon_walk"), "dragon_walk_f");
 
-  ForEachImage(pr("bdragon_fly"), ImagePainter(pGraph, vColors));
-  ForEachImage(pr("bdragon_stable"), ImagePainter(pGraph, vColors));
-  ForEachImage(pr("dragon_walk_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("bdragon_fly"), ImagePainter(pGraph, vColors));
+  ForEachImage((*pr)("bdragon_stable"), ImagePainter(pGraph, vColors));
+  ForEachImage((*pr)("dragon_walk_f"), ImageFlipper(pGraph));
 
-  pr.LoadSeqTS("explosion\\explosion2.txt", "explosion");
-  pr.LoadSeqTS("explosion\\laser_expl.txt", "laser_expl");
+  pr->LoadSeqTS("explosion\\explosion2.txt", "explosion");
+  pr->LoadSeqTS("explosion\\laser_expl.txt", "laser_expl");
 
-  pr.LoadSeqTS("explosion\\explosion_15.txt", "explosion_15");
-  pr.LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_15");
+  pr->LoadSeqTS("explosion\\explosion_15.txt", "explosion_15");
+  pr->LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_15");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 4);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 4);
 
-  pr.LoadSeqTS("explosion\\explosion2.txt", "explosion_2", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("explosion\\explosion2.txt", "explosion_2", Color(0, 0, 0, 0),
                nScale * 2);
-  pr.LoadSeqTS("explosion\\laser_expl.txt", "laser_expl_2", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("explosion\\laser_expl.txt", "laser_expl_2", Color(0, 0, 0, 0),
                nScale * 2);
 
-  pr.LoadSeqTS("explosion\\explosion_15.txt", "explosion_3", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("explosion\\explosion_15.txt", "explosion_3", Color(0, 0, 0, 0),
                nScale * 2);
-  pr.LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_3",
+  pr->LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_3",
                Color(0, 0, 0, 0), nScale * 2);
 
-  pr.LoadSeqTS("fireball\\fireball.txt", "fireball");
-  pr.LoadSeqTS("fireball\\fireball_15.txt", "fireball_15");
-  pr.LoadSeqTS("fireball\\fireball.txt", "fireball_2", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("fireball\\fireball.txt", "fireball");
+  pr->LoadSeqTS("fireball\\fireball_15.txt", "fireball_15");
+  pr->LoadSeqTS("fireball\\fireball.txt", "fireball_2", Color(0, 0, 0, 0),
                nScale * 2);
-  pr.LoadSeqTS("fireball\\fireball_15.txt", "fireball_3", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("fireball\\fireball_15.txt", "fireball_3", Color(0, 0, 0, 0),
                nScale * 2);
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 5);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 5);
 
-  pr.LoadSeqTS("fireball\\laser.txt", "laser");
-  pr.LoadSeqTS("fireball\\laser_15.txt", "laser_15");
-  pr.LoadSeqTS("fireball\\laser.txt", "laser_2", Color(0, 0, 0, 0), nScale * 2);
-  pr.LoadSeqTS("fireball\\laser_15.txt", "laser_3", Color(0, 0, 0, 0),
+  pr->LoadSeqTS("fireball\\laser.txt", "laser");
+  pr->LoadSeqTS("fireball\\laser_15.txt", "laser_15");
+  pr->LoadSeqTS("fireball\\laser.txt", "laser_2", Color(0, 0, 0, 0), nScale * 2);
+  pr->LoadSeqTS("fireball\\laser_15.txt", "laser_3", Color(0, 0, 0, 0),
                nScale * 2);
-  pr.LoadSeqTS("fireball\\fireball_icon.txt", "fireball_icon",
+  pr->LoadSeqTS("fireball\\fireball_icon.txt", "fireball_icon",
                Color(255, 255, 255));
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 6);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 6);
 
-  pr.LoadSeqTS("knight\\knight.txt", "knight");
-  pr.LoadSeqTS("knight\\die.txt", "knight_die");
-  pr.LoadSeqTS("knight\\fire.txt", "knight_fire");
-  pr.LoadSeqTS("ghostnight\\ghost_knight_burn.txt", "ghost_knight_burn");
-  pr.LoadSeqTS("ghostnight\\ghost_knight.txt", "ghost_knight");
-  pr.LoadSeqTS("ghostnight\\ghost_burn.txt", "ghost_burn");
-  pr.LoadSeqTS("ghostnight\\ghost.txt", "ghost");
+  pr->LoadSeqTS("knight\\knight.txt", "knight");
+  pr->LoadSeqTS("knight\\die.txt", "knight_die");
+  pr->LoadSeqTS("knight\\fire.txt", "knight_fire");
+  pr->LoadSeqTS("ghostnight\\ghost_knight_burn.txt", "ghost_knight_burn");
+  pr->LoadSeqTS("ghostnight\\ghost_knight.txt", "ghost_knight");
+  pr->LoadSeqTS("ghostnight\\ghost_burn.txt", "ghost_burn");
+  pr->LoadSeqTS("ghostnight\\ghost.txt", "ghost");
 
-  pr.LoadSeqTS("golem\\golem.txt", "golem");
-  pr.LoadSeqTS("golem\\golem_death.txt", "golem_die");
+  pr->LoadSeqTS("golem\\golem.txt", "golem");
+  pr->LoadSeqTS("golem\\golem_death.txt", "golem_die");
 
-  pr.AddSequence(pr("golem"), "golem_f");
-  ForEachImage(pr("golem_f"), ImageFlipper(pGraph));
+  pr->AddSequence((*pr)("golem"), "golem_f");
+  ForEachImage((*pr)("golem_f"), ImageFlipper(pGraph));
 
-  pr.AddSequence(pr("golem_die"), "golem_die_f");
-  ForEachImage(pr("golem_die_f"), ImageFlipper(pGraph));
+  pr->AddSequence((*pr)("golem_die"), "golem_die_f");
+  ForEachImage((*pr)("golem_die_f"), ImageFlipper(pGraph));
 
-  pr.LoadSeqTS("skelly\\skelly.txt", "skelly");
-  pr.LoadSeqTS("skelly\\die.txt", "skelly_die");
-  pr.LoadSeqTS("skelly\\summon.txt", "skelly_summon");
+  pr->LoadSeqTS("skelly\\skelly.txt", "skelly");
+  pr->LoadSeqTS("skelly\\die.txt", "skelly_die");
+  pr->LoadSeqTS("skelly\\summon.txt", "skelly_summon");
 
-  pr.LoadSeqTS("trader\\trader.txt", "trader");
-  pr.LoadSeqTS("trader\\die.txt", "trader_die");
+  pr->LoadSeqTS("trader\\trader.txt", "trader");
+  pr->LoadSeqTS("trader\\die.txt", "trader_die");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 7);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 7);
 
-  pr.AddSequence(pr("trader"), "trader_f");
-  pr.AddSequence(pr("trader_die"), "trader_die_f");
-  ForEachImage(pr("trader_f"), ImageFlipper(pGraph));
-  ForEachImage(pr("trader_die_f"), ImageFlipper(pGraph));
+  pr->AddSequence((*pr)("trader"), "trader_f");
+  pr->AddSequence((*pr)("trader_die"), "trader_die_f");
+  ForEachImage((*pr)("trader_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("trader_die_f"), ImageFlipper(pGraph));
 
-  pr.LoadSeqTS("princess\\princess.txt", "princess");
-  pr.LoadSeqTS("princess\\die.txt", "princess_die");
+  pr->LoadSeqTS("princess\\princess.txt", "princess");
+  pr->LoadSeqTS("princess\\die.txt", "princess_die");
 
-  pr.AddSequence(pr("princess"), "princess_f");
-  pr.AddSequence(pr("princess_die"), "princess_die_f");
-  ForEachImage(pr("princess_f"), ImageFlipper(pGraph));
-  ForEachImage(pr("princess_die_f"), ImageFlipper(pGraph));
+  pr->AddSequence((*pr)("princess"), "princess_f");
+  pr->AddSequence((*pr)("princess_die"), "princess_die_f");
+  ForEachImage((*pr)("princess_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("princess_die_f"), ImageFlipper(pGraph));
 
-  pr.LoadSeqTS("mage\\mage.txt", "mage");
-  pr.LoadSeqTS("mage\\spell.txt", "mage_spell");
-  pr.LoadSeqTS("mage\\die.txt", "mage_die");
+  pr->LoadSeqTS("mage\\mage.txt", "mage");
+  pr->LoadSeqTS("mage\\spell.txt", "mage_spell");
+  pr->LoadSeqTS("mage\\die.txt", "mage_die");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 8);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 8);
 
-  pr.AddSequence(pr("mage"), "mage_f");
-  pr.AddSequence(pr("mage_spell"), "mage_spell_f");
-  pr.AddSequence(pr("mage_die"), "mage_die_f");
-  ForEachImage(pr("mage_f"), ImageFlipper(pGraph));
-  ForEachImage(pr("mage_spell_f"), ImageFlipper(pGraph));
-  ForEachImage(pr("mage_die_f"), ImageFlipper(pGraph));
+  pr->AddSequence((*pr)("mage"), "mage_f");
+  pr->AddSequence((*pr)("mage_spell"), "mage_spell_f");
+  pr->AddSequence((*pr)("mage_die"), "mage_die_f");
+  ForEachImage((*pr)("mage_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("mage_spell_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("mage_die_f"), ImageFlipper(pGraph));
 
-  pr.LoadSeqTS("slime\\slime_walk.txt", "slime");
-  pr.LoadSeqTS("slime\\slime_die.txt", "slime_die");
-  pr.LoadSeqTS("slime\\slime_poke.txt", "slime_poke");
-  pr.LoadSeqTS("slime\\slime_reproduce.txt", "slime_reproduce");
-  pr.LoadSeqTS("slime\\slime_reproduce_fast.txt", "slime_reproduce_fast");
-  pr.LoadSeqTS("slime\\slime_cloud.txt", "slime_cloud");
+  pr->LoadSeqTS("slime\\slime_walk.txt", "slime");
+  pr->LoadSeqTS("slime\\slime_die.txt", "slime_die");
+  pr->LoadSeqTS("slime\\slime_poke.txt", "slime_poke");
+  pr->LoadSeqTS("slime\\slime_reproduce.txt", "slime_reproduce");
+  pr->LoadSeqTS("slime\\slime_reproduce_fast.txt", "slime_reproduce_fast");
+  pr->LoadSeqTS("slime\\slime_cloud.txt", "slime_cloud");
 
-  pr.LoadSeqTS("slime\\mega_slime_walk.txt", "megaslime");
-  pr.LoadSeqTS("slime\\mega_slime_die.txt", "megaslime_die");
-  pr.LoadSeqTS("slime\\mega_slime_reproduce.txt", "megaslime_reproduce");
+  pr->LoadSeqTS("slime\\mega_slime_walk.txt", "megaslime");
+  pr->LoadSeqTS("slime\\mega_slime_die.txt", "megaslime_die");
+  pr->LoadSeqTS("slime\\mega_slime_reproduce.txt", "megaslime_reproduce");
 
-  pr.LoadSndSeq("sound\\over.txt", "over");
-  pr.LoadSndSeq("sound\\pluanbo.txt", "pluanbo");
-  pr.LoadSndSeq("sound\\click.txt", "click");
+  pr->LoadSndSeq("sound\\over.txt", "over");
+  pr->LoadSndSeq("sound\\pluanbo.txt", "pluanbo");
+  pr->LoadSndSeq("sound\\click.txt", "click");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, pr, 9);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 9);
 
-  pr.LoadSnd("start_game.wav", "start_game");
-  pr.LoadSnd("death01.wav", "death");
-  pr.LoadSnd("golem_death2.wav", "golem_death");
-  pr.LoadSnd("megaslime_spawn1.wav", "slime_spawn");
-  pr.LoadSnd("megaslime_spawn2.wav", "megaslime_die");
-  pr.LoadSnd("megaslime_hit.wav", "megaslime_hit");
-  pr.LoadSnd("megaslime_bonus2.wav", "megaslime_bonus");
-  pr.LoadSnd("megaslime_move4.wav", "megaslime_jump");
-  pr.LoadSnd("megaslime_move3.wav", "megaslime_land");
-  pr.LoadSnd("skeleton_bonus1.wav", "skeleton_bonus");
+  pr->LoadSnd("start_game.wav", "start_game");
+  pr->LoadSnd("death01.wav", "death");
+  pr->LoadSnd("golem_death2.wav", "golem_death");
+  pr->LoadSnd("megaslime_spawn1.wav", "slime_spawn");
+  pr->LoadSnd("megaslime_spawn2.wav", "megaslime_die");
+  pr->LoadSnd("megaslime_hit.wav", "megaslime_hit");
+  pr->LoadSnd("megaslime_bonus2.wav", "megaslime_bonus");
+  pr->LoadSnd("megaslime_move4.wav", "megaslime_jump");
+  pr->LoadSnd("megaslime_move3.wav", "megaslime_land");
+  pr->LoadSnd("skeleton_bonus1.wav", "skeleton_bonus");
 
-  pr.LoadSnd("explosion01.wav", "explosion");
-  pr.LoadSnd("powerup03.wav", "powerup");
-  pr.LoadSnd("laser04.wav", "laser");
-  pr.LoadSnd("shoot2.wav", "shoot");
-  pr.LoadSnd("dropping.wav", "knight_fall");
-  pr.LoadSnd("knight_from_sky.wav", "dropping");
-  pr.LoadSnd("pickup_sound_pxtone.wav", "pickup");
-  pr.LoadSnd("princess_capture.wav", "princess_capture");
-  pr.LoadSnd("win_level_2.wav", "win_level");
-  pr.LoadSnd("all_princess_escape.wav", "all_princess_escape");
-  pr.LoadSnd("destroy_castle_sound.wav", "destroy_castle_sound");
-  pr.LoadSnd("one_princess.wav", "one_princess");
-  pr.LoadSnd("leave_tower.wav", "leave_tower");
-  pr.LoadSnd("return_tower.wav", "return_tower");
-  pr.LoadSnd("step_left.wav", "step_left");
-  pr.LoadSnd("step_right.wav", "step_right");
-  pr.LoadSnd("hit_golem.wav", "hit_golem");
-  pr.LoadSnd("slime_poke.wav", "slime_poke");
-  pr.LoadSnd("slime_summon.wav", "slime_summon");
-  pr.LoadSnd("princess_arrive.wav", "princess_arrive");
+  pr->LoadSnd("explosion01.wav", "explosion");
+  pr->LoadSnd("powerup03.wav", "powerup");
+  pr->LoadSnd("laser04.wav", "laser");
+  pr->LoadSnd("shoot2.wav", "shoot");
+  pr->LoadSnd("dropping.wav", "knight_fall");
+  pr->LoadSnd("knight_from_sky.wav", "dropping");
+  pr->LoadSnd("pickup_sound_pxtone.wav", "pickup");
+  pr->LoadSnd("princess_capture.wav", "princess_capture");
+  pr->LoadSnd("win_level_2.wav", "win_level");
+  pr->LoadSnd("all_princess_escape.wav", "all_princess_escape");
+  pr->LoadSnd("destroy_castle_sound.wav", "destroy_castle_sound");
+  pr->LoadSnd("one_princess.wav", "one_princess");
+  pr->LoadSnd("leave_tower.wav", "leave_tower");
+  pr->LoadSnd("return_tower.wav", "return_tower");
+  pr->LoadSnd("step_left.wav", "step_left");
+  pr->LoadSnd("step_right.wav", "step_right");
+  pr->LoadSnd("hit_golem.wav", "hit_golem");
+  pr->LoadSnd("slime_poke.wav", "slime_poke");
+  pr->LoadSnd("slime_summon.wav", "slime_summon");
+  pr->LoadSnd("princess_arrive.wav", "princess_arrive");
 
-  pr.LoadSnd("sound/A.wav", "A");
-  pr.LoadSnd("sound/B.wav", "B");
-  pr.LoadSnd("sound/C.wav", "C");
-  pr.LoadSnd("sound/D.wav", "D");
-  pr.LoadSnd("sound/E.wav", "E");
+  pr->LoadSnd("sound/A.wav", "A");
+  pr->LoadSnd("sound/B.wav", "B");
+  pr->LoadSnd("sound/C.wav", "C");
+  pr->LoadSnd("sound/D.wav", "D");
+  pr->LoadSnd("sound/E.wav", "E");
 
-  pr.LoadSnd("dddragon.wav", "background_music");
-  pr.LoadSnd("_dddragon.wav", "background_music_slow");
+  pr->LoadSnd("dddragon.wav", "background_music");
+  pr->LoadSnd("_dddragon.wav", "background_music_slow");
 
 #ifdef FULL_VERSION
-  pr.LoadSnd("dddragon1.wav", "background_music2");
-  pr.LoadSnd("_dddragon1.wav", "background_music_slow2");
+  pr->LoadSnd("dddragon1.wav", "background_music2");
+  pr->LoadSnd("_dddragon1.wav", "background_music_slow2");
 
-  pr.LoadSnd("dddragon2.wav", "background_music3");
-  pr.LoadSnd("_dddragon2.wav", "background_music_slow3");
+  pr->LoadSnd("dddragon2.wav", "background_music3");
+  pr->LoadSnd("_dddragon2.wav", "background_music_slow3");
 #else // save memory on trial, though, *something* needs to be loaded otherwise
       // crashes.
-  pr.LoadSnd("dddragon.wav", "background_music2");
-  pr.LoadSnd("_dddragon.wav", "background_music_slow2");
+  pr->LoadSnd("dddragon.wav", "background_music2");
+  pr->LoadSnd("_dddragon.wav", "background_music_slow2");
 
-  pr.LoadSnd("dddragon.wav", "background_music3");
-  pr.LoadSnd("_dddragon.wav", "background_music_slow3");
+  pr->LoadSnd("dddragon.wav", "background_music3");
+  pr->LoadSnd("_dddragon.wav", "background_music_slow3");
 #endif
 
   plr.pSnd = pSndRaw_;
 
   plr.vThemes.resize(6);
-  plr.vThemes[BG_BACKGROUND] = pr.GetSnd("background_music");
-  plr.vThemes[BG_SLOW_BACKGROUND] = pr.GetSnd("background_music_slow");
-  plr.vThemes[BG_BACKGROUND2] = pr.GetSnd("background_music2");
-  plr.vThemes[BG_SLOW_BACKGROUND2] = pr.GetSnd("background_music_slow2");
-  plr.vThemes[BG_BACKGROUND3] = pr.GetSnd("background_music3");
-  plr.vThemes[BG_SLOW_BACKGROUND3] = pr.GetSnd("background_music_slow3");
+  plr.vThemes[BG_BACKGROUND] = pr->GetSnd("background_music");
+  plr.vThemes[BG_SLOW_BACKGROUND] = pr->GetSnd("background_music_slow");
+  plr.vThemes[BG_BACKGROUND2] = pr->GetSnd("background_music2");
+  plr.vThemes[BG_SLOW_BACKGROUND2] = pr->GetSnd("background_music_slow2");
+  plr.vThemes[BG_BACKGROUND3] = pr->GetSnd("background_music3");
+  plr.vThemes[BG_SLOW_BACKGROUND3] = pr->GetSnd("background_music_slow3");
 
   plr.pSnd->SetVolume(.5);
 
@@ -298,7 +300,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   bAngry = false;
 
   smart_pointer<Animation> pStr = make_smart(
-      new Animation(0, pr("start"), nFramesInSecond / 5,
+      new Animation(0, (*pr)("start"), nFramesInSecond / 5,
                     Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
   // menu
@@ -342,14 +344,14 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       make_smart(new SoundControls(plr, -1));
 
   smart_pointer<Animation> pWin = make_smart(new Animation(
-      0, pr("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
+      0, (*pr)("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
   smart_pointer<StaticImage> pL = make_smart(new StaticImage(
-      pr["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true));
+      (*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true));
   smart_pointer<Animation> pBurnL = make_smart(
-      new Animation(0, pr("burn"), 3,
+      new Animation(0, (*pr)("burn"), 3,
                     Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true));
   smart_pointer<Animation> pBurnR = make_smart(
-      new Animation(0, pr("burn"), 4,
+      new Animation(0, (*pr)("burn"), 4,
                     Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true));
   pBurnR->seq.nActive += 4;
 
@@ -380,30 +382,30 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum));
 
   smart_pointer<AnimationOnce> pO = make_smart(
-      new AnimationOnce(0, pr("over"), nFramesInSecond / 2,
+      new AnimationOnce(0, (*pr)("over"), nFramesInSecond / 2,
                         Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
   smart_pointer<AnimationOnce> pPlu = make_smart(
-      new AnimationOnce(0, pr("pluanbo"), nFramesInSecond / 10,
+      new AnimationOnce(0, (*pr)("pluanbo"), nFramesInSecond / 10,
                         Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
   smart_pointer<AnimationOnce> pGen = make_smart(
-      new AnimationOnce(0, pr("gengui"), nFramesInSecond / 5,
+      new AnimationOnce(0, (*pr)("gengui"), nFramesInSecond / 5,
                         Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
 
   smart_pointer<SimpleSoundEntity> pOver = make_smart(
-      new SimpleSoundEntity(pr.GetSndSeq("over"), nFramesInSecond / 2, pSnd));
+      new SimpleSoundEntity(pr->GetSndSeq("over"), nFramesInSecond / 2, pSnd));
   smart_pointer<SimpleSoundEntity> pPluSnd = make_smart(new SimpleSoundEntity(
-      pr.GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd));
+      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd));
   smart_pointer<SimpleSoundEntity> pClkSnd = make_smart(
-      new SimpleSoundEntity(pr.GetSndSeq("click"), nFramesInSecond / 5, pSnd));
+      new SimpleSoundEntity(pr->GetSndSeq("click"), nFramesInSecond / 5, pSnd));
 
 #ifdef TRIAL_VERSION
   smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(
-      pr["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
+      (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
   pCnt1->AddV(pTrial);
 #endif
 
   smart_pointer<Animation> pMenuCaret =
-      make_smart(new Animation(2, pr("arrow"), 3, Point(0, 0), true));
+      make_smart(new Animation(2, (*pr)("arrow"), 3, Point(0, 0), true));
   // menu entity
   smart_pointer<MenuDisplay> pMenuDisplay = make_smart(
       new MenuDisplay(Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
@@ -492,30 +494,30 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       make_smart(new BuyNowController(pSelf, rBound, Color(0, 0, 0)));
 
   smart_pointer<Animation> pGolem = make_smart(
-      new Animation(0, pr("golem_f"), nFramesInSecond / 10,
+      new Animation(0, (*pr)("golem_f"), nFramesInSecond / 10,
                     Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
   smart_pointer<Animation> pSkeleton1 = make_smart(
-      new Animation(0, pr("skelly"), nFramesInSecond / 4,
+      new Animation(0, (*pr)("skelly"), nFramesInSecond / 4,
                     Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
   smart_pointer<Animation> pSkeleton2 = make_smart(new Animation(
-      0, pr("skelly"), nFramesInSecond / 4 + 1,
+      0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
       Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
   smart_pointer<Animation> pSkeleton3 = make_smart(new Animation(
-      0, pr("skelly"), nFramesInSecond / 4 - 1,
+      0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
       Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
   smart_pointer<Animation> pMage = make_smart(
-      new Animation(0, pr("mage_spell"), nFramesInSecond / 2,
+      new Animation(0, (*pr)("mage_spell"), nFramesInSecond / 2,
                     Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
   smart_pointer<Animation> pGhost = make_smart(new Animation(
-      0, pr("ghost"), nFramesInSecond / 6,
+      0, (*pr)("ghost"), nFramesInSecond / 6,
       Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
   smart_pointer<Animation> pWhiteKnight = make_smart(new Animation(
-      0, pr("ghost_knight"), nFramesInSecond / 6,
+      0, (*pr)("ghost_knight"), nFramesInSecond / 6,
       Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
 
   // smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(...));
   smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(
-      pr["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
+      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
   smart_pointer<VisualEntity> pSlimeUpd =
       make_smart(new SlimeUpdater(pBuy.get()));
 
@@ -573,4 +575,20 @@ void DragonGameController::Restart(int nActive_ /* = -1*/) {
 void DragonGameController::Menu() {
   pMenu->nResumePosition = nActive;
   nActive = 0;
+}
+
+Index &DragonGameController::GetImg(std::string key) {
+  return (*pr)[key];
+}
+
+ImageSequence &DragonGameController::GetImgSeq(std::string key) {
+  return (*pr)(key);
+}
+
+Index &DragonGameController::GetSnd(std::string key) {
+  return pr->GetSnd(key);
+}
+
+SoundSequence &DragonGameController::GetSndSeq(std::string key) {
+  return pr->GetSndSeq(key);
 }

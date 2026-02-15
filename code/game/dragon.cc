@@ -274,7 +274,7 @@ void Dragon::Update() {
 
         (*itr)->bExist = false;
 
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("pickup"));
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("pickup"));
         break;
       }
     }
@@ -329,7 +329,7 @@ void Dragon::Draw(smart_pointer<ScalingDrawer> pDr) {
 
 void Dragon::AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent) {
   if (!bSilent)
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("powerup"));
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("powerup"));
 
   if (pBonus.is_null())
     return;
@@ -407,14 +407,14 @@ void Dragon::Fire(fPoint fDir) {
   }
 
   if (fb.bMap["laser"])
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("laser"));
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("laser"));
   else
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("shoot"));
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("shoot"));
 }
 
 void Dragon::Toggle() {
   if (!bFly) {
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("leave_tower"));
+    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("leave_tower"));
 
     bFly = true;
     bTookOff = true;
@@ -461,17 +461,17 @@ void Dragon::Toggle() {
         }
 
         if (j != pAd->vCs.size()) {
-          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("princess_capture"));
+          pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("princess_capture"));
         } else {
           FlushBonuses();
 
-          pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("win_level"));
+          pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("win_level"));
           pAd->pGl->Next();
         }
       } else if (cCarry == 'T')
         AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
       else
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("return_tower"));
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("return_tower"));
 
       bCarry = false;
       cCarry = ' ';
@@ -505,7 +505,7 @@ void Dragon::Toggle() {
         imgCarry = (*itr)->GetImage();
         cCarry = (*itr)->GetType();
 
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->pr.GetSnd("pickup"));
+        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("pickup"));
       } else {
         throw SimpleException("not supposed to drop things");
       }

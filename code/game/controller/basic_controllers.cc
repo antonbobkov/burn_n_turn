@@ -176,7 +176,7 @@ void EntityListController::OnMouseDown(Point pPos) { pGl->Next(); }
 
 void StartScreenController::Next() {
   pGl->Next();
-  pGl->pSnd->PlaySound(pGl->pr.GetSnd("start_game"));
+  pGl->pSnd->PlaySound(pGl->GetSnd("start_game"));
 }
 
 void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
@@ -193,7 +193,7 @@ Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
       pCrFollow(), bRelease(false), tm(nFramesInSecond / 5), Beepy(true) {
-  ImageSequence seq1 = pGl_->pr(sRun);
+  ImageSequence seq1 = pGl_->GetImgSeq(sRun);
 
   int xPos = 5;
   if (bFlip)
@@ -209,7 +209,7 @@ Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
 
   pCrRun = pCr1;
 
-  ImageSequence seq2 = pGl_->pr(sChase);
+  ImageSequence seq2 = pGl_->GetImgSeq(sChase);
 
   smart_pointer<FancyCritter> pCr2 = make_smart(
       new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 12, 0),
@@ -233,9 +233,9 @@ void Cutscene::Update() {
 
   if (tm.Tick()) {
     if (Beepy)
-      pGl->pSnd->PlaySound(pGl->pr.GetSnd("beep"));
+      pGl->pSnd->PlaySound(pGl->GetSnd("beep"));
     else
-      pGl->pSnd->PlaySound(pGl->pr.GetSnd("boop"));
+      pGl->pSnd->PlaySound(pGl->GetSnd("boop"));
 
     Beepy = !Beepy;
   }

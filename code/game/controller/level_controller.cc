@@ -99,7 +99,7 @@ struct BonusDrawer : public VisualEntity {
             continue;
           }
 
-        ImageSequence img = GetBonusImage(pBns->nNum, pAd->pGl->pr);
+        ImageSequence img = pAd->pGl->GetImgSeq(GetBonusImage(pBns->nNum));
 
         pDr->Draw(img.vImage[nAnimationCounter % img.vImage.size()], p, false);
 
@@ -111,7 +111,7 @@ struct BonusDrawer : public VisualEntity {
       p.x = 3;
 
       for (int i = 0; i < pAd->vDr[nDr]->nFireballCount; ++i) {
-        pDr->Draw(pAd->pGl->pr("fireball_icon").GetImage(), p, false);
+        pDr->Draw(pAd->pGl->GetImgSeq("fireball_icon").GetImage(), p, false);
 
         p.x += 7;
       }
@@ -135,7 +135,7 @@ LevelController::LevelController(DragonGameController *pGl_,
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
       bTakeOffToggle(false), tutOne(std::make_unique<TutorialLevelOne>()),
       tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
-      mc(pGl->pr("claw"), Point()), bTimerFlash(false) {}
+      mc(pGl->GetImgSeq("claw"), Point()), bTimerFlash(false) {}
 
 smart_pointer<Dragon> LevelController::FindDragon(Dragon *p) {
   for (size_t i = 0; i < vDr.size(); ++i)
@@ -182,7 +182,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   t = Timer(lvl.nTimer);
 
   vDr.push_back(make_smart(new Dragon(
-      vCs[0].get(), pSelf, pGl->pr("dragon_stable"), pGl->pr("dragon_fly"),
+      vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"), pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
   if (vDr.back()->pCs != nullptr)
     vDr.back()->pCs->pDrag = vDr.back();
@@ -554,7 +554,7 @@ void LevelController::MegaGeneration(Point p) {
       bGhostTime = true;
 
       if (!pGl->sbMusicOn.Get())
-        pGl->pSnd->PlaySound(pGl->pr.GetSnd("E"));
+        pGl->pSnd->PlaySound(pGl->GetSnd("E"));
 
       if (nLvl > 6)
         pGr->Generate(true);
@@ -569,7 +569,7 @@ void LevelController::MegaGeneration(Point p) {
   } else {
     if (tBlink.Tick()) {
       if (!pGl->sbMusicOn.Get() && !bGhostTime && !bBlink)
-        pGl->pSnd->PlaySound(pGl->pr.GetSnd("D"));
+        pGl->pSnd->PlaySound(pGl->GetSnd("D"));
 
       bBlink = !bBlink;
     }
