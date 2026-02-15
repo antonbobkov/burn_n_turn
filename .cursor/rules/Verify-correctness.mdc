@@ -8,14 +8,14 @@ After finishing requested changes, generate short summary string which can be us
 Assume the workspace is the source directory (code). Build and bin are its
 siblings. From the workspace root:
 
-To make and build: `cd ../build; cmake ../code -G "MinGW Makefiles";
+To make and build: `cd build; cmake ../code -G "MinGW Makefiles";
 mingw32-make`
 
-To build only: `cd ../build; mingw32-make`
+To build only: `cd build; mingw32-make`
 
-To run all tests: `cd ../build; ctest --output-on-failure`. Don't run tests
+To run all tests: `cd build; ctest --output-on-failure`. Don't run tests
 if build didn't succeed.
 
-To run simulation test: `cd ../bin; .\simulation_test.exe`
+To run simulation test: `cd bin; .\simulation_test.exe`
 
 Important: run cmake only from inside the build directory.
