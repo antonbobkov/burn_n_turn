@@ -2,6 +2,7 @@
 #include "dragon_constants.h"
 #include "dragon_macros.h"
 #include "game.h"
+#include "game/dragon_game_runner.h"
 #include "game_utils/game_runner_interface.h"
 #include "utils/smart_pointer.h"
 

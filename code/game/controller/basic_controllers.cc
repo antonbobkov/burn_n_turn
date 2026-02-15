@@ -1,5 +1,6 @@
 #include "game/dragon_constants.h"
 #include "game/game.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
 
@@ -7,7 +8,7 @@
 #include "wrappers/color.h"
 #include <memory>
 
-SimpleController::SimpleController(DragonGameControllerList *pGraph,
+SimpleController::SimpleController(DragonGameController *pGraph,
                                    std::string strFileName)
     : GameController(pGraph) {
   nImage = pGl->pGraph->LoadImage(strFileName);
@@ -24,7 +25,7 @@ void SimpleController::OnKey(GuiKeyType c, bool bUp) {
   pGl->Next();
 }
 
-FlashingController::FlashingController(DragonGameControllerList *pGraph,
+FlashingController::FlashingController(DragonGameController *pGraph,
                                        std::string strFileName,
                                        std::string strTextName)
     : GameController(pGraph), nTimer(0), bShow(true) {
@@ -90,7 +91,7 @@ void EntityListController::AddBackground(Color c) {
   AddV(pBkg);
 }
 
-EntityListController::EntityListController(DragonGameControllerList *pGl_,
+EntityListController::EntityListController(DragonGameController *pGl_,
                                            Rectangle rBound, Color c)
     : GameController(pGl_, rBound), bNoRefresh(false) {
   AddBackground(c);
@@ -188,67 +189,7 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
     Next();
 }
 
-BuyNowController::BuyNowController(DragonGameControllerList *pGl_,
-                                   Rectangle rBound, Color c)
-    : EntityListController(pGl_, rBound, c), t(120), nSlimeCount(50),
-      tVel(nFramesInSecond / 2) {
-  for (int i = 0; i < nSlimeCount; i++) {
-    mSlimes.push_back(make_smart(
-        new Animation(0, pGl->pr("slime"), nFramesInSecond / 10,
-                      Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true)));
-    mSlimeVel.push_back(fPoint());
-    mSlimePos.push_back(mSlimes.back()->pos);
-  }
-
-  bNoRefresh = true;
-}
-
-void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {
-  fVel = RandomAngle();
-
-  if (rand() % 7 == 0)
-    fVel = fPoint(rBound.sz.x / 2, rBound.sz.y / 2) - fPoint(pPos);
-
-  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fSlimeSpeed);
-}
-
-void BuyNowController::DrawSlimes() {
-  for (unsigned i = 0; i < mSlimes.size(); i++)
-    mSlimes[i]->Draw(pGl->pDr);
-}
-
-void BuyNowController::Update() {
-  EntityListController::Update();
-
-  if (tVel.Tick()) {
-    for (unsigned i = 0; i < mSlimes.size(); i++)
-      if (float(rand()) / RAND_MAX < .25)
-        RandomizeVelocity(mSlimeVel[i], mSlimePos[i]);
-  }
-
-  for (unsigned i = 0; i < mSlimes.size(); i++) {
-    mSlimes[i]->Update();
-    mSlimePos[i] += mSlimeVel[i];
-    mSlimes[i]->pos = mSlimePos[i].ToPnt();
-  }
-
-  if (t >= 0)
-    t--;
-
-  pGl->pGraph->RefreshAll();
-}
-
-void BuyNowController::OnKey(GuiKeyType c, bool bUp) {
-  if (t < 0)
-    EntityListController::OnKey(c, bUp);
-}
-
-void BuyNowController::OnMouseDown(Point pPos) {
-  if (t < 0)
-    EntityListController::OnMouseDown(pPos);
-}
-
-Cutscene::Cutscene(DragonGameControllerList *pGl_, Rectangle rBound_,
+Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
       pCrFollow(), bRelease(false), tm(nFramesInSecond / 5), Beepy(true) {
@@ -312,7 +253,7 @@ void DragonScoreController::OnMouseDown(Point pPos) {
     pGl->Next();
 }
 
-DragonScoreController::DragonScoreController(DragonGameControllerList *pGl_,
+DragonScoreController::DragonScoreController(DragonGameController *pGl_,
                                              Rectangle rBound, Color c,
                                              bool bScoreShow)
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),

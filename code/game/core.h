@@ -6,7 +6,7 @@
 struct TowerDataWrap;
 struct MenuController;
 
-struct DragonGameControllerList;
+struct DragonGameController;
 struct GameController;
 
 extern const std::string sFullScreenPath;

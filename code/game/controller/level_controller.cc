@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
 #include "game_utils/draw_utils.h"
 #include "game/dragon_constants.h"
@@ -125,7 +126,7 @@ struct BonusDrawer : public VisualEntity {
 
 static const float fSpreadFactor = 2.0f;
 
-LevelController::LevelController(DragonGameControllerList *pGl_,
+LevelController::LevelController(DragonGameController *pGl_,
                                  Rectangle rBound, Color c,
                                  const LevelLayout &lvl)
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),

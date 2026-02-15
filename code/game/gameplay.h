@@ -9,6 +9,7 @@
 #include "wrappers/gui_key_type.h"
 
 /** Included after critter_generators.h and dragon.h from game.h. */
+struct DragonGameController;
 struct LevelController;
 
 /** Floating "+N" score text at a point; animates then removes. */
@@ -48,10 +49,10 @@ struct SoundControls : public EventEntity {
 /** Draws high score in a rectangle. */
 struct HighScoreShower : public VisualEntity {
   std::string get_class_name() override { return "HighScoreShower"; }
-  DragonGameControllerList *pGl;
+  DragonGameController *pGl;
   Rectangle rBound;
 
-  HighScoreShower(DragonGameControllerList *pGl_, Rectangle rBound_)
+  HighScoreShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
@@ -59,10 +60,10 @@ struct HighScoreShower : public VisualEntity {
 
 struct IntroTextShower : public VisualEntity {
   std::string get_class_name() override { return "IntroTextShower"; }
-  DragonGameControllerList *pGl;
+  DragonGameController *pGl;
   Rectangle rBound;
 
-  IntroTextShower(DragonGameControllerList *pGl_, Rectangle rBound_)
+  IntroTextShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);

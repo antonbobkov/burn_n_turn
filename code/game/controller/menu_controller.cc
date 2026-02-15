@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/menu_controller.h"
 #include "game_utils/draw_utils.h"
 
@@ -50,7 +51,7 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   }
 }
 
-MenuController::MenuController(DragonGameControllerList *pGl_,
+MenuController::MenuController(DragonGameController *pGl_,
                                Rectangle rBound, Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
       pMenuDisplay(), mc(pGl_->pr("claw"), Point()),

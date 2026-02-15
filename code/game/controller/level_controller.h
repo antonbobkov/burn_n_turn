@@ -13,7 +13,7 @@
 
 struct Castle;
 struct Dragon;
-struct DragonGameControllerList;
+struct DragonGameController;
 struct FireballBonusAnimation;
 struct KnightGenerator;
 struct MageGenerator;
@@ -80,7 +80,7 @@ struct LevelController : public EntityListController {
   smart_pointer<TutorialTextEntity> pTutorialText;
 
   LevelController(const LevelController &) = delete;
-  LevelController(DragonGameControllerList *pGl_, Rectangle rBound, Color c,
+  LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
                   const LevelLayout &lvl);
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);

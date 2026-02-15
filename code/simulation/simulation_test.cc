@@ -4,6 +4,7 @@
  */
 
 #include "game/game.h"
+#include "game/dragon_game_runner.h"
 #include "game_utils/MessageWriter.h"
 #include "game_utils/game_runner_interface.h"
 #include "utils/file_utils.h"

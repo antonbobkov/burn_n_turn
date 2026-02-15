@@ -4,10 +4,13 @@ project(TowerDefense LANGUAGES CXX)
 add_library(GameCore STATIC
   core.cc
   game_runner_interface_impl.cc
+  dragon_game_runner.cc
   entities.cc
   level.cc
   tutorial.cc
   controller/basic_controllers.cc
+  controller/buy_now_controller.cc
+  controller/dragon_game_controller.cc
   controller/level_controller.cc
   controller/menu_controller.cc
   fireball.cc
