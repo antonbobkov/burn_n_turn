@@ -1,7 +1,6 @@
 #ifndef TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 #define TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 
-#include "game/level.h"
 #include "game_utils/game_runner_interface.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/geometry.h"
@@ -9,8 +8,11 @@
 
 struct DragonGameController;
 class FilePath;
+struct LevelLayout;
 class FileManager;
 struct FontWriter;
+struct ScalingDrawer;
+struct NumberDrawer;
 
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {
