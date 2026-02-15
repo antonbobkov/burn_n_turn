@@ -1,15 +1,26 @@
-#include "game/core.h"
+#include "game/controller/buy_now_controller.h"
+#include "game/controller/dragon_game_controller.h"
+#include "game/controller/level_controller.h"
+#include "game/controller/menu_controller.h"
 #include "game/dragon_constants.h"
 #include "game/dragon_macros.h"
-#include "game/game.h"
-#include "game_utils/image_sequence.h"
+#include "game/dragon_game_runner.h"
+#include "game/level.h"
 #include "game_utils/Preloader.h"
+#include "game_utils/image_sequence.h"
+#include "game_utils/game_runner_interface.h"
+#include "game_utils/sound_utils.h"
 #include "game_utils/sound_sequence.h"
-#include "game/controller/buy_now_controller.h"
+#include "utils/file_utils.h"
+#include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+#include "wrappers/geometry.h"
+#include "wrappers/font_writer.h"
 
 static void DrawStuff(Rectangle rBound,
-    smart_pointer<GraphicalInterface<Index>> pGraph,
-    smart_pointer<SoundInterface<Index>> pSnd, Preloader &pr, int n) {
+                      smart_pointer<GraphicalInterface<Index>> pGraph,
+                      smart_pointer<SoundInterface<Index>> pSnd, Preloader &pr,
+                      int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;
@@ -49,12 +60,13 @@ static void DrawStuff(Rectangle rBound,
 DragonGameController::DragonGameController(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
     smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
-    smart_pointer<SoundInterface<Index>> pSndRaw_, const std::vector<LevelLayout> &vLvl_,
-    Rectangle rBound_, TowerDataWrap *pWrp_, FilePath *fp)
+    smart_pointer<SoundInterface<Index>> pSndRaw_,
+    const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
+    TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
-      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)), pSndRaw(pSndRaw_),
-      pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))), nScore(0),
-      vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
+      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
+      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))),
+      nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
       pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(), vLevelPointers(3),
       sbTutorialOn(fp, "tutorial_on.txt", true, true),
       snProgress(fp, "stuff.txt", 0, true),
@@ -126,7 +138,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("logo\\gengui.txt", "gengui", Color(0, 0, 0), nScale * 2);
   pr->LoadSeqTS("castle\\castle.txt", "castle", Color(0, 0, 0));
   pr->LoadSeqTS("castle\\destroy_castle_dust.txt", "destroy_castle",
-               Color(0, 0, 0));
+                Color(0, 0, 0));
 
   pr->LoadSeqTS("dragon_fly\\fly.txt", "dragon_fly");
   pr->LoadSeqTS("dragon\\stable.txt", "dragon_stable");
@@ -151,31 +163,32 @@ DragonGameController::DragonGameController(
   DrawStuff(rBound, pGraph, pSndRaw_, *pr, 4);
 
   pr->LoadSeqTS("explosion\\explosion2.txt", "explosion_2", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
   pr->LoadSeqTS("explosion\\laser_expl.txt", "laser_expl_2", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
 
   pr->LoadSeqTS("explosion\\explosion_15.txt", "explosion_3", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
   pr->LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_3",
-               Color(0, 0, 0, 0), nScale * 2);
+                Color(0, 0, 0, 0), nScale * 2);
 
   pr->LoadSeqTS("fireball\\fireball.txt", "fireball");
   pr->LoadSeqTS("fireball\\fireball_15.txt", "fireball_15");
   pr->LoadSeqTS("fireball\\fireball.txt", "fireball_2", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
   pr->LoadSeqTS("fireball\\fireball_15.txt", "fireball_3", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
 
   DrawStuff(rBound, pGraph, pSndRaw_, *pr, 5);
 
   pr->LoadSeqTS("fireball\\laser.txt", "laser");
   pr->LoadSeqTS("fireball\\laser_15.txt", "laser_15");
-  pr->LoadSeqTS("fireball\\laser.txt", "laser_2", Color(0, 0, 0, 0), nScale * 2);
+  pr->LoadSeqTS("fireball\\laser.txt", "laser_2", Color(0, 0, 0, 0),
+                nScale * 2);
   pr->LoadSeqTS("fireball\\laser_15.txt", "laser_3", Color(0, 0, 0, 0),
-               nScale * 2);
+                nScale * 2);
   pr->LoadSeqTS("fireball\\fireball_icon.txt", "fireball_icon",
-               Color(255, 255, 255));
+                Color(255, 255, 255));
 
   DrawStuff(rBound, pGraph, pSndRaw_, *pr, 6);
 
@@ -612,17 +625,13 @@ void DragonGameController::Menu() {
   nActive = 0;
 }
 
-Index &DragonGameController::GetImg(std::string key) {
-  return (*pr)[key];
-}
+Index &DragonGameController::GetImg(std::string key) { return (*pr)[key]; }
 
 ImageSequence &DragonGameController::GetImgSeq(std::string key) {
   return (*pr)(key);
 }
 
-Index &DragonGameController::GetSnd(std::string key) {
-  return pr->GetSnd(key);
-}
+Index &DragonGameController::GetSnd(std::string key) { return pr->GetSnd(key); }
 
 SoundSequence &DragonGameController::GetSndSeq(std::string key) {
   return pr->GetSndSeq(key);

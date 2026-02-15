@@ -1,11 +1,16 @@
-#include "game/dragon_constants.h"
-#include "game/game.h"
+#include "game_utils/game_runner_interface.h"
+#include "game/controller/basic_controllers.h"
 #include "game/controller/dragon_game_controller.h"
+#include "game/controller/game_controller_interface.h"
+#include "game/dragon_constants.h"
+#include "game/dragon_game_runner.h"
+#include "game/entities.h"
+#include "game/level.h"
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
-
-
 #include "wrappers/color.h"
+#include "wrappers/geometry.h"
+#include "wrappers/gui_key_type.h"
 #include <memory>
 
 SimpleController::SimpleController(DragonGameController *pGraph,

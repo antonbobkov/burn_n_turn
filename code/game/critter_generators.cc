@@ -1,10 +1,15 @@
-#include "game.h"
-#include "game/controller/level_controller.h"
+#include "critter_generators.h"
+#include "critters.h"
 #include "dragon_constants.h"
 #include "dragon_macros.h"
+#include "game/controller/dragon_game_controller.h"
+#include "game/controller/level_controller.h"
+#include "game/entities.h"
+#include "game/level.h"
+#include "game/tutorial.h"
 #include "utils/random_utils.h"
 #include "utils/smart_pointer.h"
-
+#include "wrappers/geometry.h"
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(pAdv_) {
@@ -27,8 +32,7 @@ float KnightGenerator::GetRate() {
 }
 
 KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
-                                 LevelController *pBc_,
-                                 const BrokenLine &bl_)
+                                 LevelController *pBc_, const BrokenLine &bl_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       seq(pBc_->pGl->GetImgSeq("knight")), bl(bl_), tm(1), bFirst(false) {
   if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
@@ -57,11 +61,12 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   if (bGolem) {
-    pCr = make_smart(new Knight(
-        Critter(14, p, v * .5, rBound, 3,
-                v.x < 0 ? pBc->pGl->GetImgSeq("golem") : pBc->pGl->GetImgSeq("golem_f"),
-                true),
-        pBc, 'W'));
+    pCr =
+        make_smart(new Knight(Critter(14, p, v * .5, rBound, 3,
+                                      v.x < 0 ? pBc->pGl->GetImgSeq("golem")
+                                              : pBc->pGl->GetImgSeq("golem_f"),
+                                      true),
+                              pBc, 'W'));
   } else if (pBc->bGhostTime) {
     pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
     pCr->cType = 'G';
@@ -104,12 +109,12 @@ void PrincessGenerator::Update() {
 
     vel.Normalize(fPrincessSpeed);
 
-    smart_pointer<Princess> pCr =
-        make_smart(new Princess(Critter(7, p, vel, rBound, 3,
-                                        vel.x < 0 ? pBc->pGl->GetImgSeq("princess_f")
-                                                  : pBc->pGl->GetImgSeq("princess"),
-                                        true),
-                                pBc));
+    smart_pointer<Princess> pCr = make_smart(
+        new Princess(Critter(7, p, vel, rBound, 3,
+                             vel.x < 0 ? pBc->pGl->GetImgSeq("princess_f")
+                                       : pBc->pGl->GetImgSeq("princess"),
+                             true),
+                     pBc));
     if (bFirst) {
       pCr->sUnderText = "capture";
       bFirst = false;
@@ -153,10 +158,12 @@ void MageGenerator::MageGenerate() {
 
   vel.Normalize(fMageSpeed);
 
-  smart_pointer<Mage> pCr = make_smart(new Mage(
-      Critter(7, p, vel, rBound, 3,
-              vel.x < 0 ? pBc->pGl->GetImgSeq("mage_f") : pBc->pGl->GetImgSeq("mage"), true),
-      pBc, pBc->pGl->bAngry));
+  smart_pointer<Mage> pCr =
+      make_smart(new Mage(Critter(7, p, vel, rBound, 3,
+                                  vel.x < 0 ? pBc->pGl->GetImgSeq("mage_f")
+                                            : pBc->pGl->GetImgSeq("mage"),
+                                  true),
+                          pBc, pBc->pGl->bAngry));
   pBc->AddBoth(pCr);
   pBc->lsPpl.push_back(pCr);
 }
@@ -198,11 +205,12 @@ void TraderGenerator::Update() {
     fPoint vel(v);
     vel.Normalize(fTraderSpeed);
 
-    smart_pointer<Trader> pCr = make_smart(new Trader(
-        Critter(7, p, vel, rBound, 3,
-                vel.x < 0 ? pBc->pGl->GetImgSeq("trader") : pBc->pGl->GetImgSeq("trader_f"),
-                true),
-        pBc, bFirstBns));
+    smart_pointer<Trader> pCr = make_smart(
+        new Trader(Critter(7, p, vel, rBound, 3,
+                           vel.x < 0 ? pBc->pGl->GetImgSeq("trader")
+                                     : pBc->pGl->GetImgSeq("trader_f"),
+                           true),
+                   pBc, bFirstBns));
 
     if (bFirst) {
       pCr->sUnderText = "kill";
@@ -226,8 +234,8 @@ void TraderGenerator::Update() {
     v.Normalize(fSkeletonSpeed);
 
     smart_pointer<Knight> pCr = make_smart(new Knight(
-        Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->GetImgSeq("skelly"), true), pAdv,
-        'S'));
+        Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->GetImgSeq("skelly"), true),
+        pAdv, 'S'));
     pAdv->AddBoth(pCr);
     pAdv->lsPpl.push_back(pCr);
   }

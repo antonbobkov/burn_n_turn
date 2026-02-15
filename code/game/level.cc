@@ -1,12 +1,12 @@
-#include "game_utils/draw_utils.h"
 #include "level.h"
 #include "dragon_constants.h"
-#include "game.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
+#include "game_utils/draw_utils.h"
 #include "utils/smart_pointer.h"
-
 #include "utils/file_utils.h"
 #include "wrappers/color.h"
+#include "wrappers/geometry.h"
 
 void Road::Draw(smart_pointer<ScalingDrawer> pDr) {
   unsigned n = pDr->nFactor;

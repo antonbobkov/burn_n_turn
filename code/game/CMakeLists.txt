@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 project(TowerDefense LANGUAGES CXX)
 
 add_library(GameCore STATIC
-  core.cc
   game_runner_interface_impl.cc
   dragon_game_runner.cc
   entities.cc
@@ -17,7 +16,6 @@ add_library(GameCore STATIC
   critters.cc
   critter_generators.cc
   dragon.cc
-  gameplay.cc
 )
 target_include_directories(GameCore PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(GameCore PUBLIC GameUtils)

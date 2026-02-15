@@ -1,11 +1,19 @@
-#include "game.h"
+#include "dragon.h"
+#include "dragon_constants.h"
+#include "dragon_macros.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
+#include "game/critters.h"
+#include "game/entities.h"
+#include "game/fireball.h"
+#include "game/level.h"
+#include "game/tutorial.h"
 #include "game_utils/draw_utils.h"
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
-#include "dragon_constants.h"
-#include "dragon_macros.h"
+#include "wrappers/geometry.h"
 
+int nSlimeMax = 100;
 
 void DragonLeash::ModifyTilt(Point trackball) {
   tilt -= tilt * naturalScaleFactor;
@@ -123,8 +131,9 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 
     nSlimeMax *= 2;
 
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin(),
-                                                     etr = pAd->lsPpl.end();
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator
+             itr = pAd->lsPpl.begin(),
+             etr = pAd->lsPpl.end();
          itr != etr; ++itr)
       if ((*itr)->GetType() == 'K' || (*itr)->GetType() == 'S' ||
           (*itr)->GetType() == 'L') {
@@ -154,8 +163,9 @@ smart_pointer<TimedFireballBonus> Dragon::GetBonus(unsigned n, unsigned nTime) {
 }
 
 void Dragon::FlushBonuses() {
-  for (std::list<smart_pointer<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
-                                                     etr = lsBonuses.end();
+  for (std::list<smart_pointer<TimedFireballBonus>>::iterator
+           itr = lsBonuses.begin(),
+           etr = lsBonuses.end();
        itr != etr; ++itr)
     pAd->pGl->lsBonusesToCarryOver.push_back(*itr);
 }
@@ -173,8 +183,9 @@ FireballBonus Dragon::GetAllBonuses() {
   CleanUp(lsBonuses);
   FireballBonus fbRet(-1, true);
 
-  for (std::list<smart_pointer<TimedFireballBonus>>::iterator itr = lsBonuses.begin(),
-                                                     etr = lsBonuses.end();
+  for (std::list<smart_pointer<TimedFireballBonus>>::iterator
+           itr = lsBonuses.begin(),
+           etr = lsBonuses.end();
        itr != etr; ++itr)
     fbRet += **itr;
 
@@ -183,12 +194,12 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(Castle *pCs_, LevelController *pAd_,
-               ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
+Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
+               ImageSequence imgFly_, ButtonSet bt_)
     : pAd(pAd_), imgStable(imgStable_), imgFly(imgFly_),
       Critter(13,
               pCs_ == nullptr ? pAd_->vCs[0]->GetPosition()
-                             : pCs_->GetPosition(),
+                              : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(pCs_), bt(bt_),
       nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
@@ -261,7 +272,8 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+             pAd->lsPpl.begin();
          itr != pAd->lsPpl.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -491,7 +503,8 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAd->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pAd->lsPpl.begin();
        itr != pAd->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;

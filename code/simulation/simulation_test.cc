@@ -3,7 +3,6 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "game/game.h"
 #include "game/dragon_game_runner.h"
 #include "game_utils/MessageWriter.h"
 #include "game_utils/game_runner_interface.h"
@@ -12,7 +11,6 @@
 #include "wrappers/gui_key_type.h"
 #include "wrappers_mock/GuiMock.h"
 #include "wrappers_mock/SuiMock.h"
-
 
 #include <algorithm>
 #include <catch2/catch.hpp>

@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_BASIC_CONTROLLERS_H
 
 #include "game/controller/game_controller_interface.h"
+#include "utils/index.h"
 #include "utils/smart_pointer.h"
 #include "utils/timer.h"
 #include "wrappers/color.h"
@@ -10,7 +11,6 @@
 #include <list>
 #include <memory>
 #include <vector>
-
 
 struct Animation;
 struct ConsumableEntity;
@@ -85,8 +85,7 @@ struct EntityListController : public GameController {
 
   EntityListController(const EntityListController &) = delete;
   bool bNoRefresh;
-  EntityListController(DragonGameController *pGl_, Rectangle rBound,
-                       Color c);
+  EntityListController(DragonGameController *pGl_, Rectangle rBound, Color c);
 
   /**
    * Each frame: remove dead things from the lists, move everything that can
@@ -107,8 +106,7 @@ struct EntityListController : public GameController {
 
 struct StartScreenController : public EntityListController {
   std::string get_class_name() override { return "StartScreenController"; }
-  StartScreenController(DragonGameController *pGl_, Rectangle rBound,
-                        Color c)
+  StartScreenController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
   /** Advance to next screen and play start_game sound. */
@@ -150,8 +148,8 @@ struct DragonScoreController : public EntityListController {
   Timer t;
   bool bClickToExit;
 
-  DragonScoreController(DragonGameController *pGl_, Rectangle rBound,
-                        Color c, bool bScoreShow);
+  DragonScoreController(DragonGameController *pGl_, Rectangle rBound, Color c,
+                        bool bScoreShow);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void Update();
@@ -165,8 +163,7 @@ struct DragonScoreController : public EntityListController {
  * on input. */
 struct AutoAdvanceController : public EntityListController {
   std::string get_class_name() override { return "AutoAdvanceController"; }
-  AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound,
-                        Color c)
+  AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
   /*virtual*/ void Update();

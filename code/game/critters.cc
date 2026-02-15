@@ -1,13 +1,19 @@
-#include "game.h"
+#include "critters.h"
+#include "critter_generators.h"
+#include "dragon_constants.h"
+#include "dragon.h"
+#include "dragon_macros.h"
+#include "fireball.h"
 #include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
+#include "game/entities.h"
+#include "game/level.h"
+#include "game/tutorial.h"
 #include "game_utils/draw_utils.h"
 #include "game_utils/image_sequence.h"
 #include "utils/random_utils.h"
 #include "utils/smart_pointer.h"
-#include "dragon_constants.h"
-#include "dragon_macros.h"
-
+#include "wrappers/geometry.h"
 
 void SummonSkeletons(LevelController *pAc, Point p) {
   int nNum = 4;
@@ -70,7 +76,8 @@ void Mage::OnHit(char cWhat) {
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f") : pAc->pGl->GetImgSeq("mage_die"),
+      fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f")
+                 : pAc->pGl->GetImgSeq("mage_die"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
@@ -142,7 +149,8 @@ void Trader::OnHit(char cWhat) {
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die") : pAc->pGl->GetImgSeq("trader_die_f"),
+      fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die")
+                 : pAc->pGl->GetImgSeq("trader_die_f"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->AddBoth(pAn);
@@ -196,7 +204,8 @@ void Knight::Update() {
   if (cType == 'S') {
     CleanUp(pAc->lsPpl);
 
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+             pAc->lsPpl.begin();
          itr != pAc->lsPpl.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -288,8 +297,8 @@ void Knight::OnHit(char cWhat) {
 }
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
-    : Critter(8, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("megaslime"),
-              nFramesInSecond / 5),
+    : Critter(8, fPos, fPoint(0, 0), rBound, 3,
+              pAc_->pGl->GetImgSeq("megaslime"), nFramesInSecond / 5),
       pAc(pAc_), nHealth(nSlimeHealthMax) {
   bDieOnExit = false;
 }
@@ -391,7 +400,8 @@ void Ghostiness::Update() {
 
 Slime::Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
              int nGeneration_)
-    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("slime"), true),
+    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("slime"),
+              true),
       pAc(pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
   ++pAc->nSlimeNum;
@@ -416,7 +426,8 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pAc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pAc->lsPpl.begin();
        itr != pAc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -453,7 +464,8 @@ void Slime::OnHit(char cWhat) {
       (*itr)->OnHit('M');
     }
 
-    for (std::list<smart_pointer<Sliminess>>::iterator itr = pAc->lsSliminess.begin();
+    for (std::list<smart_pointer<Sliminess>>::iterator itr =
+             pAc->lsSliminess.begin();
          itr != pAc->lsSliminess.end(); ++itr) {
       if (!(*itr)->bExist)
         continue;
@@ -515,8 +527,7 @@ void Slime::OnHit(char cWhat) {
 
 Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
-    : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_),
-      pSlm() {
+    : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_), pSlm() {
   ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
                             : pAdv->pGl->GetImgSeq("slime_reproduce");
 
@@ -620,8 +631,8 @@ void Mage::Update() {
       if (tSpell.Tick()) {
         bCasting = false;
         Critter::fVel = fMvVel;
-        Critter::seq =
-            fMvVel.x < 0 ? pAc->pGl->GetImgSeq("mage_f") : pAc->pGl->GetImgSeq("mage");
+        Critter::seq = fMvVel.x < 0 ? pAc->pGl->GetImgSeq("mage_f")
+                                    : pAc->pGl->GetImgSeq("mage");
       }
     }
   }
@@ -691,12 +702,12 @@ void Castle::OnKnight(char cWhat) {
       fPoint v = RandomAngle();
       v.Normalize(fPrincessSpeed * 3.F);
 
-      smart_pointer<Princess> pCr =
-          make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                          v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                                                  : pAv->pGl->GetImgSeq("princess"),
-                                          true),
-                                  pAv));
+      smart_pointer<Princess> pCr = make_smart(
+          new Princess(Critter(7, GetPosition(), v, rBound, 0,
+                               v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                                       : pAv->pGl->GetImgSeq("princess"),
+                               true),
+                       pAv));
       pAv->AddBoth(pCr);
       pAv->lsPpl.push_back(pCr);
     }
@@ -711,12 +722,12 @@ void Castle::OnKnight(char cWhat) {
                  cos(r + i * 2 * 3.1415F / nPrincesses));
         v.Normalize(fPrincessSpeed * 3.F);
 
-        smart_pointer<Princess> pCr =
-            make_smart(new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                            v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                                                    : pAv->pGl->GetImgSeq("princess"),
-                                            true),
-                                    pAv));
+        smart_pointer<Princess> pCr = make_smart(
+            new Princess(Critter(7, GetPosition(), v, rBound, 0,
+                                 v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                                         : pAv->pGl->GetImgSeq("princess"),
+                                 true),
+                         pAv));
         pAv->AddBoth(pCr);
         pAv->lsPpl.push_back(pCr);
       }

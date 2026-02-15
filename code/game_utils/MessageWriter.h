@@ -45,4 +45,6 @@ public:
   /*virtual*/ void Write(WriteType wt, std::string strMsg);
 };
 
+extern MessageWriter *pWr;
+
 #endif // MESSAGE_WRITER_HDR_INCLUDE_GUARD_09_04_10_06_07_PM

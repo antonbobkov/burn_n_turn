@@ -1,22 +1,23 @@
-#include "game/game.h"
-#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
-#include "game_utils/draw_utils.h"
-#include "game/dragon_constants.h"
-#include "game/dragon_macros.h"
-#include "game_utils/sound_utils.h"
-#include "game_utils/image_sequence.h"
-#include "utils/random_utils.h"
-#include "wrappers/color.h"
-#include "game/common.h"
-#include "game/core.h"
+#include "game/controller/dragon_game_controller.h"
+#include "game/critter_generators.h"
 #include "game/critters.h"
 #include "game/dragon.h"
+#include "game/dragon_constants.h"
+#include "game/dragon_game_runner.h"
+#include "game/dragon_macros.h"
 #include "game/fireball.h"
-#include "game_utils/game_runner_interface.h"
 #include "game/level.h"
-#include "utils/smart_pointer.h"
 #include "game/tutorial.h"
+#include "game/entities.h"
+#include "game_utils/draw_utils.h"
+#include "game_utils/game_runner_interface.h"
+#include "game_utils/image_sequence.h"
+#include "game_utils/sound_utils.h"
+#include "utils/random_utils.h"
+#include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+#include "wrappers/geometry.h"
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
 struct AdNumberDrawer : public VisualEntity {
@@ -126,9 +127,8 @@ struct BonusDrawer : public VisualEntity {
 
 static const float fSpreadFactor = 2.0f;
 
-LevelController::LevelController(DragonGameController *pGl_,
-                                 Rectangle rBound, Color c,
-                                 const LevelLayout &lvl)
+LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
+                                 Color c, const LevelLayout &lvl)
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
@@ -172,18 +172,17 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    vRd.push_back(
-        make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
+    vRd.push_back(make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
-    vCs.push_back(
-        std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
+    vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
 
   t = Timer(lvl.nTimer);
 
-  vDr.push_back(make_smart(new Dragon(
-      vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"), pGl->GetImgSeq("dragon_fly"),
-      ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
+  vDr.push_back(make_smart(
+      new Dragon(vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"),
+                 pGl->GetImgSeq("dragon_fly"),
+                 ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
   if (vDr.back()->pCs != nullptr)
     vDr.back()->pCs->pDrag = vDr.back();
 
@@ -433,8 +432,7 @@ void LevelController::MegaGeneration() {
 }
 
 void LevelController::MegaGeneration(Point p) {
-  smart_pointer<MegaSliminess> pSlm =
-      make_smart(new MegaSliminess(p, pSelf));
+  smart_pointer<MegaSliminess> pSlm = make_smart(new MegaSliminess(p, pSelf));
   AddE(pSlm);
 }
 

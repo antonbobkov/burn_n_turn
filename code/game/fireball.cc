@@ -1,10 +1,15 @@
-#include "game.h"
+#include "dragon_constants.h"
+#include "dragon_macros.h"
+#include "fireball.h"
+#include "game/controller/dragon_game_controller.h"
 #include "game/controller/level_controller.h"
+#include "game/critters.h"
+#include "game/entities.h"
+#include "game/level.h"
 #include "game_utils/draw_utils.h"
 #include "game_utils/image_sequence.h"
 #include "utils/smart_pointer.h"
-#include "dragon_constants.h"
-#include "dragon_macros.h"
+#include "wrappers/geometry.h"
 
 #include <map>
 #include <ostream>
@@ -14,7 +19,7 @@ template <class T>
 static void Union(std::map<std::string, T> &TarMap,
                   const std::map<std::string, T> &srcMap) {
   for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
-                                                          etr = srcMap.end();
+                                                         etr = srcMap.end();
        itr != etr; ++itr)
     TarMap[itr->first] += itr->second;
 }
@@ -78,7 +83,8 @@ void ChainExplosion::Update() {
 
   CleanUp(pBc->lsPpl);
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -121,7 +127,8 @@ KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
 void KnightOnFire::Update() {
   Critter::Update();
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -237,8 +244,8 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
   else {
     Polar pol(Critter::fVel);
     unsigned n = DiscreetAngle(pol.a, 16);
-    Critter::seq =
-        ImageSequence(pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
+    Critter::seq = ImageSequence(
+        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
 }
 
@@ -247,7 +254,8 @@ void Fireball::Update() {
 
   bool bMultiHit = false;
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr = pBc->lsPpl.begin();
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pBc->lsPpl.begin();
        itr != pBc->lsPpl.end(); ++itr) {
     if (!(*itr)->bExist)
       continue;
@@ -303,18 +311,18 @@ void Fireball::Update() {
 
           if (!fb.bMap["laser"]) {
             pEx = make_smart(new ChainExplosion(
-                AnimationOnce(GetPriority(),
-                              pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
-                              nFramesInSecond / 10, (*itr)->GetPosition(),
-                              true),
+                AnimationOnce(
+                    GetPriority(),
+                    pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
+                    nFramesInSecond / 10, (*itr)->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.uMap["explode"] - 1)));
           } else {
             pEx = make_smart(new ChainExplosion(
-                AnimationOnce(GetPriority(),
-                              pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
-                              nFramesInSecond / 10, (*itr)->GetPosition(),
-                              true),
+                AnimationOnce(
+                    GetPriority(),
+                    pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
+                    nFramesInSecond / 10, (*itr)->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.uMap["explode"] - 1)));
           }
@@ -356,13 +364,13 @@ void CircularFireball::Update() {
   if (fb.bMap["laser"]) {
     Polar pol(Critter::fVel);
     unsigned n = DiscreetAngle(pol.a, 16);
-    Critter::seq =
-        ImageSequence(pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
+    Critter::seq = ImageSequence(
+        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
 }
 
 FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
-                                                LevelController *pAd_)
+                                               LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       bBlink(false), pAd(pAd_), tm(nBonusOnGroundTime), sUnderText("") {
   seq = pAd->pGl->GetImgSeq(GetBonusImage(n));

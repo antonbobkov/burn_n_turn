@@ -1,12 +1,15 @@
-#include "game/game.h"
-#include "game/controller/dragon_game_controller.h"
 #include "game/controller/menu_controller.h"
+#include "game/controller/dragon_game_controller.h"
+#include "game/controller/game_controller_interface.h"
+#include "game/dragon_game_runner.h"
 #include "game_utils/draw_utils.h"
-
-#include "wrappers/color.h"
-#include "utils/file_utils.h"
-#include "game_utils/game_runner_interface.h"
 #include "game_utils/event.h"
+#include "game_utils/game_runner_interface.h"
+#include "utils/file_utils.h"
+#include "utils/smart_pointer.h"
+#include "wrappers/color.h"
+#include "wrappers/geometry.h"
+#include "wrappers/gui_key_type.h"
 
 std::string OnOffString(bool b) {
   if (b)
@@ -51,11 +54,11 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   }
 }
 
-MenuController::MenuController(DragonGameController *pGl_,
-                               Rectangle rBound, Color c, int nResumePosition_)
+MenuController::MenuController(DragonGameController *pGl_, Rectangle rBound,
+                               Color c, int nResumePosition_)
     : EntityListController(pGl_, rBound, c), nResumePosition(nResumePosition_),
-      pMenuDisplay(), mc(pGl_->GetImgSeq("claw"), Point()),
-      pHintText(), pOptionText() {
+      pMenuDisplay(), mc(pGl_->GetImgSeq("claw"), Point()), pHintText(),
+      pOptionText() {
   bNoRefresh = true;
 }
 

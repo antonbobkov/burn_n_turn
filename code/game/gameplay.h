@@ -1,4 +1,0 @@
-#ifndef TOWER_DEFENSE_GAMEPLAY_H
-#define TOWER_DEFENSE_GAMEPLAY_H
-
-#endif
