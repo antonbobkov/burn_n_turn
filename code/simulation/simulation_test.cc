@@ -28,6 +28,24 @@ const std::string kSoundFileName("soundon.txt");
 const unsigned kKeyPressFrames[] = {8, 18, 28};
 const unsigned kKeyPressCount = 3;
 
+/* Longer run: cheats, advance past cutscene, load chapter, late level, game over.
+ */
+const unsigned kGameOverSimulationFrames = 5500;
+const unsigned kCheatAdvancePastCutscene = 4;  /* levels 0->1->2 then cutscene */
+const unsigned kCheatAdvanceToLateLevel = 6;
+
+/* Build list of smart_pointer types with non-zero count, sorted by count desc. */
+std::vector<std::pair<std::string, int>> GetNonZeroSmartPointerCounts() {
+  std::vector<std::pair<std::string, int>> nonzero;
+  for (const auto &entry : g_smart_pointer_count) {
+    if (entry.second != 0)
+      nonzero.push_back({entry.first, entry.second});
+  }
+  std::sort(nonzero.begin(), nonzero.end(),
+            [](const auto &a, const auto &b) { return a.second > b.second; });
+  return nonzero;
+}
+
 } // namespace
 
 TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
@@ -156,13 +174,154 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
     CHECK(b_exit);
   }
 
-  std::vector<std::pair<std::string, int>> nonzero;
-  for (const auto &entry : g_smart_pointer_count) {
-    if (entry.second != 0)
-      nonzero.push_back({entry.first, entry.second});
+  std::vector<std::pair<std::string, int>> nonzero = GetNonZeroSmartPointerCounts();
+  for (const auto &p : nonzero)
+    std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
+              << "\n";
+  std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter << "\n";
+
+  CHECK(nGlobalSuperMegaCounter == 0);
+  CHECK(nonzero.empty());
+}
+
+TEST_CASE("Simulation cheats, load chapter, wait for game over",
+          "[simulation][integration]") {
+  srand(12345);
+
+  {
+    smart_pointer<MockGraphicalInterface> p_mock_gr =
+        make_smart(new MockGraphicalInterface());
+    smart_pointer<GraphicalInterface<Index>> p_gr =
+        make_smart(new SimpleGraphicalInterface<std::string>(p_mock_gr));
+    smart_pointer<MockSoundInterface> p_mock_snd =
+        make_smart(new MockSoundInterface());
+    smart_pointer<SoundInterface<Index>> p_snd =
+        make_smart(new SimpleSoundInterface<std::string>(p_mock_snd));
+
+    std::unique_ptr<StdFileManager> underlying(new StdFileManager());
+    std::unique_ptr<CachingReadOnlyFileManager> fm(
+        new CachingReadOnlyFileManager(underlying.get(), ".txt"));
+
+    /* Enable cheats so the game reads sbCheatsOn true from file at startup. */
+    WriteContentToFile(fm.get(), "cheat.txt", "1");
+
+    bool b_exit = false;
+    bool b_true = true;
+    smart_pointer<Event> p_exit_ev = make_smart(NewSwitchEvent(b_exit, b_true));
+    smart_pointer<MessageWriter> p_msg = make_smart(new EmptyWriter());
+    Size sz(kScreenW, kScreenH);
+
+    ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
+    smart_pointer<DragonGameRunner> p_gl =
+        make_smart(new DragonGameRunner(pe));
+
+    bool reached_game_over = false;
+    unsigned n_cheat_advance_count = 0;
+    unsigned n_cheat_late_count = 0;
+    bool did_load_chapter = false;
+    bool in_wait_phase = false;
+    bool opened_menu_for_chapter = false;
+    unsigned menu_nav_step = 0;
+    unsigned exit_phase = 0;       /* 0=none, 1=from game over, 2=score, ... */
+    unsigned menu_exit_step = 0;
+
+    for (unsigned i = 0; i < kGameOverSimulationFrames && !b_exit; ++i) {
+      std::string screen_name = p_gl->GetActiveControllerName();
+      bool on_game_over =
+          (p_gl->GetActiveControllerIndex() ==
+           p_gl->GetControllerCount() - 2) &&
+          (screen_name == "logo");
+
+      if (on_game_over)
+        reached_game_over = true;
+      if (reached_game_over && exit_phase == 0)
+        exit_phase = 1;
+
+      /* Press Enter to get past logo and start into first level. */
+      if (i >= 8 && i <= 30 && i % 10 == 8)
+        p_gl->KeyDown(GUI_RETURN);
+
+      if (screen_name == "level") {
+        if (!in_wait_phase) {
+          /* Advance a few levels via cheat (past first cutscene). */
+          if (n_cheat_advance_count < kCheatAdvancePastCutscene &&
+              i >= 50 + n_cheat_advance_count * 15) {
+            p_gl->KeyDown(static_cast<GuiKeyType>('\\'));
+            n_cheat_advance_count++;
+          }
+          /* Open menu to load chapter once past first cutscene (level 3); do
+           * it soon so the level timer does not advance the game. */
+          else if (n_cheat_advance_count >= kCheatAdvancePastCutscene &&
+                   !did_load_chapter && !opened_menu_for_chapter && i >= 110) {
+            p_gl->KeyDown(GUI_ESCAPE);
+            opened_menu_for_chapter = true;
+          }
+        }
+        /* After load chapter: advance to one of the last levels via cheat. */
+        if (did_load_chapter && n_cheat_late_count < kCheatAdvanceToLateLevel &&
+            i >= 200 + n_cheat_late_count * 15) {
+          p_gl->KeyDown(static_cast<GuiKeyType>('\\'));
+          n_cheat_late_count++;
+        }
+        /* Start wait phase: do nothing until game over. */
+        if (did_load_chapter &&
+            n_cheat_late_count >= kCheatAdvanceToLateLevel && !in_wait_phase) {
+          in_wait_phase = true;
+        }
+      }
+
+      if (screen_name == "menu" && opened_menu_for_chapter && !did_load_chapter) {
+        /* Main menu: continue=0, restart=1, load chapter=2. Step 0,1: DOWN x2;
+         * step 2: Enter (open load chapter). Step 3: DOWN (chapter 2); 4: Enter.
+         */
+        if (menu_nav_step == 0) {
+          p_gl->KeyDown(GUI_DOWN);
+          p_gl->KeyDown(GUI_DOWN);
+          menu_nav_step = 1;
+        } else if (menu_nav_step == 1) {
+          p_gl->KeyDown(GUI_RETURN);
+          menu_nav_step = 2;
+        } else if (menu_nav_step == 2) {
+          p_gl->KeyDown(GUI_DOWN);
+          menu_nav_step = 3;
+        } else if (menu_nav_step == 3) {
+          p_gl->KeyDown(GUI_RETURN);
+          did_load_chapter = true;
+        }
+      }
+
+      /* Exit the game after game over: game over -> score -> start -> level ->
+       * menu -> select exit. */
+      if (exit_phase == 1 && on_game_over) {
+        p_gl->KeyDown(GUI_RETURN);
+        exit_phase = 2;
+      } else if (exit_phase == 2 && screen_name == "score") {
+        p_gl->KeyDown(GUI_RETURN);
+        exit_phase = 3;
+      } else if (exit_phase == 3 && screen_name == "start") {
+        p_gl->KeyDown(GUI_RETURN);
+        exit_phase = 4;
+      } else if (exit_phase == 4 && screen_name == "level") {
+        p_gl->KeyDown(GUI_ESCAPE);
+        exit_phase = 5;
+      } else if (exit_phase == 5 && screen_name == "menu") {
+        if (menu_exit_step < 4)
+          p_gl->KeyDown(GUI_DOWN);
+        else
+          p_gl->KeyDown(GUI_RETURN);
+        menu_exit_step++;
+      }
+
+      p_gl->Update();
+    }
+
+    CHECK(did_load_chapter);
+    CHECK(reached_game_over);
+    CHECK(b_exit);
   }
-  std::sort(nonzero.begin(), nonzero.end(),
-            [](const auto &a, const auto &b) { return a.second > b.second; });
+
+  std::vector<std::pair<std::string, int>> nonzero =
+      GetNonZeroSmartPointerCounts();
   for (const auto &p : nonzero)
     std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
               << "\n";
