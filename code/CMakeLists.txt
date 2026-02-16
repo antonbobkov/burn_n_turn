@@ -12,11 +12,26 @@ project(Dragongame LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# CMP0169 OLD: silence deprecation warning for FetchContent_Populate().
+# We are silencing: CMake warns that Populate() is deprecated in favour of
+# MakeAvailable(). We use Populate for SDL2, SDL2_image, SDL2_mixer because
+# we fetch pre-built MinGW zips (binaries + headers), not CMake source trees.
+# Populate only downloads and unpacks; we then take paths via GetProperties.
+# MakeAvailable() would try to configure/build the extracted content and is
+# not suitable for these zips. Warning: in a future CMake release Populate
+# may be removed; we would then need another way to download and unpack
+# these dependencies (e.g. ExternalProject or a small script).
+cmake_policy(SET CMP0169 OLD)
+
+# Build all executables into the bin directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin/")
+
 # Catch2 v2 (FetchContent)
 include(FetchContent)
 FetchContent_Declare(
   Catch2
   URL https://github.com/catchorg/Catch2/archive/v2.13.10.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 set(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(Catch2)
@@ -27,6 +42,7 @@ set(SDL2_ARCH "i686-w64-mingw32" CACHE STRING "MinGW arch: i686-w64-mingw32 or x
 FetchContent_Declare(
   SDL2
   URL "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-devel-${SDL2_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_Populate(SDL2)
 FetchContent_GetProperties(SDL2 SOURCE_DIR SDL2_SRC)
@@ -38,6 +54,7 @@ set(SDL2_IMAGE_VERSION "2.8.8" CACHE STRING "SDL2_image release version")
 FetchContent_Declare(
   SDL2_image
   URL "https://github.com/libsdl-org/SDL_image/releases/download/release-${SDL2_IMAGE_VERSION}/SDL2_image-devel-${SDL2_IMAGE_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_Populate(SDL2_image)
 FetchContent_GetProperties(SDL2_image SOURCE_DIR SDL2_IMAGE_SRC)
@@ -48,10 +65,12 @@ set(SDL2_MIXER_VERSION "2.8.1" CACHE STRING "SDL2_mixer release version")
 FetchContent_Declare(
   SDL2_mixer
   URL "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${SDL2_MIXER_VERSION}/SDL2_mixer-devel-${SDL2_MIXER_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_Populate(SDL2_mixer)
 FetchContent_GetProperties(SDL2_mixer SOURCE_DIR SDL2_MIXER_SRC)
 set(SDL_MIXER_PATH "${SDL2_MIXER_SRC}/${SDL2_ARCH}" CACHE PATH "Path to SDL2_mixer (pre-built include + lib)" FORCE)
+
 
 # Copy SDL DLLs to bin so executables find them on first run (no manual copy)
 get_filename_component(SDL_BIN_ABS "${SDL_PATH}/bin" ABSOLUTE
@@ -76,9 +95,6 @@ add_custom_command(TARGET copy_sdl_dlls POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
       "${SDL_MIXER_BIN_ABS}/SDL2_mixer.dll"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-
-# Build all example executables into the code directory (../code from build dir)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin/")
 
 enable_testing()
 
