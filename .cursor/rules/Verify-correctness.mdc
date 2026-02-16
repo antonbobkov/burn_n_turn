@@ -3,8 +3,6 @@ alwaysApply: true
 ---
 After modifying CMake files, run cmake and build. After modifying code, make sure project builds and all tests pass. Even if the build/test issues are unrelated to modified code, fix them anyway. Most important test is simulator_test, always make sure it passes.
 
-After finishing requested changes, generate short summary string which can be used as a commit description.
-
 Assume the workspace is the source directory (code). Build and bin are its
 siblings. From the workspace root:
 
