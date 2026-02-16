@@ -33,3 +33,8 @@ target_include_directories(SDL_ex4_sound PRIVATE
     ${SDL_MIXER_PATH}/include/SDL2)
 target_link_directories(SDL_ex4_sound PRIVATE ${SDL_PATH}/lib ${SDL_MIXER_PATH}/lib)
 target_link_libraries(SDL_ex4_sound PRIVATE mingw32 SDL2main SDL2 SDL2_mixer)
+
+add_dependencies(SDL_ex1_basic copy_sdl_dlls)
+add_dependencies(SDL_ex2_interactive copy_sdl_dlls)
+add_dependencies(SDL_ex3_image copy_sdl_dlls)
+add_dependencies(SDL_ex4_sound copy_sdl_dlls)

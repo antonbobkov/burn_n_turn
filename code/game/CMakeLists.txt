@@ -43,3 +43,4 @@ target_link_libraries(tower_defense PRIVATE
   SDL2_image
   SDL2_mixer
 )
+add_dependencies(tower_defense copy_sdl_dlls)

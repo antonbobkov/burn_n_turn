@@ -80,3 +80,7 @@ target_link_libraries(test_sdl PRIVATE Catch2::Catch2WithMain GuiSdl SuiSdl ming
 
 add_test(NAME test_sdl COMMAND $<TARGET_FILE:test_sdl>)
 set_tests_properties(test_sdl PROPERTIES WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_dependencies(gui_sdl_example copy_sdl_dlls)
+add_dependencies(sui_sdl_example copy_sdl_dlls)
+add_dependencies(test_sdl copy_sdl_dlls)

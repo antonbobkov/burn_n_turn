@@ -53,6 +53,30 @@ FetchContent_Populate(SDL2_mixer)
 FetchContent_GetProperties(SDL2_mixer SOURCE_DIR SDL2_MIXER_SRC)
 set(SDL_MIXER_PATH "${SDL2_MIXER_SRC}/${SDL2_ARCH}" CACHE PATH "Path to SDL2_mixer (pre-built include + lib)" FORCE)
 
+# Copy SDL DLLs to bin so executables find them on first run (no manual copy)
+get_filename_component(SDL_BIN_ABS "${SDL_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+get_filename_component(SDL_IMAGE_BIN_ABS "${SDL_IMAGE_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+get_filename_component(SDL_MIXER_BIN_ABS "${SDL_MIXER_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+add_custom_target(copy_sdl_dlls
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  COMMENT "Copying SDL DLLs to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_BIN_ABS}/SDL2.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_IMAGE_BIN_ABS}/SDL2_image.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_MIXER_BIN_ABS}/SDL2_mixer.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 # Build all example executables into the code directory (../code from build dir)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin/")
 
