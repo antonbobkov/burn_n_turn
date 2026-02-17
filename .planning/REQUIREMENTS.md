@@ -89,25 +89,26 @@ Explicitly excluded. Documented to prevent scope creep.
 
 Which phases cover which requirements. Updated during roadmap creation.
 
-| Requirement | Phase | Status   |
-|-------------|-------|----------|
-| PROC-01     | —     | Pending  |
-| PROC-02    | —     | Pending  |
-| BURN-01    | —     | Pending  |
-| BURN-02    | —     | Pending  |
-| BURN-03    | —     | Pending  |
-| CLEAN-01   | —     | Pending  |
-| REMOVE-01  | —     | Pending  |
-| REMOVE-02  | —     | Pending  |
-| DOC-01     | —     | Pending  |
-| VER-01     | —     | Pending  |
-| VER-02     | —     | Pending  |
+| Requirement | Phase   | Status  |
+|-------------|--------|---------|
+| PROC-01     | Phase 1| Pending |
+| PROC-02     | Phase 1| Pending |
+| PROC-03     | Phase 1| Pending |
+| BURN-01     | Phases 2–5 | Pending |
+| BURN-02     | Phases 2–5 | Pending |
+| BURN-03     | Phases 2–5 | Pending |
+| CLEAN-01    | Phases 2–5 | Pending |
+| REMOVE-01   | Phase 6| Pending |
+| REMOVE-02   | Phase 6| Pending |
+| DOC-01      | Phase 6| Pending |
+| VER-01      | All   | Pending |
+| VER-02      | All   | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️ (to be filled by roadmap)
+- Mapped to phases: 12
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2025-02-16*
-*Last updated: 2025-02-16 after adjustment (no migrate if lifetime unclear; end summary)*
+*Last updated: 2025-02-16 after roadmap creation (traceability filled)*
