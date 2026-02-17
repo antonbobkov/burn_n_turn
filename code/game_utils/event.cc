@@ -6,6 +6,11 @@ void Trigger(smart_pointer<Event> pE) {
     pE->Trigger();
 }
 
+void Trigger(Event* pE) {
+  if (pE)
+    pE->Trigger();
+}
+
 void SequenceOfEvents::Trigger() {
   for (size_t i = 0, sz = vEv.size(); i < sz; ++i)
     ::Trigger(vEv[i]);

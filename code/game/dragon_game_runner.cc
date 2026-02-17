@@ -11,16 +11,16 @@
 
 MessageWriter *pWr = 0;
 
-DragonGameRunner::DragonGameRunner(ProgramEngine pe) {
+DragonGameRunner::DragonGameRunner(ProgramEngine const& pe) {
   pData = new TowerDataWrap(pe);
 }
 
 DragonGameRunner::~DragonGameRunner() { delete pData; }
 
-TowerDataWrap::TowerDataWrap(ProgramEngine pe) {
+TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
   szActualRez = pe.szActualRez;
 
-  pExitProgram = pe.pExitProgram;
+  pExitProgram = pe.pExitProgram.get();
 
   pWr = pe.pMsg.get();
 

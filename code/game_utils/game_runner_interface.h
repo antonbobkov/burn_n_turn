@@ -5,6 +5,7 @@
 #include "utils/smart_pointer.h"
 #include "wrappers/gui_key_type.h"
 
+#include <memory>
 #include "MessageWriter.h"
 #include "wrappers/GuiGen.h"
 #include "wrappers/SuiGen.h"
@@ -32,36 +33,39 @@ struct ProgramInfo {
 ProgramInfo GetProgramInfo();
 
 struct ProgramEngine {
-  smart_pointer<Event> pExitProgram;
+  std::unique_ptr<Event> pExitProgram;
 
   smart_pointer<GraphicalInterface<Index>> pGr;
   smart_pointer<SoundInterface<Index>> pSndMng;
-  smart_pointer<MessageWriter> pMsg;
+  std::unique_ptr<MessageWriter> pMsg;
 
   FileManager *p_fm;
 
   Size szScreenRez;
   Size szActualRez;
 
-  ProgramEngine(smart_pointer<Event> pExitProgram_,
+  ProgramEngine(std::unique_ptr<Event> pExitProgram_,
                 smart_pointer<GraphicalInterface<Index>> pGr_,
                 smart_pointer<SoundInterface<Index>> pSndMng_,
-                smart_pointer<MessageWriter> pMsg_, FileManager *p_fm_)
-      : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
-        p_fm(p_fm_) {
+                std::unique_ptr<MessageWriter> pMsg_, FileManager *p_fm_)
+      : pExitProgram(std::move(pExitProgram_)), pGr(pGr_), pSndMng(pSndMng_),
+        pMsg(std::move(pMsg_)), p_fm(p_fm_) {
     szScreenRez = GetProgramInfo().szScreenRez;
     szActualRez = szScreenRez;
   }
 
-  ProgramEngine(smart_pointer<Event> pExitProgram_,
+  ProgramEngine(std::unique_ptr<Event> pExitProgram_,
                 smart_pointer<GraphicalInterface<Index>> pGr_,
                 smart_pointer<SoundInterface<Index>> pSndMng_,
-                smart_pointer<MessageWriter> pMsg_, Size szScreenRez_,
+                std::unique_ptr<MessageWriter> pMsg_, Size szScreenRez_,
                 FileManager *p_fm_)
-      : pExitProgram(pExitProgram_), pGr(pGr_), pSndMng(pSndMng_), pMsg(pMsg_),
-        p_fm(p_fm_), szScreenRez(szScreenRez_) {
+      : pExitProgram(std::move(pExitProgram_)), pGr(pGr_), pSndMng(pSndMng_),
+        pMsg(std::move(pMsg_)), p_fm(p_fm_), szScreenRez(szScreenRez_) {
     szActualRez = szScreenRez;
   }
+
+  ProgramEngine(ProgramEngine const&) = delete;
+  ProgramEngine& operator=(ProgramEngine const&) = delete;
 
   FileManager *GetFileManager() const { return p_fm; }
 };
@@ -81,6 +85,6 @@ public:
   virtual void Fire() {}
 };
 
-smart_pointer<GameRunner> GetGameRunner(ProgramEngine pe);
+smart_pointer<GameRunner> GetGameRunner(ProgramEngine const& pe);
 
 #endif // GAME_RUNNER_INTERFACE_H

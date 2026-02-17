@@ -7,13 +7,15 @@
 building and all tests (especially simulation_test) must pass after every
 change.
 
-**Current focus:** Phase 1 — Process and leaf (game_utils)
+**Current focus:** Phase 2 — Wrappers and platform types
 
-**Completed:** None. Roadmap and requirements defined; ready to execute
-Phase 1.
+**Completed:** Phase 1 (Process and leaf game_utils). MessageWriter migrated
+to unique_ptr, SP_Info removed. Event (exit) migrated to unique_ptr at
+ProgramEngine, Event* elsewhere; Event keeps SP_Info until SequenceOfEvents
+migrated. Build and all tests pass.
 
-**Next:** Run `/gsd-discuss-phase 1` to gather context and clarify approach,
-or `/gsd-plan-phase 1` to plan Phase 1 directly.
+**Next:** /gsd-discuss-phase 2 or /gsd-plan-phase 2 for wrappers and platform
+types.
 
 ---
-*Last updated: 2025-02-16 after roadmap creation*
+*Last updated: 2025-02-16 after Phase 1 execution*

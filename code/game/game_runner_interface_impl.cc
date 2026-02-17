@@ -46,6 +46,6 @@ ProgramInfo GetProgramInfo() {
   return inf;
 }
 
-smart_pointer<GameRunner> GetGameRunner(ProgramEngine pe) {
+smart_pointer<GameRunner> GetGameRunner(ProgramEngine const& pe) {
   return make_smart(new DragonGameRunner(pe));
 }

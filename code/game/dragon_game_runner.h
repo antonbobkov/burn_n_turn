@@ -17,11 +17,11 @@ struct NumberDrawer;
 /** Holds exit event and graphics/sound interfaces for tower game setup. */
 class TowerDataWrap {
 public:
-  TowerDataWrap(ProgramEngine pe);
+  TowerDataWrap(ProgramEngine const& pe);
 
   FilePath *GetFilePath() const { return fp_.get(); }
 
-  smart_pointer<Event> pExitProgram;
+  Event* pExitProgram;
 
   smart_pointer<GraphicalInterface<Index>> pGr;
   smart_pointer<SoundInterface<Index>> pSm;
@@ -46,7 +46,7 @@ class DragonGameRunner : public GameRunner {
 
 public:
   std::string get_class_name() override { return "DragonGameRunner"; }
-  DragonGameRunner(ProgramEngine pe);
+  DragonGameRunner(ProgramEngine const& pe);
   ~DragonGameRunner();
 
   /*virtual*/ void Update();

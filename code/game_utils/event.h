@@ -7,6 +7,7 @@
 
 class Event : virtual public SP_Info {
   friend void Trigger(smart_pointer<Event> pE);
+  friend void Trigger(Event* pE);
 
   virtual void Trigger() = 0;
 
@@ -16,6 +17,7 @@ public:
 };
 
 void Trigger(smart_pointer<Event> pE);
+void Trigger(Event* pE);
 
 class EmptyEvent : public Event {
 public:

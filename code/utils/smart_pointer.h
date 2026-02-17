@@ -131,6 +131,7 @@ public:
   }
 
   T *get() { return pPointTo; }
+  T *get() const { return pPointTo; }
 
   bool is_null() const { return pPointTo == 0; }
 };

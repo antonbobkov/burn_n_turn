@@ -70,11 +70,13 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
 
     bool b_exit = false;
     bool b_true = true;
-    smart_pointer<Event> p_exit_ev = make_smart(NewSwitchEvent(b_exit, b_true));
-    smart_pointer<MessageWriter> p_msg = make_smart(new EmptyWriter());
+    auto p_exit_ev =
+        std::make_unique<SwitchEvent<bool, bool>>(b_exit, b_true);
+    auto p_msg = std::make_unique<EmptyWriter>();
     Size sz(kScreenW, kScreenH);
 
-    ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
+    ProgramEngine pe(std::move(p_exit_ev), p_gr, p_snd, std::move(p_msg), sz,
+                     fm.get());
     smart_pointer<DragonGameRunner> p_gl = make_smart(new DragonGameRunner(pe));
 
     bool reached_level = false;
@@ -207,11 +209,13 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
 
     bool b_exit = false;
     bool b_true = true;
-    smart_pointer<Event> p_exit_ev = make_smart(NewSwitchEvent(b_exit, b_true));
-    smart_pointer<MessageWriter> p_msg = make_smart(new EmptyWriter());
+    auto p_exit_ev =
+        std::make_unique<SwitchEvent<bool, bool>>(b_exit, b_true);
+    auto p_msg = std::make_unique<EmptyWriter>();
     Size sz(kScreenW, kScreenH);
 
-    ProgramEngine pe(p_exit_ev, p_gr, p_snd, p_msg, sz, fm.get());
+    ProgramEngine pe(std::move(p_exit_ev), p_gr, p_snd, std::move(p_msg), sz,
+                     fm.get());
     smart_pointer<DragonGameRunner> p_gl =
         make_smart(new DragonGameRunner(pe));
 

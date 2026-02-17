@@ -1,9 +1,12 @@
 #include <iostream>
 #include <map>
+#include <memory>
 #include <time.h>
 #include <vector>
 
+#include "game_utils/event.h"
 #include "game_utils/game_runner_interface.h"
+#include "game_utils/MessageWriter.h"
 #include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/color.h"
@@ -94,8 +97,9 @@ int main(int argc, char *argv[]) {
     }
 
     std::unique_ptr<FileManager> fm(new StdFileManager());
-    ProgramEngine pe(make_smart(NewSwitchEvent(bExit, bTrue)), pGr, pSndMng,
-                     make_smart(new IoWriter()), inf.szScreenRez, fm.get());
+    ProgramEngine pe(
+        std::make_unique<SwitchEvent<bool, bool>>(bExit, bTrue), pGr, pSndMng,
+        std::make_unique<IoWriter>(), inf.szScreenRez, fm.get());
 
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);
