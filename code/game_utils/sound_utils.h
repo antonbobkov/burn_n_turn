@@ -16,11 +16,11 @@ template <class T> class SoundInterface;
  * (Toggle/Get). */
 class SoundInterfaceProxy : virtual public SP_Info {
   bool bSoundOn;
-  smart_pointer<SoundInterface<Index>> pSndRaw;
+  SoundInterface<Index> *pSndRaw;
 
 public:
   std::string get_class_name() override { return "SoundInterfaceProxy"; }
-  SoundInterfaceProxy(smart_pointer<SoundInterface<Index>> pSndRaw_)
+  SoundInterfaceProxy(SoundInterface<Index> *pSndRaw_)
       : pSndRaw(pSndRaw_), bSoundOn(true) {}
 
   void PlaySound(Index i, int nChannel = -1, bool bLoop = false);
@@ -34,11 +34,11 @@ public:
 struct BackgroundMusicPlayer {
   int nCurrTheme;
   std::vector<Index> vThemes;
-  smart_pointer<SoundInterface<Index>> pSnd;
+  SoundInterface<Index> *pSnd;
 
   bool bOff;
 
-  BackgroundMusicPlayer() : nCurrTheme(-1), pSnd(), bOff(false) {}
+  BackgroundMusicPlayer() : nCurrTheme(-1), pSnd(nullptr), bOff(false) {}
 
   void SwitchTheme(int nTheme);
   void StopMusic();

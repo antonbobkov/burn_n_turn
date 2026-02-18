@@ -7,7 +7,6 @@
 
 class SdlSoundInterface : public SoundInterface<Mix_Chunk *> {
 public:
-  std::string get_class_name() override { return "SdlSoundInterface"; }
   SdlSoundInterface();
 
   /*virtual*/ void DeleteSound(Mix_Chunk *pSnd);

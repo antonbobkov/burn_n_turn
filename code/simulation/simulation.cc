@@ -50,15 +50,13 @@ void RunSimulation() {
   srand(12345);
 
   std::cout << "[sim] Creating mocks and file manager\n";
-  smart_pointer<MockGraphicalInterface> p_mock_gr =
-      make_smart(new MockGraphicalInterface());
-  smart_pointer<GraphicalInterface<Index>> p_gr =
-      make_smart(new SimpleGraphicalInterface<std::string>(p_mock_gr));
+  auto p_mock_gr = std::make_unique<MockGraphicalInterface>();
+  auto p_gr = std::make_unique<SimpleGraphicalInterface<std::string>>(
+      p_mock_gr.get());
 
-  smart_pointer<MockSoundInterface> p_mock_snd =
-      make_smart(new MockSoundInterface());
-  smart_pointer<SoundInterface<Index>> p_snd =
-      make_smart(new SimpleSoundInterface<std::string>(p_mock_snd));
+  auto p_mock_snd = std::make_unique<MockSoundInterface>();
+  auto p_snd = std::make_unique<SimpleSoundInterface<std::string>>(
+      p_mock_snd.get());
 
   std::unique_ptr<StdFileManager> underlying(new StdFileManager());
   std::unique_ptr<CachingReadOnlyFileManager> fm(
@@ -72,8 +70,8 @@ void RunSimulation() {
   Size sz(kScreenW, kScreenH);
 
   std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
-  ProgramEngine pe(std::move(p_exit_ev), p_gr, p_snd, std::move(p_msg), sz,
-                   fm.get());
+  ProgramEngine pe(std::move(p_exit_ev), p_gr.get(), p_snd.get(),
+                   std::move(p_msg), sz, fm.get());
   smart_pointer<DragonGameRunner> p_gl = make_smart(new DragonGameRunner(pe));
 
   std::string sound_content_before;

@@ -19,9 +19,9 @@ template <class T> class GraphicalInterface;
 /** Base for drawing an image at a point; ScalingDrawer adds scale and color
  * key. */
 struct Drawer : virtual public SP_Info {
-  smart_pointer<GraphicalInterface<Index>> pGr;
+  GraphicalInterface<Index> *pGr;
 
-  Drawer() : pGr() {}
+  Drawer() : pGr(nullptr) {}
   std::string get_class_name() override { return "Drawer"; }
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
@@ -32,7 +32,7 @@ struct ScalingDrawer : public Drawer {
   unsigned nFactor;
   Color cTr;
 
-  ScalingDrawer(smart_pointer<GraphicalInterface<Index>> pGr_,
+  ScalingDrawer(GraphicalInterface<Index> *pGr_,
                 unsigned nFactor_,
                 Color cTr_ = Color(0, 255, 255))
       : nFactor(nFactor_), cTr(cTr_) {

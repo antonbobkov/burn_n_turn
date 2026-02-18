@@ -29,7 +29,6 @@ private:
  * return unique keys (suffix _0, _1, ...). Never reuses the same object. */
 class MockGraphicalInterface : public GraphicalInterface<std::string> {
 public:
-  std::string get_class_name() override { return "MockGraphicalInterface"; }
   MockGraphicalInterface() : next_id_(0) {}
 
   /*virtual*/ void DeleteImage(std::string pImg);

@@ -35,8 +35,8 @@ ProgramInfo GetProgramInfo();
 struct ProgramEngine {
   std::unique_ptr<Event> pExitProgram;
 
-  smart_pointer<GraphicalInterface<Index>> pGr;
-  smart_pointer<SoundInterface<Index>> pSndMng;
+  GraphicalInterface<Index> *pGr;
+  SoundInterface<Index> *pSndMng;
   std::unique_ptr<MessageWriter> pMsg;
 
   FileManager *p_fm;
@@ -45,8 +45,8 @@ struct ProgramEngine {
   Size szActualRez;
 
   ProgramEngine(std::unique_ptr<Event> pExitProgram_,
-                smart_pointer<GraphicalInterface<Index>> pGr_,
-                smart_pointer<SoundInterface<Index>> pSndMng_,
+                GraphicalInterface<Index> *pGr_,
+                SoundInterface<Index> *pSndMng_,
                 std::unique_ptr<MessageWriter> pMsg_, FileManager *p_fm_)
       : pExitProgram(std::move(pExitProgram_)), pGr(pGr_), pSndMng(pSndMng_),
         pMsg(std::move(pMsg_)), p_fm(p_fm_) {
@@ -55,8 +55,8 @@ struct ProgramEngine {
   }
 
   ProgramEngine(std::unique_ptr<Event> pExitProgram_,
-                smart_pointer<GraphicalInterface<Index>> pGr_,
-                smart_pointer<SoundInterface<Index>> pSndMng_,
+                GraphicalInterface<Index> *pGr_,
+                SoundInterface<Index> *pSndMng_,
                 std::unique_ptr<MessageWriter> pMsg_, Size szScreenRez_,
                 FileManager *p_fm_)
       : pExitProgram(std::move(pExitProgram_)), pGr(pGr_), pSndMng(pSndMng_),

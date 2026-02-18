@@ -18,8 +18,8 @@
 #include "wrappers/font_writer.h"
 
 static void DrawStuff(Rectangle rBound,
-                      smart_pointer<GraphicalInterface<Index>> pGraph,
-                      smart_pointer<SoundInterface<Index>> pSnd, Preloader &pr,
+                      GraphicalInterface<Index> *pGraph,
+                      SoundInterface<Index> *pSnd, Preloader &pr,
                       int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
@@ -59,13 +59,13 @@ static void DrawStuff(Rectangle rBound,
 
 DragonGameController::DragonGameController(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
-    smart_pointer<NumberDrawer> pBigNum_, smart_pointer<FontWriter> pFancyNum_,
-    smart_pointer<SoundInterface<Index>> pSndRaw_,
+    smart_pointer<NumberDrawer> pBigNum_, FontWriter *pFancyNum_,
+    SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     TowerDataWrap *pWrp_, FilePath *fp)
     : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
-      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw))),
+      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw_))),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
       pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(), vLevelPointers(3),
       sbTutorialOn(fp, "tutorial_on.txt", true, true),

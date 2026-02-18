@@ -5,8 +5,8 @@
 
 #include "GuiSdl.h"
 #include "SuiSdl.h"
-#include "utils/smart_pointer.h"
 #include <SDL.h>
+#include <memory>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <catch2/catch.hpp>
@@ -41,8 +41,7 @@ TEST_CASE("SDL image and sound load", "[sdl]") {
 }
 
 TEST_CASE("SdlGraphicalInterface::LoadImage", "[sdl][gui]") {
-  smart_pointer<SdlGraphicalInterface> pGr =
-      make_smart(new SdlGraphicalInterface(Size(640, 480)));
+  auto pGr = std::make_unique<SdlGraphicalInterface>(Size(640, 480));
   SdlImage *pImg = pGr->LoadImage("test_image.bmp");
   REQUIRE(pImg != nullptr);
   pGr->DeleteImage(pImg);
@@ -50,7 +49,7 @@ TEST_CASE("SdlGraphicalInterface::LoadImage", "[sdl][gui]") {
 
 TEST_CASE("SdlSoundInterface::LoadSound", "[sdl][sui]") {
   REQUIRE(SDL_Init(SDL_INIT_AUDIO) >= 0);
-  smart_pointer<SdlSoundInterface> pSnd = make_smart(new SdlSoundInterface());
+  auto pSnd = std::make_unique<SdlSoundInterface>();
   Mix_Chunk *chunk = pSnd->LoadSound("test_sound.wav");
   REQUIRE(chunk != nullptr);
   pSnd->DeleteSound(chunk);

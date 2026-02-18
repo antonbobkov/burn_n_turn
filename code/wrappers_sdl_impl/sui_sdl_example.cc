@@ -8,13 +8,12 @@
  */
 
 #include "SuiSdl.h"
-#include "utils/smart_pointer.h"
-
 #include "utils/exception.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <iostream>
+#include <memory>
 
 int main(int argc, char **args) {
   std::cout << "[sui_sdl_example] Starting...\n";
@@ -27,8 +26,8 @@ int main(int argc, char **args) {
     return 1;
   }
 
-  smart_pointer<SdlSoundInterface> pSnd = make_smart(new SdlSoundInterface());
-  SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd);
+  auto pSnd = std::make_unique<SdlSoundInterface>();
+  SimpleSoundInterface<Mix_Chunk *> soundIf(pSnd.get());
 
   SDL_Window *window =
       SDL_CreateWindow("sui_sdl_example", SDL_WINDOWPOS_UNDEFINED,
@@ -108,7 +107,7 @@ int main(int argc, char **args) {
     Mix_FreeMusic(music);
   if (soundLoaded)
     soundIf.DeleteSound(sndIndex);
-  pSnd = smart_pointer<SdlSoundInterface>();
+  pSnd.reset();
 
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);

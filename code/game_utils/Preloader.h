@@ -37,8 +37,8 @@
 
 /** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {
-  smart_pointer<GraphicalInterface<Index>> pGr;
-  ImageFlipper(smart_pointer<GraphicalInterface<Index>> pGr_);
+  GraphicalInterface<Index> *pGr;
+  ImageFlipper(GraphicalInterface<Index> *pGr_);
   void operator()(Index &img);
 };
 
@@ -46,12 +46,11 @@ struct ImageFlipper {
 struct ImagePainter {
   typedef std::pair<Color, Color> ColorMap;
 
-  smart_pointer<GraphicalInterface<Index>> pGr;
+  GraphicalInterface<Index> *pGr;
   std::vector<ColorMap> vTr;
 
-  ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_, Color cFrom,
-               Color cTo);
-  ImagePainter(smart_pointer<GraphicalInterface<Index>> pGr_,
+  ImagePainter(GraphicalInterface<Index> *pGr_, Color cFrom, Color cTo);
+  ImagePainter(GraphicalInterface<Index> *pGr_,
                const std::vector<ColorMap> &vTr_);
   /** Copy image and apply all vTr color replacements (from -> to). */
   void operator()(Index &img);
@@ -93,8 +92,8 @@ public:
 class Preloader : virtual public SP_Info {
 public:
   std::string get_class_name() override { return "Preloader"; }
-  Preloader(smart_pointer<GraphicalInterface<Index>> pGr_,
-            smart_pointer<SoundInterface<Index>> pSn_, FilePath *fp);
+  Preloader(GraphicalInterface<Index> *pGr_,
+            SoundInterface<Index> *pSn_, FilePath *fp);
 
   /** Image index by key; throws if not found. */
   Index &operator[](std::string key);
@@ -161,8 +160,8 @@ private:
 
   FilePath *fp_;
 
-  smart_pointer<GraphicalInterface<Index>> pGr;
-  smart_pointer<SoundInterface<Index>> pSn;
+  GraphicalInterface<Index> *pGr;
+  SoundInterface<Index> *pSn;
 };
 
 #endif // PRELOADER_HEADER_02_20_10_09_09

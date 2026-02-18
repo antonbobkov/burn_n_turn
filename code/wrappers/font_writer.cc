@@ -8,7 +8,7 @@
 #include <sstream>
 
 FontWriter::FontWriter(FilePath *fp, std::string sFont,
-                       smart_pointer<GraphicalInterface<Index>> pGr_,
+                       GraphicalInterface<Index> *pGr_,
                        unsigned nZoom)
     : vImgIndx(256, -1), pGr(pGr_) {
   sFont = fp->GetRelativePath(sFont);

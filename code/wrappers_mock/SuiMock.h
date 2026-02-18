@@ -9,7 +9,6 @@
  * other ops are no-op. */
 class MockSoundInterface : public SoundInterface<std::string> {
 public:
-  std::string get_class_name() override { return "MockSoundInterface"; }
   /*virtual*/ void DeleteSound(std::string snd);
   /*virtual*/ std::string LoadSound(std::string sFile);
   /*virtual*/ void PlaySound(std::string snd, int nChannel, bool bLoop);

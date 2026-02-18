@@ -2,11 +2,10 @@
 #define SUIGEN_ALREADY_INCLUDED_08_25
 
 #include "utils/index.h"
-#include "utils/smart_pointer.h"
+#include <string>
 
-template <class SndHndl> class SoundInterface : virtual public SP_Info {
+template <class SndHndl> class SoundInterface {
 public:
-  std::string get_class_name() override { return "SoundInterface"; }
   virtual ~SoundInterface() {}
 
   virtual void DeleteSound(SndHndl snd) = 0;
@@ -20,13 +19,12 @@ public:
 
 template <class SndHndl>
 class SimpleSoundInterface : public SoundInterface<Index>, public IndexRemover {
-  std::string get_class_name() override { return "SimpleSoundInterface"; }
-  smart_pointer<SoundInterface<SndHndl>> pSn;
+  SoundInterface<SndHndl> *pSn;
 
   IndexKeeper<SndHndl> kp;
 
 public:
-  SimpleSoundInterface(smart_pointer<SoundInterface<SndHndl>> pSn_)
+  SimpleSoundInterface(SoundInterface<SndHndl> *pSn_)
       : pSn(pSn_) {}
 
   /*virtual*/ void DeleteSound(Index snd);
@@ -40,7 +38,6 @@ public:
 };
 
 template <class T> class DummySoundInterface : public SoundInterface<T> {
-  std::string get_class_name() override { return "DummySoundInterface"; }
   /*virtual*/ void DeleteSound(T snd){};
   /*virtual*/ T LoadSound(std::string sFile) { return T(); }
 

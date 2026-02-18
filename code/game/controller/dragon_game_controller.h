@@ -36,13 +36,13 @@ struct DragonGameController {
 
   smart_pointer<MenuController> pMenu;
 
-  smart_pointer<GraphicalInterface<Index>> pGraph;
+  GraphicalInterface<Index> *pGraph;
   smart_pointer<ScalingDrawer> pDr;
   smart_pointer<NumberDrawer> pNum;
   smart_pointer<NumberDrawer> pBigNum;
-  smart_pointer<FontWriter> pFancyNum;
+  FontWriter *pFancyNum;
 
-  smart_pointer<SoundInterface<Index>> pSndRaw;
+  SoundInterface<Index> *pSndRaw;
   smart_pointer<SoundInterfaceProxy> pSnd;
 
   std::vector<LevelLayout> vLvl;
@@ -69,8 +69,8 @@ struct DragonGameController {
   DragonGameController(smart_pointer<ScalingDrawer> pDr_,
                        smart_pointer<NumberDrawer> pNum_,
                        smart_pointer<NumberDrawer> pBigNum_,
-                       smart_pointer<FontWriter> pFancyNum_,
-                       smart_pointer<SoundInterface<Index>> pSndRaw_,
+                       FontWriter *pFancyNum_,
+                       SoundInterface<Index> *pSndRaw_,
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
                        TowerDataWrap *pWrp_, FilePath *fp);
 

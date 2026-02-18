@@ -7,19 +7,19 @@
  */
 
 #include "GuiSdl.h"
-#include "utils/smart_pointer.h"
-
 #include "wrappers/color.h"
+
 #include <iostream>
+#include <memory>
 
 int main(int argc, char **args) {
   std::cout << "[gui_sdl_example] Starting...\n";
 
   const char *imageFile = (argc > 1) ? args[1] : "test_image.bmp";
 
-  smart_pointer<SdlGraphicalInterface> pGr;
+  std::unique_ptr<SdlGraphicalInterface> pGr;
   try {
-    pGr = make_smart(new SdlGraphicalInterface(Size(640, 480)));
+    pGr = std::make_unique<SdlGraphicalInterface>(Size(640, 480));
   } catch (GraphicalInterfaceException &e) {
     std::cerr << "SdlGraphicalInterface init failed: " << e.GetDescription(true)
               << "\n";
@@ -62,7 +62,7 @@ int main(int argc, char **args) {
   if (pImg)
     pGr->DeleteImage(pImg);
 
-  pGr = smart_pointer<SdlGraphicalInterface>();
+  pGr.reset();
   /* Destructor calls SDL_Quit(). */
 
   std::cout << "[gui_sdl_example] Exiting.\n";

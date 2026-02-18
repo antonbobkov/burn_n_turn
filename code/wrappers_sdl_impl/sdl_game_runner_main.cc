@@ -75,15 +75,14 @@ int main(int argc, char *argv[]) {
 
     Rectangle rOffSet = sBound;
 
-    smart_pointer<SdlGraphicalInterface> pGraph = make_smart(
-        new SdlGraphicalInterface(sBound.sz, inf.bFullScreen, rOffSet));
-    smart_pointer<GraphicalInterface<Index>> pGr =
-        make_smart(new SimpleGraphicalInterface<SdlImage *>(pGraph));
+    auto pGraph = std::make_unique<SdlGraphicalInterface>(
+        sBound.sz, inf.bFullScreen, rOffSet);
+    auto pGr = std::make_unique<SimpleGraphicalInterface<SdlImage *>>(
+        pGraph.get());
 
-    smart_pointer<SdlSoundInterface> pSound =
-        make_smart(new SdlSoundInterface());
-    smart_pointer<SoundInterface<Index>> pSndMng =
-        make_smart(new SimpleSoundInterface<Mix_Chunk *>(pSound));
+    auto pSound = std::make_unique<SdlSoundInterface>();
+    auto pSndMng = std::make_unique<SimpleSoundInterface<Mix_Chunk *>>(
+        pSound.get());
 
     // SDL_WM_SetIcon(SDL_LoadBMP("icon\\game_icon.bmp"), NULL);
     // pGraph->SetIcon("icon\\game_icon.bmp");
@@ -98,8 +97,8 @@ int main(int argc, char *argv[]) {
 
     std::unique_ptr<FileManager> fm(new StdFileManager());
     ProgramEngine pe(
-        std::make_unique<SwitchEvent<bool, bool>>(bExit, bTrue), pGr, pSndMng,
-        std::make_unique<IoWriter>(), inf.szScreenRez, fm.get());
+        std::make_unique<SwitchEvent<bool, bool>>(bExit, bTrue), pGr.get(),
+        pSndMng.get(), std::make_unique<IoWriter>(), inf.szScreenRez, fm.get());
 
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);

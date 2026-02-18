@@ -500,7 +500,7 @@ void LevelController::MegaGeneration(Point p) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
   mc.bPressed = pt.bPressed;
-  mc.DrawCursor(pGl->pGraph.get());
+  mc.DrawCursor(pGl->pGraph);
 #endif
 #endif
   pGl->pGraph->RefreshAll();

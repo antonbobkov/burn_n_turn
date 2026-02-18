@@ -103,8 +103,6 @@ class MakeSoundEvent : public Event {
 
 public:
   std::string get_class_name() override { return "MakeSoundEvent"; }
-  MakeSoundEvent(smart_pointer<SoundInterface<Index>> pSn_, Index Snd_)
-      : pSn(pSn_.get()), Snd(Snd_) {}
   MakeSoundEvent(SoundInterface<Index> *pSn_, Index Snd_)
       : pSn(pSn_), Snd(Snd_) {}
 

@@ -10,19 +10,17 @@
 #include "GuiGen.h"
 #include "color.h"
 
-
-struct FontWriter : virtual public SP_Info {
-  std::string get_class_name() override { return "FontWriter"; }
+struct FontWriter {
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
-  smart_pointer<GraphicalInterface<Index>> pGr;
+  GraphicalInterface<Index> *pGr;
 
   Size szSymbol;
   Color clSymbol;
   int nGap;
 
   FontWriter(FilePath *fp, std::string sFont,
-             smart_pointer<GraphicalInterface<Index>> pGr_, unsigned nZoom = 1);
+             GraphicalInterface<Index> *pGr_, unsigned nZoom = 1);
 
   Size GetSize(std::string s);
 

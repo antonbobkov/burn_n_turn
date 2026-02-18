@@ -48,8 +48,8 @@ TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
   pNum = make_smart(new NumberDrawer(pDr, fp_.get(), sFontPath, "dragonfont"));
   pBigNum =
       make_smart(new NumberDrawer(pBigDr, fp_.get(), sFontPath, "dragonfont"));
-  pFancyNum = make_smart(
-      new FontWriter(fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2));
+  pFancyNum = std::make_unique<FontWriter>(
+      fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2);
 
   std::string levelsFile;
 #ifdef FULL_VERSION
@@ -64,7 +64,7 @@ TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
   pCnt = std::make_unique<DragonGameController>(
-      pDr, pNum, pBigNum, pFancyNum, pSm, vLvl, rBound, this, fp_.get());
+      pDr, pNum, pBigNum, pFancyNum.get(), pSm, vLvl, rBound, this, fp_.get());
   pCnt->StartUp(pCnt.get());
 }
 

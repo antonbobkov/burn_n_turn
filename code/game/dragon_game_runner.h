@@ -23,13 +23,13 @@ public:
 
   Event* pExitProgram;
 
-  smart_pointer<GraphicalInterface<Index>> pGr;
-  smart_pointer<SoundInterface<Index>> pSm;
+  GraphicalInterface<Index> *pGr;
+  SoundInterface<Index> *pSm;
 
   smart_pointer<ScalingDrawer> pDr;
   smart_pointer<NumberDrawer> pNum;
   smart_pointer<NumberDrawer> pBigNum;
-  smart_pointer<FontWriter> pFancyNum;
+  std::unique_ptr<FontWriter> pFancyNum;
 
   FileManager *p_fm_;
   std::unique_ptr<FilePath> fp_;

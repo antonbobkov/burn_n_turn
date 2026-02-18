@@ -23,7 +23,6 @@
 #include "utils/exception.h"
 #include "utils/file_utils.h"
 #include "utils/index.h"
-#include "utils/smart_pointer.h"
 
 typedef unsigned char Byte;
 
@@ -211,9 +210,8 @@ public:
 
 /* Abstract drawing API: create/load/save images, draw images/rectangles,
  * refresh. ImageHndl is backend-specific (e.g. raw pointer or Index). */
-template <class ImageHndl> class GraphicalInterface : virtual public SP_Info {
+template <class ImageHndl> class GraphicalInterface {
 public:
-  std::string get_class_name() override { return "GraphicalInterface"; }
   virtual ~GraphicalInterface() {}
 
   virtual void DeleteImage(ImageHndl pImg) = 0;
@@ -256,8 +254,7 @@ public:
 template <class ImageHndl>
 struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
                                   public IndexRemover {
-  std::string get_class_name() override { return "SimpleGraphicalInterface"; }
-  smart_pointer<GraphicalInterface<ImageHndl>> pGr;
+  GraphicalInterface<ImageHndl> *pGr;
 
   IndexKeeper<ImageHndl> kp;
 
@@ -270,7 +267,7 @@ struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
   }
 
 public:
-  SimpleGraphicalInterface(smart_pointer<GraphicalInterface<ImageHndl>> pGr_)
+  SimpleGraphicalInterface(GraphicalInterface<ImageHndl> *pGr_)
       : pGr(pGr_) {}
 
   /*virtual*/ void DeleteImage(Index pImg);
@@ -324,10 +321,9 @@ template <class ImageHndl> class CameraControl {
   Scale sCurr;
 
 public:
-  smart_pointer<GraphicalInterface<ImageHndl>> pGr;
+  GraphicalInterface<ImageHndl> *pGr;
 
-  CameraControl(smart_pointer<GraphicalInterface<ImageHndl>> pGr_ = 0,
-                Scale s = Scale())
+  CameraControl(GraphicalInterface<ImageHndl> *pGr_ = 0, Scale s = Scale())
       : pGr(pGr_), sCurr(s) {}
 
   Point GetOffset() { return sCurr.pOffset; }
@@ -375,7 +371,7 @@ public:
 };
 
 template <class T>
-void ConvertImage(smart_pointer<GraphicalInterface<T>> pGr, std::string strImg,
+void ConvertImage(GraphicalInterface<T> *pGr, std::string strImg,
                   std::string strExtFrom, std::string strExtTo) {
   T img = pGr->LoadImage(strImg + "." + strExtFrom);
   pGr->SaveImage(strImg + "." + strExtTo, img);
