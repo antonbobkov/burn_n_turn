@@ -1,8 +1,9 @@
 # DragonGameController Public Members – Access Catalog
 
 This document lists where each public data member and public method of
-`DragonGameController` is accessed from, and whether each access is a read,
-write, or a call to a member function on that member.
+`DragonGameController` is accessed from **other classes** (DragonGameController
+itself is omitted). For each access, the table describes what the access is
+used for.
 
 **Source of truth:** `code/game/controller/dragon_game_controller.h`
 
@@ -14,206 +15,185 @@ write, or a call to a member function on that member.
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameRunner | `game/dragon_game_runner.cc` | Read: `.size()`, `[nActive]`; member calls: `->Update()`, `->OnKey()`, `->OnMouse()`, `->OnMouseDown()`, `->OnMouseUp()`, `->DoubleClick()`, `->Fire()`, `->GetControllerName()` |
-| LevelController | `game/controller/level_controller.cc` | Read: `.size()` (in expression for `nActive`) |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read: `.size()` in `Next()`, `Restart()`; write: `.clear()` in `Restart()`; used when building controllers in `StartUp()` |
+| DragonGameRunner | `game/dragon_game_runner.cc` | Read `.size()` and `[nActive]`; call `->Update()`, `->OnKey()`, `->OnMouse()`, etc. on the active controller. Used to forward frame updates and input to the currently active screen (menu, level, cutscene, etc.) and to report the active controller name. |
+| LevelController | `game/controller/level_controller.cc` | Read `.size()` when computing which index to switch to. Used when leaving the level (e.g. game over) to set the active controller back to the menu (second-to-last in the vector). |
 
 ### `nActive` (unsigned)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameRunner | `game/dragon_game_runner.cc` | Read: for controller count, current name, and indexing into `vCnt` |
-| MenuController | `game/controller/menu_controller.cc` | Write: `pGl->nActive = pMenuController->nResumePosition` |
-| LevelController | `game/controller/level_controller.cc` | Write: `pGl->nActive = pGl->vCnt.size() - 2` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read/write: in `Next()`, `Restart()`, `Menu()` |
+| DragonGameRunner | `game/dragon_game_runner.cc` | Read to know how many controllers exist and which one is active, and to index into `vCnt` for updates and input. Used so the runner can delegate to the correct controller. |
+| MenuController | `game/controller/menu_controller.cc` | Write: set to the menu’s stored resume position when returning from the menu. Ensures the game returns to the correct screen (e.g. level or start) after the user picks an option. |
+| LevelController | `game/controller/level_controller.cc` | Write: set to the menu index when leaving the level. Ensures the menu is shown (e.g. after game over) instead of staying on the level. |
 
-### `vLevelPointers` (vector<int>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Read: `.at(0)`, `.at(1)`, `.at(2)` passed to `Restart()` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read: `.at(i)` in `Next()`; write: initialised in ctor (size 3) |
-
-### `pMenu` (smart_pointer<MenuController>)
+### `vLevelPointers` (vector of int)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Member calls: `->AddBoth()`, `->AddV()`, `->AddE()`, `->pMenuDisplay =`, `->pMenuDisplay->UpdateMenuEntries()`, `->nResumePosition =`; also `->pHintText =`, `->pOptionText =` (PC_VERSION) |
+| MenuController | `game/controller/menu_controller.cc` | Read `.at(0)`, `.at(1)`, `.at(2)` and pass each to `Restart()`. Used when the user selects a level from the menu so the game restarts at the chosen level index. |
 
-### `pGraph` (smart_pointer<GraphicalInterface<Index>>)
+### `pMenu` (`smart_pointer` to MenuController)
 
-| Component | File | Access |
-|-----------|------|--------|
-| SimpleController / FlashingController | `game/controller/basic_controllers.cc` | Member calls: `->LoadImage()`, `->DeleteImage()`, `->DrawImage()`, `->GetImage()`, `->RefreshAll()` |
-| EntityListController | `game/controller/basic_controllers.cc` | Member call: `->RefreshAll()` |
-| LevelController | `game/controller/level_controller.cc` | Member calls: `->DrawRectangle()`, `->RefreshAll()`, `->DrawCursor()` (via `.get()`) |
-| MenuController | `game/controller/menu_controller.cc` | Member call: `->RefreshAll()` |
-| BuyNowController | `game/controller/buy_now_controller.cc` | Member call: `->RefreshAll()` |
+Only accessed by DragonGameController (omitted).
 
-### `pDr` (smart_pointer<ScalingDrawer>)
+### `pGraph` (`smart_pointer` to GraphicalInterface of Index)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member call: passed to `Draw()` (option/hint text) |
-| EntityListController | `game/controller/basic_controllers.cc` | Read: `->nFactor`; member call: `->Draw()` for entries |
-| BuyNowController | `game/controller/buy_now_controller.cc` | Member call: `->Draw()` for slimes |
-| LevelController | `game/controller/level_controller.cc` | (LevelController uses its own drawer; no direct `pGl->pDr` in the grep – `pNum` used for HUD) |
+| EntityListController | `game/controller/basic_controllers.cc` | Call `->RefreshAll()`. Used to redraw the screen when the entity list (e.g. level select) is updated. |
+| LevelController | `game/controller/level_controller.cc` | Call `->DrawRectangle()`, `->RefreshAll()`, and `->DrawCursor()` (via `.get()`). Used to draw overlays (e.g. dimming), refresh the display, and show the cursor during the level. |
+| MenuController | `game/controller/menu_controller.cc` | Call `->RefreshAll()`. Used to refresh the display when the menu is shown or updated. |
+| BuyNowController | `game/controller/buy_now_controller.cc` | Call `->RefreshAll()`. Used to refresh the buy-now / trial screen. |
 
-### `pNum` (smart_pointer<NumberDrawer>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| LevelController | `game/controller/level_controller.cc` | Member calls: `->DrawNumber()`, `->DrawWord()`, `->DrawColorNumber()`, `->DrawColorWord()`; also passed to tutorial entity |
-| Critters | `game/critters.cc` | Member call: `->DrawWord()` (via `pAc->pGl->pNum`) |
-| Fireball | `game/fireball.cc` | Member call: `->DrawWord()` |
-| Entities | `game/entities.cc` | Member calls: `->DrawWord()`, `->DrawColorWord()` |
-
-### `pBigNum` (smart_pointer<NumberDrawer>)
+### `pDr` (`smart_pointer` to ScalingDrawer)
 
 | Component | File | Access |
 |-----------|------|--------|
-| LevelController | `game/controller/level_controller.cc` | Member call: `->DrawWord()` |
-| HighScoreShower / IntroTextShower (entities) | `game/entities.cc` | Member calls: `->DrawWord()`, `->DrawNumber()` (score, high score) |
+| MenuController | `game/controller/menu_controller.cc` | Pass to `Draw()` for option and hint text. Used so menu text is drawn with the correct scaling. |
+| EntityListController | `game/controller/basic_controllers.cc` | Read `->nFactor` for layout; call `->Draw()` for list entries. Used to scale and draw the level-select (or similar) list. |
+| BuyNowController | `game/controller/buy_now_controller.cc` | Call `->Draw()` for slime entities. Used to draw the animated slimes on the buy-now screen. |
 
-### `pFancyNum` (smart_pointer<FontWriter>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| IntroTextShower | `game/entities.cc` | Member calls: `->GetSize()`, `->DrawWord()` |
-
-### `pSndRaw` (smart_pointer<SoundInterface<Index>>)
+### `pNum` (`smart_pointer` to NumberDrawer)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Used in ctor (e.g. `plr.pSnd = pSndRaw_`), and in `DrawStuff()` during loading |
+| LevelController | `game/controller/level_controller.cc` | Call `->DrawNumber()`, `->DrawWord()`, `->DrawColorNumber()`, `->DrawColorWord()`; also pass to the tutorial entity. Used to draw the in-level HUD (score, level, time, labels) and to let the tutorial draw its text. |
+| Critters | `game/critters.cc` | Call `->DrawWord()` (via `pAc->pGl->pNum`). Used to draw text under critters (e.g. damage or labels). |
+| Fireball | `game/fireball.cc` | Call `->DrawWord()`. Used to draw text under fireballs (e.g. labels). |
+| Entities | `game/entities.cc` | Call `->DrawWord()`, `->DrawColorWord()`. Used to draw text on generic visual entities. |
 
-### `pSnd` (smart_pointer<SoundInterfaceProxy>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Member calls: `->SetVolume()`, and via `plr`; also `PlaySound(GetSnd(...))` during loading |
-| MenuController | `game/controller/menu_controller.cc` | Member calls: `->PlaySound()`, `->Toggle()`, `->Get()`; `sbSoundOn.Set(pSnd->Get())` |
-| LevelController | `game/controller/level_controller.cc` | Member call: `->PlaySound()` |
-| Basic controllers | `game/controller/basic_controllers.cc` | Member call: `->PlaySound()` |
-| Critters | `game/critters.cc` | Member call: `->PlaySound()` (via `pAc->pGl`, `pAdv->pGl`) |
-| CritterGenerators | `game/critter_generators.cc` | Member call: `->PlaySound()` |
-| Dragon | `game/dragon.cc` | Member call: `->PlaySound()` |
-| Fireball | `game/fireball.cc` | Member call: `->PlaySound()` |
-
-### `vLvl` (vector<LevelLayout>)
+### `pBigNum` (`smart_pointer` to NumberDrawer)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read: in ctor (copy), in `StartUp()` loop (`.size()`, `vLvl[i]`) when creating LevelControllers |
+| LevelController | `game/controller/level_controller.cc` | Call `->DrawWord()`. Used to draw large text on the level HUD when needed. |
+| HighScoreShower / IntroTextShower (entities) | `game/entities.cc` | Call `->DrawWord()`, `->DrawNumber()` for score and high score. Used to show the big score and high score on the intro/high-score screens. |
+
+### `pFancyNum` (`smart_pointer` to FontWriter)
+
+| Component | File | Access |
+|-----------|------|--------|
+| IntroTextShower | `game/entities.cc` | Call `->GetSize()` and `->DrawWord()`. Used to measure and draw the fancy intro text. |
+
+### `pSndRaw` (`smart_pointer` to SoundInterface of Index)
+
+Only accessed by DragonGameController (omitted).
+
+### `pSnd` (`smart_pointer` to SoundInterfaceProxy)
+
+| Component | File | Access |
+|-----------|------|--------|
+| MenuController | `game/controller/menu_controller.cc` | Call `->PlaySound()`, `->Toggle()`, `->Get()`; sync `sbSoundOn` with `pSnd->Get()`. Used to play menu sounds (e.g. beeps), toggle sound on/off, and keep the saved sound setting in sync with the proxy. |
+| LevelController | `game/controller/level_controller.cc` | Call `->PlaySound()`. Used to play in-level sounds (e.g. timer beeps). |
+| Basic controllers | `game/controller/basic_controllers.cc` | Call `->PlaySound()`. Used to play sounds on start screen, cutscenes, and score screens (e.g. start game, beep/boop). |
+| Critters | `game/critters.cc` | Call `->PlaySound()` (via `pAc->pGl`, `pAdv->pGl`). Used to play critter sounds (death, steps, hits, spawn, etc.). |
+| CritterGenerators | `game/critter_generators.cc` | Call `->PlaySound()`. Used to play sounds when critters are spawned (e.g. princess arrive). |
+| Dragon | `game/dragon.cc` | Call `->PlaySound()`. Used to play dragon sounds (pickup, shoot, capture, win, etc.). |
+| Fireball | `game/fireball.cc` | Call `->PlaySound()`. Used to play fireball sounds (death, explosion). |
+
+### `vLvl` (vector of LevelLayout)
+
+Only accessed by DragonGameController (omitted).
 
 ### `nScore` (int)
 
 | Component | File | Access |
 |-----------|------|--------|
-| Simulation | `simulation/simulation.cc` | Read: for logging |
-| DragonGameRunner | (only via GetTowerController(); score read in simulation) | — |
-| LevelController | `game/controller/level_controller.cc` | Read: for HUD drawing |
-| Entities | `game/entities.cc` | Read: HighScoreShower; write: `pGl->nScore +=` (score updates) |
-| DragonScoreController (basic_controllers) | `game/controller/basic_controllers.cc` | Read: for high-score check and output; write: `pGl->nHighScore = pGl->nScore` when updating high score |
+| Simulation | `simulation/simulation.cc` | Read for logging. Used to print the current score in test output. |
+| LevelController | `game/controller/level_controller.cc` | Read for HUD drawing. Used to show the current score on the level screen. |
+| Entities | `game/entities.cc` | Read in HighScoreShower; write `pGl->nScore +=` when awarding points. Used to display score and to add points when the player earns them (e.g. killing critters). |
+| DragonScoreController (basic_controllers) | `game/controller/basic_controllers.cc` | Read to compare with high score and to write to the output stream; write `pGl->nHighScore = pGl->nScore` when the score exceeds high score. Used to update and persist the high score and to show score at the end of a run. |
 
 ### `nHighScore` (int)
 
 | Component | File | Access |
 |-----------|------|--------|
-| Simulation | `simulation/simulation.cc` | Read: for logging |
-| CritterGenerators | `game/critter_generators.cc` | Read: `pBc->pGl->nHighScore == 0` (first-time logic) |
-| Entities | `game/entities.cc` | Read: for drawing in HighScoreShower |
-| DragonScoreController | `game/controller/basic_controllers.cc` | Read/write: compare and set from `nScore` |
+| Simulation | `simulation/simulation.cc` | Read for logging. Used to print the high score in test output. |
+| CritterGenerators | `game/critter_generators.cc` | Read `pBc->pGl->nHighScore == 0`. Used to decide first-time behaviour (e.g. different spawns when the player has never scored). |
+| Entities | `game/entities.cc` | Read for drawing in HighScoreShower. Used to show the high score on the intro/high-score screen. |
+| DragonScoreController (basic_controllers) | `game/controller/basic_controllers.cc` | Read and write when comparing with `nScore`. Used to update the saved high score when the current run beats it. |
 
 ### `bAngry` (bool)
 
 | Component | File | Access |
 |-----------|------|--------|
-| Critters | `game/critters.cc` | Write: `pAc->pGl->bAngry = true` |
-| CritterGenerators | `game/critter_generators.cc` | Read: `pBc->pGl->bAngry`; passed into constructor |
+| Critters | `game/critters.cc` | Write `pAc->pGl->bAngry = true`. Used to mark the game as “angry” when the player triggers certain events (e.g. attacking a princess). |
+| CritterGenerators | `game/critter_generators.cc` | Read `pBc->pGl->bAngry` and pass into constructors. Used to spawn or configure critters differently when the game is in angry mode. |
 
-### `snProgress` (SavableVariable<int>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Read: `.Get()` for menu state |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read: `.Get()` in `Next()`; write: `.Set(i)` in `Next()` |
-
-### `sbSoundOn` (SavableVariable<bool>)
+### `snProgress` (SavableVariable of int)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Write: `.Set(...)`; read: `.Get()` for menu display |
+| MenuController | `game/controller/menu_controller.cc` | Read `.Get()` to decide menu state. Used to enable/disable menu options (e.g. which levels are unlocked) based on how far the player has progressed. |
 
-### `sbMusicOn` (SavableVariable<bool>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Write: `.Set(...)`; read: `.Get()` for menu display |
-| LevelController | `game/controller/level_controller.cc` | Read: `.Get()` for gameplay logic |
-
-### `sbTutorialOn` (SavableVariable<bool>)
+### `sbSoundOn` (SavableVariable of bool)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member call: `BoolToggle(pGl->sbTutorialOn)`; read: `.Get()` |
-| LevelController | `game/controller/level_controller.cc` | Read: `.GetConstPointer()` passed to entity |
+| MenuController | `game/controller/menu_controller.cc` | Write `.Set(...)` when the user toggles sound; read `.Get()` for menu label. Used to persist and display the “sound on/off” setting. |
 
-### `sbFullScreen` (SavableVariable<bool>)
-
-| Component | File | Access |
-|-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member call: `BoolToggle()`; read: `.Get()` |
-
-### `sbCheatsOn` (SavableVariable<bool>)
+### `sbMusicOn` (SavableVariable of bool)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member call: `BoolToggle()`; read: `.Get()` |
-| LevelController | `game/controller/level_controller.cc` | Read: `.Get()` |
-| Basic controllers | `game/controller/basic_controllers.cc` | Read: `.Get()` (cheat key) |
+| MenuController | `game/controller/menu_controller.cc` | Write `.Set(...)` when the user toggles music; read `.Get()` for menu label. Used to persist and display the “music on/off” setting. |
+| LevelController | `game/controller/level_controller.cc` | Read `.Get()` in gameplay logic. Used to decide whether to play or allow music during the level (e.g. ghost-time or blink logic). |
 
-### `sbCheatsUnlocked` (SavableVariable<bool>)
+### `sbTutorialOn` (SavableVariable of bool)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read: `.Get()` passed to MenuDisplay ctor |
+| MenuController | `game/controller/menu_controller.cc` | Call `BoolToggle(pGl->sbTutorialOn)`; read `.Get()` for menu label. Used to let the user turn the tutorial on/off and to show the current state in the menu. |
+| LevelController | `game/controller/level_controller.cc` | Read `.GetConstPointer()` and pass to an entity. Used so the tutorial entity can show or hide hints based on the saved tutorial setting. |
+
+### `sbFullScreen` (SavableVariable of bool)
+
+| Component | File | Access |
+|-----------|------|--------|
+| MenuController | `game/controller/menu_controller.cc` | Call `BoolToggle()`; read `.Get()`. Used to toggle fullscreen from the menu and to show the current fullscreen state (e.g. for deciding whether to show “exit” option). |
+
+### `sbCheatsOn` (SavableVariable of bool)
+
+| Component | File | Access |
+|-----------|------|--------|
+| MenuController | `game/controller/menu_controller.cc` | Call `BoolToggle()`; read `.Get()` for menu. Used to let the user enable/disable cheats and to show whether cheats are on. |
+| LevelController | `game/controller/level_controller.cc` | Read `.Get()`. Used to enable cheat behaviour during the level (e.g. skip to next level). |
+| Basic controllers | `game/controller/basic_controllers.cc` | Read `.Get()` when handling key input. Used to react to the cheat key (e.g. backslash) only when cheats are enabled. |
+
+### `sbCheatsUnlocked` (SavableVariable of bool)
+
+Only accessed by DragonGameController (omitted).
 
 ### `rBound` (Rectangle)
 
 | Component | File | Access |
 |-----------|------|--------|
-| LevelController | `game/controller/level_controller.cc` | Read: `pGl->rBound.sz.x`, `pGl->rBound.sz.y` for positioning |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Read/write: used in ctor and StartUp (e.g. menu position); passed to controllers. Not accessed from other files as `pGl->rBound` except LevelController above. |
+| LevelController | `game/controller/level_controller.cc` | Read `pGl->rBound.sz.x` and `pGl->rBound.sz.y`. Used to position UI (e.g. tutorial hint) relative to the game’s screen size. |
 
 ### `plr` (BackgroundMusicPlayer)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member call: `->ToggleOff()`; read: `.bOff` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Write: `plr.pSnd =`, `plr.vThemes[...] =`; member call: `plr.pSnd->SetVolume()` |
+| MenuController | `game/controller/menu_controller.cc` | Call `->ToggleOff()`; read `.bOff`. Used to mute/unmute background music when the user toggles music in the menu, and to keep the menu label in sync with the actual mute state. |
 
-### `lsBonusesToCarryOver` (list of TimedFireballBonus)
-
-| Component | File | Access |
-|-----------|------|--------|
-| Dragon | `game/dragon.cc` | Member calls: `.push_back()`, `.clear()`; read: `.begin()`, `.end()` for iteration |
-| LevelController | `game/controller/level_controller.cc` | Member call: `.clear()` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | (Indirect: level setup; list is cleared by LevelController/Dragon.) |
-
-### `pWrp` (TowerDataWrap*)
+### `lsBonusesToCarryOver` (list of `smart_pointer` to TimedFireballBonus)
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Member access: `->pExitProgram` (in `Exit()`) |
-| LevelController | `game/controller/level_controller.cc` | Read: `->szActualRez` |
-| DragonScoreController | `game/controller/basic_controllers.cc` | Member call: `->GetFilePath()` |
+| Dragon | `game/dragon.cc` | Call `.push_back()`, `.clear()`; read `.begin()`, `.end()` to iterate. Used to carry timed fireball bonuses from one level to the next (dragon adds bonuses when finishing a level and consumes/clears them when starting the next). |
+| LevelController | `game/controller/level_controller.cc` | Call `.clear()`. Used to clear carried-over bonuses when starting or resetting a level so the list does not persist incorrectly. |
 
-### `pSelf` (DragonGameController*)
+### `pWrp` (TowerDataWrap pointer)
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Write: in `StartUp(pSelf_)`; read: passed to controller constructors in `StartUp()` |
+| MenuController | `game/controller/menu_controller.cc` | Read `->pExitProgram` in `Exit()`. Used to trigger program exit when the user chooses “exit” from the menu. |
+| LevelController | `game/controller/level_controller.cc` | Read `->szActualRez`. Used to get the actual resolution for layout or rendering decisions during the level. |
+| DragonScoreController (basic_controllers) | `game/controller/basic_controllers.cc` | Call `->GetFilePath()`. Used to get the file path for saving high score (or similar) to disk. |
+
+### `pSelf` (DragonGameController pointer)
+
+Only accessed by DragonGameController (omitted).
 
 ---
 
@@ -223,79 +203,70 @@ write, or a call to a member function on that member.
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameRunner | `game/dragon_game_runner.cc` | Call: `pCnt->StartUp(pCnt.get())` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Call: `StartUp(pSelf)` from `Restart()` |
+| DragonGameRunner | `game/dragon_game_runner.cc` | Call `pCnt->StartUp(pCnt.get())` after creating the controller. Used to initialise the controller and build the initial screen stack (menu, start screen, etc.). |
 
 ### `Next()`
 
 | Component | File | Access |
 |-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | (Definition) |
-| Dragon | `game/dragon.cc` | Call: `pAd->pGl->Next()` |
-| Basic controllers | `game/controller/basic_controllers.cc` | Call: `pGl->Next()` (many controllers) |
-| LevelController | `game/controller/level_controller.cc` | Call: `pGl->Next()` (cheat) |
+| Dragon | `game/dragon.cc` | Call `pAd->pGl->Next()`. Used when the dragon wins the level (e.g. all princesses captured) to advance to the next screen. |
+| Basic controllers | `game/controller/basic_controllers.cc` | Call `pGl->Next()` from various controllers (start screen, cutscene, score screen, entity list, etc.). Used when the user completes a screen or clicks to advance (e.g. “next level”, “continue”). |
+| LevelController | `game/controller/level_controller.cc` | Call `pGl->Next()` when a cheat is used. Used to skip to the next level from in-game. |
 
 ### `Restart(int nActive_)`
 
 | Component | File | Access |
 |-----------|------|--------|
-| MenuController | `game/controller/menu_controller.cc` | Call: `pGl->Restart()` and `Restart(vLevelPointers.at(0/1/2))` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | Call: `Restart()` from `Next()` (no arg) |
+| MenuController | `game/controller/menu_controller.cc` | Call `pGl->Restart()` or `Restart(vLevelPointers.at(0/1/2))`. Used when the user picks “resume” or a specific level from the menu so the game restarts from the chosen point. |
 
 ### `Menu()`
 
 | Component | File | Access |
 |-----------|------|--------|
-| EntityListController | `game/controller/basic_controllers.cc` | Call: `pGl->Menu()` |
-| LevelController | `game/controller/level_controller.cc` | Call: `pGl->Menu()` |
+| EntityListController | `game/controller/basic_controllers.cc` | Call `pGl->Menu()`. Used when the user chooses “back to menu” from the level-select (or similar) screen. |
+| LevelController | `game/controller/level_controller.cc` | Call `pGl->Menu()`. Used when the user pauses or quits the level to return to the main menu. |
 
 ### `GetImg(std::string key)`
 
 | Component | File | Access |
 |-----------|------|--------|
-| Level | `game/level.cc` | Call: `pAd->pGl->GetImg("road")` (and usage of returned reference) |
-| Fireball | `game/fireball.cc` | Call: `pAd->pGl->GetImg("empty")` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | (Definition; also used internally via preloader in loading) |
+| Level | `game/level.cc` | Call `pAd->pGl->GetImg("road")` and use the returned reference. Used to get the road tile image for drawing the level’s road. |
+| Fireball | `game/fireball.cc` | Call `pAd->pGl->GetImg("empty")`. Used to get the empty/placeholder image when needed for drawing. |
 
 ### `GetImgSeq(std::string key)`
 
 | Component | File | Access |
 |-----------|------|--------|
-| LevelController | `game/controller/level_controller.cc` | Call: `GetImgSeq(...)` for bonus, claw, dragon, etc. |
-| MenuController | `game/controller/menu_controller.cc` | Call: `pGl_->GetImgSeq("claw")` in ctor |
-| Basic controllers | `game/controller/basic_controllers.cc` | Call: `pGl_->GetImgSeq(sRun)`, `GetImgSeq(sChase)` |
-| BuyNowController | `game/controller/buy_now_controller.cc` | Call: `pGl->GetImgSeq("slime")` |
-| Critters | `game/critters.cc` | Call: many `pAc->pGl->GetImgSeq(...)`, `pAdv->pGl->GetImgSeq(...)` |
-| CritterGenerators | `game/critter_generators.cc` | Call: `pBc->pGl->GetImgSeq(...)`, `pAdv->pGl->GetImgSeq(...)` |
-| Dragon | `game/dragon.cc` | (Images/sequences from level/fireball; GetImgSeq used via level/fireball) |
-| Fireball | `game/fireball.cc` | Call: `pBc->pGl->GetImgSeq(...)`, `pAd->pGl->GetImgSeq(...)` |
+| LevelController | `game/controller/level_controller.cc` | Call `GetImgSeq(...)` for bonus icons, claw cursor, dragon, timer, etc. Used to get image sequences for the level HUD and entities. |
+| MenuController | `game/controller/menu_controller.cc` | Call `pGl_->GetImgSeq("claw")` in ctor. Used to get the claw cursor sequence for the menu. |
+| Basic controllers | `game/controller/basic_controllers.cc` | Call `pGl_->GetImgSeq(sRun)`, `GetImgSeq(sChase)` for cutscenes. Used to get the run and chase animation sequences for cutscene playback. |
+| BuyNowController | `game/controller/buy_now_controller.cc` | Call `pGl->GetImgSeq("slime")`. Used to get the slime animation for the buy-now screen. |
+| Critters | `game/critters.cc` | Call `pAc->pGl->GetImgSeq(...)`, `pAdv->pGl->GetImgSeq(...)` for many sequences (death, walk, burn, spawn, etc.). Used to get the correct sprite sequences for each critter type and state. |
+| CritterGenerators | `game/critter_generators.cc` | Call `pBc->pGl->GetImgSeq(...)`, `pAdv->pGl->GetImgSeq(...)`. Used to get image sequences when constructing critters (golem, princess, mage, trader, skeleton, etc.). |
+| Fireball | `game/fireball.cc` | Call `pBc->pGl->GetImgSeq(...)`, `pAd->pGl->GetImgSeq(...)` for fireball, laser, explosion, bonus. Used to get the correct graphics for fireballs and effects. |
 
 ### `GetSnd(std::string key)`
 
 | Component | File | Access |
 |-----------|------|--------|
-| All components that call `pGl->pSnd->PlaySound(pGl->GetSnd("..."))` | Multiple (critters, dragon, fireball, menu, level, basic_controllers, critter_generators) | Call: used to get sound index for `PlaySound()` |
-| DragonGameController | `game/controller/dragon_game_controller.cc` | (Definition; also used via preloader for `plr.vThemes`) |
+| MenuController, LevelController, Basic controllers, Critters, CritterGenerators, Dragon, Fireball | Various | Call `pGl->GetSnd("...")` and pass the result to `pGl->pSnd->PlaySound()`. Used to resolve a sound name to an index and then play that sound (menu beeps, level sounds, critter/dragon/fireball effects, etc.). |
 
 ### `GetSndSeq(std::string key)`
 
-| Component | File | Access |
-|-----------|------|--------|
-| DragonGameController | `game/controller/dragon_game_controller.cc` | (Definition; used for menu/game-over sound entities via preloader `pr->GetSndSeq(...)`) |
+Only used internally by DragonGameController (e.g. for menu/game-over sound entities via the preloader). No other classes call it (omitted).
 
 ---
 
 ## Summary by component
 
-- **DragonGameRunner** – vCnt (read, member calls), nActive (read), StartUp (call).
-- **Simulation** – nScore, nHighScore (read, for logging).
-- **LevelController** – vCnt (read), nActive (write), pGraph, pNum, pBigNum, pSnd, rBound, sbMusicOn, sbTutorialOn, sbCheatsOn, lsBonusesToCarryOver, pWrp; Next, Menu, GetImgSeq, GetSnd (calls).
-- **MenuController** – nActive (write), vLevelPointers (read), pGraph, pDr, pSnd, snProgress, sbSoundOn, sbMusicOn, sbTutorialOn, sbFullScreen, sbCheatsOn, plr, pWrp; Restart, GetImgSeq, GetSnd (calls).
+- **DragonGameRunner** – vCnt, nActive (read / delegate to active controller); StartUp (call to initialise).
+- **Simulation** – nScore, nHighScore (read for logging).
+- **LevelController** – vCnt, nActive (read/write for screen switching); pGraph, pNum, pBigNum, pSnd, rBound, sbMusicOn, sbTutorialOn, sbCheatsOn, lsBonusesToCarryOver, pWrp; Next, Menu, GetImgSeq, GetSnd (calls).
+- **MenuController** – nActive, vLevelPointers, pGraph, pDr, pSnd, snProgress, sbSoundOn, sbMusicOn, sbTutorialOn, sbFullScreen, sbCheatsOn, plr, pWrp; Restart, GetImgSeq, GetSnd (calls).
 - **Basic controllers** – pGraph, pDr, pNum, pSnd, nScore, nHighScore, sbCheatsOn, pWrp; Next, Menu, GetImgSeq, GetSnd (calls).
 - **BuyNowController** – pGraph, pDr, GetImgSeq (calls).
 - **Dragon** – pSnd, lsBonusesToCarryOver; Next, GetImgSeq, GetSnd (calls).
 - **Critters / CritterGenerators** – pNum, pSnd, nHighScore, bAngry; GetImgSeq, GetSnd (calls).
 - **Fireball** – pNum, pSnd; GetImg, GetImgSeq, GetSnd (calls).
-- **Entities** – pBigNum, pFancyNum, pNum, nScore, nHighScore; GetImgSeq (via other types) and score write.
-- **Level** – GetImg (call).
-- **DragonGameController (self)** – All members and methods used or defined in `dragon_game_controller.cc`.
+- **Entities** – pBigNum, pFancyNum, pNum, nScore, nHighScore (draw and update score).
+- **Level** – GetImg (call for road image).
