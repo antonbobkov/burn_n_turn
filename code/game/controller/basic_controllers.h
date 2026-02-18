@@ -19,35 +19,6 @@ struct EventEntity;
 struct FancyCritter;
 struct VisualEntity;
 
-/** Controller that draws a single full-screen image and advances on key. */
-struct SimpleController : public GameController {
-  std::string get_class_name() override { return "SimpleController"; }
-  Index nImage;
-
-  SimpleController(DragonGameController *pGraph, std::string strFileName);
-  ~SimpleController();
-
-  /*virtual*/ void Update();
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ std::string GetControllerName() const { return "basic"; }
-};
-
-/** Controller that draws background + text that flashes every second. */
-struct FlashingController : public GameController {
-  std::string get_class_name() override { return "FlashingController"; }
-  Index nImage, nText;
-  unsigned nTimer;
-  bool bShow;
-
-  FlashingController(DragonGameController *pGraph, std::string strFileName,
-                     std::string strTextName);
-  ~FlashingController();
-
-  /*virtual*/ void Update();
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ std::string GetControllerName() const { return "basic"; }
-};
-
 /** GameController with draw/update/consumable lists; Update runs Move, Update,
  * then draws by priority. */
 struct EntityListController : public GameController {

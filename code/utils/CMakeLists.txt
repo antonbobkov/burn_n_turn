@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 project(Utils LANGUAGES CXX)
 
 add_library(Utils
-  debug_log.h
-  debug_log.cc
   exception.h
   exception.cc
   file_utils.h

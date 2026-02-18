@@ -3,7 +3,6 @@
 
 #include "Preloader.h"
 #include "utils/smart_pointer.h"
-#include <iostream>
 
 class Event : virtual public SP_Info {
   friend void Trigger(smart_pointer<Event> pE);
@@ -18,21 +17,6 @@ public:
 
 void Trigger(smart_pointer<Event> pE);
 void Trigger(Event* pE);
-
-class EmptyEvent : public Event {
-public:
-  std::string get_class_name() override { return "EmptyEvent"; }
-  /*virtual*/ void Trigger(){};
-};
-
-class WriteEvent : public Event {
-  std::string sText;
-
-public:
-  std::string get_class_name() override { return "WriteEvent"; }
-  WriteEvent(std::string sText_) : sText(sText_) {}
-  /*virtual*/ void Trigger() { std::cout << sText << "\n"; };
-};
 
 template <class T> class TerminatorEvent : public Event {
   T *pObject;
@@ -92,21 +76,6 @@ struct SequenceOfEvents : public Event {
     vEv.push_back(pEv2);
     vEv.push_back(pEv3);
   }
-};
-
-SequenceOfEvents *TwoEvents(smart_pointer<Event> pEv1,
-                            smart_pointer<Event> pEv2);
-
-class MakeSoundEvent : public Event {
-  SoundInterface<Index> *pSn;
-  Index Snd;
-
-public:
-  std::string get_class_name() override { return "MakeSoundEvent"; }
-  MakeSoundEvent(SoundInterface<Index> *pSn_, Index Snd_)
-      : pSn(pSn_), Snd(Snd_) {}
-
-  /*virtual*/ void Trigger() { pSn->PlaySound(Snd); }
 };
 
 #endif // EVENT_HEADER_08_27_10_06_16

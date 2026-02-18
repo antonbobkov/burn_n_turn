@@ -104,10 +104,6 @@ fPoint operator*(const fPoint &f1, float f) {
   fPoint ff(f1);
   return ff *= f;
 }
-float Dot(const fPoint &f1, const fPoint &f2) {
-  return f1.x * f2.x + f1.y * f2.y;
-}
-
 std::ostream &operator<<(std::ostream &ofs, fPoint f) {
   ofs << f.x << " " << f.y;
   return ofs;
@@ -242,14 +238,6 @@ std::istream &operator>>(std::istream &ifs, Rectangle &r) {
 bool InsideRectangle(Rectangle r, Point p) {
   return r.p.x <= p.x && p.x < r.p.x + r.sz.x && r.p.y <= p.y &&
          p.y < r.p.y + r.sz.y;
-}
-
-Point Center(Rectangle r) {
-  return Point(r.p.x + r.sz.x / 2, r.p.y + r.sz.y / 2);
-}
-
-Point RandomPnt(Rectangle r) {
-  return Point(r.p.x + rand() % (r.sz.x), r.p.y + rand() % (r.sz.y));
 }
 
 Rectangle operator+(const Rectangle &r, const Point &p) {

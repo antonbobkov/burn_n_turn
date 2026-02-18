@@ -13,57 +13,6 @@
 #include "wrappers/gui_key_type.h"
 #include <memory>
 
-SimpleController::SimpleController(DragonGameController *pGraph,
-                                   std::string strFileName)
-    : GameController(pGraph) {
-  nImage = pGl->pGraph->LoadImage(strFileName);
-}
-
-SimpleController::~SimpleController() { pGl->pGraph->DeleteImage(nImage); }
-
-void SimpleController::Update() { pGl->pGraph->DrawImage(Point(0, 0), nImage); }
-
-void SimpleController::OnKey(GuiKeyType c, bool bUp) {
-  if (bUp)
-    return;
-
-  pGl->Next();
-}
-
-FlashingController::FlashingController(DragonGameController *pGraph,
-                                       std::string strFileName,
-                                       std::string strTextName)
-    : GameController(pGraph), nTimer(0), bShow(true) {
-  nImage = pGl->pGraph->LoadImage(strFileName);
-  nText = pGl->pGraph->LoadImage(strTextName);
-
-  pGl->pGraph->GetImage(nText)->ChangeColor(Color(255, 255, 255),
-                                            Color(0, 0, 0, 0));
-}
-
-FlashingController::~FlashingController() {
-  pGl->pGraph->DeleteImage(nImage);
-  pGl->pGraph->DeleteImage(nText);
-}
-
-void FlashingController::Update() {
-  ++nTimer;
-  if (nTimer % nFramesInSecond == 0)
-    bShow = !bShow;
-
-  pGl->pGraph->DrawImage(Point(0, 0), nImage, false);
-  if (bShow)
-    pGl->pGraph->DrawImage(Point(0, 0), nText, false);
-  pGl->pGraph->RefreshAll();
-}
-
-void FlashingController::OnKey(GuiKeyType c, bool bUp) {
-  if (bUp)
-    return;
-
-  pGl->Next();
-}
-
 void EntityListController::AddV(smart_pointer<VisualEntity> pVs) {
   lsDraw.push_back(pVs);
 }

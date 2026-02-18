@@ -58,7 +58,6 @@ fPoint &operator/=(fPoint &f1, float f);
 fPoint &operator*=(fPoint &f1, float f);
 fPoint operator/(const fPoint &f1, float f);
 fPoint operator*(const fPoint &f1, float f);
-float Dot(const fPoint &f1, const fPoint &f2);
 
 std::ostream &operator<<(std::ostream &ofs, fPoint f);
 std::istream &operator>>(std::istream &ifs, fPoint &f);
@@ -129,9 +128,7 @@ std::ostream &operator<<(std::ostream &ofs, Rectangle r);
 std::istream &operator>>(std::istream &ifs, Rectangle &r);
 
 bool InsideRectangle(Rectangle r, Point p);
-Point Center(Rectangle r);
 inline Point Center(Size sz) { return Point(sz.x / 2, sz.y / 2); }
-Point RandomPnt(Rectangle r);
 Rectangle operator+(const Rectangle &r, const Point &p);
 Rectangle operator+(const Rectangle &r1, const Rectangle &r2);
 Rectangle Intersect(const Rectangle &r1, const Rectangle &r2);

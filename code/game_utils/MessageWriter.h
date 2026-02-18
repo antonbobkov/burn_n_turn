@@ -1,11 +1,8 @@
 #ifndef MESSAGE_WRITER_HDR_INCLUDE_GUARD_09_04_10_06_07_PM
 #define MESSAGE_WRITER_HDR_INCLUDE_GUARD_09_04_10_06_07_PM
 
-#include <fstream>
 #include <iostream>
 #include <string>
-
-#include <map>
 
 enum WriteType { WT_DEBUG, WT_ERROR };
 
@@ -28,14 +25,6 @@ public:
 
 class IoWriter : public MessageWriter {
 public:
-  /*virtual*/ void Write(WriteType wt, std::string strMsg);
-};
-
-class FileWriter : public MessageWriter {
-  std::map<WriteType, std::string> mFiles;
-
-public:
-  void AddFile(WriteType wt, std::string sFile);
   /*virtual*/ void Write(WriteType wt, std::string strMsg);
 };
 
