@@ -29,7 +29,9 @@ template <typename T> struct GraphicalInterface;
 template <typename T> struct SoundInterface;
 struct SoundInterfaceProxy;
 
-/** Holds all savable options; MenuController gets a pointer to mutate/persist. */
+/** The realm's scroll of choices—sound, music, tutorial, fullscreen, cheats.
+ * The menu keeper reads and writes these; they are saved between sessions.
+ */
 struct DragonGameSettings {
   SavableVariable<int> snProgress;
   SavableVariable<bool> sbSoundOn;
@@ -42,14 +44,14 @@ struct DragonGameSettings {
   DragonGameSettings(FilePath *fp, const std::string &fullScreenPath);
 };
 
-/** Global game state: level storage, active controller, graphics/sound, score,
- * savable options, music. */
+/** The great hall of the realm: where levels dwell, who holds the throne,
+ * sights and sounds, the hero's tally, scrolls of choice, and the bard's song.
+ */
 struct DragonGameController {
   DragonGameController(smart_pointer<ScalingDrawer> pDr_,
                        smart_pointer<NumberDrawer> pNum_,
                        smart_pointer<NumberDrawer> pBigNum_,
-                       FontWriter *pFancyNum_,
-                       SoundInterface<Index> *pSndRaw_,
+                       FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
                        TowerDataWrap *pWrp_, FilePath *fp);
 
@@ -57,93 +59,93 @@ struct DragonGameController {
   void Next();
   void Restart(int nActive_ = -1);
 
-  /** Controller currently in control (menu, level, start, etc.). */
+  /** Who holds the throne right now—the menu, a level, or the gates of dawn. */
   GameController *GetActiveController() const;
-  /** Name of current screen for logging and tests (e.g. "menu", "level"). */
+  /** Name of the screen before you, for scribes and trials (e.g. menu, level). */
   std::string GetActiveControllerName() const;
-  /** True when the game-over screen is showing. */
+  /** True when the dragon has claimed the day—the game-over screen is upon you. */
   bool IsOnGameOverScreen() const;
-  /** Open main menu and remember where to return. */
+  /** Step into the great menu hall; the path back is remembered. */
   void EnterMenu();
-  /** Leave menu and return to the screen we came from. */
+  /** Leave the menu and return to where the quest had paused. */
   void ExitMenuResume();
-  /** Restart from a given chapter (e.g. menu "chapter 1/2/3"). */
+  /** Begin the tale anew from a chosen chapter (e.g. chapter 1, 2, or 3). */
   void RestartFromChapter(int chapter);
-  /** Switch to the game-over screen. */
+  /** Show the screen where the dragon wins—game over. */
   void ShowGameOverScreen();
 
-  /** Main graphics interface (e.g. for drawing cursor). */
+  /** The realm's canvas—where the cursor and all sights are drawn. */
   GraphicalInterface<Index> *GetGraphics() const;
-  /** Redraw the whole screen. */
+  /** Refresh the entire vista; paint the screen anew. */
   void RefreshAll();
-  /** Drawer that scales sprites to screen size. */
+  /** The drawer that fits sprites to the screen's measure. */
   smart_pointer<ScalingDrawer> GetDrawer() const;
-  /** Scale factor used for drawing (e.g. 1, 2). */
+  /** How much to magnify the realm when drawing (e.g. 1, 2). */
   unsigned GetDrawScaleFactor() const;
 
-  /** Small number font for score and UI. */
+  /** Small runes for the score and the hero's interface. */
   smart_pointer<NumberDrawer> GetNumberDrawer() const;
-  /** Large number font for score display. */
+  /** Great runes for the score when it is shown in glory. */
   smart_pointer<NumberDrawer> GetBigNumberDrawer() const;
-  /** Fancy font for intro and messages. */
+  /** Elegant script for the tale's opening and messages from the realm. */
   FontWriter *GetFancyFont() const;
 
-  /** Play a sound by key (e.g. "death", "explosion"). */
+  /** Let the bard play a sound by its name (e.g. death, explosion). */
   void PlaySound(std::string key);
-  /** Turn sound on or off and persist the choice. */
+  /** Mute or unmute the realm's sounds; the choice is remembered. */
   void ToggleSoundOutput();
-  /** True if sound is currently on. */
+  /** True if the realm's sounds are not muted. */
   bool IsSoundOutputOn() const;
-  /** Start or stop background music and persist the choice. */
+  /** Start or still the bard's song; the choice is remembered. */
   void ToggleMusicPlayback();
-  /** True if music is currently off. */
+  /** True if the bard's song is stilled. */
   bool IsMusicPlaybackOff() const;
 
-  /** Current score this run. */
+  /** The hero's tally for this run. */
   int GetScore() const;
-  /** Best score so far (saved to file). */
+  /** The finest tally yet—inscribed in the scrolls. */
   int GetHighScore() const;
-  /** Add points to current score. */
+  /** Add to the hero's tally. */
   void AddScore(int delta);
-  /** If score beats high score, update it and save to file. */
+  /** If the tally bests the record, inscribe the new high in the scrolls. */
   void UpdateHighScoreIfNeeded();
 
-  /** True when dragon is in angry mode. */
+  /** Do the wizards burn with wrath? */
   bool IsAngry() const;
-  /** Switch dragon to angry mode. */
+  /** Rouse the wizards' wrath. */
   void SetAngry();
 
-  /** Saved progress (which level/chapter we reached). */
+  /** How far the hero has journeyed—which chapter is unlocked (saved). */
   int GetProgress() const;
-  /** Saved option: sound on or off. */
+  /** Scroll of choice: are the realm's sounds heard? */
   bool IsSoundOnSetting() const;
-  /** Saved option: music on or off. */
+  /** Scroll of choice: does the bard play? */
   bool IsMusicOnSetting() const;
-  /** Saved option: show tutorial or not. */
+  /** Scroll of choice: show the wise one's guidance or not. */
   bool IsTutorialOnSetting() const;
-  /** Saved option: fullscreen or windowed. */
+  /** Scroll of choice: fill the window or show a frame. */
   bool IsFullScreenSetting() const;
-  /** Saved option: cheats enabled or not. */
+  /** Scroll of choice: are the hidden arts enabled? */
   bool AreCheatsOnSetting() const;
-  /** Saved option: cheats have been unlocked. */
+  /** Scroll of choice: the hidden arts have been earned. */
   bool CheatsUnlocked() const;
 
-  /** Play area rectangle in logical coordinates. */
+  /** The battlefield's bounds in the realm's measure. */
   const Rectangle &GetBounds() const;
-  /** Screen size in pixels. */
+  /** The window's size in pixels—the realm's true measure. */
   Size GetActualResolution() const;
-  /** Path helper for loading and saving files. */
+  /** The keeper of paths—where scrolls are read and written. */
   FilePath *GetFilePath() const;
-  /** Quit the game (trigger exit event). */
+  /** Leave the realm—close the gates and end the tale. */
   void ExitProgram();
 
-  /** Remove all bonuses carried to the next level. */
+  /** Leave behind all treasures meant for the next chapter. */
   void ClearBonusesToCarryOver();
-  /** Add a bonus to carry to the next level. */
+  /** Add a treasure to carry into the next chapter. */
   void AddBonusToCarryOver(smart_pointer<TimedFireballBonus> b);
-  /** List of bonuses to carry to the next level (read-only). */
-  const std::list<smart_pointer<TimedFireballBonus>> &GetBonusesToCarryOver()
-      const;
+  /** The pack of treasures bound for the next chapter (gaze but do not alter). */
+  const std::list<smart_pointer<TimedFireballBonus>> &
+  GetBonusesToCarryOver() const;
 
   Index &GetImg(std::string key);
   ImageSequence &GetImgSeq(std::string key);
