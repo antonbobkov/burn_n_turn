@@ -25,7 +25,7 @@ struct Castle : public Critter {
   /*unsigned*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
-/** Princess unit: Critter + ConsumableEntity, captured by dragon. */
+/** The princess: a soul the dragon can rescue and carry to the castle. */
 struct Princess : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Princess"; }
   LevelController *pAc;
@@ -36,7 +36,7 @@ struct Princess : public Critter, public ConsumableEntity {
 
   /*virtual*/ char GetType() { return 'P'; }
 
-  /** Spawn BonusScore, set bExist false. */
+  /** When hit: show the bonus tally and vanish from the world. */
   /*virtual*/ void OnHit(char cWhat);
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
@@ -71,7 +71,7 @@ unsigned RandomBonus(bool bInTower = true);
 
 std::string GetBonusImage(int n);
 
-/** Trader unit: drops bonus, bFirstBns ref for first-bonus logic. */
+/** The trader: drops a treasure when felled; first-bonus is tracked elsewhere. */
 struct Trader : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Trader"; }
   LevelController *pAc;
@@ -89,7 +89,7 @@ struct Trader : public Critter, public ConsumableEntity {
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
-/** Knight unit: chases princess/castle, can become ghost (Ghostiness). */
+/** The knight: chases princess and castle, and may rise again as a ghost. */
 struct Knight : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Knight"; }
   LevelController *pAc;
@@ -105,15 +105,14 @@ struct Knight : public Critter, public ConsumableEntity {
 
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
-  /** Move position back one unit along current velocity. */
+  /** Push the knight back one step along his path. */
   void KnockBack();
 
   /**
-   * Each frame: if the knight is on a castle, notify the castle and remove the
-   * knight. If it is a skeleton: remove dead units and bonuses, then damage or
-   * kill princesses and traders on hit, and collect bonus pickups. When the
-   * knight moves, advance the walk animation and play step sounds at the right
-   * moments.
+   * Each tick: if the knight reaches a castle, the castle is told and the
+   * knight is gone. If he is a skeleton: clear the fallen and treasures, harm
+   * or slay princess and trader on touch, and gather bonus pickups. When he
+   * moves, advance the walk and play the step at the right moment.
    */
   /*virtual*/ void Update();
 
@@ -124,7 +123,7 @@ struct Knight : public Critter, public ConsumableEntity {
   /*virtual*/ char GetType() { return cType; }
 };
 
-/** Large slime unit: splits or merges (MegaSlime logic). */
+/** The great slime: it may split or merge in the dance of the MegaSlime. */
 struct MegaSlime : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "MegaSlime"; }
   LevelController *pAc;
@@ -140,9 +139,9 @@ struct MegaSlime : public Critter, public ConsumableEntity {
   void RandomizeVelocity();
 
   /**
-   * Remove collected bonuses. When the slime touches a bonus pickup, remove it
-   * and play a sound. On the timer: advance the animation; on jump and land
-   * frames, play sounds and either randomize movement or stop.
+   * Clear bonuses it has swallowed. When it touches a pickup, the treasure
+   * is gone and a sound plays. Each tick: advance the dance; on jump and land,
+   * play sounds and either change direction or stand still.
    */
   /*virtual*/ void Update();
 
@@ -153,7 +152,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
   /*virtual*/ char GetType() { return 'E'; }
 };
 
-/** Ghost knight effect: timed visual at a position. */
+/** The ghost's echo: a brief shimmer where the knight fell. */
 struct Ghostiness : public EventEntity {
   std::string get_class_name() override { return "Ghostiness"; }
   Timer t;
@@ -169,7 +168,7 @@ struct Ghostiness : public EventEntity {
   /*virutal*/ void Update();
 };
 
-/** Slime unit: moves toward target, timer for behavior. */
+/** A slime: it drifts toward its prey, a timer guiding its steps. */
 struct Slime : public Critter, public ConsumableEntity {
   std::string get_class_name() override { return "Slime"; }
   LevelController *pAc;
@@ -193,7 +192,7 @@ struct Slime : public Critter, public ConsumableEntity {
   ~Slime();
 };
 
-/** Spawns slimes on a timer at a position. */
+/** Summons slimes on a timer at a spot in the realm. */
 struct Sliminess : public EventEntity {
   std::string get_class_name() override { return "Sliminess"; }
   Timer t;
@@ -208,7 +207,7 @@ struct Sliminess : public EventEntity {
 
   /*virutal*/ void Update();
 
-  /** Cancels the spawn (this and the visual both removed). */
+  /** End the summoning; the spawn and its shimmer are gone. */
   void Kill();
 
   Point GetPosition() { return p; }
@@ -216,7 +215,7 @@ struct Sliminess : public EventEntity {
   ~Sliminess();
 };
 
-/** Spawns MegaSlimes; holds position and controller. */
+/** Summons the great slimes; keeps the spot and the realm's keeper. */
 struct MegaSliminess : public EventEntity {
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
@@ -228,7 +227,7 @@ struct MegaSliminess : public EventEntity {
   /*virutal*/ void Update();
 };
 
-/** SimpleVisualEntity that moves with fPos/fVel (e.g. menu slime). */
+/** A drifting slime that moves with position and velocity (e.g. in the menu). */
 struct FloatingSlime : public SimpleVisualEntity {
   std::string get_class_name() override { return "FloatingSlime"; }
   fPoint fPos;

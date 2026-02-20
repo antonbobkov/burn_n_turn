@@ -25,8 +25,8 @@ struct TutorialLevelOne;
 struct TutorialLevelTwo;
 struct TutorialTextEntity;
 
-/** Main game controller: castles, roads, dragon, generators, bonuses, input.
- */
+/** The keeper of the chapter: castles, roads, dragon, spawners, treasures,
+ * and the hero's input. */
 struct LevelController : public EntityListController {
   std::string get_class_name() override { return "LevelController"; }
   std::vector<std::unique_ptr<Castle>> vCs;
@@ -85,7 +85,7 @@ struct LevelController : public EntityListController {
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
 
-  /** Return the smart_pointer in vDr that wraps p, or null. */
+  /** Find the dragon in our list that matches p, or return nothing. */
   smart_pointer<Dragon> FindDragon(Dragon *p);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);

@@ -14,7 +14,8 @@ struct FontWriter;
 struct ScalingDrawer;
 struct NumberDrawer;
 
-/** Holds exit event and graphics/sound interfaces for tower game setup. */
+/** The tower's chest: exit signal and the realm's sight and sound, for when
+ * the game is first raised. */
 class TowerDataWrap {
 public:
   TowerDataWrap(ProgramEngine const& pe);
@@ -40,7 +41,8 @@ public:
   Size szActualRez;
 };
 
-/** Top-level tower game: owns TowerDataWrap, builds and runs level flow. */
+/** The top of the tower: holds the chest, builds the chapters and runs the
+ * tale. */
 class DragonGameRunner : public GameRunner {
   TowerDataWrap *pData;
 
@@ -59,12 +61,11 @@ public:
   /*virtual*/ void DoubleClick();
   /*virtual*/ void Fire();
 
-  /** For simulation/inspection: current tower controller (levels, menu, etc.).
-   */
+  /** For scribes and trials: who holds the tower now (levels, menu, etc.). */
   DragonGameController *GetTowerController() const;
-  /** Name of current screen for simulation (e.g. "menu", "start", "level"). */
+  /** Name of the screen before you (e.g. menu, start, level). */
   std::string GetActiveControllerName() const;
-  /** True if current screen is game-over (for simulation_test). */
+  /** True when the dragon has claimed the day (for the trial of simulation). */
   bool IsOnGameOverScreen() const;
 };
 

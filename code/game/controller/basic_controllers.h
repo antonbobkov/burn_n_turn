@@ -19,22 +19,23 @@ struct EventEntity;
 struct FancyCritter;
 struct VisualEntity;
 
-/** GameController with draw/update/consumable lists; Update runs Move, Update,
- * then draws by priority. */
+/** A controller that keeps lists of things to draw, update, and consume; each
+ * tick it moves, updates, then paints from back to front. */
 struct EntityListController : public GameController {
   std::string get_class_name() override { return "EntityListController"; }
   std::list<smart_pointer<VisualEntity>> lsDraw;
   std::list<smart_pointer<EventEntity>> lsUpdate;
   std::list<smart_pointer<ConsumableEntity>> lsPpl;
 
-  /** Owned entities (controller owns lifetime). Empty for now. */
+  /** Creatures and sights this controller brought into the world (it owns
+   * them). Empty for now. */
   std::list<std::unique_ptr<Entity>> owned_entities;
   std::list<VisualEntity *> owned_visual_entities;
   std::list<EventEntity *> owned_event_entities;
 
-  /** Add visual entity to lsDraw. */
+  /** Add a sight to the list of things drawn. */
   void AddV(smart_pointer<VisualEntity> pVs);
-  /** Adds an event entity to the update list. */
+  /** Add a creature that ticks each frame to the update list. */
   void AddE(smart_pointer<EventEntity> pEv);
 
   void AddOwnedVisualEntity(std::unique_ptr<VisualEntity> p);
@@ -51,7 +52,7 @@ struct EntityListController : public GameController {
     lsUpdate.push_back(t);
   }
 
-  /** Add scaled fullscreen StaticRectangle of color c to lsDraw. */
+  /** Add a fullscreen colored veil to the draw list. */
   void AddBackground(Color c);
 
   EntityListController(const EntityListController &) = delete;
@@ -59,13 +60,13 @@ struct EntityListController : public GameController {
   EntityListController(DragonGameController *pGl_, Rectangle rBound, Color c);
 
   /**
-   * Each frame: remove dead things from the lists, move everything that can
-   * move, then update everyone. Draw everything in order from back to front.
-   * Refresh the screen unless refresh is disabled.
+   * Each tick: clear the fallen from the lists, move all that can move, then
+   * update everyone. Draw from back to front. Refresh the vista unless
+   * refresh is stilled.
    */
   /*virtual*/ void Update();
 
-  /** Non-owned entities to update and draw (e.g. owned elsewhere). */
+  /** Creatures and sights that tick and draw here but are owned elsewhere. */
   virtual std::vector<EventEntity *> GetNonOwnedUpdateEntities() { return {}; }
   virtual std::vector<VisualEntity *> GetNonOwnedDrawEntities() { return {}; }
 
@@ -80,7 +81,7 @@ struct StartScreenController : public EntityListController {
   StartScreenController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
-  /** Advance to next screen and play start_game sound. */
+  /** Step to the next screen and let the bard play the start_game tune. */
   void Next();
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
@@ -100,9 +101,9 @@ struct Cutscene : public EntityListController {
   bool bRelease;
 
   /**
-   * Sets up the chase: black screen, one character running and one waiting.
-   * Runner starts left or right depending on flip; when the runner reaches the
-   * middle, the chaser is released. Beep/boop timer for sound.
+   * Set the stage: dark veil, one soul running and one waiting. Runner starts
+   * left or right by flip; when the runner reaches the middle, the chaser is
+   * unleashed. A timer drives the beeps and boops.
    */
   Cutscene(DragonGameController *pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false);
@@ -113,7 +114,8 @@ struct Cutscene : public EntityListController {
   /*virtual*/ std::string GetControllerName() const { return "cutscene"; }
 };
 
-/** Controller that shows dragon score and exits on click or timer. */
+/** A screen that shows the dragon's tally and leaves on click or when time
+ * runs out. */
 struct DragonScoreController : public EntityListController {
   std::string get_class_name() override { return "DragonScoreController"; }
   Timer t;
@@ -130,8 +132,8 @@ struct DragonScoreController : public EntityListController {
   /*virtual*/ std::string GetControllerName() const { return "score"; }
 };
 
-/** EntityListController that advances (Next) when only background is left or
- * on input. */
+/** A controller that steps to the next screen when only the veil remains, or
+ * when the hero gives a sign. */
 struct AutoAdvanceController : public EntityListController {
   std::string get_class_name() override { return "AutoAdvanceController"; }
   AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)

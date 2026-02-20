@@ -8,7 +8,7 @@
 
 class FilePath;
 
-/** Exception for BrokenLine segment errors (e.g. invalid/empty segment). */
+/** Thrown when a path segment is wrong (e.g. invalid or empty). */
 class SegmentSimpleException : public MyException {
   std::string strProblem;
 
@@ -20,8 +20,8 @@ public:
   /*virtual*/ std::string GetErrorMessage() const { return strProblem; }
 };
 
-/** Polyline(s): vEdges is list of point sequences; CloseLast, Add, AddLine,
- * Join, stream I/O. */
+/** A path made of segments: vEdges holds the point sequences; CloseLast,
+ * Add, AddLine, Join, and stream read/write. */
 struct BrokenLine {
   typedef std::vector<fPoint> VecLine;
   typedef std::vector<VecLine> VecLines;
@@ -51,8 +51,8 @@ struct BrokenLine {
 std::ostream &operator<<(std::ostream &ofs, const BrokenLine &bl);
 std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
 
-/** Level road segment: vertical/horizontal, coordinate, bounds; Draw renders
- * gray bar. */
+/** A stretch of road in the chapter: vertical or horizontal, with coordinate
+ * and bounds; Draw paints the gray bar. */
 struct Road : virtual public VisualEntity {
   std::string get_class_name() override { return "Road"; }
   bool bVertical;
@@ -83,8 +83,7 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
 
 struct LevelController;
 
-/** Fancy road: draws tiled road image; needs LevelController for resources.
- */
+/** A road with a tiled image; needs the level keeper for its art. */
 struct FancyRoad : public Road {
   FancyRoad(const Road &rd, LevelController *pAd_) : Road(rd), pAd(pAd_) {}
   LevelController *pAd;
@@ -92,8 +91,8 @@ struct FancyRoad : public Road {
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
-/** One level: bounds, knight spawn line, castle positions, roads, timer, spawn
- * freqs; Convert scales coords. */
+/** One chapter: bounds, where knights appear, castle spots, roads, timer, and
+ * spawn rates; Convert scales the realm's measure. */
 struct LevelLayout {
   Rectangle sBound;
 

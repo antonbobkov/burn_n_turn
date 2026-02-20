@@ -20,7 +20,7 @@ const float fTraderSpeed = .5F * fSpeedConstant;
 const float fMageSpeed = .5F * fSpeedConstant;
 const float fSlimeSpeed = 1.F * fSpeedConstant;
 const float fGhostSpeedMultiplier =
-    1.3f; // where ghost speed = knightspeed*ghostspeedmultiplier
+    1.3f; /* ghost runs swifter than the knight by this factor */
 
 const float fFireballSpeed = 1.F * fSpeedConstant;
 
@@ -50,15 +50,15 @@ const int nSummonRadius = 60;
 const int nGolemHealthMax = 70;
 const int nSlimeHealthMax = 30;
 
-// flying constants
+/* when the dragon takes to the sky */
 const float fFlightCoefficient = 6.5F;
 const float fTowerClickRadius = 25;
 const float fDragonClickRadius = 25;
 
-// Bonus stuff
+/* treasures and fireball renewal */
 const float fInitialFrequency = 2.F;
-const int nInitialRegen = 0; // in deciseconds
-const int nRegenDelay = 10;  // in deciseconds
+const int nInitialRegen = 0; /* deciseconds */
+const int nRegenDelay = 10;  /* deciseconds */
 
 #ifndef KEYBOARD_CONTROLS
 const int nInitialFireballs = 4;

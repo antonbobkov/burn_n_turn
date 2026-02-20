@@ -16,7 +16,7 @@
 struct DragonGameController;
 struct LevelController;
 
-/** Root entity; bExist flag, virtual dtor. */
+/** The root of all things in the realm; a flag says if it still exists. */
 struct Entity : virtual public SP_Info {
   std::string get_class_name() override { return "Entity"; }
   bool bExist;
@@ -24,14 +24,14 @@ struct Entity : virtual public SP_Info {
   virtual ~Entity() {}
 };
 
-/** Entity that can Move and Update each frame. */
+/** A thing that can step and update each tick. */
 struct EventEntity : virtual public Entity {
   std::string get_class_name() override { return "EventEntity"; }
   virtual void Move() {}
   virtual void Update() {}
 };
 
-/** Entity with a screen position (GetPosition). */
+/** A thing that has a place on the vista (GetPosition). */
 struct ScreenEntity : virtual public Entity {
   std::string get_class_name() override { return "ScreenEntity"; }
   virtual Point GetPosition() { return Point(0, 0); }
@@ -47,7 +47,7 @@ struct VisualEntity : virtual public ScreenEntity {
   VisualEntity &operator=(VisualEntity &&) = delete;
 };
 
-/** VisualEntity that draws multi-line text via NumberDrawer at a position. */
+/** A sight that paints lines of text at a point on the vista. */
 struct TextDrawEntity : virtual public VisualEntity {
   std::string get_class_name() override { return "TextDrawEntity"; }
   float dPriority;
@@ -69,8 +69,8 @@ struct TextDrawEntity : virtual public VisualEntity {
   /*virtual*/ float GetPriority() { return dPriority; }
 };
 
-/** VisualEntity with an ImageSequence: draws current frame, Update toggles by
- * timer or on position change. */
+/** A sight with a sequence of images: draws the current frame; Update steps
+ * by timer or when position changes. */
 struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "SimpleVisualEntity"; }
   float dPriority;
@@ -104,8 +104,8 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   /*virtual*/ void Update();
 };
 
-/** EventEntity that plays a SoundSequence on a timer; sets bExist false when
- * sequence ends. */
+/** A thing that plays a sound sequence on a timer; it vanishes when the tune
+ * ends. */
 struct SimpleSoundEntity : virtual public EventEntity {
   std::string get_class_name() override { return "SimpleSoundEntity"; }
   unsigned nPeriod;
@@ -122,7 +122,7 @@ struct SimpleSoundEntity : virtual public EventEntity {
   /*virtual*/ void Update();
 };
 
-/** SimpleVisualEntity with fixed position (no movement). */
+/** A sight that stays in one place and cycles through frames. */
 struct Animation : public SimpleVisualEntity {
   std::string get_class_name() override { return "Animation"; }
   Point pos;
@@ -134,7 +134,7 @@ struct Animation : public SimpleVisualEntity {
   /*virtual*/ Point GetPosition() { return pos; }
 };
 
-/** Animation that runs once then sets bExist false (seq plays to end). */
+/** An animation that plays once to the end, then vanishes. */
 struct AnimationOnce : public SimpleVisualEntity {
   std::string get_class_name() override { return "AnimationOnce"; }
   Point pos;
@@ -149,7 +149,7 @@ struct AnimationOnce : public SimpleVisualEntity {
   /*virtual*/ void Update();
 };
 
-/** VisualEntity that draws a single image at a fixed point. */
+/** A sight that shows one image at a fixed point. */
 struct StaticImage : public VisualEntity {
   std::string get_class_name() override { return "StaticImage"; }
   Index img;
@@ -168,7 +168,7 @@ struct StaticImage : public VisualEntity {
   /*virtual*/ float GetPriority() { return dPriority; }
 };
 
-/** VisualEntity that draws a filled rectangle (no position). */
+/** A sight that draws a filled rectangle (covers the vista, no single spot). */
 struct StaticRectangle : public VisualEntity {
   std::string get_class_name() override { return "StaticRectangle"; }
   float dPriority;
@@ -185,7 +185,7 @@ struct StaticRectangle : public VisualEntity {
   /*virtual*/ float GetPriority() { return dPriority; }
 };
 
-/** ScreenEntity with radius for hit detection (HitDetection). */
+/** A thing on the vista with a radius—so we can tell when it touches another. */
 struct PhysicalEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "PhysicalEntity"; }
   virtual unsigned GetRadius() { return 0; }
@@ -194,7 +194,7 @@ struct PhysicalEntity : virtual public ScreenEntity {
   bool HitDetection(PhysicalEntity *pPh);
 };
 
-/** PhysicalEntity that can be hit (OnHit), has type (GetType) and image
+/** A thing that can be struck (OnHit), has a kind (GetType) and an image
  * (GetImage). */
 struct ConsumableEntity : virtual public PhysicalEntity {
   std::string get_class_name() override { return "ConsumableEntity"; }
@@ -203,8 +203,8 @@ struct ConsumableEntity : virtual public PhysicalEntity {
   virtual Index GetImage() = 0;
 };
 
-/** Moving unit: position, velocity, bounds, radius; Move() steps and clamps or
- * kills on exit. */
+/** A creature that moves: place, speed, bounds, and radius; Move() steps it
+ * and clamps or removes it when it leaves the realm. */
 struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
   std::string get_class_name() override { return "Critter"; }
   unsigned nRadius;
@@ -233,7 +233,7 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
         sUnderText("") {}
 };
 
-/** Critter that advances position and toggles frame on a timer (tm). */
+/** A creature that steps and flips frames by a timer. */
 struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
   std::string get_class_name() override { return "FancyCritter"; }
   unsigned nRadius;
@@ -256,7 +256,7 @@ struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
         tm(nPeriod) {}
 };
 
-/** Sort key for draw order: priority and height (operator<). */
+/** How we order what is drawn: by priority and height (operator<). */
 struct ScreenPos {
   float fPriority;
   int nHeight;
@@ -270,7 +270,7 @@ struct ScreenPos {
   }
 };
 
-/** Floating "+N" score text at a point; animates then removes. */
+/** A floating "+N" tally at a point; it lingers a moment then fades. */
 struct BonusScore : public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "BonusScore"; }
   LevelController *pAc;
@@ -304,7 +304,7 @@ struct SoundControls : public EventEntity {
   /*virtual*/ void Update();
 };
 
-/** Draws high score in a rectangle. */
+/** Paints the finest tally yet within a rectangle on the vista. */
 struct HighScoreShower : public VisualEntity {
   std::string get_class_name() override { return "HighScoreShower"; }
   DragonGameController *pGl;
@@ -327,7 +327,7 @@ struct IntroTextShower : public VisualEntity {
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 };
 
-/** Remove from list any element for which bExist is false. */
+/** Clear from the list all that have left the realm (bExist is false). */
 template <class T> void CleanUp(std::list<T> &ar) {
   for (typename std::list<T>::iterator itr = ar.begin(), etr = ar.end();
        itr != etr;) {

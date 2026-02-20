@@ -7,8 +7,8 @@
 
 struct DragonGameController;
 
-/** Scrolling tutorial text; SetText queues sNewText and Update scrolls between
- * sText and sNewText. */
+/** The wise one's scrolling words. SetText queues new lines; Update scrolls
+ * between the old and the new. */
 struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "TutorialTextEntity"; }
   float dPriority;
@@ -33,21 +33,23 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
       : dPriority(dPriority_), pos(pos_), pNum(pNum_), t(1), nOffset(0),
         nTextVerticalSpacing(7), nDelta(1), pGl(pGl_) {}
 
-  /** Set content to v; scrolls from sText to v or sets sText if empty. */
+  /** Set the scroll's words to v; scroll from current lines to v or set if
+   * empty. */
   void SetText(std::vector<std::string> v);
 
-  /** Draw sText lines with vertical offset nOffset; skip if tutorial off. */
+  /** Draw the lines with a vertical offset; skip if the wise one's guidance is
+   * off. */
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 
-  /** Advances the scroll each tick; when scroll ends, the new text replaces
-   * the old. */
+  /** Advance the scroll each tick; when it ends, the new words replace the
+   * old. */
   /*virtual*/ void Update();
 };
 
-/** First tutorial: tracks knight kill, flying, princess spawn/capture;
- * GetText/Update drive TutorialTextEntity. */
+/** First tale: tracks when the knight falls, when the dragon flies, when the
+ * princess appears or is captured; GetText/Update feed the scrolling words. */
 struct TutorialLevelOne {
   bool bKilledKnight;
   bool bFlying;
@@ -60,32 +62,32 @@ struct TutorialLevelOne {
       : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
         bPrincessCaptured(false), pTexter() {}
 
-  /** Chooses which tutorial lines to show for level one. */
+  /** Choose which lines the wise one speaks for the first chapter. */
   std::vector<std::string> GetText();
 
-  /** Pushes the current tutorial lines to the display. */
+  /** Send the current lines to the scroll. */
   void Update();
 
   void ShotFired() {}
 
-  /** Set bKilledKnight and refresh tutorial text. */
+  /** Mark that the knight fell and refresh the wise one's words. */
   void KnightKilled();
 
-  /** Set flying on and refresh text. */
+  /** Mark that the dragon took flight and refresh the words. */
   void FlyOn();
 
-  /** Set flying off and refresh text. */
+  /** Mark that the dragon landed and refresh the words. */
   void FlyOff();
 
-  /** Mark princess spawned and refresh text. */
+  /** Mark that the princess appeared and refresh the words. */
   void PrincessGenerate();
 
-  /** Mark princess captured and refresh text. */
+  /** Mark that the princess was captured and refresh the words. */
   void PrincessCaptured();
 };
 
-/** Second tutorial: trader spawn/kill and bonus pickup; GetText/Update drive
- * TutorialTextEntity. */
+/** Second tale: trader appearing and falling, bonus picked up; GetText/Update
+ * feed the scrolling words. */
 struct TutorialLevelTwo {
   bool bTraderGenerated;
   bool bTraderKilled;
@@ -97,19 +99,19 @@ struct TutorialLevelTwo {
       : bTraderGenerated(false), bTraderKilled(false), bBonusPickedUp(false),
         pTexter() {}
 
-  /** Build tutorial lines from trader/bonus state. */
+  /** Build the wise one's lines from trader and bonus state. */
   std::vector<std::string> GetText();
 
-  /** Pushes the current tutorial lines to the display. */
+  /** Send the current lines to the scroll. */
   void Update();
 
-  /** Set bTraderKilled and refresh text. */
+  /** Mark that the trader fell and refresh the words. */
   void TraderKilled();
 
-  /** Mark trader spawned and refresh text. */
+  /** Mark that the trader appeared and refresh the words. */
   void TraderGenerate();
 
-  /** Mark bonus picked up and refresh text. */
+  /** Mark that a bonus was picked up and refresh the words. */
   void BonusPickUp();
 };
 

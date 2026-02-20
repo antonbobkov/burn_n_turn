@@ -6,7 +6,7 @@
 #include "game_utils/draw_utils.h"
 #include "utils/smart_pointer.h"
 
-/** Controller for buy-now screen: slime animations and timer. */
+/** The keeper of the buy-now screen: slime dances and a countdown. */
 struct BuyNowController : public EntityListController {
   std::string get_class_name() override { return "BuyNowController"; }
   int t;
@@ -19,16 +19,16 @@ struct BuyNowController : public EntityListController {
 
   BuyNowController(DragonGameController *pGl_, Rectangle rBound, Color c);
 
-  /** Set fVel to random direction, sometimes toward center; scale by speed. */
+  /** Give a slime a new random heading, sometimes toward the center; scale by
+   * speed. */
   void RandomizeVelocity(fPoint &fVel, fPoint pPos);
 
-  /** Draw all slime animations. */
+  /** Paint all the slime dances. */
   void DrawSlimes();
 
   /**
-   * Runs the normal controller update. Every so often, some slimes get a new
-   * random direction. All slimes move and animate. Countdown runs. Screen
-   * refreshes.
+   * The usual tick: now and then some slimes choose a new path. All slimes
+   * move and dance. The countdown runs. The vista is refreshed.
    */
   /*virtual*/ void Update();
 
@@ -38,7 +38,7 @@ struct BuyNowController : public EntityListController {
   /*virtual*/ std::string GetControllerName() const { return "buy"; }
 };
 
-/** VisualEntity that draws slime animations for the buy-now screen. */
+/** A sight that paints the slime dances on the buy-now screen. */
 struct SlimeUpdater : public VisualEntity {
   BuyNowController *pBuy;
 

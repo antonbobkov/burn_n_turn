@@ -9,8 +9,8 @@
 struct EntityListController;
 struct LevelController;
 
-/** Power-up state: named float/unsigned/bool maps, nNum; += merges, Add
- * accumulates. */
+/** The dragon's fire strength: named numbers and flags; += combines, Add
+ * gathers more. */
 struct FireballBonus : virtual public Entity {
   std::string get_class_name() override { return "FireballBonus"; }
   std::map<std::string, float> fMap;
@@ -35,8 +35,8 @@ struct FireballBonus : virtual public Entity {
 
 std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
 
-/** Chain reaction generation count or infinite; Evolve decrements, IsLast when
- * 0. */
+/** How many echoes the blast may spawn, or endless; Evolve steps it down,
+ * IsLast when there are no more. */
 struct Chain {
   bool bInfinite;
   unsigned nGeneration;
@@ -49,8 +49,8 @@ struct Chain {
   bool IsLast() { return (!bInfinite) && (nGeneration == 0); }
 };
 
-/** Expanding explosion; hits ConsumableEntities and spawns child
- * ChainExplosions via ch. */
+/** A growing blast; it strikes all it touches and may birth more blasts
+ * through the chain. */
 struct ChainExplosion : virtual public AnimationOnce,
                         virtual public PhysicalEntity {
   std::string get_class_name() override { return "ChainExplosion"; }
@@ -67,10 +67,9 @@ struct ChainExplosion : virtual public AnimationOnce,
 
   /*virtual*/ unsigned GetRadius() { return unsigned(r); }
   /**
-   * Each frame the explosion can grow. Remove dead units. For each unit inside
-   * the blast (except golems and mega slimes): apply fire damage and optionally
-   * spawn a new explosion on them for a chain reaction. Then advance the
-   * explosion animation.
+   * Each tick the blast may grow. Clear the fallen. For each soul inside
+   * (save golems and great slimes): deal fire and maybe birth another blast
+   * for a chain. Then advance the blast's dance.
    */
   /*virtual*/ void Update();
 
@@ -84,7 +83,7 @@ struct KnightOnFire : public Critter {
   Timer t;
   Chain c;
 
-  /** Set fVel to random direction, scaled by fKnightFireSpeed. */
+  /** Send the burning knight in a random direction at fire speed. */
   void RandomizeVelocity();
 
   KnightOnFire(const Critter &cr, EntityListController *pBc_,
@@ -93,8 +92,8 @@ struct KnightOnFire : public Critter {
   /*virtual*/ void Update();
 };
 
-/** Player fireball Critter; bThrough for passthrough, hits ConsumableEntities.
- */
+/** The dragon's fireball: may pass through or stop on first hit; strikes
+ * all consumable souls it meets. */
 struct Fireball : public Critter {
   std::string get_class_name() override { return "Fireball"; }
   LevelController *pBc;
@@ -114,7 +113,7 @@ struct Fireball : public Critter {
   /*virtual*/ void Update();
 };
 
-/** FireballBonus that updates on a timer (e.g. temporary power-up). */
+/** A fire strength that fades with time (e.g. a temporary boon). */
 struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   std::string get_class_name() override { return "TimedFireballBonus"; }
   Timer t;
@@ -125,7 +124,7 @@ struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   /*virtual*/ void Update();
 };
 
-/** Fireball that orbits at fRadius (circular motion). */
+/** A fireball that circles at a fixed radius around the dragon. */
 struct CircularFireball : virtual public Fireball,
                           virtual public TimedFireballBonus {
   std::string get_class_name() override { return "CircularFireball"; }
@@ -140,8 +139,8 @@ struct CircularFireball : virtual public Fireball,
   /*virtual*/ void Update();
 };
 
-/** Pick-up animation with radius; overlaps ConsumableEntity trigger collection.
- */
+/** A treasure shimmer with a radius; when the dragon touches it, the treasure
+ * is gathered. */
 struct FireballBonusAnimation : public Animation,
                                 virtual public PhysicalEntity {
   std::string get_class_name() override { return "FireballBonusAnimation"; }

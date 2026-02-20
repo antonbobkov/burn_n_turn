@@ -1,8 +1,8 @@
 #ifndef TOWER_DEFENSE_MENU_CONTROLLER_H
 #define TOWER_DEFENSE_MENU_CONTROLLER_H
 
-/* In-game pause/main menu: menu entries, display, caret, options and
- * submenus; MenuController ties MenuDisplay and cursor to EntityListController.
+/* The great pause hall: choices on the wall, the caret that points, options
+ * and side chambers; the menu keeper ties display and cursor to the list.
  */
 
 #include "wrappers/color.h"
@@ -16,10 +16,11 @@ struct DragonGameSettings;
 struct MenuDisplay;
 struct MenuController;
 
-/** Pointer to a MenuDisplay member function used as menu item callback. */
+/** A spell the menu keeper can cast when a choice is chosen. */
 typedef void (MenuDisplay::*EvntPntr)();
 
-/** One menu item: size, label, callback (EvntPntr), disabled flag. */
+/** One choice on the wall: size, label, the spell to cast, and whether it is
+ * dimmed. */
 struct MenuEntry : virtual public SP_Info {
   std::string get_class_name() override { return "MenuEntry"; }
   Size szSize;
@@ -33,16 +34,16 @@ struct MenuEntry : virtual public SP_Info {
         bDisabled(bDisabled_) {}
 };
 
-/** Returns "on" or "off" for menu toggles. */
+/** Returns "on" or "off" for the realm's toggles. */
 std::string OnOffString(bool b);
 
-/** Labels for options submenu entries. */
+/** Labels for the options chamber. */
 std::string SoundString();
 std::string MusicString();
 std::string TutorialString();
 std::string FullTextString();
 
-/** Holds menu entries and current selection index (nMenuPosition). */
+/** The list of choices on the wall and which one the caret points to. */
 struct MenuEntryManager {
   std::vector<MenuEntry> vEntries;
   int nMenuPosition;
@@ -50,8 +51,8 @@ struct MenuEntryManager {
   MenuEntryManager() : nMenuPosition(0) {}
 };
 
-/** In-game menu: draws entries, caret, handles mouse/key; submenus and option
- * toggles. */
+/** The pause hall's face: draws choices and caret, answers mouse and key;
+ * side chambers and option toggles. */
 struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "MenuDisplay"; }
   MenuEntryManager *pCurr;
@@ -69,7 +70,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 
   smart_pointer<Animation> pMenuCaret;
 
-  /** Non-owning pointer; menu is owned by MenuController. */
+  /** The menu keeper who owns this hall (we only point). */
   MenuController *pMenuController;
 
   MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
@@ -77,14 +78,14 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
               smart_pointer<MenuController> pMenuController_,
               bool bCheatsUnlocked_);
 
-  /** Draws the menu entries and the caret at the current selection. */
+  /** Draw the choices on the wall and the caret at the chosen line. */
   /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
 
   /*virtual*/ float GetPriority() { return 0; }
 
   /*virtual*/ void Update() { pCurr->vEntries.at(0).bDisabled = false; }
 
-  /** Updates which menu item is highlighted from the mouse position. */
+  /** Move the caret to the choice under the mouse. */
   void OnMouseMove(Point pMouse);
 
   void PositionIncrement(bool bUp);
@@ -110,7 +111,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   void Chapter3();
 };
 
-/** Controller for pause/main menu: MenuDisplay, options via settings. */
+/** The keeper of the pause hall: the display and options from the scrolls. */
 struct MenuController : public EntityListController {
   std::string get_class_name() override { return "MenuController"; }
   smart_pointer<MenuDisplay> pMenuDisplay;

@@ -8,7 +8,7 @@
 
 struct LevelController;
 
-/** Spawns skeleton knights on a timer at a position. */
+/** Summons skeleton knights on a timer at a spot. */
 struct SkellyGenerator : public EventEntity {
   std::string get_class_name() override { return "SkellyGenerator"; }
   Timer t;
@@ -21,7 +21,7 @@ struct SkellyGenerator : public EventEntity {
   /*virutal*/ void Update();
 };
 
-/** Spawns knights along a path on a timer. */
+/** Summons knights along the path on a timer. */
 struct KnightGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "KnightGenerator"; }
   bool bFirst;
@@ -35,19 +35,19 @@ struct KnightGenerator : virtual public EventEntity {
 
   BrokenLine bl;
 
-  /** Returns the current spawn rate (depends on completion and ghost mode). */
+  /** The current rate at which knights appear (by completion and ghost mode). */
   float GetRate();
 
   KnightGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_,
                   const BrokenLine &bl_);
 
-  /** Spawn one Knight (or Golem/ghost) on bl; add to pBc. */
+  /** Summon one knight (or golem or ghost) on the path and add to the realm. */
   void Generate(bool bGolem = false);
 
   /*virtual*/ void Update();
 };
 
-/** Spawns princesses at a rate within bounds. */
+/** Summons princesses at a rate within the chapter bounds. */
 struct PrincessGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "PrincessGenerator"; }
   float dRate;
@@ -59,9 +59,9 @@ struct PrincessGenerator : virtual public EventEntity {
   PrincessGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
   /**
-   * When the timer fires: pick a random road and spawn a princess there,
-   * moving toward the castles. The first princess gets a "capture" hint.
-   * Add her to the game, play the arrival sound, and notify the tutorial.
+   * When the timer strikes: choose a road and summon a princess there, walking
+   * toward the castles. The first princess bears the "capture" hint. Add her to
+   * the realm, play the arrival tune, and tell the wise one.
    */
   /*virtual*/ void Update();
 };
@@ -78,11 +78,11 @@ struct MageGenerator : virtual public EventEntity {
 
   /*virtual*/ void Update();
 
-  /** Spawn one Mage on a random road; add to pBc. */
+  /** Summon one mage on a random road and add to the realm. */
   void MageGenerate();
 };
 
-/** Spawns traders at a rate within bounds. */
+/** Summons traders at a rate within the chapter bounds. */
 struct TraderGenerator : virtual public EventEntity {
   std::string get_class_name() override { return "TraderGenerator"; }
   float dRate;

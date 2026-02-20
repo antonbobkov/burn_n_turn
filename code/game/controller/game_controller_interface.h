@@ -7,8 +7,8 @@
 
 struct DragonGameController;
 
-/** Base controller: holds pGl, rBound; virtual input/Update (OnKey, OnMouse,
- * Fire, etc.). */
+/** The base of all screen keepers: holds the realm and bounds; input and
+ * tick are virtual (OnKey, OnMouse, Fire, etc.). */
 struct GameController : virtual public SP_Info {
   std::string get_class_name() override { return "GameController"; }
   DragonGameController *pGl;
@@ -30,7 +30,7 @@ struct GameController : virtual public SP_Info {
   virtual void DoubleClick() {}
   virtual void Fire() {}
 
-  /** Name of this screen for simulation/inspection (e.g. "menu", "level"). */
+  /** The name of this screen for scribes and trials (e.g. menu, level). */
   virtual std::string GetControllerName() const { return "basic"; }
 };
 

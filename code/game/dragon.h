@@ -31,7 +31,7 @@ struct DragonLeash {
   fPoint GetNewVelocity(Point trackball);
 };
 
-/** Set of key/button codes for input (e.g. fire, steer). */
+/** The hero's key bindings—which keys mean fire, steer, and so on. */
 struct ButtonSet {
   std::vector<int> vCodes;
 
@@ -42,7 +42,8 @@ struct ButtonSet {
   Point GetPoint(int nCode);
 };
 
-/** Player dragon: carries bonuses and fireballs, steer/shoot, collision. */
+/** The player's dragon: carries treasures and fireballs, steers and shoots,
+ * and meets the world in collision. */
 struct Dragon : public Critter {
   std::string get_class_name() override { return "Dragon"; }
   std::list<smart_pointer<TimedFireballBonus>> lsBonuses;
