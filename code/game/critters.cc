@@ -27,7 +27,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
     fPoint f = GetWedgeAngle(Point(1, 1), 1, i, nNum + 1);
     f.Normalize(15);
 
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("slime_summon"));
+    pAc->pGl->PlaySound("slime_summon");
     smart_pointer<SkellyGenerator> pSkel =
         make_smart(new SkellyGenerator(p + f.ToPnt(), pAc));
     pAc->AddE(pSkel);
@@ -57,7 +57,7 @@ void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
   p.y += 13;
 #ifdef UNDERLINE_UNIT_TEXT
   if (sUnderText != "")
-    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 #endif
 }
 
@@ -68,7 +68,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
   fMvVel = Critter::fVel;
 
   bAngry = true;
-  pAc->pGl->bAngry = true;
+  pAc->pGl->SetAngry();
 }
 
 void Mage::OnHit(char cWhat) {
@@ -82,7 +82,7 @@ void Mage::OnHit(char cWhat) {
 
   pAc->AddBoth(pAn);
 
-  pAc->pGl->bAngry = true;
+  pAc->pGl->SetAngry();
 
   if (pAc->nLvl > 6)
     SummonSlimes();
@@ -172,7 +172,7 @@ void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
   p.y += 13;
 #ifdef UNDERLINE_UNIT_TEXT
   if (sUnderText != "")
-    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 #endif
 }
 
@@ -183,7 +183,7 @@ void Knight::Draw(smart_pointer<ScalingDrawer> pDr) {
   p.y += 13;
 #ifdef UNDERLINE_UNIT_TEXT
   if (sUnderText != "")
-    pAc->pGl->pNum->DrawWord(sUnderText, p, true);
+    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 #endif
 }
 
@@ -213,7 +213,7 @@ void Knight::Update() {
       if (this->HitDetection(*itr)) {
 
         if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
-          pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("death"));
+          pAc->pGl->PlaySound("death");
           (*itr)->OnHit('S');
         }
       }
@@ -228,7 +228,7 @@ void Knight::Update() {
         continue;
 
       if (this->HitDetection(*itr)) {
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("skeleton_bonus"));
+        pAc->pGl->PlaySound("skeleton_bonus");
         (*itr)->bExist = false;
       }
     }
@@ -242,9 +242,9 @@ void Knight::Update() {
       seq.Toggle();
 
       if (seq.nActive == 3)
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("step_left"));
+        pAc->pGl->PlaySound("step_left");
       else if (seq.nActive == 6)
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("step_right"));
+        pAc->pGl->PlaySound("step_right");
     }
   }
   pPrev = p;
@@ -255,11 +255,11 @@ void Knight::OnHit(char cWhat) {
     KnockBack();
     if (nGolemHealth > 0) {
       --nGolemHealth;
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("hit_golem"));
+      pAc->pGl->PlaySound("hit_golem");
       return;
     }
 
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("golem_death"));
+    pAc->pGl->PlaySound("golem_death");
 
     smart_pointer<BonusScore> pB =
         make_smart(new BonusScore(pAc, GetPosition(), 5000));
@@ -323,7 +323,7 @@ void MegaSlime::Update() {
 
     if (this->HitDetection(*itr)) {
       (*itr)->bExist = false;
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_bonus"));
+      pAc->pGl->PlaySound("megaslime_bonus");
     }
   }
 
@@ -332,11 +332,11 @@ void MegaSlime::Update() {
     t = Timer(nPeriod * seq.GetTime() + rand() % 2);
 
     if (seq.nActive == 11) {
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_jump"));
+      pAc->pGl->PlaySound("megaslime_jump");
       RandomizeVelocity();
     } else if (seq.nActive == 16) {
       fVel = fPoint(0, 0);
-      pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_land"));
+      pAc->pGl->PlaySound("megaslime_land");
     }
   }
 }
@@ -344,7 +344,7 @@ void MegaSlime::Update() {
 void MegaSlime::OnHit(char cWhat) {
   if (nHealth > 0) {
     --nHealth;
-    pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_hit"));
+    pAc->pGl->PlaySound("megaslime_hit");
     return;
   }
 
@@ -355,7 +355,7 @@ void MegaSlime::OnHit(char cWhat) {
   pAc->AddBoth(pB);
 
   ImageSequence seqDead = pAc->pGl->GetImgSeq("megaslime_die");
-  pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("megaslime_die"));
+  pAc->pGl->PlaySound("megaslime_die");
 
   smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
       dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
@@ -434,7 +434,7 @@ void Slime::Update() {
 
     if (this->HitDetection(*itr)) {
       if ((*itr)->GetType() == 'K') {
-        pAc->pGl->pSnd->PlaySound(pAc->pGl->GetSnd("slime_poke"));
+        pAc->pGl->PlaySound("slime_poke");
 
         bExist = false;
 
@@ -573,7 +573,7 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
-  pAdv->pGl->pSnd->PlaySound(pAdv->pGl->GetSnd("slime_spawn"));
+  pAdv->pGl->PlaySound("slime_spawn");
 }
 
 void MegaSliminess::Update() {
@@ -661,7 +661,7 @@ void Castle::OnKnight(char cWhat) {
 
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
-      pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("destroy_castle_sound"));
+      pAv->pGl->PlaySound("destroy_castle_sound");
       pAv->pSc->nTheme = -1;
       Critter::seq = pAv->pGl->GetImgSeq("destroy_castle");
     }
@@ -694,7 +694,7 @@ void Castle::OnKnight(char cWhat) {
   }
 
   if (!pDrag.is_null()) {
-    pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("one_princess"));
+    pAv->pGl->PlaySound("one_princess");
 
     --nPrincesses;
 
@@ -712,7 +712,7 @@ void Castle::OnKnight(char cWhat) {
       pAv->lsPpl.push_back(pCr);
     }
   } else {
-    pAv->pGl->pSnd->PlaySound(pAv->pGl->GetSnd("all_princess_escape"));
+    pAv->pGl->PlaySound("all_princess_escape");
 
     if (cWhat == 'K') {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;

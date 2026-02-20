@@ -5,6 +5,8 @@
 #include "entities.h"
 #include "utils/smart_pointer.h"
 
+struct DragonGameController;
+
 /** Scrolling tutorial text; SetText queues sNewText and Update scrolls between
  * sText and sNewText. */
 struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
@@ -23,13 +25,13 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   int nTextVerticalSpacing;
 
-  const bool *pIsTutorialOn;
+  struct DragonGameController *pGl;
 
   TutorialTextEntity(float dPriority_, Point pos_,
                      smart_pointer<NumberDrawer> pNum_,
-                     const bool *pIsTutorialOn_)
+                     DragonGameController *pGl_)
       : dPriority(dPriority_), pos(pos_), pNum(pNum_), t(1), nOffset(0),
-        nTextVerticalSpacing(7), nDelta(1), pIsTutorialOn(pIsTutorialOn_) {}
+        nTextVerticalSpacing(7), nDelta(1), pGl(pGl_) {}
 
   /** Set content to v; scrolls from sText to v or sets sText if empty. */
   void SetText(std::vector<std::string> v);

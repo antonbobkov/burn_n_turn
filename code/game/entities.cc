@@ -153,19 +153,19 @@ void SoundControls::Update() {
 
   p1.x -= (nCharWidth * (s1.size() + 7)) / 2;
 
-  pGl->pBigNum->DrawWord(s1, p1, false);
+  pGl->GetBigNumberDrawer()->DrawWord(s1, p1, false);
 
   p1.x += nCharWidth * s1.size();
 
-  pGl->pBigNum->DrawNumber(pGl->nScore, p1, 7);
+  pGl->GetBigNumberDrawer()->DrawNumber(pGl->GetScore(), p1, 7);
 
   p2.x -= (nCharWidth * (s2.size() + 7)) / 2;
 
-  pGl->pBigNum->DrawWord(s2, p2, false);
+  pGl->GetBigNumberDrawer()->DrawWord(s2, p2, false);
 
   p2.x += nCharWidth * s2.size();
 
-  pGl->pBigNum->DrawNumber(pGl->nHighScore, p2, 7);
+  pGl->GetBigNumberDrawer()->DrawNumber(pGl->GetHighScore(), p2, 7);
 }
 
 /*virtual*/ void IntroTextShower::Draw(smart_pointer<ScalingDrawer> pDr) {
@@ -200,21 +200,21 @@ void SoundControls::Update() {
 
 #endif
 
-  int nHeight = pGl->pFancyNum->GetSize(" ").y + 2;
+  int nHeight = pGl->GetFancyFont()->GetSize(" ").y + 2;
 
   pCnt.y -= (vText.size() * nHeight) / 2;
 
   for (unsigned i = 0; i < vText.size(); ++i) {
-    pGl->pFancyNum->DrawWord(vText[i], pCnt, true);
+    pGl->GetFancyFont()->DrawWord(vText[i], pCnt, true);
     pCnt.y += nHeight;
   }
 }
 
 /*virtual*/ void BonusScore::Draw(smart_pointer<ScalingDrawer> pDr) {
   if (nC < 11)
-    pAc->pGl->pNum->DrawWord(sText, p, true);
+    pAc->pGl->GetNumberDrawer()->DrawWord(sText, p, true);
   else
-    pAc->pGl->pNum->DrawColorWord(sText, p, c, true);
+    pAc->pGl->GetNumberDrawer()->DrawColorWord(sText, p, c, true);
 }
 
 void BonusScore::Update() {
@@ -225,7 +225,7 @@ void BonusScore::Update() {
     ++nC;
     if (nC < 11) {
       nScoreSoFar += nScore / 11;
-      pAc->pGl->nScore += nScore / 11;
+      pAc->pGl->AddScore(nScore / 11);
       --p.y;
     } else {
       c.R -= 50;
@@ -233,7 +233,7 @@ void BonusScore::Update() {
     }
 
     if (nC == 11) {
-      pAc->pGl->nScore += nScore - nScoreSoFar;
+      pAc->pGl->AddScore(nScore - nScoreSoFar);
     }
 
     if (nC >= 15) {

@@ -29,7 +29,7 @@ struct AdNumberDrawer : public VisualEntity {
     unsigned n = pDr->nFactor;
 
 #ifdef FULL_VERSION
-    pAd->pGl->pNum->DrawNumber(pAd->pGl->nScore,
+    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->pGl->GetScore(),
                                Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
 
     if (pAd->bBlink) {
@@ -38,30 +38,30 @@ struct AdNumberDrawer : public VisualEntity {
       if (pAd->bTimerFlash)
         c = Color(255, 0, 0);
 
-      pAd->pGl->pNum->DrawColorNumber(
+      pAd->pGl->GetNumberDrawer()->DrawColorNumber(
           (pAd->t.nPeriod - pAd->t.nTimer) / nFramesInSecond,
           Point(pAd->rBound.sz.x - 14 * 4, 4), c, 4);
-      pAd->pGl->pNum->DrawColorWord(
+      pAd->pGl->GetNumberDrawer()->DrawColorWord(
           "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
     }
 
-    pAd->pGl->pNum->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
+    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
                                2);
 
-    pAd->pGl->pNum->DrawWord("score:", Point(pAd->rBound.sz.x - 33 * 4, 4));
-    pAd->pGl->pNum->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("score:", Point(pAd->rBound.sz.x - 33 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
     if (pAd->bCh) {
-      pAd->pGl->pNum->DrawColorWord(
+      pAd->pGl->GetNumberDrawer()->DrawColorWord(
           "invincible", Point(pAd->rBound.sz.x - 44 * 4, 4), Color(0, 255, 0));
     }
 #else
-    pAd->pGl->pNum->DrawNumber(pAd->pGl->nScore,
+    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->pGl->GetScore(),
                                Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
-    pAd->pGl->pNum->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
+    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
                                2);
 
-    pAd->pGl->pNum->DrawWord("score:", Point(pAd->rBound.sz.x - 23 * 4, 4));
-    pAd->pGl->pNum->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("score:", Point(pAd->rBound.sz.x - 23 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
 #endif
   }
   /*virtual*/ Point GetPosition() { return Point(); }
@@ -186,9 +186,9 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   if (vDr.back()->pCs != nullptr)
     vDr.back()->pCs->pDrag = vDr.back();
 
-  Point pos(pGl->rBound.sz.x / 2, pGl->rBound.sz.y);
-  smart_pointer<TutorialTextEntity> pTT = make_smart(new TutorialTextEntity(
-      1, pos, pGl->pNum, pGl->sbTutorialOn.GetConstPointer()));
+  Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
+  smart_pointer<TutorialTextEntity> pTT = make_smart(
+      new TutorialTextEntity(1, pos, pGl->GetNumberDrawer(), pGl));
   pTutorialText = pTT;
 
 #ifdef PC_VERSION
@@ -237,7 +237,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   if (bUp)
     return;
 
-  if (pGl->sbCheatsOn.Get()) {
+  if (pGl->AreCheatsOnSetting()) {
     if (c == '\\') {
       pGl->Next();
       return;
@@ -268,7 +268,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
 #ifdef PC_VERSION
   if (c == GUI_ESCAPE)
-    pGl->Menu();
+    pGl->EnterMenu();
 #endif
 
   for (unsigned i = 0; i < vDr.size(); ++i)
@@ -322,7 +322,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
 void LevelController::OnMouse(Point pPos) {
   Size sz1 = GetProgramInfo().szScreenRez;
-  Size sz2 = pGl->pWrp->szActualRez;
+  Size sz2 = pGl->GetActualResolution();
 
   float fX = float(sz1.x) / sz2.x;
   float fY = float(sz1.y) / sz2.y;
@@ -336,7 +336,7 @@ void LevelController::OnMouse(Point pPos) {
 
 void LevelController::OnMouseDown(Point pPos) {
   Size sz1 = GetProgramInfo().szScreenRez;
-  Size sz2 = pGl->pWrp->szActualRez;
+  Size sz2 = pGl->GetActualResolution();
 
   float fX = float(sz1.x) / sz2.x;
   float fY = float(sz1.y) / sz2.y;
@@ -448,7 +448,7 @@ void LevelController::MegaGeneration(Point p) {
     if (nLvl != 1 && nLvl != 4 && nLvl != 7 && nLvl != 10) {
       vDr[0]->RecoverBonuses();
     }
-    pGl->lsBonusesToCarryOver.clear();
+    pGl->ClearBonusesToCarryOver();
   }
 
   if (bPaused) {
@@ -470,9 +470,9 @@ void LevelController::MegaGeneration(Point p) {
     r.sz.x *= nScale;
     r.sz.y *= nScale;
 
-    pGl->pGraph->DrawRectangle(r, Color(0, 0, 0), false);
-    pGl->pBigNum->DrawWord(s1, p1, true);
-    pGl->pGraph->RefreshAll();
+    pGl->GetGraphics()->DrawRectangle(r, Color(0, 0, 0), false);
+    pGl->GetBigNumberDrawer()->DrawWord(s1, p1, true);
+    pGl->RefreshAll();
 
     return;
   }
@@ -500,13 +500,13 @@ void LevelController::MegaGeneration(Point p) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
   mc.bPressed = pt.bPressed;
-  mc.DrawCursor(pGl->pGraph);
+  mc.DrawCursor(pGl->GetGraphics());
 #endif
 #endif
-  pGl->pGraph->RefreshAll();
+  pGl->RefreshAll();
 
   if (tLoseTimer.nPeriod != 0 && tLoseTimer.Tick()) {
-    pGl->nActive = pGl->vCnt.size() - 2;
+    pGl->ShowGameOverScreen();
     return;
   }
 
@@ -551,8 +551,8 @@ void LevelController::MegaGeneration(Point p) {
     if (t.Tick()) {
       bGhostTime = true;
 
-      if (!pGl->sbMusicOn.Get())
-        pGl->pSnd->PlaySound(pGl->GetSnd("E"));
+      if (!pGl->IsMusicOnSetting())
+        pGl->PlaySound("E");
 
       if (nLvl > 6)
         pGr->Generate(true);
@@ -566,8 +566,8 @@ void LevelController::MegaGeneration(Point p) {
     }
   } else {
     if (tBlink.Tick()) {
-      if (!pGl->sbMusicOn.Get() && !bGhostTime && !bBlink)
-        pGl->pSnd->PlaySound(pGl->GetSnd("D"));
+      if (!pGl->IsMusicOnSetting() && !bGhostTime && !bBlink)
+        pGl->PlaySound("D");
 
       bBlink = !bBlink;
     }

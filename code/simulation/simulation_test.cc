@@ -227,10 +227,7 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
 
     for (unsigned i = 0; i < kGameOverSimulationFrames && !b_exit; ++i) {
       std::string screen_name = p_gl->GetActiveControllerName();
-      bool on_game_over =
-          (p_gl->GetActiveControllerIndex() ==
-           p_gl->GetControllerCount() - 2) &&
-          (screen_name == "logo");
+      bool on_game_over = p_gl->IsOnGameOverScreen();
 
       if (on_game_over)
         reached_game_over = true;

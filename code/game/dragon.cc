@@ -167,14 +167,12 @@ void Dragon::FlushBonuses() {
            itr = lsBonuses.begin(),
            etr = lsBonuses.end();
        itr != etr; ++itr)
-    pAd->pGl->lsBonusesToCarryOver.push_back(*itr);
+    pAd->pGl->AddBonusToCarryOver(*itr);
 }
 
 void Dragon::RecoverBonuses() {
-  for (std::list<smart_pointer<TimedFireballBonus>>::iterator
-           itr = pAd->pGl->lsBonusesToCarryOver.begin(),
-           etr = pAd->pGl->lsBonusesToCarryOver.end();
-       itr != etr; ++itr) {
+  const auto &lst = pAd->pGl->GetBonusesToCarryOver();
+  for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
     AddBonus(*itr, true);
   }
 }
@@ -221,7 +219,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
   SimpleVisualEntity::seq = imgStable;
   Critter::bDieOnExit = false;
 
-  pAd->pGl->lsBonusesToCarryOver.clear();
+  pAd->pGl->ClearBonusesToCarryOver();
 }
 
 void Dragon::Update() {
@@ -286,7 +284,7 @@ void Dragon::Update() {
 
         (*itr)->bExist = false;
 
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("pickup"));
+        pAd->pGl->PlaySound("pickup");
         break;
       }
     }
@@ -341,7 +339,7 @@ void Dragon::Draw(smart_pointer<ScalingDrawer> pDr) {
 
 void Dragon::AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent) {
   if (!bSilent)
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("powerup"));
+    pAd->pGl->PlaySound("powerup");
 
   if (pBonus.is_null())
     return;
@@ -419,14 +417,14 @@ void Dragon::Fire(fPoint fDir) {
   }
 
   if (fb.bMap["laser"])
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("laser"));
+    pAd->pGl->PlaySound("laser");
   else
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("shoot"));
+    pAd->pGl->PlaySound("shoot");
 }
 
 void Dragon::Toggle() {
   if (!bFly) {
-    pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("leave_tower"));
+    pAd->pGl->PlaySound("leave_tower");
 
     bFly = true;
     bTookOff = true;
@@ -473,17 +471,17 @@ void Dragon::Toggle() {
         }
 
         if (j != pAd->vCs.size()) {
-          pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("princess_capture"));
+          pAd->pGl->PlaySound("princess_capture");
         } else {
           FlushBonuses();
 
-          pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("win_level"));
+          pAd->pGl->PlaySound("win_level");
           pAd->pGl->Next();
         }
       } else if (cCarry == 'T')
         AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
       else
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("return_tower"));
+        pAd->pGl->PlaySound("return_tower");
 
       bCarry = false;
       cCarry = ' ';
@@ -518,7 +516,7 @@ void Dragon::Toggle() {
         imgCarry = (*itr)->GetImage();
         cCarry = (*itr)->GetType();
 
-        pAd->pGl->pSnd->PlaySound(pAd->pGl->GetSnd("pickup"));
+        pAd->pGl->PlaySound("pickup");
       } else {
         throw SimpleException("not supposed to drop things");
       }

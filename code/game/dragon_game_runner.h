@@ -62,12 +62,10 @@ public:
   /** For simulation/inspection: current tower controller (levels, menu, etc.).
    */
   DragonGameController *GetTowerController() const;
-  /** Active screen index (0=menu, 1..=logos/start/levels). */
-  unsigned GetActiveControllerIndex() const;
-  /** Total number of screens. */
-  unsigned GetControllerCount() const;
   /** Name of current screen for simulation (e.g. "menu", "start", "level"). */
   std::string GetActiveControllerName() const;
+  /** True if current screen is game-over (for simulation_test). */
+  bool IsOnGameOverScreen() const;
 };
 
 #endif

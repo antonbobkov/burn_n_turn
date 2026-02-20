@@ -35,7 +35,7 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_, const BrokenLine &bl_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       seq(pBc_->pGl->GetImgSeq("knight")), bl(bl_), tm(1), bFirst(false) {
-  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
+  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
 #ifdef TRIAL_VERSION
   if (pBc->nLvl == 1)
@@ -88,7 +88,7 @@ PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
                                      LevelController *pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
-  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0)
+  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
 
 #ifdef TRIAL_VERSION
@@ -121,7 +121,7 @@ void PrincessGenerator::Update() {
     }
     pBc->AddBoth(pCr);
     pBc->lsPpl.push_back(pCr);
-    pBc->pGl->pSnd->PlaySound(pBc->pGl->GetSnd("princess_arrive"));
+    pBc->pGl->PlaySound("princess_arrive");
 
     pBc->tutOne->PrincessGenerate();
   }
@@ -130,7 +130,7 @@ void PrincessGenerator::Update() {
 MageGenerator::MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
                              LevelController *pBc_)
     : rBound(rBound_), pBc(pBc_) {
-  if (pBc->pGl->bAngry)
+  if (pBc->pGl->IsAngry())
     dRate = dAngryRate_;
   else
     dRate = dRate_;
@@ -163,7 +163,7 @@ void MageGenerator::MageGenerate() {
                                   vel.x < 0 ? pBc->pGl->GetImgSeq("mage_f")
                                             : pBc->pGl->GetImgSeq("mage"),
                                   true),
-                          pBc, pBc->pGl->bAngry));
+                          pBc, pBc->pGl->IsAngry()));
   pBc->AddBoth(pCr);
   pBc->lsPpl.push_back(pCr);
 }
@@ -181,7 +181,7 @@ TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false), bFirstBns(false) {
-  if (pBc->nLvl == 1 && pBc->pGl->nHighScore == 0) {
+  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0) {
     bFirst = true;
     bFirstBns = true;
   }

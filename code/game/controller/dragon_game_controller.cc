@@ -6,6 +6,7 @@
 #include "game/dragon_macros.h"
 #include "game/dragon_game_runner.h"
 #include "game/level.h"
+#include "game_utils/event.h"
 #include "game_utils/Preloader.h"
 #include "game_utils/image_sequence.h"
 #include "game_utils/game_runner_interface.h"
@@ -57,24 +58,29 @@ static void DrawStuff(Rectangle rBound,
 #endif // LOADING_SCREEN
 }
 
+DragonGameSettings::DragonGameSettings(FilePath *fp,
+                                       const std::string &fullScreenPath)
+    : snProgress(fp, "stuff.txt", 0, true),
+      sbSoundOn(fp, "soundon.txt", true, true),
+      sbMusicOn(fp, "musicon.txt", true, true),
+      sbTutorialOn(fp, "tutorial_on.txt", true, true),
+      sbFullScreen(fp, fullScreenPath, false, true),
+      sbCheatsOn(fp, "cheat.txt", false, true),
+      sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {}
+
 DragonGameController::DragonGameController(
     smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
     smart_pointer<NumberDrawer> pBigNum_, FontWriter *pFancyNum_,
     SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     TowerDataWrap *pWrp_, FilePath *fp)
-    : nActive(1), pDr(pDr_), pGraph(pDr_->pGr), pNum(pNum_), pBigNum(pBigNum_),
+    : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_->pGr),
+      pNum(pNum_), pBigNum(pBigNum_),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
       pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw_))),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
-      pFancyNum(pFancyNum_), pWrp(pWrp_), pMenu(), vLevelPointers(3),
-      sbTutorialOn(fp, "tutorial_on.txt", true, true),
-      snProgress(fp, "stuff.txt", 0, true),
-      sbFullScreen(fp, sFullScreenPath, false, true),
-      sbSoundOn(fp, "soundon.txt", true, true),
-      sbMusicOn(fp, "musicon.txt", true, true),
-      sbCheatsOn(fp, "cheat.txt", false, true),
-      sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {
+      settings_(fp, sFullScreenPath), pFancyNum(pFancyNum_), pWrp(pWrp_),
+      pMenu(), vLevelPointers(3), pSelf(nullptr) {
   {
     if (fp->FileExists("high.txt")) {
       std::unique_ptr<InStreamHandler> ih = fp->ReadFile("high.txt");
@@ -329,10 +335,10 @@ DragonGameController::DragonGameController(
 
   plr.pSnd->SetVolume(.5);
 
-  if (!sbMusicOn.Get())
+  if (!settings_.sbMusicOn.Get())
     plr.ToggleOff();
 
-  if (!sbSoundOn.Get())
+  if (!settings_.sbSoundOn.Get())
     pSnd->Toggle();
 
   pNum->CacheColor(Color(205, 205, 0));
@@ -352,8 +358,8 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
                     Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
   // menu
-  smart_pointer<MenuController> pMenuHolder = make_smart(new MenuController(
-      pSelf, rBound, Color(0, 0, 0), 3)); // resume position shouldn't matter
+  smart_pointer<MenuController> pMenuHolder = make_smart(
+      new MenuController(pSelf, &settings_, rBound, Color(0, 0, 0)));
   pMenu = pMenuHolder;
 
   // logo 1
@@ -457,7 +463,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   // menu entity
   smart_pointer<MenuDisplay> pMenuDisplay = make_smart(
       new MenuDisplay(Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-                      pMenuCaret, pMenu, sbCheatsUnlocked.Get()));
+                      pMenuCaret, pMenu, settings_.sbCheatsUnlocked.Get()));
 
   pMenu->AddBoth(pMenuDisplay);
   pMenu->pMenuDisplay = pMenuDisplay;
@@ -601,8 +607,9 @@ void DragonGameController::Next() {
     ++nActive;
 
     for (unsigned i = 0; i < vLevelPointers.size(); ++i) {
-      if (nActive == vLevelPointers.at(i) && snProgress.Get() < int(i)) {
-        snProgress.Set(i);
+      if (nActive == vLevelPointers.at(i) &&
+          settings_.snProgress.Get() < int(i)) {
+        settings_.snProgress.Set(i);
         pMenu->pMenuDisplay->UpdateMenuEntries();
       }
     }
@@ -620,9 +627,173 @@ void DragonGameController::Restart(int nActive_ /* = -1*/) {
   StartUp(pSelf);
 }
 
-void DragonGameController::Menu() {
-  pMenu->nResumePosition = nActive;
+void DragonGameController::EnterMenu() {
+  nResumePosition = nActive;
   nActive = 0;
+}
+
+void DragonGameController::ExitMenuResume() {
+  nActive = nResumePosition;
+}
+
+void DragonGameController::RestartFromChapter(int chapter) {
+  if (chapter >= 0 && chapter < int(vLevelPointers.size()))
+    Restart(vLevelPointers.at(chapter));
+}
+
+void DragonGameController::ShowGameOverScreen() {
+  if (vCnt.size() >= 2)
+    nActive = vCnt.size() - 2;
+}
+
+GameController *DragonGameController::GetActiveController() const {
+  if (nActive >= vCnt.size())
+    return nullptr;
+  return vCnt[nActive].get();
+}
+
+std::string DragonGameController::GetActiveControllerName() const {
+  GameController *p = GetActiveController();
+  return p ? p->GetControllerName() : "";
+}
+
+bool DragonGameController::IsOnGameOverScreen() const {
+  if (vCnt.size() < 2)
+    return false;
+  unsigned gameOverIndex = vCnt.size() - 2;
+  return nActive == gameOverIndex &&
+         GetActiveController() &&
+         GetActiveController()->GetControllerName() == "logo";
+}
+
+GraphicalInterface<Index> *DragonGameController::GetGraphics() const {
+  return pGraph;
+}
+
+void DragonGameController::RefreshAll() {
+  if (pGraph)
+    pGraph->RefreshAll();
+}
+
+smart_pointer<ScalingDrawer> DragonGameController::GetDrawer() const {
+  return pDr;
+}
+
+unsigned DragonGameController::GetDrawScaleFactor() const {
+  return !pDr.is_null() ? pDr->nFactor : 0;
+}
+
+smart_pointer<NumberDrawer> DragonGameController::GetNumberDrawer() const {
+  return pNum;
+}
+
+smart_pointer<NumberDrawer> DragonGameController::GetBigNumberDrawer() const {
+  return pBigNum;
+}
+
+FontWriter *DragonGameController::GetFancyFont() const {
+  return pFancyNum;
+}
+
+void DragonGameController::PlaySound(std::string key) {
+  if (pSnd.get())
+    pSnd->PlaySound(GetSnd(key));
+}
+
+void DragonGameController::ToggleSoundOutput() {
+  if (pSnd.get())
+    pSnd->Toggle();
+}
+
+bool DragonGameController::IsSoundOutputOn() const {
+  return pSnd.get() && pSnd->Get();
+}
+
+void DragonGameController::ToggleMusicPlayback() {
+  plr.ToggleOff();
+}
+
+bool DragonGameController::IsMusicPlaybackOff() const {
+  return plr.bOff;
+}
+
+int DragonGameController::GetScore() const { return nScore; }
+
+int DragonGameController::GetHighScore() const { return nHighScore; }
+
+void DragonGameController::AddScore(int delta) { nScore += delta; }
+
+void DragonGameController::UpdateHighScoreIfNeeded() {
+  if (nScore > nHighScore) {
+    nHighScore = nScore;
+    FilePath *fp = pWrp ? pWrp->GetFilePath() : nullptr;
+    if (fp) {
+      std::unique_ptr<OutStreamHandler> oh = fp->WriteFile("high.txt");
+      if (oh)
+        oh->GetStream() << nScore;
+    }
+  }
+}
+
+bool DragonGameController::IsAngry() const { return bAngry; }
+
+void DragonGameController::SetAngry() { bAngry = true; }
+
+int DragonGameController::GetProgress() const {
+  return settings_.snProgress.Get();
+}
+
+bool DragonGameController::IsSoundOnSetting() const {
+  return settings_.sbSoundOn.Get();
+}
+
+bool DragonGameController::IsMusicOnSetting() const {
+  return settings_.sbMusicOn.Get();
+}
+
+bool DragonGameController::IsTutorialOnSetting() const {
+  return settings_.sbTutorialOn.Get();
+}
+
+bool DragonGameController::IsFullScreenSetting() const {
+  return settings_.sbFullScreen.Get();
+}
+
+bool DragonGameController::AreCheatsOnSetting() const {
+  return settings_.sbCheatsOn.Get();
+}
+
+bool DragonGameController::CheatsUnlocked() const {
+  return settings_.sbCheatsUnlocked.Get();
+}
+
+const Rectangle &DragonGameController::GetBounds() const { return rBound; }
+
+Size DragonGameController::GetActualResolution() const {
+  return pWrp ? pWrp->szActualRez : Size(0, 0);
+}
+
+FilePath *DragonGameController::GetFilePath() const {
+  return pWrp ? pWrp->GetFilePath() : nullptr;
+}
+
+void DragonGameController::ExitProgram() {
+  if (pWrp && pWrp->pExitProgram)
+    Trigger(pWrp->pExitProgram);
+}
+
+void DragonGameController::ClearBonusesToCarryOver() {
+  lsBonusesToCarryOver.clear();
+}
+
+void DragonGameController::AddBonusToCarryOver(
+    smart_pointer<TimedFireballBonus> b) {
+  lsBonusesToCarryOver.push_back(b);
+}
+
+const std::list<smart_pointer<TimedFireballBonus>> &
+DragonGameController::GetBonusesToCarryOver() const {
+  return lsBonusesToCarryOver;
 }
 
 Index &DragonGameController::GetImg(std::string key) { return (*pr)[key]; }

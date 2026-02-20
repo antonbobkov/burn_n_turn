@@ -12,6 +12,7 @@
 #include "wrappers/gui_key_type.h"
 #include "game_utils/mouse_utils.h"
 
+struct DragonGameSettings;
 struct MenuDisplay;
 struct MenuController;
 
@@ -109,10 +110,9 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   void Chapter3();
 };
 
-/** Controller for pause/main menu: MenuDisplay, resume position. */
+/** Controller for pause/main menu: MenuDisplay, options via settings. */
 struct MenuController : public EntityListController {
   std::string get_class_name() override { return "MenuController"; }
-  int nResumePosition;
   smart_pointer<MenuDisplay> pMenuDisplay;
 
   MouseCursor mc;
@@ -120,8 +120,10 @@ struct MenuController : public EntityListController {
   smart_pointer<TextDrawEntity> pHintText;
   smart_pointer<TextDrawEntity> pOptionText;
 
-  MenuController(DragonGameController *pGl_, Rectangle rBound,
-                 Color c, int nResumePosition_);
+  DragonGameSettings *settings;
+
+  MenuController(DragonGameController *pGl_, DragonGameSettings *settings_,
+                 Rectangle rBound, Color c);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void OnMouse(Point pPos);

@@ -34,7 +34,7 @@ void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {
 
 void BuyNowController::DrawSlimes() {
   for (unsigned i = 0; i < mSlimes.size(); i++)
-    mSlimes[i]->Draw(pGl->pDr);
+    mSlimes[i]->Draw(pGl->GetDrawer());
 }
 
 void BuyNowController::Update() {
@@ -55,7 +55,7 @@ void BuyNowController::Update() {
   if (t >= 0)
     t--;
 
-  pGl->pGraph->RefreshAll();
+  pGl->RefreshAll();
 }
 
 void BuyNowController::OnKey(GuiKeyType c, bool bUp) {

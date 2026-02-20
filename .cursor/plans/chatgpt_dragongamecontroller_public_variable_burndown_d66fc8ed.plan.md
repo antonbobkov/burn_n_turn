@@ -4,13 +4,13 @@ overview: Make all `DragonGameController` data members private and replace all e
 todos:
   - id: design-api
     content: Design and add the minimal function-based public API on DragonGameController; move all data members to private; add missing standard includes in the header.
-    status: pending
+    status: completed
   - id: update-callers
     content: Update all external call sites to use the new DragonGameController APIs (runner, controllers, entities, simulation, critters, dragon, etc.).
-    status: pending
+    status: completed
   - id: verify-build-tests
     content: Build with mingw32-make, run ctest, and run simulation_test; fix any regressions.
-    status: pending
+    status: completed
 isProject: false
 ---
 

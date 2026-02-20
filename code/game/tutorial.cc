@@ -1,4 +1,5 @@
 #include "tutorial.h"
+#include "game/controller/dragon_game_controller.h"
 #include "dragon_macros.h"
 #include "game_utils/draw_utils.h"
 
@@ -41,7 +42,7 @@ void TutorialTextEntity::SetText(std::vector<std::string> v) {
 }
 
 void TutorialTextEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
-  if (pIsTutorialOn && (*pIsTutorialOn == false))
+  if (pGl && !pGl->IsTutorialOnSetting())
     return;
 
   for (unsigned i = 0; i < sText.size(); ++i) {

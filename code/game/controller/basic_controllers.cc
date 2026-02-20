@@ -36,8 +36,8 @@ void EntityListController::AddOwnedEventEntity(std::unique_ptr<EventEntity> p) {
 
 void EntityListController::AddBackground(Color c) {
   Rectangle r = rBound.sz;
-  r.sz.x *= pGl->pDr->nFactor;
-  r.sz.y *= pGl->pDr->nFactor;
+  r.sz.x *= pGl->GetDrawScaleFactor();
+  r.sz.y *= pGl->GetDrawScaleFactor();
 
   smart_pointer<StaticRectangle> pBkg =
       make_smart(new StaticRectangle(r, c, -1.F));
@@ -112,11 +112,11 @@ void EntityListController::Update() {
     }
 
     for (auto &entry : mmp)
-      entry.second->Draw(pGl->pDr);
+      entry.second->Draw(pGl->GetDrawer());
   }
 
   if (!bNoRefresh)
-    pGl->pGraph->RefreshAll();
+    pGl->RefreshAll();
 }
 
 void EntityListController::OnKey(GuiKeyType c, bool bUp) {
@@ -130,7 +130,7 @@ void EntityListController::OnMouseDown(Point pPos) { pGl->Next(); }
 
 void StartScreenController::Next() {
   pGl->Next();
-  pGl->pSnd->PlaySound(pGl->GetSnd("start_game"));
+  pGl->PlaySound("start_game");
 }
 
 void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
@@ -138,7 +138,7 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
     return;
 
   if (c == GUI_ESCAPE)
-    pGl->Menu();
+    pGl->EnterMenu();
   else
     Next();
 }
@@ -187,9 +187,9 @@ void Cutscene::Update() {
 
   if (tm.Tick()) {
     if (Beepy)
-      pGl->pSnd->PlaySound(pGl->GetSnd("beep"));
+      pGl->PlaySound("beep");
     else
-      pGl->pSnd->PlaySound(pGl->GetSnd("boop"));
+      pGl->PlaySound("boop");
 
     Beepy = !Beepy;
   }
@@ -198,7 +198,7 @@ void Cutscene::Update() {
 }
 
 void Cutscene::OnKey(GuiKeyType c, bool bUp) {
-  if (!bUp && c == '\\' && pGl->sbCheatsOn.Get())
+  if (!bUp && c == '\\' && pGl->AreCheatsOnSetting())
     pGl->Next();
 }
 
@@ -226,15 +226,8 @@ void DragonScoreController::OnKey(GuiKeyType c, bool bUp) {
 void DragonScoreController::DoubleClick() { pGl->Next(); }
 
 void DragonScoreController::Update() {
-  if (pGl->nHighScore < pGl->nScore) {
-    pGl->nHighScore = pGl->nScore;
-
-    FilePath *fp = pGl->pWrp->GetFilePath();
-    if (fp) {
-      std::unique_ptr<OutStreamHandler> oh = fp->WriteFile("high.txt");
-      if (oh)
-        oh->GetStream() << pGl->nScore;
-    }
+  if (pGl->GetHighScore() < pGl->GetScore()) {
+    pGl->UpdateHighScoreIfNeeded();
   }
 
   EntityListController::Update();

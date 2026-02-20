@@ -269,7 +269,7 @@ void Fireball::Update() {
         bExist = false;
         return;
       } else
-        pBc->pGl->pSnd->PlaySound(pBc->pGl->GetSnd("death"));
+        pBc->pGl->PlaySound("death");
 
       if ((*itr)->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
         (*itr)->OnHit('F');
@@ -329,7 +329,7 @@ void Fireball::Update() {
 
           pBc->AddBoth(pEx);
 
-          pBc->pGl->pSnd->PlaySound(pBc->pGl->GetSnd("explosion"));
+          pBc->pGl->PlaySound("explosion");
         }
       }
 
@@ -386,7 +386,7 @@ void FireballBonusAnimation::Draw(smart_pointer<ScalingDrawer> pDr) {
 
 #ifdef UNDERLINE_UNIT_TEXT
   if (sUnderText != "")
-    pAd->pGl->pNum->DrawWord(sUnderText, p, true);
+    pAd->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 #endif
 }
 

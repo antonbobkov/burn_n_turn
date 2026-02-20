@@ -72,29 +72,26 @@ DragonGameController *DragonGameRunner::GetTowerController() const {
   return pData ? pData->pCnt.get() : nullptr;
 }
 
-unsigned DragonGameRunner::GetActiveControllerIndex() const {
-  DragonGameController *twr = GetTowerController();
-  return twr ? twr->nActive : 0;
-}
-
-unsigned DragonGameRunner::GetControllerCount() const {
-  DragonGameController *twr = GetTowerController();
-  return twr ? twr->vCnt.size() : 0;
-}
-
 std::string DragonGameRunner::GetActiveControllerName() const {
   DragonGameController *twr = GetTowerController();
-  if (!twr || twr->nActive >= twr->vCnt.size())
-    return "";
-  return twr->vCnt[twr->nActive]->GetControllerName();
+  return twr ? twr->GetActiveControllerName() : "";
+}
+
+bool DragonGameRunner::IsOnGameOverScreen() const {
+  DragonGameController *twr = GetTowerController();
+  return twr && twr->IsOnGameOverScreen();
 }
 
 void DragonGameRunner::Update() {
-  pData->pCnt->vCnt[pData->pCnt->nActive]->Update();
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->Update();
 }
 
 void DragonGameRunner::KeyDown(GuiKeyType nCode) {
-  pData->pCnt->vCnt[pData->pCnt->nActive]->OnKey(nCode, false);
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->OnKey(nCode, false);
 
 #ifndef PC_VERSION
   if (nCode == GUI_ESCAPE)
@@ -103,13 +100,17 @@ void DragonGameRunner::KeyDown(GuiKeyType nCode) {
 }
 
 void DragonGameRunner::KeyUp(GuiKeyType nCode) {
-  pData->pCnt->vCnt[pData->pCnt->nActive]->OnKey(nCode, true);
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->OnKey(nCode, true);
 }
 
 void DragonGameRunner::MouseMove(Point pPos) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
-  pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouse(pPos);
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->OnMouse(pPos);
 #endif
 #endif
 }
@@ -117,7 +118,9 @@ void DragonGameRunner::MouseMove(Point pPos) {
 void DragonGameRunner::MouseDown(Point pPos) {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
-  pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouseDown(pPos);
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->OnMouseDown(pPos);
 #endif
 #endif
 }
@@ -125,15 +128,21 @@ void DragonGameRunner::MouseDown(Point pPos) {
 void DragonGameRunner::MouseUp() {
 #ifdef PC_VERSION
 #ifndef KEYBOARD_CONTROLS
-  pData->pCnt->vCnt[pData->pCnt->nActive]->OnMouseUp();
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->OnMouseUp();
 #endif
 #endif
 }
 
 void DragonGameRunner::DoubleClick() {
-  pData->pCnt->vCnt[pData->pCnt->nActive]->DoubleClick();
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->DoubleClick();
 }
 
 void DragonGameRunner::Fire() {
-  pData->pCnt->vCnt[pData->pCnt->nActive]->Fire();
+  GameController *p = GetTowerController() ? GetTowerController()->GetActiveController() : nullptr;
+  if (p)
+    p->Fire();
 }

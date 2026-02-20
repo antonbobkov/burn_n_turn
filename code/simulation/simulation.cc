@@ -37,10 +37,9 @@ void LogState(DragonGameRunner *ctrl) {
   DragonGameController *twr = ctrl->GetTowerController();
   if (!twr)
     return;
-  std::cout << "[sim] screen " << ctrl->GetActiveControllerName() << " ("
-            << ctrl->GetActiveControllerIndex() << "/"
-            << ctrl->GetControllerCount() << ") score=" << twr->nScore
-            << " high=" << twr->nHighScore << "\n";
+  std::cout << "[sim] screen " << ctrl->GetActiveControllerName()
+            << " score=" << twr->GetScore()
+            << " high=" << twr->GetHighScore() << "\n";
 }
 
 } // namespace
