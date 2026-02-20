@@ -85,14 +85,23 @@ Implement a **minimal set of accessors/forwarders** to cover all documented exte
 
 Planned `DragonGameController` additions (in `[code/game/controller/dragon_game_controller.h](code/game/controller/dragon_game_controller.h)` / `.cc`):
 
-- **Controller stack**
-  - `GameController *GetActiveController() const`
-  - `unsigned GetActiveControllerIndex() const`
-  - `unsigned GetControllerCount() const`
-  - `std::string GetActiveControllerName() const`
-  - `void SetActiveControllerIndex(unsigned idx)` (used by menu “continue”)
-  - `void ShowGameOverScreen()` (replaces `nActive = vCnt.size() - 2`)
-  - `void RestartChapter(unsigned chapterIndex)` (replaces `vLevelPointers.at(i)` in menu)
+- **Controller stack (no index visibility outside class)**
+  - **Chosen approach**: treat the controller stack as a private state machine.
+  External code never reads/writes the active index and never indexes `vCnt`.
+  - **Runner dispatch**:
+    - `GameController *GetActiveController() const`
+    - Runner calls `GetActiveController()->Update()` and forwards input to that
+    controller (no `nActive`, no `vCnt` access).
+  - **Screen flow transitions (replaces `nActive` writes and `vCnt.size()` math)**:
+    - `void Next()` (already exists)
+    - `void Restart(int start_screen = -1)` (already exists)
+    - `void EnterMenu()` (stores resume screen internally and activates menu)
+    - `void ExitMenuResume()` (restores internally saved resume screen)
+    - `void RestartFromChapter(int chapter)` (menu “chapter 1/2/3”)
+    - `void ShowGameOverScreen()` (for level/game-over jump)
+  - **Observability without index**:
+    - `std::string GetActiveControllerName() const`
+    - `bool IsOnGameOverScreen() const` (used by `simulation_test`)
 - **Graphics & drawing**
   - `GraphicalInterface<Index> *GetGraphics() const` (needed for `MouseCursor::DrawCursor`)
   - `void RefreshAll()`
@@ -104,20 +113,41 @@ Planned `DragonGameController` additions (in `[code/game/controller/dragon_game_
   - `FontWriter *GetFancyFont() const`
 - **Sound**
   - `void PlaySound(std::string key)` (replaces almost all `pSnd->PlaySound(GetSnd("..."))`)
-  - `bool IsSoundOn() const` + `void ToggleSoundSetting()` (updates proxy + persists via savable)
+  - `void ToggleSoundOutput()`
+  - `bool IsSoundOutputOn() const`
+  - Menu persists the setting via its injected `DragonGameSettings *`.
+- **Music playback (non-savable side effects)**
+  - `void ToggleMusicPlayback()`
+  - `bool IsMusicPlaybackOff() const`
+  - Menu persists the setting via its injected `DragonGameSettings *`.
 - **Score / high score**
   - `int GetScore() const`, `int GetHighScore() const`
   - `void AddScore(int delta)` (replaces `nScore += ...`)
   - `void UpdateHighScoreIfNeeded()` (also persists to `high.txt` via `FilePath`)
 - **Game state flags**
   - `bool IsAngry() const`, `void SetAngry()`
-- **Savable options**
-  - `int GetProgress() const`
-  - `bool IsMusicOn() const` + `void ToggleMusicSetting()` (keeps `plr` + savable in sync)
-  - `bool IsTutorialOn() const` + `void ToggleTutorialSetting()` + `const bool *GetTutorialOnConstPointer() const`
-  - `bool IsFullScreen() const` + `void ToggleFullScreenSetting()`
-  - `bool AreCheatsOn() const` + `void ToggleCheatsSetting()`
-  - `bool CheatsUnlocked() const`
+- **Savable options (new struct)**
+  - Add `struct DragonGameSettings` that owns all `SavableVariable<>` members:
+    - `snProgress`, `sbSoundOn`, `sbMusicOn`, `sbTutorialOn`, `sbFullScreen`,
+    `sbCheatsOn`, `sbCheatsUnlocked`
+  - Define this struct in the same file as `DragonGameController` (in
+  `dragon_game_controller.h`), not in a separate header.
+  - `DragonGameController` keeps this struct private and exposes **getters only**
+  (read-only access) for non-menu code:
+    - `int GetProgress() const`
+    - `bool IsSoundOnSetting() const`
+    - `bool IsMusicOnSetting() const`
+    - `bool IsTutorialOnSetting() const`
+    - `bool IsFullScreenSetting() const`
+    - `bool AreCheatsOnSetting() const`
+    - `bool CheatsUnlocked() const`
+  - `TutorialTextEntity` receives `DragonGameController *` and calls
+  `IsTutorialOnSetting()` when it needs the tutorial-on state (no
+  `GetTutorialOnConstPointer()`).
+  - `MenuController` receives a `DragonGameSettings *` pointer (injected at
+  construction) and may mutate/persist settings directly.
+  Non-setting side effects remain behind `DragonGameController` APIs
+  (e.g. toggling sound proxy or music playback).
 - **Bounds / wrapper**
   - `const Rectangle &GetBounds() const`
   - `Size GetActualResolution() const`
@@ -135,11 +165,31 @@ All former public data members become `private:`.
 Update direct field access to the new APIs:
 
 - `[code/game/dragon_game_runner.cc](code/game/dragon_game_runner.cc)`
-  - Replace direct `vCnt`/`nActive` reads + dispatch with `GetActiveController*()` methods.
+  - Replace direct `vCnt`/`nActive` reads + dispatch with
+  `GetTowerController()->GetActiveController()` and dispatch through the
+  returned `GameController *`.
+- `[code/game/dragon_game_runner.h](code/game/dragon_game_runner.h)`
+  - Remove `GetActiveControllerIndex()` and `GetControllerCount()` so index is
+  not visible outside `DragonGameController`.
+  - Keep `GetActiveControllerName()` for simulation/inspection.
 - `[code/game/controller/level_controller.cc](code/game/controller/level_controller.cc)`
-  - Replace `pGl->nScore`, `pGl->pNum`, `pGl->pGraph`, `pGl->rBound`, `pGl->sb*`, `pGl->pSnd`, and `pGl->nActive = pGl->vCnt.size()-2`.
+  - Replace `pGl->nScore`, `pGl->pNum`, `pGl->pGraph`, `pGl->rBound`, `pGl->sb*`,
+  `pGl->pSnd`, and `pGl->nActive = pGl->vCnt.size()-2`.
+  - Replace the game-over jump with `pGl->ShowGameOverScreen()`.
+  - Pass `DragonGameController *` (e.g. `pGl`) into `TutorialTextEntity` instead
+  of `pGl->sbTutorialOn.GetConstPointer()`; the entity calls
+  `IsTutorialOnSetting()` when it needs the tutorial-on state.
 - `[code/game/controller/menu_controller.cc](code/game/controller/menu_controller.cc)`
-  - Replace `pGl->pDr`, `pGl->pGraph`, `pGl->pSnd`, `pGl->sb*`, `pGl->plr`, `pGl->nActive`, `pGl->vLevelPointers`, `pGl->pWrp->pExitProgram`.
+  - Replace direct reads/writes of `pGl->sb*` / `pGl->snProgress` with the
+  injected `DragonGameSettings *settings_`.
+  - Replace `pGl->plr` access with `DragonGameController` methods (toggle/query
+  music playback), and replace `pGl->pSnd` toggle/get with
+  `ToggleSoundOutput()` / `IsSoundOutputOn()`.
+  - Replace `pGl->nActive` writes with `ExitMenuResume()` (continue) and remove
+  any menu-visible index state.
+  - Replace chapter restart via `pGl->vLevelPointers` with
+  `pGl->RestartFromChapter(chapter)`.
+  - Replace exit via `pGl->pWrp->pExitProgram` with `pGl->ExitProgram()`.
 - `[code/game/controller/basic_controllers.cc](code/game/controller/basic_controllers.cc)`
   - Replace `pGl->pDr->nFactor`, `pGl->pGraph->RefreshAll()`, `pGl->pSnd->PlaySound(...)`, `pGl->sbCheatsOn.Get()`, `pGl->nScore/nHighScore` writes/reads, and `pGl->pWrp->GetFilePath()`.
 - `[code/game/entities.cc](code/game/entities.cc)`
@@ -154,6 +204,10 @@ Update direct field access to the new APIs:
   - Replace `pGl->pDr` and `pGl->pGraph->RefreshAll()`.
 - `[code/simulation/simulation.cc](code/simulation/simulation.cc)`
   - Replace `twr->nScore` / `twr->nHighScore` reads with getters.
+  - Remove index/count logging; log screen name only.
+- `[code/simulation/simulation_test.cc](code/simulation/simulation_test.cc)`
+  - Replace `GetActiveControllerIndex() == GetControllerCount() - 2` checks with
+  `IsOnGameOverScreen()` and/or controller-name-based assertions.
 
 ## Header hygiene (as part of touching the header)
 
