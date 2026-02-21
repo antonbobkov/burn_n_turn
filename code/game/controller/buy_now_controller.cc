@@ -13,9 +13,9 @@ BuyNowController::BuyNowController(DragonGameController *pGl_, Rectangle rBound,
     : EntityListController(pGl_, rBound, c), t(120), nSlimeCount(50),
       tVel(nFramesInSecond / 2) {
   for (int i = 0; i < nSlimeCount; i++) {
-    mSlimes.push_back(make_smart(
-        new Animation(0, pGl->GetImgSeq("slime"), nFramesInSecond / 10,
-                      Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true)));
+    mSlimes.push_back(std::make_unique<Animation>(
+        0, pGl->GetImgSeq("slime"), nFramesInSecond / 10,
+        Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true));
     mSlimeVel.push_back(fPoint());
     mSlimePos.push_back(mSlimes.back()->pos);
   }

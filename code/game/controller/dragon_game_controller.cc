@@ -520,7 +520,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
     pAd->Init(pAd.get(), vLvl[i]);
 
     pAd->AddE(pBckgMusic);
-    pAd->pSc = pBckgMusic;
+    pAd->pSc = pBckgMusic.get();
 
     // game level
     vCnt.push_back(pAd);

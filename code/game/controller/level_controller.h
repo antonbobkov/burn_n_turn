@@ -68,7 +68,7 @@ struct LevelController : public EntityListController {
 
   KnightGenerator *pGr;
   MageGenerator *pMgGen;
-  smart_pointer<SoundControls> pSc;
+  SoundControls *pSc;
 
   LevelController *pSelf;
 

@@ -150,13 +150,13 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   tLoseTimer.nPeriod = 0;
 
-  smart_pointer<AdNumberDrawer> pNm = make_smart(new AdNumberDrawer());
+  auto pNm = std::make_unique<AdNumberDrawer>();
   pNm->pAd = pSelf;
-  AddV(pNm);
+  AddOwnedVisualEntity(std::move(pNm));
 
-  smart_pointer<BonusDrawer> pBd = make_smart(new BonusDrawer());
+  auto pBd = std::make_unique<BonusDrawer>();
   pBd->pAd = pSelf;
-  AddV(pBd);
+  AddOwnedVisualEntity(std::move(pBd));
 
   smart_pointer<KnightGenerator> pGen = make_smart(
       new KnightGenerator(lvl.vFreq.at(0), rBound, pSelf, lvl.blKnightGen));

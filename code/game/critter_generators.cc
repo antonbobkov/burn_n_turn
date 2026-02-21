@@ -13,10 +13,9 @@
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(pAdv_) {
-  smart_pointer<AnimationOnce> pSlm =
-      make_smart(new AnimationOnce(2.F, pAdv->pGl->GetImgSeq("skelly_summon"),
-                                   unsigned(.1F * nFramesInSecond), p_, true));
-  pAdv_->AddBoth(pSlm);
+  pAdv_->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      2.F, pAdv->pGl->GetImgSeq("skelly_summon"),
+      unsigned(.1F * nFramesInSecond), p_, true));
 }
 
 float KnightGenerator::GetRate() {

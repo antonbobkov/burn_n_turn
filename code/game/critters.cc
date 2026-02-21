@@ -1,7 +1,7 @@
 #include "critters.h"
 #include "critter_generators.h"
-#include "dragon_constants.h"
 #include "dragon.h"
+#include "dragon_constants.h"
 #include "dragon_macros.h"
 #include "fireball.h"
 #include "game/controller/dragon_game_controller.h"
@@ -35,19 +35,15 @@ void SummonSkeletons(LevelController *pAc, Point p) {
 }
 
 void Princess::OnHit(char cWhat) {
-  smart_pointer<BonusScore> pB =
-      make_smart(new BonusScore(pAc, GetPosition(), 250));
-  pAc->AddBoth(pB);
+  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
   bExist = false;
 
-  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("princess_die_f")
                  : pAc->pGl->GetImgSeq("princess_die"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
-
-  pAc->AddBoth(pAn);
 }
 
 void Princess::Draw(ScalingDrawer *pDr) {
@@ -74,13 +70,11 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
 void Mage::OnHit(char cWhat) {
   bExist = false;
 
-  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f")
                  : pAc->pGl->GetImgSeq("mage_die"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
-
-  pAc->AddBoth(pAn);
 
   pAc->pGl->SetAngry();
 
@@ -139,21 +133,17 @@ unsigned RandomBonus(bool bInTower) {
 }
 
 void Trader::OnHit(char cWhat) {
-  smart_pointer<BonusScore> pB =
-      make_smart(new BonusScore(pAc, GetPosition(), 60));
-  pAc->AddBoth(pB);
+  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
 
   bExist = false;
 
   pAc->tutTwo->TraderKilled();
 
-  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die")
                  : pAc->pGl->GetImgSeq("trader_die_f"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
-
-  pAc->AddBoth(pAn);
 
   smart_pointer<FireballBonusAnimation> pFb = make_smart(
       new FireballBonusAnimation(GetPosition(), RandomBonus(false), pAc));
@@ -261,8 +251,7 @@ void Knight::OnHit(char cWhat) {
 
     pAc->pGl->PlaySound("golem_death");
 
-    smart_pointer<BonusScore> pB =
-        make_smart(new BonusScore(pAc, GetPosition(), 5000));
+    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
   }
 
   bExist = false;
@@ -270,9 +259,7 @@ void Knight::OnHit(char cWhat) {
   pAc->tutOne->KnightKilled();
 
   if (cType != 'G') {
-    smart_pointer<BonusScore> pB =
-        make_smart(new BonusScore(pAc, GetPosition(), 100));
-    pAc->AddBoth(pB);
+    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
 
     ImageSequence seqDead = pAc->pGl->GetImgSeq("knight_die");
 
@@ -285,10 +272,9 @@ void Knight::OnHit(char cWhat) {
         seqDead = pAc->pGl->GetImgSeq("golem_die_f");
     }
 
-    smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+    pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
         dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
         GetPosition(), true));
-    pAc->AddBoth(pAn);
   } else {
     smart_pointer<Ghostiness> pGhs =
         make_smart(new Ghostiness(GetPosition(), pAc, *this, nGhostHit));
@@ -350,17 +336,14 @@ void MegaSlime::OnHit(char cWhat) {
 
   bExist = false;
 
-  smart_pointer<BonusScore> pB =
-      make_smart(new BonusScore(pAc, GetPosition(), 500));
-  pAc->AddBoth(pB);
+  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
 
   ImageSequence seqDead = pAc->pGl->GetImgSeq("megaslime_die");
   pAc->pGl->PlaySound("megaslime_die");
 
-  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
       dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
       GetPosition(), true));
-  pAc->AddBoth(pAn);
 }
 
 Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
@@ -374,9 +357,7 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
 
   t = Timer(n * seq.GetTotalTime());
 
-  smart_pointer<AnimationOnce> pFire =
-      make_smart(new AnimationOnce(2.F, seq, n, p_, true));
-  pAdv_->AddBoth(pFire);
+  pAdv_->AddOwnedBoth(std::make_unique<AnimationOnce>(2.F, seq, n, p_, true));
 }
 
 void Ghostiness::Update() {
@@ -438,10 +419,9 @@ void Slime::Update() {
 
         bExist = false;
 
-        smart_pointer<AnimationOnce> pAn = make_smart(
-            new AnimationOnce(dPriority, pAc->pGl->GetImgSeq("slime_poke"),
-                              nFramesInSecond / 5, GetPosition(), true));
-        pAc->AddBoth(pAn);
+        pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+            dPriority, pAc->pGl->GetImgSeq("slime_poke"), nFramesInSecond / 5,
+            GetPosition(), true));
 
         break;
       }
@@ -501,15 +481,12 @@ void Slime::OnHit(char cWhat) {
   bool bRevive = (cWhat != 'M');
 
   if (cWhat != 'M') {
-    smart_pointer<BonusScore> pB =
-        make_smart(new BonusScore(pAc, GetPosition(), 1));
-    pAc->AddBoth(pB);
+    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 1));
   }
 
-  smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
       dPriority, pAc->pGl->GetImgSeq(bRevive ? "slime_die" : "slime_poke"),
       nFramesInSecond / 5, GetPosition(), true));
-  pAc->AddBoth(pAn);
 
   if (!bRevive)
     return;

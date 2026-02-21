@@ -155,10 +155,9 @@ void KnightOnFire::Update() {
   if (nTimer != 0 && --nTimer == 0) {
     bExist = false;
 
-    smart_pointer<AnimationOnce> pAn = make_smart(new AnimationOnce(
+    pBc->AddOwnedBoth(std::make_unique<AnimationOnce>(
         dPriority, pBc->pGl->GetImgSeq("knight_die"),
         unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
-    pBc->AddBoth(pAn);
   }
 
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
