@@ -6,10 +6,10 @@
 #include "game/dragon_constants.h"
 #include "game/dragon_game_runner.h"
 #include "game/dragon_macros.h"
+#include "game/entities.h"
 #include "game/fireball.h"
 #include "game/level.h"
 #include "game/tutorial.h"
-#include "game/entities.h"
 #include "game_utils/draw_utils.h"
 #include "game_utils/game_runner_interface.h"
 #include "game_utils/image_sequence.h"
@@ -24,13 +24,14 @@ struct AdNumberDrawer : public VisualEntity {
   LevelController *pAd;
 
   AdNumberDrawer() : pAd(0) {}
+  explicit AdNumberDrawer(LevelController *ad) : pAd(ad) {}
 
   /*virtual*/ void Draw(ScalingDrawer *pDr) {
     unsigned n = pDr->nFactor;
 
 #ifdef FULL_VERSION
-    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->pGl->GetScore(),
-                               Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
+    pAd->pGl->GetNumberDrawer()->DrawNumber(
+        pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
 
     if (pAd->bBlink) {
       Color c(255, 255, 0);
@@ -45,23 +46,27 @@ struct AdNumberDrawer : public VisualEntity {
           "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
     }
 
-    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
-                               2);
+    pAd->pGl->GetNumberDrawer()->DrawNumber(
+        pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
 
-    pAd->pGl->GetNumberDrawer()->DrawWord("score:", Point(pAd->rBound.sz.x - 33 * 4, 4));
-    pAd->pGl->GetNumberDrawer()->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("score:",
+                                          Point(pAd->rBound.sz.x - 33 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("level:",
+                                          Point(pAd->rBound.sz.x - 9 * 4, 4));
     if (pAd->bCh) {
       pAd->pGl->GetNumberDrawer()->DrawColorWord(
           "invincible", Point(pAd->rBound.sz.x - 44 * 4, 4), Color(0, 255, 0));
     }
 #else
-    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->pGl->GetScore(),
-                               Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
-    pAd->pGl->GetNumberDrawer()->DrawNumber(pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4),
-                               2);
+    pAd->pGl->GetNumberDrawer()->DrawNumber(
+        pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
+    pAd->pGl->GetNumberDrawer()->DrawNumber(
+        pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
 
-    pAd->pGl->GetNumberDrawer()->DrawWord("score:", Point(pAd->rBound.sz.x - 23 * 4, 4));
-    pAd->pGl->GetNumberDrawer()->DrawWord("level:", Point(pAd->rBound.sz.x - 9 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("score:",
+                                          Point(pAd->rBound.sz.x - 23 * 4, 4));
+    pAd->pGl->GetNumberDrawer()->DrawWord("level:",
+                                          Point(pAd->rBound.sz.x - 9 * 4, 4));
 #endif
   }
   /*virtual*/ Point GetPosition() { return Point(); }
@@ -78,6 +83,8 @@ struct BonusDrawer : public VisualEntity {
 
   BonusDrawer()
       : pAd(0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
+  explicit BonusDrawer(LevelController *ad)
+      : pAd(ad), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
 
   /*virtual*/ void Draw(ScalingDrawer *pDr) {
     if (t.Tick())
@@ -150,13 +157,8 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   tLoseTimer.nPeriod = 0;
 
-  auto pNm = std::make_unique<AdNumberDrawer>();
-  pNm->pAd = pSelf;
-  AddOwnedVisualEntity(std::move(pNm));
-
-  auto pBd = std::make_unique<BonusDrawer>();
-  pBd->pAd = pSelf;
-  AddOwnedVisualEntity(std::move(pBd));
+  AddOwnedVisualEntity(std::make_unique<AdNumberDrawer>(pSelf));
+  AddOwnedVisualEntity(std::make_unique<BonusDrawer>(pSelf));
 
   smart_pointer<KnightGenerator> pGen = make_smart(
       new KnightGenerator(lvl.vFreq.at(0), rBound, pSelf, lvl.blKnightGen));
@@ -187,8 +189,8 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
     vDr.back()->pCs->pDrag = vDr.back();
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
-  smart_pointer<TutorialTextEntity> pTT = make_smart(
-      new TutorialTextEntity(1, pos, pGl->GetNumberDrawer(), pGl));
+  smart_pointer<TutorialTextEntity> pTT =
+      make_smart(new TutorialTextEntity(1, pos, pGl->GetNumberDrawer(), pGl));
   pTutorialText = pTT;
 
 #ifdef PC_VERSION

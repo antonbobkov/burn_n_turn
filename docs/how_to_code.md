@@ -19,7 +19,7 @@
 - avoid using unsigned int/long when possible
 - use anonymous namespaces for helper functions in .cpp files
 
-- functions
+- functions and member variables
   - prefer pointers to non-const references
 
 - non-standard-library includes
