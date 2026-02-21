@@ -55,7 +55,7 @@ void NumberDrawer::CacheColor(Color c) {
   mpCachedRecolorings[c] = vNewColors;
 }
 
-NumberDrawer::NumberDrawer(smart_pointer<ScalingDrawer> pDr_, FilePath *fp,
+NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
                           std::string sFontPath, std::string sFontName)
     : pDr(pDr_), vImgIndx(256, -1) {
   std::string txtPath = fp->GetRelativePath(sFontPath + sFontName + ".txt");

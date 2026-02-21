@@ -50,7 +50,7 @@ void Princess::OnHit(char cWhat) {
   pAc->AddBoth(pAn);
 }
 
-void Princess::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Princess::Draw(ScalingDrawer *pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -165,7 +165,7 @@ void Trader::OnHit(char cWhat) {
   pAc->lsBonus.push_back(pFb);
 }
 
-void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Trader::Draw(ScalingDrawer *pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -176,7 +176,7 @@ void Trader::Draw(smart_pointer<ScalingDrawer> pDr) {
 #endif
 }
 
-void Knight::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Knight::Draw(ScalingDrawer *pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -737,7 +737,7 @@ void Castle::OnKnight(char cWhat) {
   }
 }
 
-void Castle::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Castle::Draw(ScalingDrawer *pDr) {
   Critter::seq.nActive = nPrincesses;
 
   if (nPrincesses > 4)

@@ -2,8 +2,8 @@
 #define TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 
 #include "game_utils/game_runner_interface.h"
-#include "utils/smart_pointer.h"
 #include "wrappers/geometry.h"
+#include "utils/smart_pointer.h"
 #include <memory>
 
 struct DragonGameController;
@@ -27,9 +27,10 @@ public:
   GraphicalInterface<Index> *pGr;
   SoundInterface<Index> *pSm;
 
-  smart_pointer<ScalingDrawer> pDr;
-  smart_pointer<NumberDrawer> pNum;
-  smart_pointer<NumberDrawer> pBigNum;
+  std::unique_ptr<ScalingDrawer> pDr;
+  std::unique_ptr<ScalingDrawer> pBigDr;
+  std::unique_ptr<NumberDrawer> pNum;
+  std::unique_ptr<NumberDrawer> pBigNum;
   std::unique_ptr<FontWriter> pFancyNum;
 
   FileManager *p_fm_;

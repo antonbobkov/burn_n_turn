@@ -48,10 +48,9 @@ struct DragonGameSettings {
  * sights and sounds, the hero's tally, scrolls of choice, and the bard's song.
  */
 struct DragonGameController {
-  DragonGameController(smart_pointer<ScalingDrawer> pDr_,
-                       smart_pointer<NumberDrawer> pNum_,
-                       smart_pointer<NumberDrawer> pBigNum_,
-                       FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
+  DragonGameController(ScalingDrawer *pDr_, NumberDrawer *pNum_,
+                       NumberDrawer *pBigNum_, FontWriter *pFancyNum_,
+                       SoundInterface<Index> *pSndRaw_,
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
                        TowerDataWrap *pWrp_, FilePath *fp);
 
@@ -79,14 +78,14 @@ struct DragonGameController {
   /** Refresh the entire vista; paint the screen anew. */
   void RefreshAll();
   /** The drawer that fits sprites to the screen's measure. */
-  smart_pointer<ScalingDrawer> GetDrawer() const;
+  ScalingDrawer *GetDrawer() const;
   /** How much to magnify the realm when drawing (e.g. 1, 2). */
   unsigned GetDrawScaleFactor() const;
 
   /** Small runes for the score and the hero's interface. */
-  smart_pointer<NumberDrawer> GetNumberDrawer() const;
+  NumberDrawer *GetNumberDrawer() const;
   /** Great runes for the score when it is shown in glory. */
-  smart_pointer<NumberDrawer> GetBigNumberDrawer() const;
+  NumberDrawer *GetBigNumberDrawer() const;
   /** Elegant script for the tale's opening and messages from the realm. */
   FontWriter *GetFancyFont() const;
 
@@ -162,9 +161,9 @@ private:
   smart_pointer<MenuController> pMenu;
 
   GraphicalInterface<Index> *pGraph;
-  smart_pointer<ScalingDrawer> pDr;
-  smart_pointer<NumberDrawer> pNum;
-  smart_pointer<NumberDrawer> pBigNum;
+  ScalingDrawer *pDr;
+  NumberDrawer *pNum;
+  NumberDrawer *pBigNum;
   FontWriter *pFancyNum;
 
   SoundInterface<Index> *pSndRaw;

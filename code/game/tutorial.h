@@ -17,7 +17,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   std::vector<std::string> sText;
   std::vector<std::string> sNewText;
 
-  smart_pointer<NumberDrawer> pNum;
+  NumberDrawer *pNum;
 
   Timer t;
   int nOffset;
@@ -27,8 +27,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   struct DragonGameController *pGl;
 
-  TutorialTextEntity(float dPriority_, Point pos_,
-                     smart_pointer<NumberDrawer> pNum_,
+  TutorialTextEntity(float dPriority_, Point pos_, NumberDrawer *pNum_,
                      DragonGameController *pGl_)
       : dPriority(dPriority_), pos(pos_), pNum(pNum_), t(1), nOffset(0),
         nTextVerticalSpacing(7), nDelta(1), pGl(pGl_) {}
@@ -39,7 +38,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   /** Draw the lines with a vertical offset; skip if the wise one's guidance is
    * off. */
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 

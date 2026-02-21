@@ -41,7 +41,7 @@ void TutorialTextEntity::SetText(std::vector<std::string> v) {
   }
 }
 
-void TutorialTextEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
+void TutorialTextEntity::Draw(ScalingDrawer *pDr) {
   if (pGl && !pGl->IsTutorialOnSetting())
     return;
 

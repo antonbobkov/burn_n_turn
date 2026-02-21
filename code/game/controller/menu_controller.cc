@@ -23,7 +23,7 @@ std::string MusicString() { return "music: "; }
 std::string TutorialString() { return "tutorial: "; }
 std::string FullTextString() { return "full screen: "; }
 
-void MenuDisplay::Draw(smart_pointer<ScalingDrawer> pDr) {
+void MenuDisplay::Draw(ScalingDrawer *pDr) {
   Point p = pLeftTop;
   for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
     if (!pCurr->vEntries[i].bDisabled)
@@ -96,7 +96,7 @@ void MenuController::Update() {
   pGl->RefreshAll();
 }
 
-MenuDisplay::MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
+MenuDisplay::MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
                          smart_pointer<Animation> pMenuCaret_,
                          smart_pointer<MenuController> pMenuController_,
                          bool bCheatsUnlocked_)

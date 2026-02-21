@@ -73,7 +73,7 @@ struct ChainExplosion : virtual public AnimationOnce,
    */
   /*virtual*/ void Update();
 
-  void Draw(smart_pointer<ScalingDrawer> pDr) { AnimationOnce::Draw(pDr); }
+  void Draw(ScalingDrawer *pDr) { AnimationOnce::Draw(pDr); }
 };
 
 struct KnightOnFire : public Critter {
@@ -155,7 +155,7 @@ struct FireballBonusAnimation : public Animation,
 
   /*virtual*/ unsigned GetRadius() { return 20U; }
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ void Update();
 };

@@ -25,7 +25,7 @@ struct AdNumberDrawer : public VisualEntity {
 
   AdNumberDrawer() : pAd(0) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
+  /*virtual*/ void Draw(ScalingDrawer *pDr) {
     unsigned n = pDr->nFactor;
 
 #ifdef FULL_VERSION
@@ -79,7 +79,7 @@ struct BonusDrawer : public VisualEntity {
   BonusDrawer()
       : pAd(0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
+  /*virtual*/ void Draw(ScalingDrawer *pDr) {
     if (t.Tick())
       ++nAnimationCounter;
 

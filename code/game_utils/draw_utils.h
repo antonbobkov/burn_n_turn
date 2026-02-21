@@ -4,31 +4,29 @@
 /* draw_utils.h - Drawing helpers: Drawer base, ScalingDrawer for scaled
  * images with color key, NumberDrawer for font-based digits and text.
  *
- * Dependencies (include required): SP_Info -> utils/smart_pointer.h;
- * Color -> wrappers/color.h; Point -> wrappers/geometry.h;
- * Index -> utils/index.h; smart_pointer -> utils/smart_pointer.h. */
+ * Dependencies: Color -> wrappers/color.h; Point -> wrappers/geometry.h;
+ * Index -> utils/index.h. */
 
 #include "utils/index.h"
-#include "utils/smart_pointer.h"
 #include "wrappers/color.h"
 #include "wrappers/geometry.h"
+#include <map>
+#include <vector>
 
 class FilePath;
 template <class T> class GraphicalInterface;
 
 /** Base for drawing an image at a point; ScalingDrawer adds scale and color
  * key. */
-struct Drawer : virtual public SP_Info {
+struct Drawer {
   GraphicalInterface<Index> *pGr;
 
   Drawer() : pGr(nullptr) {}
-  std::string get_class_name() override { return "Drawer"; }
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
 
 /** Drawer that scales images by nFactor and uses cTr as transparency key. */
 struct ScalingDrawer : public Drawer {
-  std::string get_class_name() override { return "ScalingDrawer"; }
   unsigned nFactor;
   Color cTr;
 
@@ -48,9 +46,8 @@ struct ScalingDrawer : public Drawer {
 
 /** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for
  * recolored text. */
-struct NumberDrawer : virtual public SP_Info {
-  std::string get_class_name() override { return "NumberDrawer"; }
-  smart_pointer<ScalingDrawer> pDr;
+struct NumberDrawer {
+  ScalingDrawer *pDr;
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
 
@@ -58,7 +55,7 @@ struct NumberDrawer : virtual public SP_Info {
 
   void CacheColor(Color c);
 
-  NumberDrawer(smart_pointer<ScalingDrawer> pDr_, FilePath *fp,
+  NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
                std::string sFontPath, std::string sFontName);
 
   std::string GetNumber(unsigned n, unsigned nDigits = 0);

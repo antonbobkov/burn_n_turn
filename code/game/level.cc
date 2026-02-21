@@ -8,7 +8,7 @@
 #include "wrappers/color.h"
 #include "wrappers/geometry.h"
 
-void Road::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Road::Draw(ScalingDrawer *pDr) {
   unsigned n = pDr->nFactor;
   if (bVertical)
     pDr->pGr->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
@@ -302,7 +302,7 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
   return ifs;
 }
 
-void FancyRoad::Draw(smart_pointer<ScalingDrawer> pDr) {
+void FancyRoad::Draw(ScalingDrawer *pDr) {
   unsigned n = pDr->nFactor;
   Image *p = pDr->pGr->GetImage(pAd->pGl->GetImg("road"));
   Size sz = p->GetSize();

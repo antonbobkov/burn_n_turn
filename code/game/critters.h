@@ -22,7 +22,7 @@ struct Castle : public Critter {
 
   void OnKnight(char cWhat);
 
-  /*unsigned*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*unsigned*/ void Draw(ScalingDrawer *pDr);
 };
 
 /** The princess: a soul the dragon can rescue and carry to the castle. */
@@ -39,7 +39,7 @@ struct Princess : public Critter, public ConsumableEntity {
   /** When hit: show the bonus tally and vanish from the world. */
   /*virtual*/ void OnHit(char cWhat);
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 };
 
 struct Mage : public Critter, public ConsumableEntity {
@@ -86,7 +86,7 @@ struct Trader : public Critter, public ConsumableEntity {
 
   /*virtual*/ void OnHit(char cWhat);
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 };
 
 /** The knight: chases princess and castle, and may rise again as a ghost. */
@@ -103,7 +103,7 @@ struct Knight : public Critter, public ConsumableEntity {
       : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(1),
         nGolemHealth(nGolemHealthMax) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /** Push the knight back one step along his path. */
   void KnockBack();
@@ -132,9 +132,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 
   MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_);
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr) {
-    Critter::Draw(pDr);
-  }
+  /*virtual*/ void Draw(ScalingDrawer *pDr) { Critter::Draw(pDr); }
 
   void RandomizeVelocity();
 

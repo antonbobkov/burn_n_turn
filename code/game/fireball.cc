@@ -377,7 +377,7 @@ FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
   coronaSeq = pAd->pGl->GetImgSeq("corona");
 }
 
-void FireballBonusAnimation::Draw(smart_pointer<ScalingDrawer> pDr) {
+void FireballBonusAnimation::Draw(ScalingDrawer *pDr) {
   pDr->Draw(coronaSeq.GetImage(), GetPosition(), bCenter);
   Animation::Draw(pDr);
 

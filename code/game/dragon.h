@@ -93,7 +93,7 @@ struct Dragon : public Critter {
 
   /*vrtual*/ Point GetPosition();
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   void AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent = false);
 

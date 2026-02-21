@@ -317,7 +317,7 @@ Point Dragon::GetPosition() {
   return fPos.ToPnt();
 }
 
-void Dragon::Draw(smart_pointer<ScalingDrawer> pDr) {
+void Dragon::Draw(ScalingDrawer *pDr) {
   if (bCarry)
     pDr->Draw(imgCarry, GetPosition(), true);
 

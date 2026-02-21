@@ -68,6 +68,6 @@ void BuyNowController::OnMouseDown(Point pPos) {
     EntityListController::OnMouseDown(pPos);
 }
 
-void SlimeUpdater::Draw(smart_pointer<ScalingDrawer> pDr) {
+void SlimeUpdater::Draw(ScalingDrawer *pDr) {
   pBuy->DrawSlimes();
 }

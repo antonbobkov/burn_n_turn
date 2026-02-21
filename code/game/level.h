@@ -68,7 +68,7 @@ struct Road : virtual public VisualEntity {
   /*virtual*/ float GetPriority() { return 0; }
   /*virtual*/ Point GetPosition() { return Point(); }
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   void RoadMap(Point &p, Point &v);
 };
@@ -88,7 +88,7 @@ struct FancyRoad : public Road {
   FancyRoad(const Road &rd, LevelController *pAd_) : Road(rd), pAd(pAd_) {}
   LevelController *pAd;
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 };
 
 /** One chapter: bounds, where knights appear, castle spots, roads, timer, and

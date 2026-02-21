@@ -15,7 +15,7 @@ void TextDrawEntity::SetText(std::string sText) {
   vText = BreakUpString(sText);
 }
 
-void TextDrawEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
+void TextDrawEntity::Draw(ScalingDrawer *pDr) {
   Point p = pos;
   for (unsigned i = 0; i < vText.size(); ++i) {
     pNum->DrawWord(vText[i], p, bCenter);
@@ -41,15 +41,15 @@ void SimpleVisualEntity::Update() {
   }
 }
 
-void SimpleVisualEntity::Draw(smart_pointer<ScalingDrawer> pDr) {
+void SimpleVisualEntity::Draw(ScalingDrawer *pDr) {
   pDr->Draw(seq.GetImage(), GetPosition(), bCenter);
 }
 
-void StaticImage::Draw(smart_pointer<ScalingDrawer> pDr) {
+void StaticImage::Draw(ScalingDrawer *pDr) {
   pDr->Draw(img, GetPosition(), bCentered);
 }
 
-void StaticRectangle::Draw(smart_pointer<ScalingDrawer> pDr) {
+void StaticRectangle::Draw(ScalingDrawer *pDr) {
   pDr->pGr->DrawRectangle(r, c, false);
 }
 
@@ -141,7 +141,7 @@ void SoundControls::Update() {
     plr.StopMusic();
 }
 
-/*virtual*/ void HighScoreShower::Draw(smart_pointer<ScalingDrawer> pDr) {
+/*virtual*/ void HighScoreShower::Draw(ScalingDrawer *pDr) {
   int nScale = 2;
   int nCharWidth = 4;
 
@@ -168,7 +168,7 @@ void SoundControls::Update() {
   pGl->GetBigNumberDrawer()->DrawNumber(pGl->GetHighScore(), p2, 7);
 }
 
-/*virtual*/ void IntroTextShower::Draw(smart_pointer<ScalingDrawer> pDr) {
+/*virtual*/ void IntroTextShower::Draw(ScalingDrawer *pDr) {
   int nScale = 2;
 
   Point pCnt = Point(rBound.sz.x / 2 * nScale, rBound.sz.y / 2 * nScale);
@@ -210,7 +210,7 @@ void SoundControls::Update() {
   }
 }
 
-/*virtual*/ void BonusScore::Draw(smart_pointer<ScalingDrawer> pDr) {
+/*virtual*/ void BonusScore::Draw(ScalingDrawer *pDr) {
   if (nC < 11)
     pAc->pGl->GetNumberDrawer()->DrawWord(sText, p, true);
   else

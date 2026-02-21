@@ -44,7 +44,7 @@ struct SlimeUpdater : public VisualEntity {
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
   /*virtual*/ float GetPriority() { return 0; }
 };
 

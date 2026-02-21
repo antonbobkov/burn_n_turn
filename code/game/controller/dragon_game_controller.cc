@@ -69,12 +69,11 @@ DragonGameSettings::DragonGameSettings(FilePath *fp,
       sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {}
 
 DragonGameController::DragonGameController(
-    smart_pointer<ScalingDrawer> pDr_, smart_pointer<NumberDrawer> pNum_,
-    smart_pointer<NumberDrawer> pBigNum_, FontWriter *pFancyNum_,
-    SoundInterface<Index> *pSndRaw_,
+    ScalingDrawer *pDr_, NumberDrawer *pNum_, NumberDrawer *pBigNum_,
+    FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     TowerDataWrap *pWrp_, FilePath *fp)
-    : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_->pGr),
+    : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_ ? pDr_->pGr : 0),
       pNum(pNum_), pBigNum(pBigNum_),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
       pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw_))),
@@ -675,19 +674,19 @@ void DragonGameController::RefreshAll() {
     pGraph->RefreshAll();
 }
 
-smart_pointer<ScalingDrawer> DragonGameController::GetDrawer() const {
+ScalingDrawer *DragonGameController::GetDrawer() const {
   return pDr;
 }
 
 unsigned DragonGameController::GetDrawScaleFactor() const {
-  return !pDr.is_null() ? pDr->nFactor : 0;
+  return pDr ? pDr->nFactor : 0;
 }
 
-smart_pointer<NumberDrawer> DragonGameController::GetNumberDrawer() const {
+NumberDrawer *DragonGameController::GetNumberDrawer() const {
   return pNum;
 }
 
-smart_pointer<NumberDrawer> DragonGameController::GetBigNumberDrawer() const {
+NumberDrawer *DragonGameController::GetBigNumberDrawer() const {
   return pBigNum;
 }
 

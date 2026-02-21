@@ -39,7 +39,7 @@ struct ScreenEntity : virtual public Entity {
 
 struct VisualEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "VisualEntity"; }
-  virtual void Draw(smart_pointer<ScalingDrawer> pDr) {}
+  virtual void Draw(ScalingDrawer *pDr) {}
   virtual float GetPriority() { return 0; }
   VisualEntity() = default;
   VisualEntity(const VisualEntity &) = default;
@@ -54,17 +54,17 @@ struct TextDrawEntity : virtual public VisualEntity {
   Point pos;
   bool bCenter;
   std::vector<std::string> vText;
-  smart_pointer<NumberDrawer> pNum;
+  NumberDrawer *pNum;
 
   TextDrawEntity(float dPriority_, Point pos_, bool bCenter_, std::string sText,
-                 smart_pointer<NumberDrawer> pNum_)
+                 NumberDrawer *pNum_)
       : dPriority(dPriority_), pos(pos_), bCenter(bCenter_), pNum(pNum_) {
     SetText(sText);
   }
 
   void SetText(std::string sText);
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 };
@@ -95,7 +95,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
       : dPriority(dPriority_), seq(seq_), bCenter(bCenter_), bTimer(false),
         bStep(bStep_), nPeriod(1), bImageToggle(false) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ float GetPriority() { return dPriority; }
 
@@ -161,7 +161,7 @@ struct StaticImage : public VisualEntity {
               float dPriority_ = 0)
       : img(img_), dPriority(dPriority_), p(p_), bCentered(bCentered_) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ Point GetPosition() { return p; }
 
@@ -178,7 +178,7 @@ struct StaticRectangle : public VisualEntity {
   StaticRectangle(Rectangle r_, Color c_, float dPriority_ = 0)
       : r(r_), c(c_), dPriority(dPriority_) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ Point GetPosition() { return Point(0, 0); }
 
@@ -286,7 +286,7 @@ struct BonusScore : public EventEntity, public VisualEntity {
 
   /*virtual*/ void Update();
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ float GetPriority() { return 5; }
 
@@ -313,7 +313,7 @@ struct HighScoreShower : public VisualEntity {
   HighScoreShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 };
 
 struct IntroTextShower : public VisualEntity {
@@ -324,7 +324,7 @@ struct IntroTextShower : public VisualEntity {
   IntroTextShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 };
 
 /** Clear from the list all that have left the realm (bExist is false). */

@@ -66,20 +66,20 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   bool bCheatsUnlocked;
 
   Point pLeftTop;
-  smart_pointer<NumberDrawer> pNum;
+  NumberDrawer *pNum;
 
   smart_pointer<Animation> pMenuCaret;
 
   /** The menu keeper who owns this hall (we only point). */
   MenuController *pMenuController;
 
-  MenuDisplay(Point pLeftTop_, smart_pointer<NumberDrawer> pNum_,
+  MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
               smart_pointer<Animation> pMenuCaret_,
               smart_pointer<MenuController> pMenuController_,
               bool bCheatsUnlocked_);
 
   /** Draw the choices on the wall and the caret at the chosen line. */
-  /*virtual*/ void Draw(smart_pointer<ScalingDrawer> pDr);
+  /*virtual*/ void Draw(ScalingDrawer *pDr);
 
   /*virtual*/ float GetPriority() { return 0; }
 
