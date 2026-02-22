@@ -189,22 +189,19 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
     vDr.back()->pCs->pDrag = vDr.back();
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
-  smart_pointer<TutorialTextEntity> pTT =
-      make_smart(new TutorialTextEntity(1, pos, pGl->GetNumberDrawer(), pGl));
-  pTutorialText = pTT;
+  pTutorialText = std::make_unique<TutorialTextEntity>(
+      1, pos, pGl->GetNumberDrawer(), pGl);
 
 #ifdef PC_VERSION
 
   if (nLvl == 1) {
-    tutOne->pTexter = pTT;
+    tutOne->pTexter = pTutorialText.get();
     tutOne->Update();
-    AddBoth(pTT);
   }
 
   if (nLvl == 2) {
-    tutTwo->pTexter = pTT;
+    tutTwo->pTexter = pTutorialText.get();
     tutTwo->Update();
-    AddBoth(pTT);
   }
 
 #endif
@@ -416,6 +413,8 @@ std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
   std::vector<EventEntity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
+  if (pTutorialText)
+    out.push_back(pTutorialText.get());
   return out;
 }
 
@@ -423,6 +422,8 @@ std::vector<VisualEntity *> LevelController::GetNonOwnedDrawEntities() {
   std::vector<VisualEntity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
+  if (pTutorialText)
+    out.push_back(pTutorialText.get());
   return out;
 }
 

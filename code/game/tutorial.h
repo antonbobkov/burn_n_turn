@@ -3,7 +3,6 @@
 
 #include "game_utils/draw_utils.h"
 #include "entities.h"
-#include "utils/smart_pointer.h"
 
 struct DragonGameController;
 
@@ -55,7 +54,7 @@ struct TutorialLevelOne {
   bool bPrincessGenerated;
   bool bPrincessCaptured;
 
-  smart_pointer<TutorialTextEntity> pTexter;
+  TutorialTextEntity *pTexter;
 
   TutorialLevelOne()
       : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
@@ -92,7 +91,7 @@ struct TutorialLevelTwo {
   bool bTraderKilled;
   bool bBonusPickedUp;
 
-  smart_pointer<TutorialTextEntity> pTexter;
+  TutorialTextEntity *pTexter;
 
   TutorialLevelTwo()
       : bTraderGenerated(false), bTraderKilled(false), bBonusPickedUp(false),

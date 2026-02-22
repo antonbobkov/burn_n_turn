@@ -116,7 +116,7 @@ std::vector<std::string> TutorialLevelOne::GetText() {
 }
 
 void TutorialLevelOne::Update() {
-  if (!pTexter.is_null())
+  if (pTexter != nullptr)
     pTexter->SetText(GetText());
 }
 
@@ -172,7 +172,7 @@ std::vector<std::string> TutorialLevelTwo::GetText() {
 }
 
 void TutorialLevelTwo::Update() {
-  if (!pTexter.is_null())
+  if (pTexter != nullptr)
     pTexter->SetText(GetText());
 }
 

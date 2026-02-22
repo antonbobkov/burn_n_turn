@@ -77,7 +77,7 @@ struct LevelController : public EntityListController {
 
   std::unique_ptr<TutorialLevelOne> tutOne;
   std::unique_ptr<TutorialLevelTwo> tutTwo;
-  smart_pointer<TutorialTextEntity> pTutorialText;
+  std::unique_ptr<TutorialTextEntity> pTutorialText;
 
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
