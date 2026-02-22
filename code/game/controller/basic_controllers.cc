@@ -39,10 +39,8 @@ void EntityListController::AddBackground(Color c) {
   r.sz.x *= pGl->GetDrawScaleFactor();
   r.sz.y *= pGl->GetDrawScaleFactor();
 
-  smart_pointer<StaticRectangle> pBkg =
-      make_smart(new StaticRectangle(r, c, -1.F));
-
-  AddV(pBkg);
+  AddOwnedVisualEntity(
+      std::make_unique<StaticRectangle>(r, c, -1.F));
 }
 
 EntityListController::EntityListController(DragonGameController *pGl_,
@@ -213,9 +211,11 @@ DragonScoreController::DragonScoreController(DragonGameController *pGl_,
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {
-    AddV(make_smart(new HighScoreShower(pGl, rBound)));
+    AddOwnedVisualEntity(
+        std::make_unique<HighScoreShower>(pGl, rBound));
   } else
-    AddV(make_smart(new IntroTextShower(pGl, rBound)));
+    AddOwnedVisualEntity(
+        std::make_unique<IntroTextShower>(pGl, rBound));
 }
 
 void DragonScoreController::OnKey(GuiKeyType c, bool bUp) {
