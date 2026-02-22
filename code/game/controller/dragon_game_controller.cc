@@ -347,10 +347,6 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   nScore = 0;
   bAngry = false;
 
-  smart_pointer<Animation> pStr = make_smart(
-      new Animation(0, (*pr)("start"), nFramesInSecond / 5,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-
   // menu
   smart_pointer<MenuController> pMenuHolder = make_smart(
       new MenuController(pSelf, &settings_, rBound, Color(0, 0, 0)));
@@ -386,22 +382,16 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   smart_pointer<EntityListController> pCut3 =
       make_smart(new Cutscene(pSelf, rBound, "dragon_walk", "mage"));
 
-  smart_pointer<SoundControls> pBckgMusic =
-      make_smart(new SoundControls(plr, BG_BACKGROUND));
-  smart_pointer<SoundControls> pNoMusic =
-      make_smart(new SoundControls(plr, -1));
+  SoundControls bckgTemplate(plr, BG_BACKGROUND);
+  SoundControls noMusicTemplate(plr, -1);
 
-  smart_pointer<Animation> pWin = make_smart(new Animation(
-      0, (*pr)("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
-  smart_pointer<StaticImage> pL = make_smart(new StaticImage(
-      (*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true));
-  smart_pointer<Animation> pBurnL = make_smart(
-      new Animation(0, (*pr)("burn"), 3,
-                    Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true));
-  smart_pointer<Animation> pBurnR = make_smart(
-      new Animation(0, (*pr)("burn"), 4,
-                    Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true));
-  pBurnR->seq.nActive += 4;
+  StaticImage logo((*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3),
+                   true);
+  Animation burnL(0, (*pr)("burn"), 3,
+                  Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true);
+  Animation burnR(0, (*pr)("burn"), 4,
+                  Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true);
+  burnR.seq.nActive += 4;
 
   std::vector<std::string> vHintPref;
   vHintPref.push_back("hint: ");
@@ -424,83 +414,72 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   std::string sHint = vHintPref.at(rand() % vHintPref.size()) +
                       vHints.at(rand() % vHints.size());
 
-  smart_pointer<TextDrawEntity> pHintText = make_smart(new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum));
-  smart_pointer<TextDrawEntity> pOptionText = make_smart(new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum));
-
-  smart_pointer<AnimationOnce> pO = make_smart(
-      new AnimationOnce(0, (*pr)("over"), nFramesInSecond / 2,
-                        Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
-  smart_pointer<AnimationOnce> pPlu = make_smart(
-      new AnimationOnce(0, (*pr)("pluanbo"), nFramesInSecond / 10,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-  smart_pointer<AnimationOnce> pGen = make_smart(
-      new AnimationOnce(0, (*pr)("gengui"), nFramesInSecond / 5,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-
-  smart_pointer<SimpleSoundEntity> pOver = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("over"), nFramesInSecond / 2,
-                            pSnd.get()));
-  smart_pointer<SimpleSoundEntity> pPluSnd = make_smart(new SimpleSoundEntity(
-      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
-  smart_pointer<SimpleSoundEntity> pClkSnd = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("click"), nFramesInSecond / 5,
-                            pSnd.get()));
+  auto pHintText = std::make_unique<TextDrawEntity>(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum);
+  auto pOptionText = std::make_unique<TextDrawEntity>(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
 
 #ifdef TRIAL_VERSION
-  smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(
+  pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(
       (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
-  pCnt1->AddV(pTrial);
 #endif
 
   pMenu->SetMenuCaret(std::make_unique<Animation>(
       2, (*pr)("arrow"), 3, Point(0, 0), true));
-  std::unique_ptr<MenuDisplay> pMenuDisplay =
-      std::make_unique<MenuDisplay>(
-          Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-          pMenu->GetMenuCaret(), pMenu.get(),
-          settings_.sbCheatsUnlocked.Get());
-  pMenu->pMenuDisplay = pMenuDisplay.get();
-  pMenu->AddOwnedBoth(std::move(pMenuDisplay));
+  pMenu->SetMenuDisplay(std::make_unique<MenuDisplay>(
+      Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
+      pMenu->GetMenuCaret(), pMenu.get(),
+      settings_.sbCheatsUnlocked.Get()));
 
-  pCnt1->AddBoth(pStr);
+  pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnR));
 
-  pCnt1->AddV(pL);
-  pCnt1->AddBoth(pBurnL);
-  pCnt1->AddBoth(pBurnR);
+  pMenu->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pMenu->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pMenu->AddOwnedBoth(std::make_unique<Animation>(burnR));
 
-  pMenu->AddV(pL);
-  pMenu->AddBoth(pBurnL);
-  pMenu->AddBoth(pBurnR);
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("start"), nFramesInSecond / 5,
+      Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
 #ifdef PC_VERSION
-  pMenu->pHintText = pHintText;
-  pMenu->pOptionText = pOptionText;
+  pMenu->SetHintText(std::move(pHintText));
+  pMenu->SetOptionText(std::move(pOptionText));
 #else
-  pCnt1->AddV(pHintText);
+  pCnt1->AddOwnedVisualEntity(std::move(pHintText));
+  pMenu->SetOptionText(std::move(pOptionText));
 #endif
 
-  pCnt3->AddBoth(pWin);
-  pCnt2->AddBoth(pO);
-  pCnt2->AddE(pOver);
+  pCnt3->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("win"), 3,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
+  pCnt2->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("over"), nFramesInSecond / 2,
+      Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
+  pCnt2->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("over"), nFramesInSecond / 2, pSnd.get()));
 
-  pCnt0_1->AddBoth(pPlu);
-  pCnt0_1->AddE(pPluSnd);
+  pCnt0_1->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("pluanbo"), nFramesInSecond / 10,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
+  pCnt0_1->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
 
-  pCnt0_2->AddBoth(pGen);
-  pCnt0_2->AddE(pClkSnd);
+  pCnt0_2->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("gengui"), nFramesInSecond / 5,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
+  pCnt0_2->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("click"), nFramesInSecond / 5, pSnd.get()));
 
-  pCnt1->AddE(pBckgMusic);
+  pCnt1->AddOwnedEventEntity(std::make_unique<SoundControls>(bckgTemplate));
 
-  pMenu->AddE(pNoMusic);
-
-  pCut1->AddE(pNoMusic);
-  pCut2->AddE(pNoMusic);
-  pCut3->AddE(pNoMusic);
-
-  pCnt2->AddE(pNoMusic);
-  pCnt3->AddE(pNoMusic);
+  pMenu->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut1->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut2->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut3->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt2->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt3->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
 
   vCnt.push_back(pMenuHolder); // menu
   vCnt.push_back(pCnt0_1);     // logo 1
@@ -515,8 +494,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
         make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd.get(), vLvl[i]);
 
-    pAd->AddE(pBckgMusic);
-    pAd->pSc = pBckgMusic.get();
+    pAd->pSc = std::make_unique<SoundControls>(bckgTemplate);
 
     // game level
     vCnt.push_back(pAd);
@@ -542,47 +520,34 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   smart_pointer<BuyNowController> pBuy =
       make_smart(new BuyNowController(pSelf, rBound, Color(0, 0, 0)));
 
-  smart_pointer<Animation> pGolem = make_smart(
-      new Animation(0, (*pr)("golem_f"), nFramesInSecond / 10,
-                    Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
-  smart_pointer<Animation> pSkeleton1 = make_smart(
-      new Animation(0, (*pr)("skelly"), nFramesInSecond / 4,
-                    Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
-  smart_pointer<Animation> pSkeleton2 = make_smart(new Animation(
+  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnR));
+  pBuy->AddOwnedVisualEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
+  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(
+      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
+
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("golem_f"), nFramesInSecond / 10,
+      Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("skelly"), nFramesInSecond / 4,
+      Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
       0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
       Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
-  smart_pointer<Animation> pSkeleton3 = make_smart(new Animation(
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
       0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
       Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
-  smart_pointer<Animation> pMage = make_smart(
-      new Animation(0, (*pr)("mage_spell"), nFramesInSecond / 2,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-  smart_pointer<Animation> pGhost = make_smart(new Animation(
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("mage_spell"), nFramesInSecond / 2,
+      Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
       0, (*pr)("ghost"), nFramesInSecond / 6,
       Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
-  smart_pointer<Animation> pWhiteKnight = make_smart(new Animation(
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
       0, (*pr)("ghost_knight"), nFramesInSecond / 6,
       Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
-
-  // smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(...));
-  smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(
-      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
-  smart_pointer<VisualEntity> pSlimeUpd =
-      make_smart(new SlimeUpdater(pBuy.get()));
-
-  pBuy->AddV(pL);
-  pBuy->AddV(pSlimeUpd);
-  pBuy->AddBoth(pBurnL);
-  pBuy->AddBoth(pBurnR);
-  pBuy->AddV(pBuyNow);
-
-  pBuy->AddBoth(pGolem);
-  pBuy->AddBoth(pSkeleton1);
-  pBuy->AddBoth(pSkeleton2);
-  pBuy->AddBoth(pSkeleton3);
-  pBuy->AddBoth(pMage);
-  pBuy->AddBoth(pGhost);
-  pBuy->AddBoth(pWhiteKnight);
 #endif
 
 #ifdef FULL_VERSION

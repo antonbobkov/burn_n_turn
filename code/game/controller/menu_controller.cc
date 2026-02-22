@@ -67,10 +67,24 @@ void MenuController::SetMenuCaret(std::unique_ptr<Animation> p) {
   pMenuCaret = std::move(p);
 }
 
+void MenuController::SetHintText(std::unique_ptr<TextDrawEntity> p) {
+  pHintText = std::move(p);
+}
+
+void MenuController::SetOptionText(std::unique_ptr<TextDrawEntity> p) {
+  pOptionText = std::move(p);
+}
+
+void MenuController::SetMenuDisplay(std::unique_ptr<MenuDisplay> p) {
+  pMenuDisplay = std::move(p);
+}
+
 std::vector<EventEntity *> MenuController::GetNonOwnedUpdateEntities() {
   std::vector<EventEntity *> out;
   if (pMenuCaret)
     out.push_back(pMenuCaret.get());
+  if (pMenuDisplay)
+    out.push_back(pMenuDisplay.get());
   return out;
 }
 
@@ -78,6 +92,8 @@ std::vector<VisualEntity *> MenuController::GetNonOwnedDrawEntities() {
   std::vector<VisualEntity *> out;
   if (pMenuCaret)
     out.push_back(pMenuCaret.get());
+  if (pMenuDisplay)
+    out.push_back(pMenuDisplay.get());
   return out;
 }
 
@@ -106,10 +122,10 @@ void MenuController::Update() {
   if (!pMenuDisplay)
     return;
   if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
-    if (!pOptionText.is_null())
+    if (pOptionText)
       pOptionText->Draw(pGl->GetDrawer());
   } else {
-    if (!pHintText.is_null())
+    if (pHintText)
       pHintText->Draw(pGl->GetDrawer());
   }
 
@@ -193,7 +209,7 @@ void MenuDisplay::PositionIncrement(bool bUp) {
       break;
   }
 
-  if (!pMenuController->pOptionText.is_null())
+  if (pMenuController->pOptionText)
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }
@@ -286,7 +302,7 @@ void MenuDisplay::UpdateMenuEntries() {
   memLoadChapter.vEntries.at(2).bDisabled =
       (pMenuController->settings->snProgress.Get() < 2);
 
-  if (!pMenuController->pOptionText.is_null())
+  if (pMenuController->pOptionText)
     pMenuController->pOptionText->SetText(
         vOptionText.at(memOptions.nMenuPosition));
 }
