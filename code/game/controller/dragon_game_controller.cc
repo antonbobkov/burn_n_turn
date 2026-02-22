@@ -391,10 +391,8 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   smart_pointer<EntityListController> pCut3 =
       make_smart(new Cutscene(pSelf, rBound, "dragon_walk", "mage"));
 
-  smart_pointer<SoundControls> pBckgMusic =
-      make_smart(new SoundControls(plr, BG_BACKGROUND));
-  smart_pointer<SoundControls> pNoMusic =
-      make_smart(new SoundControls(plr, -1));
+  SoundControls bckgTemplate(plr, BG_BACKGROUND);
+  SoundControls noMusicTemplate(plr, -1);
 
   smart_pointer<Animation> pWin = make_smart(new Animation(
       0, (*pr)("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
@@ -496,16 +494,14 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pCnt0_2->AddBoth(pGen);
   pCnt0_2->AddE(pClkSnd);
 
-  pCnt1->AddE(pBckgMusic);
+  pCnt1->AddOwnedEventEntity(std::make_unique<SoundControls>(bckgTemplate));
 
-  pMenu->AddE(pNoMusic);
-
-  pCut1->AddE(pNoMusic);
-  pCut2->AddE(pNoMusic);
-  pCut3->AddE(pNoMusic);
-
-  pCnt2->AddE(pNoMusic);
-  pCnt3->AddE(pNoMusic);
+  pMenu->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut1->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut2->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut3->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt2->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt3->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
 
   vCnt.push_back(pMenuHolder); // menu
   vCnt.push_back(pCnt0_1);     // logo 1
@@ -520,8 +516,9 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
         make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd.get(), vLvl[i]);
 
-    pAd->AddE(pBckgMusic);
-    pAd->pSc = pBckgMusic.get();
+    auto pScEntity = std::make_unique<SoundControls>(bckgTemplate);
+    pAd->pSc = pScEntity.get();
+    pAd->AddOwnedEventEntity(std::move(pScEntity));
 
     // game level
     vCnt.push_back(pAd);
