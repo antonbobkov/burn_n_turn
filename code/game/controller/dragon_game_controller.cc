@@ -425,9 +425,8 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
 
 #ifdef TRIAL_VERSION
-  smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(
+  pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(
       (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
-  pCnt1->AddV(pTrial);
 #endif
 
   pMenu->SetMenuCaret(std::make_unique<Animation>(
@@ -531,47 +530,34 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   smart_pointer<BuyNowController> pBuy =
       make_smart(new BuyNowController(pSelf, rBound, Color(0, 0, 0)));
 
-  smart_pointer<Animation> pGolem = make_smart(
-      new Animation(0, (*pr)("golem_f"), nFramesInSecond / 10,
-                    Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
-  smart_pointer<Animation> pSkeleton1 = make_smart(
-      new Animation(0, (*pr)("skelly"), nFramesInSecond / 4,
-                    Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
-  smart_pointer<Animation> pSkeleton2 = make_smart(new Animation(
-      0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
-      Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
-  smart_pointer<Animation> pSkeleton3 = make_smart(new Animation(
-      0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
-      Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
-  smart_pointer<Animation> pMage = make_smart(
-      new Animation(0, (*pr)("mage_spell"), nFramesInSecond / 2,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-  smart_pointer<Animation> pGhost = make_smart(new Animation(
-      0, (*pr)("ghost"), nFramesInSecond / 6,
-      Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
-  smart_pointer<Animation> pWhiteKnight = make_smart(new Animation(
-      0, (*pr)("ghost_knight"), nFramesInSecond / 6,
-      Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
-
-  // smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(...));
-  smart_pointer<StaticImage> pBuyNow = make_smart(new StaticImage(
-      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
-  smart_pointer<VisualEntity> pSlimeUpd =
-      make_smart(new SlimeUpdater(pBuy.get()));
-
   pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
   pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
   pBuy->AddOwnedBoth(std::make_unique<Animation>(burnR));
-  pBuy->AddV(pSlimeUpd);
-  pBuy->AddV(pBuyNow);
+  pBuy->AddOwnedVisualEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
+  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(
+      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
 
-  pBuy->AddBoth(pGolem);
-  pBuy->AddBoth(pSkeleton1);
-  pBuy->AddBoth(pSkeleton2);
-  pBuy->AddBoth(pSkeleton3);
-  pBuy->AddBoth(pMage);
-  pBuy->AddBoth(pGhost);
-  pBuy->AddBoth(pWhiteKnight);
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("golem_f"), nFramesInSecond / 10,
+      Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("skelly"), nFramesInSecond / 4,
+      Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
+      Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
+      Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("mage_spell"), nFramesInSecond / 2,
+      Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("ghost"), nFramesInSecond / 6,
+      Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("ghost_knight"), nFramesInSecond / 6,
+      Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
 #endif
 
 #ifdef FULL_VERSION
