@@ -3,9 +3,11 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
+#include "game/controller/dragon_game_controller.h"
 #include "game/dragon_game_runner.h"
 #include "game_utils/MessageWriter.h"
 #include "game_utils/game_runner_interface.h"
+#include "utils/exception.h"
 #include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/gui_key_type.h"
@@ -16,6 +18,7 @@
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -24,7 +27,7 @@ namespace {
 const unsigned kSimulationFrames = 900;
 const unsigned kScreenW = 960;
 const unsigned kScreenH = 600;
-const std::string kSoundFileName("soundon.txt");
+const std::string kGameDataFile("game_data.txt");
 const unsigned kKeyPressFrames[] = {8, 18, 28};
 const unsigned kKeyPressCount = 3;
 
@@ -50,6 +53,7 @@ std::vector<std::pair<std::string, int>> GetNonZeroSmartPointerCounts() {
 
 TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
           "[simulation][integration]") {
+  try {
   srand(12345);
 
   int counter_before = nGlobalSuperMegaCounter;
@@ -126,7 +130,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
         if (i == 135)
           p_gl->Fire();
         if (i == 150)
-          sound_content_before = GetFileContent(fm.get(), kSoundFileName);
+          sound_content_before = GetFileContent(fm.get(), kGameDataFile);
         /* Open the in-game pause menu. */
         if (i == 151)
           p_gl->KeyDown(GUI_ESCAPE);
@@ -150,7 +154,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
         if (i == 157)
           p_gl->KeyDown(GUI_RETURN);
         if (i >= 158 && i <= 165) {
-          std::string sound_after = GetFileContent(fm.get(), kSoundFileName);
+          std::string sound_after = GetFileContent(fm.get(), kGameDataFile);
           if (sound_content_before != sound_after)
             sound_file_flipped = true;
         }
@@ -182,10 +186,32 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
 
   CHECK(nGlobalSuperMegaCounter == 0);
   CHECK(nonzero.empty());
+
+  } catch (const SimpleException &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw SimpleException: " << e.GetDescription(true);
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (const MyException &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw MyException: " << e.GetDescription(true);
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (const std::exception &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw std::exception: " << e.what();
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (...) {
+    std::cerr << "Simulation threw unknown exception (not std::exception)"
+              << std::endl;
+    FAIL("Simulation threw unknown exception type");
+  }
 }
 
 TEST_CASE("Simulation cheats, load chapter, wait for game over",
           "[simulation][integration]") {
+  try {
   srand(12345);
 
   {
@@ -200,9 +226,6 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
     std::unique_ptr<CachingReadOnlyFileManager> fm(
         new CachingReadOnlyFileManager(underlying.get(), ".txt"));
 
-    /* Enable cheats so the game reads sbCheatsOn true from file at startup. */
-    WriteContentToFile(fm.get(), "cheat.txt", "1");
-
     bool b_exit = false;
     bool b_true = true;
     auto p_exit_ev =
@@ -214,6 +237,9 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
                      std::move(p_msg), sz, fm.get());
     smart_pointer<DragonGameRunner> p_gl =
         make_smart(new DragonGameRunner(pe));
+    DragonGameController *ctrl = p_gl->GetTowerController();
+    if (ctrl)
+      ctrl->SetCheatsOnSetting(true);
 
     bool reached_game_over = false;
     unsigned n_cheat_advance_count = 0;
@@ -326,4 +352,25 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
 
   CHECK(nGlobalSuperMegaCounter == 0);
   CHECK(nonzero.empty());
+
+  } catch (const SimpleException &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw SimpleException: " << e.GetDescription(true);
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (const MyException &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw MyException: " << e.GetDescription(true);
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (const std::exception &e) {
+    std::ostringstream msg;
+    msg << "Simulation threw std::exception: " << e.what();
+    std::cerr << msg.str() << std::endl;
+    FAIL(msg.str());
+  } catch (...) {
+    std::cerr << "Simulation threw unknown exception (not std::exception)"
+              << std::endl;
+    FAIL("Simulation threw unknown exception type");
+  }
 }

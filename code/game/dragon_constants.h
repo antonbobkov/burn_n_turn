@@ -2,10 +2,8 @@
 #define TOWER_DEFENSE_DRAGON_CONSTANTS_H
 
 #include "dragon_macros.h"
-#include <string>
 
 extern int nSlimeMax;
-extern const std::string sFullScreenPath;
 
 const unsigned nFramesInSecond = 30;
 

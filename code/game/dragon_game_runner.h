@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_DRAGON_GAME_RUNNER_H
 
 #include "game_utils/game_runner_interface.h"
+#include "utils/configuration_file.h"
 #include "wrappers/geometry.h"
 #include "utils/smart_pointer.h"
 #include <memory>
@@ -34,6 +35,8 @@ public:
   std::unique_ptr<FontWriter> pFancyNum;
 
   FileManager *p_fm_;
+  std::unique_ptr<ConfigurationFile> config_;
+  std::unique_ptr<ConfigurationFile> game_data_;
   std::unique_ptr<FilePath> fp_;
 
   std::vector<LevelLayout> vLvl;

@@ -37,11 +37,11 @@ struct DragonGameSettings {
   SavableVariable<bool> sbSoundOn;
   SavableVariable<bool> sbMusicOn;
   SavableVariable<bool> sbTutorialOn;
-  SavableVariable<bool> sbFullScreen;
   SavableVariable<bool> sbCheatsOn;
   SavableVariable<bool> sbCheatsUnlocked;
+  SavableVariable<int> snHighScore;
 
-  DragonGameSettings(FilePath *fp, const std::string &fullScreenPath);
+  DragonGameSettings(ConfigurationFile *cfg);
 };
 
 /** The great hall of the realm: where levels dwell, who holds the throne,
@@ -52,7 +52,9 @@ struct DragonGameController {
                        NumberDrawer *pBigNum_, FontWriter *pFancyNum_,
                        SoundInterface<Index> *pSndRaw_,
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
-                       TowerDataWrap *pWrp_, FilePath *fp);
+                       TowerDataWrap *pWrp_, FilePath *fp,
+                       ConfigurationFile *config,
+                       ConfigurationFile *game_data);
 
   void StartUp(DragonGameController *pSelf);
   void Next();
@@ -122,10 +124,14 @@ struct DragonGameController {
   bool IsMusicOnSetting() const;
   /** Scroll of choice: show the wise one's guidance or not. */
   bool IsTutorialOnSetting() const;
-  /** Scroll of choice: fill the window or show a frame. */
+  /** Scroll of choice: fill the window or show a frame (from config FULLSCREEN). */
   bool IsFullScreenSetting() const;
+  /** Set fullscreen in config so next launch uses it. */
+  void SetFullScreenSetting(bool value);
   /** Scroll of choice: are the hidden arts enabled? */
   bool AreCheatsOnSetting() const;
+  /** Set cheats on/off (e.g. for tests). */
+  void SetCheatsOnSetting(bool value);
   /** Scroll of choice: the hidden arts have been earned. */
   bool CheatsUnlocked() const;
 
@@ -185,6 +191,8 @@ private:
   std::list<smart_pointer<TimedFireballBonus>> lsBonusesToCarryOver;
 
   TowerDataWrap *pWrp;
+
+  ConfigurationFile *p_config_;
 
   DragonGameController *pSelf;
 

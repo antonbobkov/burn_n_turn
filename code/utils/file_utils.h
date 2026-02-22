@@ -9,10 +9,12 @@
  * (own and expose an ostream* or istream*). FileManager and implementations:
  * StdFileManager, InMemoryFileManager, CachingReadOnlyFileManager.
  * FilePath: path plus slash/convention, allowed chars, and ReadFile/WriteFile.
- * SavableVariable<T>: single value load/save to a file. Helpers: Separate
- * (split path into folder and file), BoolToggle.
+ * SavableVariable<T>: single value load/save via ConfigurationFile key.
+ * Helpers: Separate (split path into folder and file), BoolToggle.
  */
 
+#include "configuration_file.h"
+#include "exception.h"
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -152,7 +154,7 @@ public:
 
   /* Return base path + s, normalized. */
   std::string GetRelativePath(std::string s) const;
-  /* Return s with disallowed chars stripped. */
+  /* Return s if all characters are allowed; throw if any are disallowed. */
   std::string Format(std::string s) const;
 
   std::unique_ptr<OutStreamHandler> WriteFile(std::string s);
@@ -181,42 +183,42 @@ std::ostream &operator<<(std::ostream &ofs, const FilePath &fp);
 
 /* --- Single-value persistence (SavableVariable) --- */
 
-/* Holds a value of type T and uses a path to load/save it. Takes a FilePath*
- * and a file name; on construction (if load), loads via FilePath::ReadFile;
- * on Set(..., true) or Save(), writes via FilePath::WriteFile. Caller keeps
- * FilePath lifetime. Uses stream >> and << so T must support them. */
+/* Holds a value of type T in a ConfigurationFile under a key. On construction
+ * (if load), loads via cfg->GetEntry(key); on Set(..., true) or Save(),
+ * writes via cfg->UpdateEntry(key, value). Caller keeps ConfigurationFile
+ * lifetime. For bool: only "true"/"false" in file. For int: decimal string. */
 template <class T> class SavableVariable {
 public:
-  /* path: where to read/write (non-null); fileName: name passed to
-   * ReadFile/WriteFile; defaultVal when not loading or read fails;
+  /* cfg: non-null; key: entry name; defaultVal when not loading or parse fails;
    * load: false skips read. */
-  SavableVariable(FilePath *path, std::string fileName, T defaultVal,
+  SavableVariable(ConfigurationFile *cfg, std::string key, T defaultVal,
                   bool load = true)
-      : fp_(path), file_(fileName) {
+      : cfg_(cfg), key_(std::move(key)) {
     if (!load)
       var_ = defaultVal;
-    else if (!fp_->FileExists(file_))
-      var_ = defaultVal;
     else {
-      std::unique_ptr<InStreamHandler> pIn = fp_->ReadFile(file_);
-      if (pIn) {
-        std::istream &ifs = pIn->GetStream();
-        ifs >> var_;
-        if (ifs.fail())
-          var_ = defaultVal;
-      } else
+      std::string s = cfg_->GetEntry(key_);
+      if (s.empty())
         var_ = defaultVal;
+      else {
+        std::istringstream iss(s);
+        T v;
+        if (!(iss >> v)) {
+          throw SimpleException("SavableVariable", "constructor",
+                               "failed to parse key \"" + key_ + "\" value \"" +
+                                   s + "\"");
+        }
+        var_ = v;
+      }
     }
   }
 
-  /* Write current value to the file via FilePath::WriteFile. */
   void Save() {
-    std::unique_ptr<OutStreamHandler> pOut = fp_->WriteFile(file_);
-    if (pOut)
-      pOut->GetStream() << var_;
+    std::ostringstream oss;
+    oss << var_;
+    cfg_->UpdateEntry(key_, oss.str());
   }
 
-  /* Update value and optionally write to file (saveToFile default true). */
   void Set(T value, bool saveToFile = true) {
     var_ = value;
     if (saveToFile)
@@ -225,13 +227,55 @@ public:
 
   T Get() const { return var_; }
 
-  /* For code that needs a const pointer to the stored value. */
   const T *GetConstPointer() const { return &var_; }
 
 private:
   T var_;
-  FilePath *fp_;
-  std::string file_;
+  ConfigurationFile *cfg_;
+  std::string key_;
+};
+
+/* bool: only "true" and "false" in file. */
+template <> class SavableVariable<bool> {
+public:
+  SavableVariable(ConfigurationFile *cfg, std::string key, bool defaultVal,
+                 bool load = true)
+      : cfg_(cfg), key_(std::move(key)) {
+    if (!load)
+      var_ = defaultVal;
+    else {
+      std::string s = cfg_->GetEntry(key_);
+      if (s.empty())
+        var_ = defaultVal;
+      else if (s == "true")
+        var_ = true;
+      else if (s == "false")
+        var_ = false;
+      else
+        throw SimpleException("SavableVariable", "constructor",
+                             "bool key \"" + key_ + "\" has invalid value \"" +
+                                 s + "\" (expected \"true\" or \"false\")");
+    }
+  }
+
+  void Save() {
+    cfg_->UpdateEntry(key_, var_ ? "true" : "false");
+  }
+
+  void Set(bool value, bool saveToFile = true) {
+    var_ = value;
+    if (saveToFile)
+      Save();
+  }
+
+  bool Get() const { return var_; }
+
+  const bool *GetConstPointer() const { return &var_; }
+
+private:
+  bool var_;
+  ConfigurationFile *cfg_;
+  std::string key_;
 };
 
 /* Flip the boolean in sv and save to its file. */

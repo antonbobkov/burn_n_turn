@@ -130,6 +130,8 @@ struct Animation : public SimpleVisualEntity {
   Animation(float dPriority_, const ImageSequence &seq, unsigned nTimeMeasure_,
             Point p, bool bCenter = false)
       : SimpleVisualEntity(dPriority_, seq, bCenter, nTimeMeasure_), pos(p) {}
+  Animation(const Animation &) = default;
+  Animation &operator=(const Animation &) = default;
 
   /*virtual*/ Point GetPosition() { return pos; }
 };
@@ -160,6 +162,8 @@ struct StaticImage : public VisualEntity {
   StaticImage(Index img_, Point p_ = Point(0, 0), bool bCentered_ = false,
               float dPriority_ = 0)
       : img(img_), dPriority(dPriority_), p(p_), bCentered(bCentered_) {}
+  StaticImage(const StaticImage &) = default;
+  StaticImage &operator=(const StaticImage &) = default;
 
   /*virtual*/ void Draw(ScalingDrawer *pDr);
 
@@ -299,6 +303,8 @@ struct SoundControls : public EventEntity {
 
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
       : plr(plr_), nTheme(nTheme_) {}
+  SoundControls(const SoundControls &) = default;
+  SoundControls &operator=(const SoundControls &) = default;
 
   /*virtual*/ void Update();
 };

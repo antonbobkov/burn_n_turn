@@ -2,6 +2,8 @@
  * file_utils_test - Catch2 tests for InMemoryFileManager and related helpers.
  */
 
+#include "configuration_file.h"
+#include "exception.h"
 #include "file_utils.h"
 #include <catch2/catch.hpp>
 #include <sstream>
@@ -111,10 +113,12 @@ TEST_CASE("FilePath GetRelativePath empty base unchanged",
   CHECK(fp->GetRelativePath("a/b") == "a/b");
 }
 
-TEST_CASE("FilePath Format strips disallowed chars", "[file_utils][FilePath]") {
+TEST_CASE("FilePath Format throws on disallowed chars", "[file_utils][FilePath]") {
   InMemoryFileManager *mgr = new InMemoryFileManager();
   std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
-  std::string out = fp->Format("a*b@c");
+  REQUIRE_THROWS_AS(fp->Format("a*b@c"), SimpleException);
+  REQUIRE_THROWS_AS(fp->Format("a*b@c"), MyException);
+  std::string out = fp->Format("abc");
   CHECK(out == "abc");
 }
 
@@ -217,56 +221,82 @@ TEST_CASE("CachingReadOnlyFileManager filter path in cache still visible",
   CHECK(GetFileContent(&cache, "no_ext") == "from cache");
 }
 
-/* --- SavableVariable (using InMemoryFileManager via FilePath) --- */
+/* --- SavableVariable (using ConfigurationFile / game_data-style file) --- */
 
 TEST_CASE("SavableVariable int load false then Set and Save",
           "[file_utils][SavableVariable]") {
-  InMemoryFileManager *mgr = new InMemoryFileManager();
-  std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
-  SavableVariable<int> sv(fp.get(), "int.txt", 0, false);
+  InMemoryFileManager mgr;
+  ConfigurationFile cfg(&mgr, "game_data.txt");
+  SavableVariable<int> sv(&cfg, "intkey", 0, false);
   CHECK(sv.Get() == 0);
   sv.Set(42);
-  CHECK(GetFileContent(mgr, "int.txt") == "42");
+  CHECK(GetFileContent(&mgr, "game_data.txt") == "intkey 42\n");
 }
 
 TEST_CASE("SavableVariable int round-trip via Save and reload",
           "[file_utils][SavableVariable]") {
-  InMemoryFileManager *mgr = new InMemoryFileManager();
-  std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
+  InMemoryFileManager mgr;
+  ConfigurationFile cfg(&mgr, "game_data.txt");
   {
-    SavableVariable<int> sv(fp.get(), "int2.txt", 0, false);
+    SavableVariable<int> sv(&cfg, "intkey2", 0, false);
     sv.Set(99);
   }
-  SavableVariable<int> sv2(fp.get(), "int2.txt", 0, true);
+  ConfigurationFile cfg2(&mgr, "game_data.txt");
+  SavableVariable<int> sv2(&cfg2, "intkey2", 0, true);
   CHECK(sv2.Get() == 99);
 }
 
 TEST_CASE("SavableVariable bool load false then Set and Save",
           "[file_utils][SavableVariable]") {
-  InMemoryFileManager *mgr = new InMemoryFileManager();
-  std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
-  SavableVariable<bool> sv(fp.get(), "bool.txt", false, false);
+  InMemoryFileManager mgr;
+  ConfigurationFile cfg(&mgr, "game_data.txt");
+  SavableVariable<bool> sv(&cfg, "boolkey", false, false);
   CHECK(sv.Get() == false);
   sv.Set(true);
-  CHECK(GetFileContent(mgr, "bool.txt") == "1");
+  CHECK(GetFileContent(&mgr, "game_data.txt") == "boolkey true\n");
 }
 
 TEST_CASE("SavableVariable bool round-trip via Save and reload",
           "[file_utils][SavableVariable]") {
-  InMemoryFileManager *mgr = new InMemoryFileManager();
-  std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
+  InMemoryFileManager mgr;
+  ConfigurationFile cfg(&mgr, "game_data.txt");
   {
-    SavableVariable<bool> sv(fp.get(), "bool2.txt", false, false);
+    SavableVariable<bool> sv(&cfg, "boolkey2", false, false);
     sv.Set(true);
   }
-  SavableVariable<bool> sv2(fp.get(), "bool2.txt", false, true);
+  ConfigurationFile cfg2(&mgr, "game_data.txt");
+  SavableVariable<bool> sv2(&cfg2, "boolkey2", false, true);
   CHECK(sv2.Get() == true);
 }
 
-TEST_CASE("SavableVariable int load true when file missing uses default",
+TEST_CASE("SavableVariable int load true when key missing uses default",
           "[file_utils][SavableVariable]") {
-  InMemoryFileManager *mgr = new InMemoryFileManager();
-  std::unique_ptr<FilePath> fp = FilePath::Create(false, "", mgr);
-  SavableVariable<int> sv(fp.get(), "none.txt", 0, true);
+  InMemoryFileManager mgr;
+  ConfigurationFile cfg(&mgr, "game_data.txt");
+  SavableVariable<int> sv(&cfg, "nonexistent", 0, true);
   CHECK(sv.Get() == 0);
+}
+
+TEST_CASE("SavableVariable int non-empty invalid value throws",
+          "[file_utils][SavableVariable]") {
+  InMemoryFileManager mgr;
+  WriteContentToFile(&mgr, "game_data.txt", "badkey not_a_number\n");
+  ConfigurationFile cfg(&mgr, "game_data.txt");
+  REQUIRE_THROWS_AS(
+      (SavableVariable<int>(&cfg, "badkey", 0, true)), SimpleException);
+}
+
+TEST_CASE("SavableVariable bool only true false in file",
+          "[file_utils][SavableVariable]") {
+  InMemoryFileManager mgr;
+  WriteContentToFile(&mgr, "game_data.txt", "bkey true\n");
+  ConfigurationFile cfg(&mgr, "game_data.txt");
+  SavableVariable<bool> sv(&cfg, "bkey", false, true);
+  CHECK(sv.Get() == true);
+  sv.Set(false);
+  CHECK(GetFileContent(&mgr, "game_data.txt") == "bkey false\n");
+  WriteContentToFile(&mgr, "game_data2.txt", "other invalid\n");
+  ConfigurationFile cfg2(&mgr, "game_data2.txt");
+  REQUIRE_THROWS_AS(
+      (SavableVariable<bool>(&cfg2, "other", true, true)), SimpleException);
 }

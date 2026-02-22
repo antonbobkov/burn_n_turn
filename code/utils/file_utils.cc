@@ -96,7 +96,7 @@ FilePath::FilePath(bool inLinux, std::string path, FileManager *fm)
   str += "abcdefghijklmnopqrstuvwxyz";
   str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   str += "1234567890";
-  str += " .-_()?<>+,\\/#";
+  str += " .-_()?<>+,\\/#:";
   for (unsigned i = 0; i < str.length(); ++i)
     allowed_.insert(str[i]);
   path_ = Format(path_);
@@ -171,11 +171,20 @@ std::string FilePath::GetParse(std::string s) const {
 std::string FilePath::Format(std::string s) const { return GetFormatted(s); }
 
 std::string FilePath::GetFormatted(std::string s) const {
-  std::string s_clean = "";
-  for (unsigned i = 0; i < s.length(); ++i)
-    if (allowed_.find(s[i]) != allowed_.end())
-      s_clean += s[i];
-  return s_clean;
+  for (unsigned i = 0; i < s.length(); ++i) {
+    if (allowed_.find(s[i]) == allowed_.end()) {
+      std::string msg = "path contains disallowed character '";
+      msg += s[i];
+      msg += "' (code ";
+      msg += std::to_string(static_cast<unsigned char>(s[i]));
+      msg += ") at position ";
+      msg += std::to_string(i);
+      msg += ": ";
+      msg += s;
+      throw SimpleException("FilePath", "Format", msg);
+    }
+  }
+  return s;
 }
 
 std::unique_ptr<OutStreamHandler> FilePath::WriteFile(std::string s) {

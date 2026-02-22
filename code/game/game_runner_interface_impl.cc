@@ -2,25 +2,10 @@
 #include "dragon_macros.h"
 #include "game/dragon_game_runner.h"
 #include "game_utils/game_runner_interface.h"
+#include "utils/configuration_file.h"
+#include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/geometry.h"
-
-#include <fstream>
-
-const std::string sFullScreenPath = "fullscreen.txt";
-
-namespace {
-
-bool AreWeFullScreen() {
-  std::ifstream ifs(sFullScreenPath);
-  bool bRet;
-  ifs >> bRet;
-  if (ifs.fail())
-    return false;
-  return bRet;
-}
-
-} // namespace
 
 ProgramInfo GetProgramInfo() {
   ProgramInfo inf;
@@ -35,7 +20,9 @@ ProgramInfo GetProgramInfo() {
   inf.nFramerate = 1000 / nFramesInSecond;
   inf.bMouseCapture = false;
 
-  static bool bFullScreen = AreWeFullScreen();
+  StdFileManager fm;
+  ConfigurationFile cfg(&fm, "config.txt");
+  bool bFullScreen = (cfg.GetEntry("FULLSCREEN") == "true");
 
   if (bFullScreen) {
     inf.bFullScreen = true;

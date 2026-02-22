@@ -233,7 +233,8 @@ void MenuDisplay::TutorialToggle() {
 }
 
 void MenuDisplay::FullScreenToggle() {
-  BoolToggle(pMenuController->settings->sbFullScreen);
+  pMenuController->pGl->SetFullScreenSetting(
+      !pMenuController->pGl->IsFullScreenSetting());
   UpdateMenuEntries();
 }
 
@@ -265,7 +266,7 @@ void MenuDisplay::UpdateMenuEntries() {
       OnOffString(pMenuController->settings->sbTutorialOn.Get());
 
   bool bFullScreenNow = GetProgramInfo().bFullScreen;
-  bool bFullScreenSetting = pMenuController->settings->sbFullScreen.Get();
+  bool bFullScreenSetting = pMenuController->pGl->IsFullScreenSetting();
   std::string sExtra = "";
   if (bFullScreenNow != bFullScreenSetting)
     sExtra = "changes will take effect next launch";

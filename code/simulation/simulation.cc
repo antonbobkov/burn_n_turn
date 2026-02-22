@@ -21,7 +21,7 @@ const unsigned kSimulationFrames = 900;
 const unsigned kScreenW = 960;
 const unsigned kScreenH = 600;
 
-const std::string kSoundFileName("soundon.txt");
+const std::string kGameDataFile("game_data.txt");
 
 /* Frames at which to press Enter to advance menu (logo1 -> logo2 -> start ->
  * first level). */
@@ -109,10 +109,10 @@ void RunSimulation() {
       if (i == 135)
         p_gl->Fire();
 
-      /* Open game menu and toggle sound (writes to file via SavableVariable).
-       */
+      /* Open game menu and toggle sound (writes to game_data.txt via
+       * SavableVariable). */
       if (i == 150)
-        sound_content_before = GetFileContent(fm.get(), kSoundFileName);
+        sound_content_before = GetFileContent(fm.get(), kGameDataFile);
       if (i == 151)
         p_gl->KeyDown(GUI_ESCAPE);
     }
@@ -132,11 +132,10 @@ void RunSimulation() {
       if (i == 157)
         p_gl->KeyDown(GUI_RETURN);
       if (i >= 158 && i <= 165 && !sound_toggle_verified) {
-        std::string sound_after = GetFileContent(fm.get(), kSoundFileName);
+        std::string sound_after = GetFileContent(fm.get(), kGameDataFile);
         if (sound_content_before != sound_after) {
           sound_toggle_verified = true;
-          std::cout << "[sim] sound file changed: \"" << sound_content_before
-                    << "\" -> \"" << sound_after << "\"\n";
+          std::cout << "[sim] game_data.txt changed after sound toggle\n";
         }
       }
       if (i == 166)
@@ -149,6 +148,6 @@ void RunSimulation() {
       LogState(p_gl.get());
   }
   if (sound_toggle_verified)
-    std::cout << "[sim] Verified: sound toggle wrote to file (cache).\n";
+    std::cout << "[sim] Verified: sound toggle wrote to game_data.txt.\n";
   std::cout << "[sim] Done\n";
 }

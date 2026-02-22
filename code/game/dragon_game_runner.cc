@@ -6,6 +6,8 @@
 #include "game/fireball.h"
 #include "game/level.h"
 #include "game_utils/event.h"
+#include "utils/configuration_file.h"
+#include "utils/file_utils.h"
 #include "utils/smart_pointer.h"
 #include "wrappers/font_writer.h"
 
@@ -25,10 +27,16 @@ TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
   pWr = pe.pMsg.get();
 
   p_fm_ = pe.GetFileManager();
+  config_ = std::make_unique<ConfigurationFile>(p_fm_, "config.txt");
   {
-    std::unique_ptr<InStreamHandler> ih = p_fm_->ReadFile("config.txt");
-    fp_ = FilePath::CreateFromStream(ih->GetStream(), p_fm_);
+    std::string systemVal = config_->GetEntry("SYSTEM");
+    bool inLinux = (systemVal == "linux" || systemVal == "1");
+    std::string pathVal = config_->GetEntry("PATH");
+    if (pathVal.empty())
+      pathVal = ".";
+    fp_ = FilePath::Create(inLinux, pathVal, p_fm_);
   }
+  game_data_ = std::make_unique<ConfigurationFile>(p_fm_, "game_data.txt");
 
   Rectangle sBound = Rectangle(pe.szScreenRez);
   unsigned nScale = 2;
@@ -64,7 +72,7 @@ TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
 
   pCnt = std::make_unique<DragonGameController>(
       pDr.get(), pNum.get(), pBigNum.get(), pFancyNum.get(), pSm, vLvl,
-      rBound, this, fp_.get());
+      rBound, this, fp_.get(), config_.get(), game_data_.get());
   pCnt->StartUp(pCnt.get());
 }
 

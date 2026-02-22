@@ -58,34 +58,29 @@ static void DrawStuff(Rectangle rBound,
 #endif // LOADING_SCREEN
 }
 
-DragonGameSettings::DragonGameSettings(FilePath *fp,
-                                       const std::string &fullScreenPath)
-    : snProgress(fp, "stuff.txt", 0, true),
-      sbSoundOn(fp, "soundon.txt", true, true),
-      sbMusicOn(fp, "musicon.txt", true, true),
-      sbTutorialOn(fp, "tutorial_on.txt", true, true),
-      sbFullScreen(fp, fullScreenPath, false, true),
-      sbCheatsOn(fp, "cheat.txt", false, true),
-      sbCheatsUnlocked(fp, "more_stuff.txt", false, true) {}
+DragonGameSettings::DragonGameSettings(ConfigurationFile *cfg)
+    : snProgress(cfg, "Progress", 0, true),
+      sbSoundOn(cfg, "SoundOn", true, true),
+      sbMusicOn(cfg, "MusicOn", true, true),
+      sbTutorialOn(cfg, "TutorialOn", true, true),
+      sbCheatsOn(cfg, "CheatsOn", false, true),
+      sbCheatsUnlocked(cfg, "CheatsUnlocked", false, true),
+      snHighScore(cfg, "HighScore", 0, true) {}
 
 DragonGameController::DragonGameController(
     ScalingDrawer *pDr_, NumberDrawer *pNum_, NumberDrawer *pBigNum_,
     FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
-    TowerDataWrap *pWrp_, FilePath *fp)
+    TowerDataWrap *pWrp_, FilePath *fp, ConfigurationFile *config,
+    ConfigurationFile *game_data)
     : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_ ? pDr_->pGr : 0),
       pNum(pNum_), pBigNum(pBigNum_),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
       pSndRaw(pSndRaw_), pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
-      settings_(fp, sFullScreenPath), pFancyNum(pFancyNum_), pWrp(pWrp_),
+      settings_(game_data), pFancyNum(pFancyNum_), pWrp(pWrp_), p_config_(config),
       pMenu(), vLevelPointers(3), pSelf(nullptr) {
-  {
-    if (fp->FileExists("high.txt")) {
-      std::unique_ptr<InStreamHandler> ih = fp->ReadFile("high.txt");
-      ih->GetStream() >> nHighScore;
-    }
-  }
+  nHighScore = settings_.snHighScore.Get();
 
   typedef ImagePainter::ColorMap ColorMap;
 
@@ -727,12 +722,7 @@ void DragonGameController::AddScore(int delta) { nScore += delta; }
 void DragonGameController::UpdateHighScoreIfNeeded() {
   if (nScore > nHighScore) {
     nHighScore = nScore;
-    FilePath *fp = pWrp ? pWrp->GetFilePath() : nullptr;
-    if (fp) {
-      std::unique_ptr<OutStreamHandler> oh = fp->WriteFile("high.txt");
-      if (oh)
-        oh->GetStream() << nScore;
-    }
+    settings_.snHighScore.Set(nHighScore);
   }
 }
 
@@ -757,11 +747,20 @@ bool DragonGameController::IsTutorialOnSetting() const {
 }
 
 bool DragonGameController::IsFullScreenSetting() const {
-  return settings_.sbFullScreen.Get();
+  return p_config_ && p_config_->GetEntry("FULLSCREEN") == "true";
+}
+
+void DragonGameController::SetFullScreenSetting(bool value) {
+  if (p_config_)
+    p_config_->UpdateEntry("FULLSCREEN", value ? "true" : "false");
 }
 
 bool DragonGameController::AreCheatsOnSetting() const {
   return settings_.sbCheatsOn.Get();
+}
+
+void DragonGameController::SetCheatsOnSetting(bool value) {
+  settings_.sbCheatsOn.Set(value);
 }
 
 bool DragonGameController::CheatsUnlocked() const {
