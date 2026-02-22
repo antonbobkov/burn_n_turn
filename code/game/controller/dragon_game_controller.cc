@@ -396,15 +396,13 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 
   smart_pointer<Animation> pWin = make_smart(new Animation(
       0, (*pr)("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
-  smart_pointer<StaticImage> pL = make_smart(new StaticImage(
-      (*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3), true));
-  smart_pointer<Animation> pBurnL = make_smart(
-      new Animation(0, (*pr)("burn"), 3,
-                    Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true));
-  smart_pointer<Animation> pBurnR = make_smart(
-      new Animation(0, (*pr)("burn"), 4,
-                    Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true));
-  pBurnR->seq.nActive += 4;
+  StaticImage logo((*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3),
+                   true);
+  Animation burnL(0, (*pr)("burn"), 3,
+                  Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true);
+  Animation burnR(0, (*pr)("burn"), 4,
+                  Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true);
+  burnR.seq.nActive += 4;
 
   std::vector<std::string> vHintPref;
   vHintPref.push_back("hint: ");
@@ -469,13 +467,13 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 
   pCnt1->AddBoth(pStr);
 
-  pCnt1->AddV(pL);
-  pCnt1->AddBoth(pBurnL);
-  pCnt1->AddBoth(pBurnR);
+  pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnR));
 
-  pMenu->AddV(pL);
-  pMenu->AddBoth(pBurnL);
-  pMenu->AddBoth(pBurnR);
+  pMenu->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pMenu->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pMenu->AddOwnedBoth(std::make_unique<Animation>(burnR));
 
 #ifdef PC_VERSION
   pMenu->pHintText = pHintText;
@@ -572,10 +570,10 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   smart_pointer<VisualEntity> pSlimeUpd =
       make_smart(new SlimeUpdater(pBuy.get()));
 
-  pBuy->AddV(pL);
+  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
+  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnR));
   pBuy->AddV(pSlimeUpd);
-  pBuy->AddBoth(pBurnL);
-  pBuy->AddBoth(pBurnR);
   pBuy->AddV(pBuyNow);
 
   pBuy->AddBoth(pGolem);
