@@ -101,8 +101,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REMOVE-01   | Phase 6| Pending |
 | REMOVE-02   | Phase 6| Pending |
 | DOC-01      | Phase 6| Pending |
-| VER-01      | All   | Pending |
-| VER-02      | All   | Pending |
+| VER-01      | All   | Complete |
+| VER-02      | All   | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total

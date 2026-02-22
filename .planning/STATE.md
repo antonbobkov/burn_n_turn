@@ -7,31 +7,23 @@
 building and all tests (especially simulation_test) must pass after every
 change.
 
-**Current focus:** Phase 3 — Game entities and animations (plan 03 executed)
+**Current focus:** Phase 4 — Critters, generators, fireball, level
 
 **Completed:** Phase 1 (Process and leaf game_utils). Phase 2 (Wrappers and
-platform). Phase 3 Plan 03: basic_controllers (AddBackground, score showers),
-MenuController (caret + MenuDisplay owned, GetNonOwned*), LevelController
-(pTutorialText unique_ptr, GetNonOwned*), tutorial pTexter raw, entities
-(HitDetection raw, SimpleSoundEntity pSnd raw, DGC pSnd unique_ptr), CLEAN-01
-(SP_Info off Entity/MenuEntry/ImageSequence; on Event/ScreenEntity/FireballBonus),
-CleanUp sync comment, DOC-01 unmigrated list, ImageSequence SP_Info removed.
-Task 1.2 (DGC StartUp full migration) deferred.
+platform). Phase 3 (Game entities and animations): Plan 03 and Plan 01.2 done
+— basic_controllers, MenuController (caret, MenuDisplay unique_ptr, GetNonOwned*),
+LevelController (pTutorialText, GetNonOwned*), tutorial pTexter raw, entities
+(HitDetection/SimpleSoundEntity raw), DGC StartUp (copyable logo/burn/SoundControls
+by value, all leaf entities make_unique + AddOwned*, MenuDisplay in MenuController),
+CLEAN-01, CleanUp sync, DOC-01, ImageSequence SP_Info removed.
 
-**Next:** Complete Task 1.2 (DGC StartUp) or proceed to Phase 4.
-
----
-Phase: 3 of 3 (Game entities and animations)
-Plan: 03 of 1 (remaining work)
-Status: Plan 03 complete (Task 1.2 deferred)
-Last activity: 2025-02-22 — Completed 03-03-PLAN.md
-
-Progress: ████████████████████░ (Phase 3 plan 03 done)
-
-Session continuity:
-Last session: 2025-02-22
-Stopped at: Completed 03-03-PLAN.md
-Resume file: None
+**Next:** Phase 4 — Critters, generators, fireball, level.
 
 ---
-*Last updated: 2025-02-22 after Phase 3 plan 03 execution*
+Phase: 3 complete (6 phases total)
+Last activity: 2025-02-21 — Phase 3 Plan 01.2 executed; verification passed
+
+Progress: █████████████████████ (Phase 3 complete)
+
+---
+*Last updated: 2025-02-21 after Phase 3 execution and verification*
