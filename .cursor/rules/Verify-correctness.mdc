@@ -6,8 +6,7 @@ After modifying CMake files, run cmake and build. After modifying code, make sur
 Assume the workspace is the source directory (code). Build and bin are its
 siblings. From the workspace root:
 
-To make and build: `cd build; cmake ../code -G "MinGW Makefiles";
-mingw32-make`
+To make and build: `cd build; cmake ../code -G "MinGW Makefiles"; mingw32-make`
 
 To build only: `cd build; mingw32-make`
 
@@ -17,3 +16,5 @@ if build didn't succeed.
 To run simulation test: `cd bin; .\simulation_test.exe`
 
 Important: run cmake only from inside the build directory.
+
+Don't use && or || in shell commands. You're in Powershell, it needs semicolons instead
