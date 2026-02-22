@@ -431,13 +431,10 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 
   pMenu->SetMenuCaret(std::make_unique<Animation>(
       2, (*pr)("arrow"), 3, Point(0, 0), true));
-  std::unique_ptr<MenuDisplay> pMenuDisplay =
-      std::make_unique<MenuDisplay>(
-          Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-          pMenu->GetMenuCaret(), pMenu.get(),
-          settings_.sbCheatsUnlocked.Get());
-  pMenu->pMenuDisplay = pMenuDisplay.get();
-  pMenu->AddOwnedBoth(std::move(pMenuDisplay));
+  pMenu->SetMenuDisplay(std::make_unique<MenuDisplay>(
+      Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
+      pMenu->GetMenuCaret(), pMenu.get(),
+      settings_.sbCheatsUnlocked.Get()));
 
   pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
   pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnL));

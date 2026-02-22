@@ -75,10 +75,16 @@ void MenuController::SetOptionText(std::unique_ptr<TextDrawEntity> p) {
   pOptionText = std::move(p);
 }
 
+void MenuController::SetMenuDisplay(std::unique_ptr<MenuDisplay> p) {
+  pMenuDisplay = std::move(p);
+}
+
 std::vector<EventEntity *> MenuController::GetNonOwnedUpdateEntities() {
   std::vector<EventEntity *> out;
   if (pMenuCaret)
     out.push_back(pMenuCaret.get());
+  if (pMenuDisplay)
+    out.push_back(pMenuDisplay.get());
   return out;
 }
 
@@ -86,6 +92,8 @@ std::vector<VisualEntity *> MenuController::GetNonOwnedDrawEntities() {
   std::vector<VisualEntity *> out;
   if (pMenuCaret)
     out.push_back(pMenuCaret.get());
+  if (pMenuDisplay)
+    out.push_back(pMenuDisplay.get());
   return out;
 }
 

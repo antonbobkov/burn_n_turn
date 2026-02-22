@@ -117,7 +117,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 struct MenuController : public EntityListController {
   std::string get_class_name() override { return "MenuController"; }
   std::unique_ptr<Animation> pMenuCaret;
-  MenuDisplay *pMenuDisplay;
+  std::unique_ptr<MenuDisplay> pMenuDisplay;
 
   MouseCursor mc;
 
@@ -130,6 +130,7 @@ struct MenuController : public EntityListController {
                  Rectangle rBound, Color c);
 
   void SetMenuCaret(std::unique_ptr<Animation> p);
+  void SetMenuDisplay(std::unique_ptr<MenuDisplay> p);
   void SetHintText(std::unique_ptr<TextDrawEntity> p);
   void SetOptionText(std::unique_ptr<TextDrawEntity> p);
   Animation *GetMenuCaret() const {
