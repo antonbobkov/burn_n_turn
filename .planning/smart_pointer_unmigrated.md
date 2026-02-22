@@ -1,16 +1,22 @@
-# Unmigrated types (for DOC-01 summary)
+# Types not migrated in Phase 3 (smart pointer → unique_ptr/raw)
 
-Types that were not migrated because object lifetime could not be determined
-with confidence. Final summary document will list these (or state that all
-classes were migrated).
+Types below are still used with `smart_pointer<T>` and were left for Phase 4 or
+other reasons.
 
-## Phase 1
+| Type | Rationale |
+|------|-----------|
+| Critter | Phase 4; lifetime and ownership with level/critters. |
+| Dragon | Phase 4; shared between LevelController::vDr and Castle::pDrag. |
+| Castle | Phase 4; level-owned. |
+| Road | Phase 4; level-owned (vRd). |
+| FancyCritter | Phase 4; Cutscene holds pCrRun, pCrFollow. |
+| Generators (Knight, Princess, Mage, Trader, Skelly) | Phase 4; level-owned. |
+| TimedFireballBonus | Phase 4; lsBonusesToCarryOver, Dragon::lsBonuses. |
+| ConsumableEntity | Phase 4; lsPpl and consumable hierarchy. |
+| FireballBonusAnimation | Phase 4; lsBonus in LevelController. |
+| Slime, Sliminess | Phase 4; lsSlimes, lsSliminess. |
+| Fireball | Phase 4; Dragon::lsBalls. |
+| GameController (and subclasses in vCnt) | Controllers in vCnt; Phase 4 or later. |
+| VisualEntity / EventEntity in lsDraw, lsUpdate | Still smart_pointer lists; migration deferred. |
 
-No types were skipped. Event and MessageWriter had clear lifetime (entry
-creates, ProgramEngine owns for program lifetime). MessageWriter hierarchy
-was fully migrated and SP_Info removed; Event exit flow was migrated to
-unique_ptr at ProgramEngine and Event* elsewhere; Event keeps SP_Info until
-SequenceOfEvents is migrated (deferral, not “unclear lifetime”).
-
----
-*Updated after Phase 1*
+Doc-only (03-03 DOC-01).

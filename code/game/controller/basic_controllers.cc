@@ -50,6 +50,9 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 }
 
 void EntityListController::Update() {
+  /* Remove !bExist from lists. Clean raw-pointer lists (owned_visual_entities,
+   * owned_event_entities) before owned_entities so no raw ptr outlives its
+   * unique_ptr when we destroy in CleanUp(owned_entities). */
   CleanUp(lsUpdate);
   CleanUp(lsDraw);
   CleanUp(lsPpl);
