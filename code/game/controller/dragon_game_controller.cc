@@ -352,10 +352,6 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   nScore = 0;
   bAngry = false;
 
-  smart_pointer<Animation> pStr = make_smart(
-      new Animation(0, (*pr)("start"), nFramesInSecond / 5,
-                    Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-
   // menu
   smart_pointer<MenuController> pMenuHolder = make_smart(
       new MenuController(pSelf, &settings_, rBound, Color(0, 0, 0)));
@@ -394,8 +390,6 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   SoundControls bckgTemplate(plr, BG_BACKGROUND);
   SoundControls noMusicTemplate(plr, -1);
 
-  smart_pointer<Animation> pWin = make_smart(new Animation(
-      0, (*pr)("win"), 3, Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
   StaticImage logo((*pr)["logo"], Point(rBound.sz.x / 2, rBound.sz.y / 3),
                    true);
   Animation burnL(0, (*pr)("burn"), 3,
@@ -425,29 +419,10 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   std::string sHint = vHintPref.at(rand() % vHintPref.size()) +
                       vHints.at(rand() % vHints.size());
 
-  smart_pointer<TextDrawEntity> pHintText = make_smart(new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum));
-  smart_pointer<TextDrawEntity> pOptionText = make_smart(new TextDrawEntity(
-      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum));
-
-  smart_pointer<AnimationOnce> pO = make_smart(
-      new AnimationOnce(0, (*pr)("over"), nFramesInSecond / 2,
-                        Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
-  smart_pointer<AnimationOnce> pPlu = make_smart(
-      new AnimationOnce(0, (*pr)("pluanbo"), nFramesInSecond / 10,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-  smart_pointer<AnimationOnce> pGen = make_smart(
-      new AnimationOnce(0, (*pr)("gengui"), nFramesInSecond / 5,
-                        Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-
-  smart_pointer<SimpleSoundEntity> pOver = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("over"), nFramesInSecond / 2,
-                            pSnd.get()));
-  smart_pointer<SimpleSoundEntity> pPluSnd = make_smart(new SimpleSoundEntity(
-      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
-  smart_pointer<SimpleSoundEntity> pClkSnd = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("click"), nFramesInSecond / 5,
-                            pSnd.get()));
+  auto pHintText = std::make_unique<TextDrawEntity>(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, sHint, pNum);
+  auto pOptionText = std::make_unique<TextDrawEntity>(
+      0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
 
 #ifdef TRIAL_VERSION
   smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(
@@ -465,8 +440,6 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pMenu->pMenuDisplay = pMenuDisplay.get();
   pMenu->AddOwnedBoth(std::move(pMenuDisplay));
 
-  pCnt1->AddBoth(pStr);
-
   pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
   pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnL));
   pCnt1->AddOwnedBoth(std::make_unique<Animation>(burnR));
@@ -475,22 +448,38 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pMenu->AddOwnedBoth(std::make_unique<Animation>(burnL));
   pMenu->AddOwnedBoth(std::make_unique<Animation>(burnR));
 
+  pCnt1->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("start"), nFramesInSecond / 5,
+      Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
+
 #ifdef PC_VERSION
-  pMenu->pHintText = pHintText;
-  pMenu->pOptionText = pOptionText;
+  pMenu->SetHintText(std::move(pHintText));
+  pMenu->SetOptionText(std::move(pOptionText));
 #else
-  pCnt1->AddV(pHintText);
+  pCnt1->AddOwnedVisualEntity(std::move(pHintText));
+  pMenu->SetOptionText(std::move(pOptionText));
 #endif
 
-  pCnt3->AddBoth(pWin);
-  pCnt2->AddBoth(pO);
-  pCnt2->AddE(pOver);
+  pCnt3->AddOwnedBoth(std::make_unique<Animation>(
+      0, (*pr)("win"), 3,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
+  pCnt2->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("over"), nFramesInSecond / 2,
+      Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
+  pCnt2->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("over"), nFramesInSecond / 2, pSnd.get()));
 
-  pCnt0_1->AddBoth(pPlu);
-  pCnt0_1->AddE(pPluSnd);
+  pCnt0_1->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("pluanbo"), nFramesInSecond / 10,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
+  pCnt0_1->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
 
-  pCnt0_2->AddBoth(pGen);
-  pCnt0_2->AddE(pClkSnd);
+  pCnt0_2->AddOwnedBoth(std::make_unique<AnimationOnce>(
+      0, (*pr)("gengui"), nFramesInSecond / 5,
+      Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
+  pCnt0_2->AddOwnedEventEntity(std::make_unique<SimpleSoundEntity>(
+      pr->GetSndSeq("click"), nFramesInSecond / 5, pSnd.get()));
 
   pCnt1->AddOwnedEventEntity(std::make_unique<SoundControls>(bckgTemplate));
 

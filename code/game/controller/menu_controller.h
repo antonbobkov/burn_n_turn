@@ -121,8 +121,8 @@ struct MenuController : public EntityListController {
 
   MouseCursor mc;
 
-  smart_pointer<TextDrawEntity> pHintText;
-  smart_pointer<TextDrawEntity> pOptionText;
+  std::unique_ptr<TextDrawEntity> pHintText;
+  std::unique_ptr<TextDrawEntity> pOptionText;
 
   DragonGameSettings *settings;
 
@@ -130,6 +130,8 @@ struct MenuController : public EntityListController {
                  Rectangle rBound, Color c);
 
   void SetMenuCaret(std::unique_ptr<Animation> p);
+  void SetHintText(std::unique_ptr<TextDrawEntity> p);
+  void SetOptionText(std::unique_ptr<TextDrawEntity> p);
   Animation *GetMenuCaret() const {
     return pMenuCaret ? pMenuCaret.get() : nullptr;
   }
