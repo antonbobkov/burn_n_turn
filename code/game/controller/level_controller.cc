@@ -139,7 +139,7 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
       nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
-      bGhostTime(false), bBlink(true), pGr(0), bLeft(false), pSc(),
+      bGhostTime(false), bBlink(true), pGr(0), bLeft(false),
       bTakeOffToggle(false), tutOne(std::make_unique<TutorialLevelOne>()),
       tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
       mc(pGl->GetImgSeq("claw"), Point()), bTimerFlash(false) {}
@@ -415,6 +415,8 @@ std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
     out.push_back(vCs[i].get());
   if (pTutorialText)
     out.push_back(pTutorialText.get());
+  if (pSc)
+    out.push_back(pSc.get());
   return out;
 }
 

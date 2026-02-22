@@ -68,7 +68,7 @@ struct LevelController : public EntityListController {
 
   KnightGenerator *pGr;
   MageGenerator *pMgGen;
-  SoundControls *pSc;
+  std::unique_ptr<SoundControls> pSc;
 
   LevelController *pSelf;
 

@@ -499,9 +499,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
         make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd.get(), vLvl[i]);
 
-    auto pScEntity = std::make_unique<SoundControls>(bckgTemplate);
-    pAd->pSc = pScEntity.get();
-    pAd->AddOwnedEventEntity(std::move(pScEntity));
+    pAd->pSc = std::make_unique<SoundControls>(bckgTemplate);
 
     // game level
     vCnt.push_back(pAd);
