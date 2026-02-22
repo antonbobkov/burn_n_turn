@@ -104,7 +104,7 @@ void EntityListController::Update() {
     }
 
     for (VisualEntity *pEx : GetNonOwnedDrawEntities()) {
-      if (pEx->bExist)
+      if (pEx && pEx->bExist)
         mmp.insert(std::pair<ScreenPos, VisualEntity *>(
             ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
     }

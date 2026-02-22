@@ -32,7 +32,7 @@ void MenuDisplay::Draw(ScalingDrawer *pDr) {
       pNum->DrawColorWord(pCurr->vEntries[i].sText, p, Color(125, 125, 125),
                           false);
 
-    if (pCurr->nMenuPosition == i)
+    if (pCurr->nMenuPosition == i && pMenuCaret)
       pMenuCaret->pos = p + Point(-11, pCurr->vEntries[i].szSize.y / 4);
 
     p.y += pCurr->vEntries[i].szSize.y;
@@ -57,10 +57,28 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
 MenuController::MenuController(DragonGameController *pGl_,
                                DragonGameSettings *settings_, Rectangle rBound,
                                Color c)
-    : EntityListController(pGl_, rBound, c), pMenuDisplay(),
+    : EntityListController(pGl_, rBound, c), pMenuCaret(), pMenuDisplay(),
       mc(pGl_->GetImgSeq("claw"), Point()), pHintText(), pOptionText(),
       settings(settings_) {
   bNoRefresh = true;
+}
+
+void MenuController::SetMenuCaret(std::unique_ptr<Animation> p) {
+  pMenuCaret = std::move(p);
+}
+
+std::vector<EventEntity *> MenuController::GetNonOwnedUpdateEntities() {
+  std::vector<EventEntity *> out;
+  if (pMenuCaret)
+    out.push_back(pMenuCaret.get());
+  return out;
+}
+
+std::vector<VisualEntity *> MenuController::GetNonOwnedDrawEntities() {
+  std::vector<VisualEntity *> out;
+  if (pMenuCaret)
+    out.push_back(pMenuCaret.get());
+  return out;
 }
 
 void MenuController::OnKey(GuiKeyType c, bool bUp) {
@@ -85,6 +103,8 @@ void MenuController::OnMouseDown(Point pPos) {}
 void MenuController::Update() {
   EntityListController::Update();
 
+  if (!pMenuDisplay)
+    return;
   if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
     if (!pOptionText.is_null())
       pOptionText->Draw(pGl->GetDrawer());
@@ -97,11 +117,11 @@ void MenuController::Update() {
 }
 
 MenuDisplay::MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
-                         smart_pointer<Animation> pMenuCaret_,
-                         smart_pointer<MenuController> pMenuController_,
+                         Animation *pMenuCaret_,
+                         MenuController *pMenuController_,
                          bool bCheatsUnlocked_)
     : pLeftTop(pLeftTop_), pNum(pNum_), pMenuCaret(pMenuCaret_),
-      pMenuController(pMenuController_.get()), pCurr(&memMain),
+      pMenuController(pMenuController_), pCurr(&memMain),
       bCheatsUnlocked(bCheatsUnlocked_) {
   Size szSpacing(50, 10);
   memMain.vEntries.push_back(

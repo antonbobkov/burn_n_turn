@@ -457,15 +457,15 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pCnt1->AddV(pTrial);
 #endif
 
-  smart_pointer<Animation> pMenuCaret =
-      make_smart(new Animation(2, (*pr)("arrow"), 3, Point(0, 0), true));
-  // menu entity
-  smart_pointer<MenuDisplay> pMenuDisplay = make_smart(
-      new MenuDisplay(Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-                      pMenuCaret, pMenu, settings_.sbCheatsUnlocked.Get()));
-
-  pMenu->AddBoth(pMenuDisplay);
-  pMenu->pMenuDisplay = pMenuDisplay;
+  pMenu->SetMenuCaret(std::make_unique<Animation>(
+      2, (*pr)("arrow"), 3, Point(0, 0), true));
+  std::unique_ptr<MenuDisplay> pMenuDisplay =
+      std::make_unique<MenuDisplay>(
+          Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
+          pMenu->GetMenuCaret(), pMenu.get(),
+          settings_.sbCheatsUnlocked.Get());
+  pMenu->pMenuDisplay = pMenuDisplay.get();
+  pMenu->AddOwnedBoth(std::move(pMenuDisplay));
 
   pCnt1->AddBoth(pStr);
 
@@ -476,7 +476,6 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pMenu->AddV(pL);
   pMenu->AddBoth(pBurnL);
   pMenu->AddBoth(pBurnR);
-  pMenu->AddBoth(pMenuCaret);
 
 #ifdef PC_VERSION
   pMenu->pHintText = pHintText;
@@ -609,7 +608,8 @@ void DragonGameController::Next() {
       if (nActive == vLevelPointers.at(i) &&
           settings_.snProgress.Get() < int(i)) {
         settings_.snProgress.Set(i);
-        pMenu->pMenuDisplay->UpdateMenuEntries();
+        if (pMenu->pMenuDisplay)
+          pMenu->pMenuDisplay->UpdateMenuEntries();
       }
     }
   }

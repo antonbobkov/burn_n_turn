@@ -11,6 +11,9 @@
 #include "game/entities.h"
 #include "wrappers/gui_key_type.h"
 #include "game_utils/mouse_utils.h"
+#include "utils/smart_pointer.h"
+#include <memory>
+#include <vector>
 
 struct DragonGameSettings;
 struct MenuDisplay;
@@ -68,14 +71,14 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
   Point pLeftTop;
   NumberDrawer *pNum;
 
-  smart_pointer<Animation> pMenuCaret;
+  Animation *pMenuCaret;
 
   /** The menu keeper who owns this hall (we only point). */
   MenuController *pMenuController;
 
   MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
-              smart_pointer<Animation> pMenuCaret_,
-              smart_pointer<MenuController> pMenuController_,
+              Animation *pMenuCaret_,
+              MenuController *pMenuController_,
               bool bCheatsUnlocked_);
 
   /** Draw the choices on the wall and the caret at the chosen line. */
@@ -114,7 +117,8 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 /** The keeper of the pause hall: the display and options from the scrolls. */
 struct MenuController : public EntityListController {
   std::string get_class_name() override { return "MenuController"; }
-  smart_pointer<MenuDisplay> pMenuDisplay;
+  std::unique_ptr<Animation> pMenuCaret;
+  MenuDisplay *pMenuDisplay;
 
   MouseCursor mc;
 
@@ -125,6 +129,14 @@ struct MenuController : public EntityListController {
 
   MenuController(DragonGameController *pGl_, DragonGameSettings *settings_,
                  Rectangle rBound, Color c);
+
+  void SetMenuCaret(std::unique_ptr<Animation> p);
+  Animation *GetMenuCaret() const {
+    return pMenuCaret ? pMenuCaret.get() : nullptr;
+  }
+
+  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
+  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
   /*virtual*/ void OnMouse(Point pPos);
