@@ -276,7 +276,7 @@ void Dragon::Update() {
       if (!(*itr)->bExist)
         continue;
 
-      if ((**itr).GetType() == 'P' && this->HitDetection(*itr)) {
+      if ((**itr).GetType() == 'P' && this->HitDetection(itr->get())) {
         bCarry = true;
         imgCarry = (*itr)->GetImage();
         cCarry = 'P';
@@ -299,7 +299,7 @@ void Dragon::Update() {
       if (!(*itr)->bExist)
         continue;
 
-      if (this->HitDetection(*itr)) {
+      if (this->HitDetection(itr->get())) {
         AddBonus(GetBonus((*itr)->n, nBonusPickUpTime));
         (*itr)->bExist = false;
 
@@ -510,7 +510,7 @@ void Dragon::Toggle() {
     if ((**itr).GetType() != 'T')
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       if (!bCarry) {
         bCarry = true;
         imgCarry = (*itr)->GetImage();

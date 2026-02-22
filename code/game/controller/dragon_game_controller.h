@@ -167,7 +167,7 @@ private:
   FontWriter *pFancyNum;
 
   SoundInterface<Index> *pSndRaw;
-  smart_pointer<SoundInterfaceProxy> pSnd;
+  std::unique_ptr<SoundInterfaceProxy> pSnd;
 
   std::vector<LevelLayout> vLvl;
 

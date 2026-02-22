@@ -76,7 +76,7 @@ DragonGameController::DragonGameController(
     : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_ ? pDr_->pGr : 0),
       pNum(pNum_), pBigNum(pBigNum_),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
-      pSndRaw(pSndRaw_), pSnd(make_smart(new SoundInterfaceProxy(pSndRaw_))),
+      pSndRaw(pSndRaw_), pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
       nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
       settings_(fp, sFullScreenPath), pFancyNum(pFancyNum_), pWrp(pWrp_),
       pMenu(), vLevelPointers(3), pSelf(nullptr) {
@@ -445,11 +445,13 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
                         Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
 
   smart_pointer<SimpleSoundEntity> pOver = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("over"), nFramesInSecond / 2, pSnd));
+      new SimpleSoundEntity(pr->GetSndSeq("over"), nFramesInSecond / 2,
+                            pSnd.get()));
   smart_pointer<SimpleSoundEntity> pPluSnd = make_smart(new SimpleSoundEntity(
-      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd));
+      pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
   smart_pointer<SimpleSoundEntity> pClkSnd = make_smart(
-      new SimpleSoundEntity(pr->GetSndSeq("click"), nFramesInSecond / 5, pSnd));
+      new SimpleSoundEntity(pr->GetSndSeq("click"), nFramesInSecond / 5,
+                            pSnd.get()));
 
 #ifdef TRIAL_VERSION
   smart_pointer<StaticImage> pTrial = make_smart(new StaticImage(

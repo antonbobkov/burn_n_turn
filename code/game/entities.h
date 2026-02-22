@@ -112,10 +112,10 @@ struct SimpleSoundEntity : virtual public EventEntity {
   Timer t;
 
   SoundSequence seq;
-  smart_pointer<SoundInterfaceProxy> pSnd;
+  SoundInterfaceProxy *pSnd;
 
   SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
-                    smart_pointer<SoundInterfaceProxy> pSnd_)
+                    SoundInterfaceProxy *pSnd_)
       : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()), pSnd(pSnd_) {
   }
 
@@ -190,7 +190,6 @@ struct PhysicalEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "PhysicalEntity"; }
   virtual unsigned GetRadius() { return 0; }
 
-  bool HitDetection(smart_pointer<PhysicalEntity> pPh);
   bool HitDetection(PhysicalEntity *pPh);
 };
 

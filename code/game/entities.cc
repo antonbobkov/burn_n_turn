@@ -78,10 +78,6 @@ void AnimationOnce::Update() {
   }
 }
 
-bool PhysicalEntity::HitDetection(smart_pointer<PhysicalEntity> pPh) {
-  return HitDetection(pPh.get());
-}
-
 bool PhysicalEntity::HitDetection(PhysicalEntity *pPh) {
   if (pPh == nullptr)
     return false;

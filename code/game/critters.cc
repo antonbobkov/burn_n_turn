@@ -200,7 +200,7 @@ void Knight::Update() {
       if (!(*itr)->bExist)
         continue;
 
-      if (this->HitDetection(*itr)) {
+      if (this->HitDetection(itr->get())) {
 
         if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
           pAc->pGl->PlaySound("death");
@@ -217,7 +217,7 @@ void Knight::Update() {
       if (!(*itr)->bExist)
         continue;
 
-      if (this->HitDetection(*itr)) {
+      if (this->HitDetection(itr->get())) {
         pAc->pGl->PlaySound("skeleton_bonus");
         (*itr)->bExist = false;
       }
@@ -307,7 +307,7 @@ void MegaSlime::Update() {
     if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       (*itr)->bExist = false;
       pAc->pGl->PlaySound("megaslime_bonus");
     }
@@ -413,7 +413,7 @@ void Slime::Update() {
     if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       if ((*itr)->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 

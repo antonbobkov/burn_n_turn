@@ -89,7 +89,7 @@ void ChainExplosion::Update() {
     if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       if ((*itr)->GetType() == 'W')
         continue;
       if ((*itr)->GetType() == 'E')
@@ -133,7 +133,7 @@ void KnightOnFire::Update() {
     if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       char cType = (*itr)->GetType();
 
       if (cType == 'W' || cType == 'E')
@@ -259,7 +259,7 @@ void Fireball::Update() {
     if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(*itr)) {
+    if (this->HitDetection(itr->get())) {
       char cType = (*itr)->GetType();
 
       if (cType == 'W' || cType == 'E') {
