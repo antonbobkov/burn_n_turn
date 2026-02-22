@@ -65,6 +65,17 @@ level/critters use NumberDrawer* from getters only.
 
 ---
 
+#### 2a. GetNonOwned* — who may override
+
+**Decision:** **Only MenuController and LevelController** override
+GetNonOwnedDrawEntities / GetNonOwnedUpdateEntities (for caret and
+tutorial text respectively). **Simple controllers must not** override
+GetNonOwned*; they receive entities by value (copies) and own them.
+When one object is passed to multiple places, prefer making a copy;
+controllers own the object.
+
+---
+
 #### 3. Menu caret (pMenuCaret — Animation)
 
 | Role | Owner | Raw pointer |
@@ -100,9 +111,11 @@ MenuController (pMenu), BuyNowController (pBuy).
 - **C.** Construct once on the stack (as non-pointers, by value), then
   pass **copies** to the controllers.
 
-**Decision:** **Option C.** Construct these objects once (on the stack, as
-non-pointers), then pass **copies** to pCnt1, pMenu, and pBuy. Each
-controller gets its own copy; no shared ownership, no AddOwned for these.
+**Decision:** **Option C / 2A (copy semantics).** Construct these objects
+once, then pass **copies** to pCnt1, pMenu, and pBuy. Each controller gets
+its own copy and **owns** it (e.g. via AddOwned*). StaticImage and
+Animation must be copyable; implement or verify copy constructors.
+No shared ownership.
 
 ---
 
@@ -110,13 +123,14 @@ controller gets its own copy; no shared ownership, no AddOwned for these.
 
 | Role | Owner | Raw pointer |
 |------|--------|-------------|
-| Create | DragonGameController::StartUp | — |
-| In lists | pCnt1 (pBckgMusic); pMenu, pCut1–3, pCnt2, pCnt3 (pNoMusic); every LevelController (pBckgMusic) | AddE(...); LevelController::pSc = pBckgMusic.get() |
+| Create | DragonGameController::StartUp (or per-controller) | — |
+| In lists | pCnt1 (pBckgMusic); pMenu, pCut1–3, pCnt2, pCnt3 (pNoMusic); every LevelController (pBckgMusic) | AddE(...); LevelController::pSc |
 
-**Decision:** **DragonGameController** owns both SoundControls (unique_ptr
-or owned list). All controllers that use them hold **raw pointers** only
-(in lsUpdate and, for LevelController, pSc). Lifetime of SoundControls
-extends beyond any single screen, so owner is the game controller.
+**Decision:** **By value (copies).** Make **copies** of SoundControls and
+pass a copy into each controller that needs one. **Each controller owns**
+its copy (e.g. AddOwnedEventEntity or AddOwnedBoth). No shared ownership;
+DragonGameController does not own SoundControls for other screens.
+SoundControls must be copyable.
 
 ---
 
@@ -187,9 +201,11 @@ strategy (e.g. same pass, or clear raw list when owned is cleared).
 - User requested explicit identification of objects used in multiple places
   and options for owner vs raw pointer. The above tables and decisions
   serve as the single reference for planner and executor.
-- Preference: single clear owner (unique_ptr) at the place that creates or
-  has the longest lifetime; everyone else raw. Avoid shared ownership for
-  Phase 3 leaf types.
+- Preference: when one object is passed to multiple places, **prefer making
+  a copy**; the controller that receives it **owns** the object. Avoid
+  shared ownership for Phase 3 leaf types. Single-owner (unique_ptr) at
+  the controller that holds the copy; no GetNonOwned* for simple
+  controllers.
 </specifics>
 
 <deferred>

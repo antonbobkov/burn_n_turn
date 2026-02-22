@@ -1,4 +1,4 @@
-# Phase 3: Game entities and animations — Plan (remaining work)
+# Phase 3: Game entities and animations — Plan
 
 ---
 wave: 1
@@ -25,9 +25,10 @@ autonomous: true
 NumberDrawer and concrete drawers, AnimationOnce, StaticImage, Animation,
 simple entities. Ownership lives in level, controllers, or critters.
 
-**Status:** Waves 1–2 (ScalingDrawer, NumberDrawer, AdNumberDrawer,
-BonusDrawer, BonusScore/AnimationOnce from critters/fireball/generators,
-buy_now mSlimes) are complete. This plan covers only remaining work.
+**Status:** Phase 3 is **largely complete**. Tasks 1.1, 1.3–1.6 and Waves 2–3
+are done (see 03-03-SUMMARY.md). **Remaining work is Task 1.2 only** (DGC
+StartUp: SoundControls and logo/burn by value; remaining entities to
+make_unique + AddOwned*). Execute **03-01.2-PLAN.md** for that.
 
 ## must_haves (goal-backward verification)
 
@@ -64,40 +65,13 @@ Execute in order. Run build and ctest; run simulation_test after each task
   (or AddOwnedBoth); store raw in list. Remove make_smart.
 - Build and run ctest; run simulation_test.
 
-### Task 1.2 — DragonGameController::StartUp: SoundControls, StaticImage, Animation, TextDrawEntity, MenuDisplay, AnimationOnce, SimpleSoundEntity
+### Task 1.2 — DragonGameController::StartUp (remaining)
 
-- In `dragon_game_controller.h`: Declare SoundControls as
-  std::unique_ptr<SoundControls> (or two unique_ptrs for pBckgMusic,
-  pNoMusic). Other leaf entity pointers become raw (Animation*,
-  StaticImage*, etc.) where ownership is elsewhere, or keep as needed for
-  single-owner storage.
-- In `dragon_game_controller.cc` StartUp:
-  - **SoundControls:** Create pBckgMusic, pNoMusic with std::make_unique;
-    store in DragonGameController; pass raw to AddE(...) and to
-    LevelController::pSc etc.
-  - **Logo and burn (pL, pBurnL, pBurnR):** Per CONTEXT Option C — create
-    once (e.g. by value or local unique_ptr then copy); pass **copies**
-    to pCnt1, pMenu, pBuy. No shared ownership.
-  - **StaticImage pTrial, pBuyNow:** Create with make_unique; add via
-    AddOwnedVisualEntity; pass raw to pCnt1, pBuy as needed.
-  - **Animation:** pWin, pBurnL, pBurnR (burn passed by value per Option C),
-    pGolem, pSkeleton1–3, pMage, pGhost, pWhiteKnight — create with
-    make_unique; add via AddOwnedVisualEntity/AddOwnedBoth; store raw in
-    lists. **pMenuCaret** is not owned here — MenuController owns it (Task 1.3).
-  - **TextDrawEntity pHintText, pOptionText:** Create with make_unique;
-    add via AddOwned* or transfer to MenuController (Task 1.3); raw in
-    lists.
-  - **MenuDisplay:** Create with make_unique; add via AddOwned* or
-    transfer to MenuController; pass raw to MenuController. MenuDisplay
-    receives Animation* pMenuCaret from MenuController (Task 1.3).
-  - **AnimationOnce pO, pPlu, pGen:** Create with make_unique; add via
-    AddOwnedBoth; raw in lists.
-  - **SimpleSoundEntity pOver, pPluSnd, pClkSnd:** Create with
-    make_unique; add via AddE; store raw in lsUpdate. If
-    SoundInterfaceProxy is still smart_pointer at owner, pass .get() into
-    SimpleSoundEntity once DGC holds proxy; else SimpleSoundEntity holds
-    SoundInterfaceProxy* (Task 1.6).
-- Build and run ctest; run simulation_test.
+**Execute 03-01.2-PLAN.md** (not this section). The detailed plan there
+reflects CONTEXT and 03-01.2-RESOLUTION-OPTIONS: SoundControls and
+logo/burn **by value** (copies; each controller owns); no list redesign;
+copyability for StaticImage, Animation, SoundControls. Tasks: copyability,
+SoundControls by value, logo/burn by value, remaining StartUp entities.
 
 ### Task 1.3 — MenuController: pMenuCaret, pMenuDisplay, pHintText, pOptionText
 
@@ -207,18 +181,7 @@ Execute in order. Run build and ctest; run simulation_test after each task
 
 ## PLANNING COMPLETE
 
-Phase 3 remaining work: (1) Wave 1 — migrate leaf entities in
-basic_controllers (StaticRectangle, HighScoreShower, IntroTextShower),
-DragonGameController::StartUp (SoundControls, StaticImage, Animation,
-TextDrawEntity, MenuDisplay, AnimationOnce, SimpleSoundEntity; logo/burn
-by value per Option C; pMenuCaret owned by MenuController), MenuController
-(caret, MenuDisplay, pHintText, pOptionText with GetNonOwned* override),
-LevelController (TutorialTextEntity unique_ptr, GetNonOwnedDrawEntities),
-tutorial.h (pTexter → TutorialTextEntity*), and entities (HitDetection
-raw only, SimpleSoundEntity pSnd raw). (2) Wave 2 — remove SP_Info from
-Entity and migrated subclasses (CLEAN-01), ensure CleanUp sync of
-owned_* with lsDraw/lsUpdate, record skipped types (DOC-01). (3) Wave 3
-optional — remove SP_Info from ImageSequence. ScalingDrawer, NumberDrawer,
-AdNumberDrawer, BonusDrawer, BonusScore/AnimationOnce from critters/
-fireball/generators, and buy_now mSlimes are already done and not in this
-plan.
+Phase 3: Tasks 1.1, 1.3–1.6 and Waves 2–3 are **done** (03-03-SUMMARY.md).
+**Remaining:** Task 1.2 only — see **03-01.2-PLAN.md** for DGC StartUp
+(SoundControls and logo/burn by value; copyability; remaining entities
+to make_unique + AddOwned*). Execute that plan to finish Phase 3.
