@@ -1,39 +1,23 @@
-# Phase 3: Game entities and animations — Plan
+# Phase 3: Game entities and animations — Plan (remaining work)
 
 ---
 wave: 1
 depends_on: ["02-wrappers-and-platform"]
 files_modified:
-  - code/game_utils/draw_utils.h
-  - code/game_utils/draw_utils.cc
-  - code/game_utils/image_sequence.h
   - code/game/entities.h
   - code/game/entities.cc
-  - code/game/level.h
-  - code/game/level.cc
-  - code/game/fireball.h
-  - code/game/fireball.cc
-  - code/game/critters.h
-  - code/game/critters.cc
-  - code/game/dragon.h
-  - code/game/dragon.cc
-  - code/game/dragon_game_runner.h
-  - code/game/dragon_game_runner.cc
   - code/game/controller/basic_controllers.h
   - code/game/controller/basic_controllers.cc
-  - code/game/controller/menu_controller.h
-  - code/game/controller/menu_controller.cc
   - code/game/controller/dragon_game_controller.h
   - code/game/controller/dragon_game_controller.cc
+  - code/game/controller/menu_controller.h
+  - code/game/controller/menu_controller.cc
   - code/game/controller/level_controller.h
   - code/game/controller/level_controller.cc
-  - code/game/controller/buy_now_controller.h
-  - code/game/controller/buy_now_controller.cc
   - code/game/tutorial.h
   - code/game/tutorial.cc
-  - code/simulation/simulation.cc
-  - code/simulation/simulation_test.cc
-autonomous: false
+  - code/game_utils/image_sequence.h
+autonomous: true
 ---
 
 **Phase:** 3 — Game entities and animations  
@@ -41,297 +25,172 @@ autonomous: false
 NumberDrawer and concrete drawers, AnimationOnce, StaticImage, Animation,
 simple entities. Ownership lives in level, controllers, or critters.
 
+**Status:** Waves 1–2 (ScalingDrawer, NumberDrawer, AdNumberDrawer,
+BonusDrawer, BonusScore/AnimationOnce from critters/fireball/generators,
+buy_now mSlimes) are complete. This plan covers only remaining work.
+
 ## must_haves (goal-backward verification)
 
-- [ ] ScalingDrawer: single owner in TowerDataWrap (unique_ptr); DragonGameController
-  and all call sites use ScalingDrawer*; Draw(ScalingDrawer*) everywhere.
-- [ ] NumberDrawer: single owner in TowerDataWrap (unique_ptr); DragonGameController,
-  TextDrawEntity, TutorialTextEntity, MenuDisplay use NumberDrawer*.
-- [ ] Leaf entities (Animation, AnimationOnce, StaticImage, StaticRectangle,
-  TextDrawEntity, SimpleSoundEntity, HighScoreShower, IntroTextShower,
-  BonusScore, AdNumberDrawer, BonusDrawer, TutorialTextEntity, MenuDisplay,
-  SoundControls): single owner at creating controller/level; raw pointers in
-  lists and in entities that reference them.
-- [ ] SP_Info removed from Drawer, ScalingDrawer, NumberDrawer, Entity and
-  migrated subclasses where no smart_pointer use remains (CLEAN-01).
+- [ ] Leaf entities in basic_controllers, DragonGameController, MenuController,
+  LevelController use single owner (unique_ptr/AddOwned*) and raw pointers
+  in lists; logo/burn passed by value (Option C); MenuController owns
+  pMenuCaret and overrides GetNonOwnedDrawEntities/GetNonOwnedUpdateEntities;
+  LevelController owns TutorialTextEntity and overrides GetNonOwnedDrawEntities.
+- [ ] PhysicalEntity::HitDetection(smart_pointer<PhysicalEntity>) removed;
+  HitDetection(PhysicalEntity*) only. SimpleSoundEntity holds
+  SoundInterfaceProxy* where owner passes raw.
+- [ ] SP_Info removed from Entity and migrated subclasses where no
+  smart_pointer use remains (CLEAN-01); Phase 4 types not touched.
+- [ ] CleanUp keeps owned_* and lsDraw/lsUpdate in sync when removing
+  !bExist entities; strategy documented if needed.
 - [ ] Build succeeds; ctest and simulation_test pass (VER-01, VER-02).
-- [ ] Any type skipped (lifetime unclear) recorded for DOC-01.
+- [ ] Phase 4 / skipped types recorded for DOC-01.
 
 ---
 
-## Wave 1: ScalingDrawer and Draw(ScalingDrawer*)
+## Wave 1: Remaining leaf entities
 
 Execute in order. Run build and ctest; run simulation_test after each task
 (or after a small group). VER-01, VER-02.
 
-### Task 1.1 — TowerDataWrap: own two ScalingDrawers with unique_ptr; NumberDrawer takes ScalingDrawer*
-
-- In `dragon_game_runner.h`: Change TowerDataWrap to hold
-  `std::unique_ptr<ScalingDrawer> pDr` and
-  `std::unique_ptr<ScalingDrawer> pBigDr`. Remove smart_pointer<ScalingDrawer>.
-- In `dragon_game_runner.cc`: TowerDataWrap ctor creates both with
-  std::make_unique<ScalingDrawer>(pGr, nScale) and
-  std::make_unique<ScalingDrawer>(pGr, nScale * 2). Pass pDr.get() and
-  pBigDr.get() into NumberDrawer ctors (NumberDrawer must accept raw ptr).
-- In `game_utils/draw_utils.h` and `draw_utils.cc`: Change NumberDrawer
-  ctor and member `pDr` to take/store `ScalingDrawer*` (non-owning) so
-  TowerDataWrap can pass pDr.get() and pBigDr.get(). Do not yet change
-  TowerDataWrap to unique_ptr<NumberDrawer> (Wave 2).
-- Build and run ctest; run simulation_test.
-
-### Task 1.2 — DragonGameController: store ScalingDrawer* and return from GetDrawer()
-
-- In `dragon_game_controller.h`: Change `pDr` from smart_pointer<ScalingDrawer>
-  to `ScalingDrawer*`. Declare GetDrawer() to return ScalingDrawer*.
-- In `dragon_game_controller.cc`: Ctor takes ScalingDrawer* (e.g. from
-  TowerDataWrap); assign and store raw pointer; GetDrawer() returns pDr.
-- In `dragon_game_runner.cc`: When constructing DragonGameController, pass
-  tower_data.pDr.get() (or equivalent) so controller receives raw pointer.
-- Build and run ctest; run simulation_test.
-
-### Task 1.3 — Draw(smart_pointer<ScalingDrawer>) → Draw(ScalingDrawer*) in headers
-
-- In `game/entities.h`: Change VisualEntity::Draw and all overrides from
-  `void Draw(smart_pointer<ScalingDrawer> pDr)` to `void Draw(ScalingDrawer*
-  pDr)`.
-- In `game/level.h`: Change Road::Draw and FancyRoad::Draw to take
-  ScalingDrawer*.
-- In `game/fireball.h`: Change FireballBonusAnimation::Draw and any other
-  Draw taking ScalingDrawer to ScalingDrawer*.
-- In `game/critters.h`: Change all Draw(ScalingDrawer*) overrides.
-- In `game/dragon.h`: Change Dragon::Draw to take ScalingDrawer*.
-- In `game/controller/menu_controller.h`: Any Draw(ScalingDrawer*) signature.
-- In `game/controller/buy_now_controller.h`: Draw(ScalingDrawer*).
-- Build (may fail until .cc updated).
-
-### Task 1.4 — Draw(ScalingDrawer*) implementations and call sites
-
-- In `game/entities.cc`: Implement all Draw(ScalingDrawer* pDr) (remove
-  .get() or smart_pointer usage in body).
-- In `game/level.cc`: Road::Draw, FancyRoad::Draw(ScalingDrawer*).
-- In `game/fireball.cc`: Draw(ScalingDrawer*) overrides.
-- In `game/critters.cc`: Draw(ScalingDrawer*) overrides.
-- In `game/dragon.cc`: Dragon::Draw(ScalingDrawer*).
-- In `game/controller/basic_controllers.cc`: entry.second->Draw(pGl->GetDrawer())
-  (call site; GetDrawer() now returns raw ptr — no change to call).
-- In `game/controller/menu_controller.cc`: Draw(ScalingDrawer*) and call sites.
-- In `game/controller/level_controller.cc`: AdNumberDrawer, BonusDrawer
-  Draw(ScalingDrawer*).
-- In `game/controller/buy_now_controller.cc`: Draw(ScalingDrawer*).
-- In `game/tutorial.cc`: TutorialTextEntity::Draw(ScalingDrawer*).
-- Build and run ctest; run simulation_test.
-
-### Task 1.5 — Remove SP_Info from Drawer and ScalingDrawer (CLEAN-01)
-
-- In `game_utils/draw_utils.h` and `draw_utils.cc`: After no
-  smart_pointer<ScalingDrawer> remains, remove SP_Info base from Drawer
-  and ScalingDrawer. Remove #include "utils/smart_pointer.h" from
-  draw_utils.h if no longer needed.
-- Build and run ctest; run simulation_test.
-
----
-
-## Wave 2: NumberDrawer
-
-### Task 2.1 — TowerDataWrap: unique_ptr for NumberDrawer
-
-- NumberDrawer already takes ScalingDrawer* (Task 1.1). In `dragon_game_runner.h`:
-  Change TowerDataWrap to hold `std::unique_ptr<NumberDrawer> pNum` and
-  `std::unique_ptr<NumberDrawer> pBigNum`.
-- In `dragon_game_runner.cc`: Create NumberDrawer with
-  std::make_unique<NumberDrawer>(pDr.get(), pFancyNum_.get(), ...) and
-  std::make_unique<NumberDrawer>(pBigDr.get(), ...). Pass pNum.get() and
-  pBigNum.get() to DragonGameController.
-- Build and run ctest; run simulation_test.
-
-### Task 2.2 — DragonGameController: store NumberDrawer* and return from getters
-
-- In `dragon_game_controller.h`: Change pNum, pBigNum to NumberDrawer*.
-  GetNumberDrawer() and GetBigNumberDrawer() return NumberDrawer*.
-- In `dragon_game_controller.cc`: Ctor takes NumberDrawer* for pNum and
-  pBigNum; store raw pointers; getters return them.
-- Build and run ctest; run simulation_test.
-
-### Task 2.3 — TextDrawEntity, TutorialTextEntity, MenuDisplay: NumberDrawer*
-
-- In `game/entities.h`: TextDrawEntity: change smart_pointer<NumberDrawer> pNum
-  to NumberDrawer*.
-- In `game/tutorial.h`: TutorialTextEntity: pNum → NumberDrawer*.
-- In `game/controller/menu_controller.h`: MenuDisplay: pNum → NumberDrawer*.
-- In corresponding .cc files and call sites: pass GetNumberDrawer() or raw
-  pointer from controller; no .get() on NumberDrawer.
-- Build and run ctest; run simulation_test.
-
-### Task 2.4 — Remove SP_Info from NumberDrawer (CLEAN-01)
-
-- In `game_utils/draw_utils.h` and `draw_utils.cc`: Remove SP_Info base
-  from NumberDrawer when no smart_pointer<NumberDrawer> remains. Remove
-  smart_pointer include if no longer needed.
-- Build and run ctest; run simulation_test.
-
----
-
-## Wave 3: Leaf entities
-
-Execute sub-waves 3a–3d in order. Run build and ctest; run simulation_test
-after each task or small group.
-
-### Wave 3a — Entities with no dependency on other smart_pointer entity types
-
-### Task 3.1 — StaticRectangle and AddBackground (basic_controllers)
+### Task 1.1 — basic_controllers: AddBackground and score showers
 
 - In `game/controller/basic_controllers.cc`: AddBackground: create
-  StaticRectangle with std::make_unique; use AddOwnedVisualEntity (or
-  AddOwnedBoth) and store raw pointer in owned_visual_entities. Remove
-  make_smart.
+  StaticRectangle with std::make_unique<StaticRectangle>(...); use
+  AddOwnedVisualEntity(...) and store raw pointer in list. Remove
+  make_smart and AddV(pBkg).
+- In same file: DragonScoreController ctor — HighScoreShower and
+  IntroTextShower: create with std::make_unique; use AddOwnedVisualEntity
+  (or AddOwnedBoth); store raw in list. Remove make_smart.
 - Build and run ctest; run simulation_test.
 
-### Task 3.2 — StaticImage (dragon_game_controller: pTrial, pBuyNow)
+### Task 1.2 — DragonGameController::StartUp: SoundControls, StaticImage, Animation, TextDrawEntity, MenuDisplay, AnimationOnce, SimpleSoundEntity
 
-- In `game/controller/dragon_game_controller.cc`: Create pTrial, pBuyNow
-  with std::make_unique<StaticImage>(...); add via AddOwnedVisualEntity or
-  AddOwnedBoth; pass raw pointers where needed (e.g. pCnt1, pBuy).
+- In `dragon_game_controller.h`: Declare SoundControls as
+  std::unique_ptr<SoundControls> (or two unique_ptrs for pBckgMusic,
+  pNoMusic). Other leaf entity pointers become raw (Animation*,
+  StaticImage*, etc.) where ownership is elsewhere, or keep as needed for
+  single-owner storage.
+- In `dragon_game_controller.cc` StartUp:
+  - **SoundControls:** Create pBckgMusic, pNoMusic with std::make_unique;
+    store in DragonGameController; pass raw to AddE(...) and to
+    LevelController::pSc etc.
+  - **Logo and burn (pL, pBurnL, pBurnR):** Per CONTEXT Option C — create
+    once (e.g. by value or local unique_ptr then copy); pass **copies**
+    to pCnt1, pMenu, pBuy. No shared ownership.
+  - **StaticImage pTrial, pBuyNow:** Create with make_unique; add via
+    AddOwnedVisualEntity; pass raw to pCnt1, pBuy as needed.
+  - **Animation:** pWin, pBurnL, pBurnR (burn passed by value per Option C),
+    pGolem, pSkeleton1–3, pMage, pGhost, pWhiteKnight — create with
+    make_unique; add via AddOwnedVisualEntity/AddOwnedBoth; store raw in
+    lists. **pMenuCaret** is not owned here — MenuController owns it (Task 1.3).
+  - **TextDrawEntity pHintText, pOptionText:** Create with make_unique;
+    add via AddOwned* or transfer to MenuController (Task 1.3); raw in
+    lists.
+  - **MenuDisplay:** Create with make_unique; add via AddOwned* or
+    transfer to MenuController; pass raw to MenuController. MenuDisplay
+    receives Animation* pMenuCaret from MenuController (Task 1.3).
+  - **AnimationOnce pO, pPlu, pGen:** Create with make_unique; add via
+    AddOwnedBoth; raw in lists.
+  - **SimpleSoundEntity pOver, pPluSnd, pClkSnd:** Create with
+    make_unique; add via AddE; store raw in lsUpdate. If
+    SoundInterfaceProxy is still smart_pointer at owner, pass .get() into
+    SimpleSoundEntity once DGC holds proxy; else SimpleSoundEntity holds
+    SoundInterfaceProxy* (Task 1.6).
 - Build and run ctest; run simulation_test.
 
-### Task 3.3 — Animation (dragon_game_controller, buy_now: mSlimes)
+### Task 1.3 — MenuController: pMenuCaret, pMenuDisplay, pHintText, pOptionText
 
-- In `game/controller/dragon_game_controller.cc`: Create pMenuCaret, pWin,
-  pBurnL, pBurnR, pGolem, pSkeleton1–3, pMage, pGhost, pWhiteKnight with
-  make_unique; add via AddOwnedVisualEntity/AddOwnedBoth; store raw in
-  lists. Leave pMenuCaret shared with MenuDisplay for 3c.
-- In `game/controller/buy_now_controller.cc`: mSlimes — change to
-  vector<unique_ptr<Animation>> or store owned and raw in list; creation
-  with make_unique, AddOwned* pattern.
+- In `menu_controller.h`: Change pMenuCaret to std::unique_ptr<Animation>;
+  pMenuDisplay to std::unique_ptr<MenuDisplay> or raw if ownership stays
+  in DGC; pHintText, pOptionText to TextDrawEntity* (non-owning) or
+  unique_ptr if MenuController owns. MenuDisplay ctor takes Animation*
+  pMenuCaret_ (non-owning).
+- In `menu_controller.cc` and `dragon_game_controller.cc`: Create
+  pMenuCaret in MenuController with make_unique; pass pMenuCaret.get()
+  to MenuDisplay ctor. MenuController overrides GetNonOwnedDrawEntities
+  and GetNonOwnedUpdateEntities to return the caret so the base draw/
+  update loop includes it. Do not add caret via AddBoth (raw pointer).
+- Ensure MenuDisplay and TextDrawEntity ownership is clear (either
+  MenuController or DGC owns; the other holds raw).
 - Build and run ctest; run simulation_test.
 
-### Task 3.4 — AnimationOnce (dragon_game_controller, level_controller, critters, fireball, generators)
+### Task 1.4 — LevelController: TutorialTextEntity ownership and draw
 
-- Migration sites: dragon_game_controller.cc, level_controller.cc,
-  critters.cc, fireball.cc, critter_generators.cc. At each creation site,
-  use make_unique<AnimationOnce>(...); add via AddOwnedVisualEntity/
-  AddOwnedEventEntity/AddOwnedBoth; store raw in lsDraw/lsUpdate. Ensure
-  single owner (controller or level); pass raw to AddBoth/AddV.
+- In `level_controller.h`: Change pTutorialText from
+  smart_pointer<TutorialTextEntity> to std::unique_ptr<TutorialTextEntity>.
+- In `level_controller.cc` Init: Create TutorialTextEntity with
+  std::make_unique<TutorialTextEntity>(...); assign to pTutorialText.
+  Assign pTutorialText.get() to tutOne->pTexter and tutTwo->pTexter (raw).
+- Override GetNonOwnedDrawEntities in LevelController to return the
+  tutorial text entity so the base draw loop draws it.
 - Build and run ctest; run simulation_test.
 
-### Task 3.5 — HighScoreShower, IntroTextShower (basic_controllers)
+### Task 1.5 — tutorial.h: pTexter as non-owning pointer
 
-- In `game/controller/basic_controllers.cc`: DragonScoreController ctor:
-  create with make_unique; AddOwnedVisualEntity (or AddOwnedBoth); store
-  raw in owned_visual_entities.
+- In `tutorial.h`: In TutorialLevelOne and TutorialLevelTwo, change
+  smart_pointer<TutorialTextEntity> pTexter to TutorialTextEntity*
+  pTexter (non-owning).
+- In `tutorial.cc`: Replace pTexter.is_null() checks with (pTexter !=
+  nullptr); call pTexter->SetText(...) unchanged.
 - Build and run ctest; run simulation_test.
 
-### Task 3.6 — BonusScore (critters, level_controller)
+### Task 1.6 — entities: HitDetection(PhysicalEntity*) and SimpleSoundEntity pSnd
 
-- In `game/critters.cc`: Princess, Trader, Knight, Slime, etc.: create
-  BonusScore with make_unique; pass to pAc->AddV(pB) or AddBoth — ensure
-  ownership transferred to LevelController (AddOwned* and raw in list).
-- In `game/controller/level_controller.cc`: If any BonusScore created here,
-  same pattern. Ensure CleanUp for owned lists removes dead entities and
-  keeps raw lists in sync.
-- Build and run ctest; run simulation_test.
-
-### Task 3.7 — AdNumberDrawer, BonusDrawer (level_controller Init)
-
-- In `game/controller/level_controller.cc`: Init: create AdNumberDrawer and
-  BonusDrawer with make_unique; add via AddOwnedVisualEntity; store raw in
-  owned_visual_entities.
-- Build and run ctest; run simulation_test.
-
-### Task 3.8 — SimpleSoundEntity (dragon_game_controller)
-
-- In `game/controller/dragon_game_controller.cc`: pOver, pPluSnd, pClkSnd —
-  create with make_unique; add via AddE to controllers; store raw in
-  lsUpdate. If SoundInterfaceProxy is still smart_pointer, SimpleSoundEntity
-  can hold SoundInterfaceProxy* once DragonGameController passes raw (or
-  defer until SoundInterfaceProxy migrated).
-- Build and run ctest; run simulation_test.
-
-### Task 3.9 — SoundControls (level_controller)
-
-- In `game/controller/level_controller.h`: Change pSc from
-  smart_pointer<SoundControls> to unique_ptr or owned in list; raw in
-  lsUpdate.
-- In `game/controller/level_controller.cc`: Create with make_unique; store
-  as single owner; pass raw where needed.
-- Build and run ctest; run simulation_test.
-
-### Wave 3b — Entities that depend on NumberDrawer* (already raw after Wave 2)
-
-### Task 3.10 — TextDrawEntity, TutorialTextEntity, MenuDisplay ownership
-
-- TextDrawEntity, TutorialTextEntity, MenuDisplay already hold
-  NumberDrawer* after Wave 2. In `dragon_game_controller.cc`,
-  `level_controller.cc`, `menu_controller.cc`: create these entities with
-  make_unique; add via AddOwnedVisualEntity/AddOwnedEventEntity/AddOwnedBoth;
-  store raw in owned_visual_entities/owned_event_entities. Ensure
-  LevelController owns TutorialTextEntity; MenuController owns MenuDisplay;
-  MenuController or StartScreenController owns TextDrawEntity (pHintText,
-  pOptionText).
-- Build and run ctest; run simulation_test.
-
-### Wave 3c — Shared reference (pMenuCaret)
-
-### Task 3.11 — MenuDisplay and MenuController: single owner for pMenuCaret
-
-- In `game/controller/menu_controller.h`: MenuDisplay holds Animation*
-  pMenuCaret (non-owning). MenuController holds unique_ptr<Animation> for
-  caret (or stores in owned list) and passes raw pointer to MenuDisplay
-  ctor.
-- In `game/controller/menu_controller.cc` and `dragon_game_controller.cc`:
-  Create caret Animation with make_unique in MenuController; pass .get() to
-  MenuDisplay ctor; add MenuDisplay and caret to lists with raw pointers.
-- Build and run ctest; run simulation_test.
-
-### Wave 3d — Entity base and SP_Info removal
-
-### Task 3.12 — PhysicalEntity::HitDetection(PhysicalEntity*)
-
-- In `game/entities.h`: Change HitDetection parameter from
-  smart_pointer<PhysicalEntity> to PhysicalEntity*.
-- In `game/entities.cc`: HitDetection implementation and call sites use
+- In `entities.h`: Remove HitDetection(smart_pointer<PhysicalEntity> pPh);
+  keep only HitDetection(PhysicalEntity* pPh). SimpleSoundEntity: change
+  smart_pointer<SoundInterfaceProxy> pSnd to SoundInterfaceProxy* pSnd
+  (non-owning). Ctor and call sites: owner (DragonGameController) passes
   raw pointer.
+- In `entities.cc`: HitDetection implementation and all call sites use
+  PhysicalEntity* only. SimpleSoundEntity ctor takes SoundInterfaceProxy*.
+- In `dragon_game_controller.cc`: Where SimpleSoundEntity is constructed,
+  pass raw SoundInterfaceProxy* (e.g. from a unique_ptr or owned proxy
+  held by DGC).
 - Build and run ctest; run simulation_test.
-
-### Task 3.13 — Remove SP_Info from Entity and migrated subclasses (CLEAN-01)
-
-- After all leaf entity types are migrated off smart_pointer: In
-  `game/entities.h` (and any subclass headers): Remove SP_Info base from
-  Entity and from subclasses that no longer have smart_pointer<T> pointing
-  to them. Do not remove from types deferred to Phase 4 (Critter, Dragon,
-  Castle, Road, etc.). Remove get_class_name overrides only if they only
-  served SP_Info. Remove #include "utils/smart_pointer.h" where no longer
-  needed.
-- Build and run ctest; run simulation_test.
-
-### Task 3.14 — CleanUp and owned list sync (if needed)
-
-- In `game/controller/basic_controllers.cc` (and any controller with
-  owned_entities/owned_visual_entities/owned_event_entities): Ensure
-  CleanUp for owned entities runs in sync: when removing an entity with
-  !bExist, remove it from owned_entities and from the corresponding entry
-  in owned_visual_entities and/or owned_event_entities in one pass so that
-  no raw pointer in owned_* outlives its unique_ptr. Document the chosen
-  sync strategy if needed.
-- Build and run ctest; run simulation_test.
-
-### Task 3.15 — Record skipped types for DOC-01 (success criterion 3)
-
-- In this phase folder (or in .planning/smart_pointer_unmigrated.md): list
-  types intentionally not migrated in Phase 3 (e.g. Critter, Dragon, Castle,
-  Road, generators, TimedFireballBonus, ConsumableEntity, FancyCritter)
-  with one-line rationale (e.g. "Phase 4" or "lifetime owned elsewhere").
-  Ensures success criterion (3) is verifiable.
-- No build change; optional doc-only step.
 
 ---
 
-## Wave 4 (optional): ImageSequence
+## Wave 2: Entity base cleanup, CleanUp sync, DOC-01
 
-### Task 4.1 — Remove SP_Info from ImageSequence (CLEAN-01)
+### Task 2.1 — Remove SP_Info from Entity and migrated subclasses (CLEAN-01)
 
-- In `game_utils/image_sequence.h`: ImageSequence has no smart_pointer<
-  ImageSequence> in codebase. Remove SP_Info base from ImageSequence.
-  Remove #include "utils/smart_pointer.h" if no longer needed.
+- In `game/entities.h` (and subclass headers as needed): Remove SP_Info
+  base from Entity and from subclasses that no longer have any
+  smart_pointer<T> pointing to them. Do not remove from types deferred to
+  Phase 4 (Critter, Dragon, Castle, Road, generators, etc.). Remove
+  get_class_name overrides only if they only served SP_Info. Remove
+  #include "utils/smart_pointer.h" where no longer needed.
+- Build and run ctest; run simulation_test.
+
+### Task 2.2 — CleanUp and owned list sync
+
+- In controllers that own entities (basic_controllers, dragon_game_controller,
+  menu_controller, level_controller): Ensure CleanUp removes entities with
+  !bExist from owned_* and from lsDraw/lsUpdate in one pass so no raw
+  pointer in a list outlives its unique_ptr. Document the sync strategy
+  (e.g. same pass, or clear raw list when owned is cleared) in code or
+  in this phase folder if non-obvious.
+- Build and run ctest; run simulation_test.
+
+### Task 2.3 — Record skipped types (DOC-01)
+
+- In this phase folder or in `.planning/smart_pointer_unmigrated.md`:
+  list types intentionally not migrated in Phase 3 (e.g. Critter, Dragon,
+  Castle, Road, generators, TimedFireballBonus, ConsumableEntity,
+  FancyCritter) with a one-line rationale (e.g. "Phase 4" or "lifetime
+  owned elsewhere"). Ensures success criterion (3) is verifiable.
+- No build change; doc-only.
+
+---
+
+## Wave 3 (optional): ImageSequence
+
+### Task 3.1 — Remove SP_Info from ImageSequence (CLEAN-01)
+
+- In `game_utils/image_sequence.h`: If no smart_pointer<ImageSequence>
+  remains in the codebase, remove SP_Info base from ImageSequence and
+  remove #include "utils/smart_pointer.h" if no longer needed.
 - Build and run ctest; run simulation_test.
 
 ---
@@ -344,10 +203,22 @@ after each task or small group.
 - Run: `cd bin; .\simulation_test.exe` (or equivalent). simulation_test
   passes (VER-02).
 
+---
+
 ## PLANNING COMPLETE
 
-Phase 3 plan: 4 waves. Wave 1 = ScalingDrawer + Draw(ScalingDrawer*); Wave 2
-= NumberDrawer; Wave 3 = Leaf entities (3a–3d); Wave 4 optional =
-ImageSequence. Execute in order; verify after each task or at wave
-boundaries. Do not migrate Phase 4 types (Critter, Dragon, Castle, Road,
-generators, etc.); record any skipped types for DOC-01.
+Phase 3 remaining work: (1) Wave 1 — migrate leaf entities in
+basic_controllers (StaticRectangle, HighScoreShower, IntroTextShower),
+DragonGameController::StartUp (SoundControls, StaticImage, Animation,
+TextDrawEntity, MenuDisplay, AnimationOnce, SimpleSoundEntity; logo/burn
+by value per Option C; pMenuCaret owned by MenuController), MenuController
+(caret, MenuDisplay, pHintText, pOptionText with GetNonOwned* override),
+LevelController (TutorialTextEntity unique_ptr, GetNonOwnedDrawEntities),
+tutorial.h (pTexter → TutorialTextEntity*), and entities (HitDetection
+raw only, SimpleSoundEntity pSnd raw). (2) Wave 2 — remove SP_Info from
+Entity and migrated subclasses (CLEAN-01), ensure CleanUp sync of
+owned_* with lsDraw/lsUpdate, record skipped types (DOC-01). (3) Wave 3
+optional — remove SP_Info from ImageSequence. ScalingDrawer, NumberDrawer,
+AdNumberDrawer, BonusDrawer, BonusScore/AnimationOnce from critters/
+fireball/generators, and buy_now mSlimes are already done and not in this
+plan.

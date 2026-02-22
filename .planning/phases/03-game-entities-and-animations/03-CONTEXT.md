@@ -19,6 +19,14 @@ and T* consistently.
 <decisions>
 ## Implementation Decisions
 
+### AddOwned... usage
+
+Use **AddOwned...()** only for objects that are **not** used anywhere else.
+Pattern: `AddOwned...(std::make_unique(...))`. If an object is used in more
+than one place (another component, list, or reference), do not use
+AddOwned—use explicit unique_ptr (or value/copies) and raw pointers or
+copies as appropriate.
+
 ### Objects used in multiple places — ownership and raw pointers
 
 The following objects are created in one place and used (stored or passed)
@@ -62,44 +70,39 @@ level/critters use NumberDrawer* from getters only.
 | Role | Owner | Raw pointer |
 |------|--------|-------------|
 | Create | DragonGameController::StartUp | — |
-| In draw/update lists | MenuController | In lsDraw/lsUpdate via AddBoth |
+| Draw/update participation | MenuController | Via GetNonOwned* overrides |
 | Display reference | MenuDisplay | `pMenuCaret` (positions the caret when drawing) |
 
 **Options considered:**
-- **A.** MenuController owns (e.g. unique_ptr in owned list); MenuDisplay
-  holds Animation*.
+- **A.** MenuController owns (e.g. unique_ptr); MenuDisplay holds Animation*.
 - **B.** DragonGameController owns; pass raw to MenuDisplay and to
-  MenuController’s AddBoth.
+  MenuController. AddBoth takes smart_pointer, so not used for raw ptrs.
 
-**Decision:** **MenuController** owns the caret (e.g. unique_ptr in owned
-list or single member). MenuDisplay holds **Animation*** only. Creation
-can stay in DragonGameController::StartUp but ownership is transferred to
-MenuController (e.g. AddOwnedBoth or equivalent); raw pointer passed to
-MenuDisplay ctor and to AddBoth for draw/update.
+**Decision:** **MenuController** owns the caret via **explicit unique_ptr**
+(not AddOwned..., since the caret is used in two places: MenuDisplay and
+draw/update). MenuDisplay holds **Animation*** only; raw pointer passed to
+MenuDisplay ctor. The caret is **not** added via AddBoth (AddBoth does not
+work for raw pointers). Instead MenuController **overrides
+GetNonOwnedDrawEntities and GetNonOwnedUpdateEntities** and returns the
+caret there so the base draw/update loop includes it.
 
 ---
 
 #### 4. Shared visuals: logo and burn (pL, pBurnL, pBurnR)
 
-Same entity added to **three** controllers: StartScreenController (pCnt1),
+Same visual needed on **three** controllers: StartScreenController (pCnt1),
 MenuController (pMenu), BuyNowController (pBuy).
 
-| Role | Owner | Raw pointer |
-|------|--------|-------------|
-| Create | DragonGameController::StartUp | — |
-| In lists | pCnt1, pMenu, pBuy | lsDraw / lsUpdate |
-
 **Options considered:**
-- **A.** DragonGameController owns (e.g. dedicated owned list); pass raw to
-  each controller’s AddV/AddBoth.
-- **B.** First controller (e.g. pCnt1) owns; others hold raw. Risk: if
-  controllers are destroyed in non-FIFO order, raw pointers in pMenu/pBuy
-  can dangle.
+- **A.** DragonGameController owns; pass raw to each controller’s
+  AddV/AddBoth.
+- **B.** First controller owns; others hold raw (dangling risk).
+- **C.** Construct once on the stack (as non-pointers, by value), then
+  pass **copies** to the controllers.
 
-**Decision:** **DragonGameController** owns pL, pBurnL, pBurnR (e.g.
-unique_ptr in an owned list or members). pCnt1, pMenu, and pBuy hold **raw
-pointers** in their lsDraw/lsUpdate only. CleanUp in controllers must not
-delete these; only remove from lists.
+**Decision:** **Option C.** Construct these objects once (on the stack, as
+non-pointers), then pass **copies** to pCnt1, pMenu, and pBuy. Each
+controller gets its own copy; no shared ownership, no AddOwned for these.
 
 ---
 
@@ -122,11 +125,13 @@ extends beyond any single screen, so owner is the game controller.
 | Role | Owner | Raw pointer |
 |------|--------|-------------|
 | Create | LevelController::Init | — |
-| In lists / refs | LevelController (AddBoth, pTutorialText); tutOne/tutTwo (pTexter) | — |
+| Store / refs | LevelController (pTutorialText); tutOne/tutTwo (pTexter) | — |
 
-**Decision:** **LevelController** owns (e.g. AddOwnedBoth; unique_ptr or
-owned list). pTutorialText and tutOne/tutTwo hold **TutorialTextEntity***
-only.
+**Decision:** **LevelController** owns by storing **unique_ptr explicitly**
+(no AddOwned calls). pTutorialText is that unique_ptr; tutOne/tutTwo hold
+**TutorialTextEntity*** only. TutorialTextEntity must be drawn via
+**GetNonOwnedDrawEntities** override (LevelController returns it in that
+override so the base draw loop includes it).
 
 ---
 
