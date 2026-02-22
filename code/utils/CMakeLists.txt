@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(Utils LANGUAGES CXX)
 
 add_library(Utils
+  configuration_file.h
+  configuration_file.cc
   exception.h
   exception.cc
   file_utils.h
@@ -20,6 +22,10 @@ add_library(Utils
 )
 
 target_include_directories(Utils PUBLIC ${CMAKE_SOURCE_DIR})
+
+add_executable(configuration_file_test configuration_file_test.cc)
+target_link_libraries(configuration_file_test PRIVATE Utils Catch2::Catch2WithMain)
+add_test(NAME configuration_file_test COMMAND $<TARGET_FILE:configuration_file_test>)
 
 add_executable(file_utils_test file_utils_test.cc)
 target_link_libraries(file_utils_test PRIVATE Utils Catch2::Catch2WithMain)
