@@ -11,7 +11,7 @@ struct LevelController;
 
 /** The dragon's fire strength: named numbers and flags; += combines, Add
  * gathers more. */
-struct FireballBonus : virtual public Entity {
+struct FireballBonus : virtual public Entity, virtual public SP_Info {
   std::string get_class_name() override { return "FireballBonus"; }
   std::map<std::string, float> fMap;
   std::map<std::string, unsigned> uMap;

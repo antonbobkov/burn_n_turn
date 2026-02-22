@@ -17,22 +17,22 @@ struct DragonGameController;
 struct LevelController;
 
 /** The root of all things in the realm; a flag says if it still exists. */
-struct Entity : virtual public SP_Info {
-  std::string get_class_name() override { return "Entity"; }
+struct Entity {
   bool bExist;
   Entity() : bExist(true) {}
   virtual ~Entity() {}
+  virtual std::string get_class_name() { return "Entity"; }
 };
 
 /** A thing that can step and update each tick. */
-struct EventEntity : virtual public Entity {
+struct EventEntity : virtual public Entity, virtual public SP_Info {
   std::string get_class_name() override { return "EventEntity"; }
   virtual void Move() {}
   virtual void Update() {}
 };
 
 /** A thing that has a place on the vista (GetPosition). */
-struct ScreenEntity : virtual public Entity {
+struct ScreenEntity : virtual public Entity, virtual public SP_Info {
   std::string get_class_name() override { return "ScreenEntity"; }
   virtual Point GetPosition() { return Point(0, 0); }
 };

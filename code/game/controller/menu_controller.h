@@ -24,8 +24,7 @@ typedef void (MenuDisplay::*EvntPntr)();
 
 /** One choice on the wall: size, label, the spell to cast, and whether it is
  * dimmed. */
-struct MenuEntry : virtual public SP_Info {
-  std::string get_class_name() override { return "MenuEntry"; }
+struct MenuEntry {
   Size szSize;
   std::string sText;
   EvntPntr pTriggerEvent;
