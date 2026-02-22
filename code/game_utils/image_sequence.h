@@ -10,13 +10,11 @@
 #include <vector>
 
 #include "utils/index.h"
-#include "utils/smart_pointer.h"
 #include "utils/timer.h"
 
 /** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
  */
-struct ImageSequence : virtual public SP_Info {
-  std::string get_class_name() override { return "ImageSequence"; }
+struct ImageSequence {
   std::vector<Index> vImage;
   std::vector<unsigned> vIntervals;
   unsigned nActive;
