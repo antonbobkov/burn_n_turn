@@ -270,19 +270,17 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-             pAd->lsPpl.begin();
-         itr != pAd->lsPpl.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<ConsumableEntity> entity : pAd->lsPpl) {
+      if (!entity->bExist)
         continue;
 
-      if ((**itr).GetType() == 'P' && this->HitDetection(itr->get())) {
+      if (entity->GetType() == 'P' && this->HitDetection(entity.get())) {
         bCarry = true;
-        imgCarry = (*itr)->GetImage();
+        imgCarry = entity->GetImage();
         cCarry = 'P';
         ++nPrCr;
 
-        (*itr)->bExist = false;
+        entity->bExist = false;
 
         pAd->pGl->PlaySound("pickup");
         break;
@@ -293,15 +291,13 @@ void Dragon::Update() {
   if (bFly) {
     CleanUp(pAd->lsBonus);
 
-    for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
-             pAd->lsBonus.begin();
-         itr != pAd->lsBonus.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<FireballBonusAnimation> bonus : pAd->lsBonus) {
+      if (!bonus->bExist)
         continue;
 
-      if (this->HitDetection(itr->get())) {
-        AddBonus(GetBonus((*itr)->n, nBonusPickUpTime));
-        (*itr)->bExist = false;
+      if (this->HitDetection(bonus.get())) {
+        AddBonus(GetBonus(bonus->n, nBonusPickUpTime));
+        bonus->bExist = false;
 
         pAd->tutTwo->BonusPickUp();
       }
@@ -501,27 +497,25 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-           pAd->lsPpl.begin();
-       itr != pAd->lsPpl.end(); ++itr) {
-    if (!(*itr)->bExist)
+  for (smart_pointer<ConsumableEntity> entity : pAd->lsPpl) {
+    if (!entity->bExist)
       continue;
 
-    if ((**itr).GetType() != 'T')
+    if (entity->GetType() != 'T')
       continue;
 
-    if (this->HitDetection(itr->get())) {
+    if (this->HitDetection(entity.get())) {
       if (!bCarry) {
         bCarry = true;
-        imgCarry = (*itr)->GetImage();
-        cCarry = (*itr)->GetType();
+        imgCarry = entity->GetImage();
+        cCarry = entity->GetType();
 
         pAd->pGl->PlaySound("pickup");
       } else {
         throw SimpleException("not supposed to drop things");
       }
 
-      (*itr)->bExist = false;
+      entity->bExist = false;
 
       return;
     }

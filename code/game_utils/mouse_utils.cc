@@ -24,17 +24,19 @@ void TrackballTracker::Update() {
 
 bool TrackballTracker::IsTrigger() {
   std::vector<int> v;
-  for (std::list<Point>::iterator itr = lsMouse.begin(); v.size() < 3; ++itr)
-    v.push_back(int(fPoint(*itr).Length()));
+  for (Point pt : lsMouse) {
+    v.push_back(int(fPoint(pt).Length()));
+    if (v.size() >= 3)
+      break;
+  }
 
   return (v[1] > v[0]) && (v[1] > v[2]);
 }
 
 fPoint TrackballTracker::GetAvMovement() {
   fPoint p;
-  for (std::list<Point>::iterator itr = lsMouse.begin(), etr = lsMouse.end();
-       itr != etr; ++itr)
-    p += *itr;
+  for (Point pt : lsMouse)
+    p += pt;
 
   p.x /= lsMouse.size();
   p.y /= lsMouse.size();

@@ -95,10 +95,7 @@ struct BonusDrawer : public VisualEntity {
     for (unsigned nDr = 0; nDr < pAd->vDr.size(); ++nDr) {
       BonusList &lst = pAd->vDr[nDr]->lsBonuses;
 
-      for (BonusList::iterator itr = lst.begin(), etr = lst.end(); itr != etr;
-           ++itr) {
-
-        smart_pointer<TimedFireballBonus> pBns = *itr;
+      for (smart_pointer<TimedFireballBonus> pBns : lst) {
 
         if (pBns->t.nPeriod &&
             (pBns->t.nPeriod - pBns->t.nTimer) < 4 * nFramesInSecond)

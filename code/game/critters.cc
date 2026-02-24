@@ -194,32 +194,28 @@ void Knight::Update() {
   if (cType == 'S') {
     CleanUp(pAc->lsPpl);
 
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-             pAc->lsPpl.begin();
-         itr != pAc->lsPpl.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<ConsumableEntity> entity : pAc->lsPpl) {
+      if (!entity->bExist)
         continue;
 
-      if (this->HitDetection(itr->get())) {
+      if (this->HitDetection(entity.get())) {
 
-        if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
+        if (entity->GetType() == 'P' || entity->GetType() == 'T') {
           pAc->pGl->PlaySound("death");
-          (*itr)->OnHit('S');
+          entity->OnHit('S');
         }
       }
     }
 
     CleanUp(pAc->lsBonus);
 
-    for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
-             pAc->lsBonus.begin();
-         itr != pAc->lsBonus.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<FireballBonusAnimation> bonus : pAc->lsBonus) {
+      if (!bonus->bExist)
         continue;
 
-      if (this->HitDetection(itr->get())) {
+      if (this->HitDetection(bonus.get())) {
         pAc->pGl->PlaySound("skeleton_bonus");
-        (*itr)->bExist = false;
+        bonus->bExist = false;
       }
     }
   }
@@ -301,14 +297,12 @@ void MegaSlime::RandomizeVelocity() {
 void MegaSlime::Update() {
   CleanUp(pAc->lsBonus);
 
-  for (std::list<smart_pointer<FireballBonusAnimation>>::iterator itr =
-           pAc->lsBonus.begin();
-       itr != pAc->lsBonus.end(); ++itr) {
-    if (!(*itr)->bExist)
+  for (smart_pointer<FireballBonusAnimation> bonus : pAc->lsBonus) {
+    if (!bonus->bExist)
       continue;
 
-    if (this->HitDetection(itr->get())) {
-      (*itr)->bExist = false;
+    if (this->HitDetection(bonus.get())) {
+      bonus->bExist = false;
       pAc->pGl->PlaySound("megaslime_bonus");
     }
   }
@@ -407,14 +401,12 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-           pAc->lsPpl.begin();
-       itr != pAc->lsPpl.end(); ++itr) {
-    if (!(*itr)->bExist)
+  for (smart_pointer<ConsumableEntity> entity : pAc->lsPpl) {
+    if (!entity->bExist)
       continue;
 
-    if (this->HitDetection(itr->get())) {
-      if ((*itr)->GetType() == 'K') {
+    if (this->HitDetection(entity.get())) {
+      if (entity->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 
         bExist = false;
@@ -435,23 +427,20 @@ void Slime::OnHit(char cWhat) {
   if (pAc->nSlimeNum >= nSlimeMax && cWhat != 'M') {
     std::vector<Point> vDeadSlimes;
 
-    for (std::list<smart_pointer<Slime>>::iterator itr = pAc->lsSlimes.begin();
-         itr != pAc->lsSlimes.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<Slime> slime : pAc->lsSlimes) {
+      if (!slime->bExist)
         continue;
 
-      vDeadSlimes.push_back((*itr)->GetPosition());
-      (*itr)->OnHit('M');
+      vDeadSlimes.push_back(slime->GetPosition());
+      slime->OnHit('M');
     }
 
-    for (std::list<smart_pointer<Sliminess>>::iterator itr =
-             pAc->lsSliminess.begin();
-         itr != pAc->lsSliminess.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (smart_pointer<Sliminess> s : pAc->lsSliminess) {
+      if (!s->bExist)
         continue;
 
-      vDeadSlimes.push_back((*itr)->GetPosition());
-      (*itr)->Kill();
+      vDeadSlimes.push_back(s->GetPosition());
+      s->Kill();
     }
 
     if (vDeadSlimes.empty())
