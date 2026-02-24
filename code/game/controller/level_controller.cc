@@ -137,7 +137,7 @@ static const float fSpreadFactor = 2.0f;
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  Color c, const LevelLayout &lvl)
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
-      nSlimeNum(0), bPaused(false), bFirstUpdate(true), bLeftDown(false),
+      nSlimeNum(0), bFirstUpdate(true), bLeftDown(false),
       bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
       bGhostTime(false), bBlink(true), pGr(0), bLeft(false),
       bTakeOffToggle(false), tutOne(std::make_unique<TutorialLevelOne>()),
@@ -347,9 +347,6 @@ void LevelController::OnMouseDown(Point pPos) {
   pt.UpdateLastDownPosition(pPos);
   pt.On();
 
-  if (bPaused)
-    return;
-
   bool bHit = false;
 
   if (!vDr[0]->bFly)
@@ -454,32 +451,6 @@ void LevelController::MegaGeneration(Point p) {
       vDr[0]->RecoverBonuses();
     }
     pGl->ClearBonusesToCarryOver();
-  }
-
-  if (bPaused) {
-    int nScale = 2;
-    int nCharWidth = 4;
-
-    Point p1 = Point(rBound.sz.x / 2 / nScale, rBound.sz.y / 2 / nScale);
-
-    std::string s1 = "paused";
-
-    nCharWidth *= nScale;
-
-    Rectangle r(Point(rBound.sz.x / 2 - (s1.size() * nCharWidth) / 2 - 10,
-                      rBound.sz.y / 2 - 10),
-                Size(s1.size() * nCharWidth + 18, 21));
-
-    r.p.x *= nScale;
-    r.p.y *= nScale;
-    r.sz.x *= nScale;
-    r.sz.y *= nScale;
-
-    pGl->GetGraphics()->DrawRectangle(r, Color(0, 0, 0), false);
-    pGl->GetBigNumberDrawer()->DrawWord(s1, p1, true);
-    pGl->RefreshAll();
-
-    return;
   }
 
   if (tLoseTimer.nPeriod == 0) {

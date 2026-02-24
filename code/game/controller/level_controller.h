@@ -62,8 +62,6 @@ struct LevelController : public EntityListController {
 
   int nSlimeNum;
 
-  bool bPaused;
-
   Timer tLoseTimer;
 
   KnightGenerator *pGr;
