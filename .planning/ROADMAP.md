@@ -82,6 +82,16 @@ types, level-owned structures. Bottom-up: these come after Phase 3.
 
 **Requirements:** BURN-01, BURN-02, BURN-03, CLEAN-01, VER-01, VER-02
 
+**Plans:** 6 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Road, FireballBonusAnimation, Slime/Sliminess (unique_ptr; GetNonOwned*; centralize CleanUp(lsBonus))
+- [ ] 04-02-PLAN.md — Fireball level-owned; remove Dragon::lsBalls; AddFireball
+- [ ] 04-03-PLAN.md — TimedFireballBonus unique_ptr; carry-over fix; GetNonOwned*
+- [ ] 04-04-PLAN.md — Dragon vDr unique_ptr; Castle::pDrag Dragon*; FindDragon returns Dragon*
+- [ ] 04-05-PLAN.md — Generators unique_ptr in LevelController; SkellyGenerator single owner
+- [ ] 04-06-PLAN.md — Critters/lsPpl single owner; CLEAN-01; record skipped
+
 **Success criteria:**
 1. Critter, generator, fireball, and level types with clear lifetime
    migrated; SP_Info removed where applicable.
