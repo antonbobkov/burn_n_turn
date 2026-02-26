@@ -8,6 +8,7 @@ add_library(GuiSdl
 
 target_include_directories(GuiSdl PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/code
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2
 )
@@ -26,6 +27,7 @@ add_library(SuiSdl
 
 target_include_directories(SuiSdl PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/code
   ${SDL_PATH}/include/SDL2
   ${SDL_MIXER_PATH}/include/SDL2
 )
@@ -41,6 +43,7 @@ target_link_libraries(SuiSdl PRIVATE Utils SuiGen SDL2 SDL2_mixer)
 add_executable(gui_sdl_example gui_sdl_example.cc)
 target_include_directories(gui_sdl_example PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/code
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2
 )
@@ -54,6 +57,7 @@ target_link_libraries(gui_sdl_example PRIVATE GuiSdl mingw32 SDL2main SDL2 SDL2_
 add_executable(sui_sdl_example sui_sdl_example.cc)
 target_include_directories(sui_sdl_example PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/code
   ${SDL_PATH}/include/SDL2
   ${SDL_MIXER_PATH}/include/SDL2
 )
@@ -67,6 +71,7 @@ target_link_libraries(sui_sdl_example PRIVATE SuiSdl mingw32 SDL2main SDL2 SDL2_
 add_executable(test_sdl test_sdl.cc)
 target_include_directories(test_sdl PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/code
   ${SDL_PATH}/include/SDL2
   ${SDL_IMAGE_PATH}/include/SDL2
   ${SDL_MIXER_PATH}/include/SDL2

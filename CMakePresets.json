@@ -1,0 +1,53 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Clang Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-g"
+      }
+    },
+    {
+      "name": "strict",
+      "inherits": "base",
+      "displayName": "Clang Strict",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -g -Werror"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Clang Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-O3 -DNDEBUG",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "YES"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    }
+  ]
+}

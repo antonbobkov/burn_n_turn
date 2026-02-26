@@ -1,0 +1,92 @@
+cmake_minimum_required(VERSION 3.14)
+project(hello_world LANGUAGES CXX)
+
+# Ensure runtime outputs (exe + DLLs) go to a single directory so SDL DLLs are found
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# CMP0169 OLD: silence deprecation warning for FetchContent_Populate().
+# We are silencing: CMake warns that Populate() is deprecated in favour of
+# MakeAvailable(). We use Populate for SDL2, SDL2_image, SDL2_mixer because
+# we fetch pre-built MinGW zips (binaries + headers), not CMake source trees.
+# Populate only downloads and unpacks; we then take paths via GetProperties.
+# MakeAvailable() would try to configure/build the extracted content and is
+# not suitable for these zips. Warning: in a future CMake release Populate
+# may be removed; we would then need another way to download and unpack
+# these dependencies (e.g. ExternalProject or a small script).
+cmake_policy(SET CMP0169 OLD)
+
+include(FetchContent)
+
+# Catch2 v2 (FetchContent)
+FetchContent_Declare(
+  Catch2
+  URL https://github.com/catchorg/Catch2/archive/v2.13.10.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+set(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(Catch2)
+
+enable_testing()
+
+
+# SDL2: fetch pre-built MinGW dev zip (use lib/ and include/, do not build from source)
+set(SDL2_VERSION "2.32.10" CACHE STRING "SDL2 release version")
+set(SDL2_ARCH "x86_64-w64-mingw32" CACHE STRING "MinGW arch: i686-w64-mingw32 or x86_64-w64-mingw32")
+FetchContent_Declare(
+  SDL2
+  URL "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-devel-${SDL2_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_Populate(SDL2)
+FetchContent_GetProperties(SDL2 SOURCE_DIR SDL2_SRC)
+# Zip extracts with i686-w64-mingw32/ and x86_64-w64-mingw32/ underneath (each has include/SDL2, lib)
+set(SDL_PATH "${SDL2_SRC}/${SDL2_ARCH}" CACHE PATH "Path to SDL2 (pre-built include + lib)" FORCE)
+
+# SDL2_image: fetch pre-built MinGW dev zip (same layout as SDL2)
+set(SDL2_IMAGE_VERSION "2.8.8" CACHE STRING "SDL2_image release version")
+FetchContent_Declare(
+  SDL2_image
+  URL "https://github.com/libsdl-org/SDL_image/releases/download/release-${SDL2_IMAGE_VERSION}/SDL2_image-devel-${SDL2_IMAGE_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_Populate(SDL2_image)
+FetchContent_GetProperties(SDL2_image SOURCE_DIR SDL2_IMAGE_SRC)
+set(SDL_IMAGE_PATH "${SDL2_IMAGE_SRC}/${SDL2_ARCH}" CACHE PATH "Path to SDL2_image (pre-built include + lib)" FORCE)
+
+# SDL2_mixer: fetch pre-built MinGW dev zip (same layout as SDL2)
+set(SDL2_MIXER_VERSION "2.8.1" CACHE STRING "SDL2_mixer release version")
+FetchContent_Declare(
+  SDL2_mixer
+  URL "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${SDL2_MIXER_VERSION}/SDL2_mixer-devel-${SDL2_MIXER_VERSION}-mingw.zip"
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_Populate(SDL2_mixer)
+FetchContent_GetProperties(SDL2_mixer SOURCE_DIR SDL2_MIXER_SRC)
+set(SDL_MIXER_PATH "${SDL2_MIXER_SRC}/${SDL2_ARCH}" CACHE PATH "Path to SDL2_mixer (pre-built include + lib)" FORCE)
+
+
+# Copy SDL DLLs to bin so executables find them on first run (no manual copy)
+get_filename_component(SDL_BIN_ABS "${SDL_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+get_filename_component(SDL_IMAGE_BIN_ABS "${SDL_IMAGE_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+get_filename_component(SDL_MIXER_BIN_ABS "${SDL_MIXER_PATH}/bin" ABSOLUTE
+    BASE_DIR "${CMAKE_BINARY_DIR}")
+add_custom_target(copy_sdl_dlls
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  COMMENT "Copying SDL DLLs to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_BIN_ABS}/SDL2.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_IMAGE_BIN_ABS}/SDL2_image.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+add_custom_command(TARGET copy_sdl_dlls POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SDL_MIXER_BIN_ABS}/SDL2_mixer.dll"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_subdirectory(code)
