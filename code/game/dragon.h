@@ -7,6 +7,8 @@
 #include "critters.h"
 #include "fireball.h"
 #include "utils/smart_pointer.h"
+#include <list>
+#include <memory>
 
 struct LevelController;
 
@@ -46,12 +48,11 @@ struct ButtonSet {
  * and meets the world in collision. */
 struct Dragon : public Critter {
   std::string get_class_name() override { return "Dragon"; }
-  std::list<smart_pointer<TimedFireballBonus>> lsBonuses;
-  std::list<smart_pointer<Fireball>> lsBalls;
+  std::list<std::unique_ptr<TimedFireballBonus>> lsBonuses;
 
   DragonLeash leash;
 
-  smart_pointer<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime);
+  std::unique_ptr<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime);
 
   void FlushBonuses();
 
@@ -95,7 +96,7 @@ struct Dragon : public Critter {
 
   /*virtual*/ void Draw(ScalingDrawer *pDr);
 
-  void AddBonus(smart_pointer<TimedFireballBonus> pBonus, bool bSilent = false);
+  void AddBonus(std::unique_ptr<TimedFireballBonus> pBonus, bool bSilent = false);
 
   void Fire(fPoint fDir);
 

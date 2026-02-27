@@ -5,6 +5,7 @@
 #include "game/dragon_constants.h"
 #include "game/dragon_macros.h"
 #include "game/dragon_game_runner.h"
+#include "game/fireball.h"
 #include "game/level.h"
 #include "game_utils/event.h"
 #include "game_utils/Preloader.h"
@@ -752,13 +753,15 @@ void DragonGameController::ClearBonusesToCarryOver() {
 }
 
 void DragonGameController::AddBonusToCarryOver(
-    smart_pointer<TimedFireballBonus> b) {
-  lsBonusesToCarryOver.push_back(b);
+    std::unique_ptr<TimedFireballBonus> b) {
+  lsBonusesToCarryOver.push_back(std::move(b));
 }
 
-const std::list<smart_pointer<TimedFireballBonus>> &
-DragonGameController::GetBonusesToCarryOver() const {
-  return lsBonusesToCarryOver;
+std::list<std::unique_ptr<TimedFireballBonus>>
+DragonGameController::TakeBonusesToCarryOver() {
+  std::list<std::unique_ptr<TimedFireballBonus>> result;
+  result.swap(lsBonusesToCarryOver);
+  return result;
 }
 
 Index &DragonGameController::GetImg(std::string key) { return (*pr)[key]; }

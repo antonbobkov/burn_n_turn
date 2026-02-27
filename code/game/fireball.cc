@@ -18,21 +18,27 @@
 template <class T>
 static void Union(std::map<std::string, T> &TarMap,
                   const std::map<std::string, T> &srcMap) {
-  for (const auto& pair : srcMap)
-    TarMap[pair.first] += pair.second;
+  for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
+                                                         etr = srcMap.end();
+       itr != etr; ++itr)
+    TarMap[itr->first] += itr->second;
 }
 
 static void Union(std::map<std::string, bool> &TarMap,
                   const std::map<std::string, bool> &srcMap) {
-  for (const auto& pair : srcMap)
-    TarMap[pair.first] |= pair.second;
+  for (std::map<std::string, bool>::const_iterator itr = srcMap.begin(),
+                                                   etr = srcMap.end();
+       itr != etr; ++itr)
+    TarMap[itr->first] |= itr->second;
 }
 
 template <class T>
 static std::ostream &Out(std::ostream &ofs,
                          const std::map<std::string, T> &srcMap) {
-  for (const auto& pair : srcMap)
-    ofs << pair.first << " = " << pair.second << "; ";
+  for (typename std::map<std::string, T>::const_iterator itr = srcMap.begin(),
+                                                         etr = srcMap.end();
+       itr != etr; ++itr)
+    ofs << itr->first << " = " << itr->second << "; ";
   return ofs;
 }
 
@@ -77,25 +83,24 @@ void ChainExplosion::Update() {
 
   CleanUp(pBc->lsPpl);
 
-  for (smart_pointer<ConsumableEntity> entity : pBc->lsPpl) {
-    if (!entity->bExist)
+  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+    if (!ptr->bExist)
       continue;
 
-    if (this->HitDetection(entity.get())) {
-      if (entity->GetType() == 'W')
+    if (this->HitDetection(ptr)) {
+      if (ptr->GetType() == 'W')
         continue;
-      if (entity->GetType() == 'E')
+      if (ptr->GetType() == 'E')
         continue;
 
-      entity->OnHit('F');
+      ptr->OnHit('F');
 
       if (!ch.IsLast()) {
-        smart_pointer<ChainExplosion> pCE = make_smart(
-            new ChainExplosion(AnimationOnce(GetPriority(), Reset(seq),
-                                             SimpleVisualEntity::t.nPeriod,
-                                             entity->GetPosition(), true),
-                               r_in, delta, pBc, ch.Evolve()));
-        pBc->AddBoth(pCE);
+        pBc->AddOwnedBoth(std::make_unique<ChainExplosion>(
+            AnimationOnce(GetPriority(), Reset(seq),
+                         SimpleVisualEntity::t.nPeriod,
+                         ptr->GetPosition(), true),
+            r_in, delta, pBc, ch.Evolve()));
       }
     }
   }
@@ -119,25 +124,24 @@ KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
 void KnightOnFire::Update() {
   Critter::Update();
 
-  for (smart_pointer<ConsumableEntity> entity : pBc->lsPpl) {
-    if (!entity->bExist)
+  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+    if (!ptr->bExist)
       continue;
 
-    if (this->HitDetection(entity.get())) {
-      char cType = entity->GetType();
+    if (this->HitDetection(ptr)) {
+      char cType = ptr->GetType();
 
       if (cType == 'W' || cType == 'E')
         continue;
 
       if (c.IsLast() || cType != 'K')
-        entity->OnHit('F');
+        ptr->OnHit('F');
       else {
-        entity->bExist = false;
-        smart_pointer<KnightOnFire> pKn = make_smart(new KnightOnFire(
-            Critter(GetRadius(), entity->GetPosition(), fPoint(), rBound,
+        ptr->bExist = false;
+        pBc->AddOwnedBoth(std::make_unique<KnightOnFire>(
+            Critter(GetRadius(), ptr->GetPosition(), fPoint(), rBound,
                     GetPriority(), ImageSequence(), true),
             pBc, nTimer_i, c.Evolve()));
-        pBc->AddBoth(pKn);
       }
     }
   }
@@ -243,30 +247,29 @@ void Fireball::Update() {
 
   bool bMultiHit = false;
 
-  for (smart_pointer<ConsumableEntity> entity : pBc->lsPpl) {
-    if (!entity->bExist)
+  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+    if (!ptr->bExist)
       continue;
 
-    if (this->HitDetection(entity.get())) {
-      char cType = entity->GetType();
+    if (this->HitDetection(ptr)) {
+      char cType = ptr->GetType();
 
       if (cType == 'W' || cType == 'E') {
-        entity->OnHit('F');
+        ptr->OnHit('F');
 
         bExist = false;
         return;
       } else
         pBc->pGl->PlaySound("death");
 
-      if (entity->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
-        entity->OnHit('F');
+      if (ptr->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
+        ptr->OnHit('F');
       else {
-        entity->bExist = false;
-        smart_pointer<KnightOnFire> pKn = make_smart(new KnightOnFire(
-            Critter(entity->GetRadius(), entity->GetPosition(), fPoint(),
+        ptr->bExist = false;
+        pBc->AddOwnedBoth(std::make_unique<KnightOnFire>(
+            Critter(ptr->GetRadius(), ptr->GetPosition(), fPoint(),
                     rBound, 1.F, ImageSequence(), true),
             pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"])));
-        pBc->AddBoth(pKn);
       }
 
       if (!bMultiHit) {
@@ -286,35 +289,30 @@ void Fireball::Update() {
           fPoint v = fVel;
 
           for (unsigned i = 0; i < nChain; ++i) {
-            smart_pointer<Fireball> pFb = make_smart(new Fireball(
-                entity->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
+            pBc->AddOwnedBoth(std::make_unique<Fireball>(
+                ptr->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
                 pBc, fb, Chain(), nChain));
-            pBc->AddBoth(pFb);
           }
         }
 
         if (fb.uMap["explode"] > 0) {
-          smart_pointer<ChainExplosion> pEx;
-
           if (!fb.bMap["laser"]) {
-            pEx = make_smart(new ChainExplosion(
+            pBc->AddOwnedBoth(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
                     pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
-                    nFramesInSecond / 10, entity->GetPosition(), true),
+                    nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.uMap["explode"] - 1)));
           } else {
-            pEx = make_smart(new ChainExplosion(
+            pBc->AddOwnedBoth(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
                     pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
-                    nFramesInSecond / 10, entity->GetPosition(), true),
+                    nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.uMap["explode"] - 1)));
           }
-
-          pBc->AddBoth(pEx);
 
           pBc->pGl->PlaySound("explosion");
         }

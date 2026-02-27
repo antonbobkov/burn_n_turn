@@ -1,22 +1,25 @@
-# Types not migrated in Phase 3 (smart pointer → unique_ptr/raw)
+# Types not migrated (smart pointer → unique_ptr/raw)
 
-Types below are still used with `smart_pointer<T>` and were left for Phase 4 or
-other reasons.
+## Phase 4 complete
 
-| Type | Rationale |
-|------|-----------|
-| Critter | Phase 4; lifetime and ownership with level/critters. |
-| Dragon | Phase 4; shared between LevelController::vDr and Castle::pDrag. |
-| Castle | Phase 4; level-owned. |
-| Road | Phase 4; level-owned (vRd). |
-| FancyCritter | Phase 4; Cutscene holds pCrRun, pCrFollow. |
-| Generators (Knight, Princess, Mage, Trader, Skelly) | Phase 4; level-owned. |
-| TimedFireballBonus | Phase 4; lsBonusesToCarryOver, Dragon::lsBonuses. |
-| ConsumableEntity | Phase 4; lsPpl and consumable hierarchy. |
-| FireballBonusAnimation | Phase 4; lsBonus in LevelController. |
-| Slime, Sliminess | Phase 4; lsSlimes, lsSliminess. |
-| Fireball | Phase 4; Dragon::lsBalls. |
-| GameController (and subclasses in vCnt) | Controllers in vCnt; Phase 4 or later. |
-| VisualEntity / EventEntity in lsDraw, lsUpdate | Still smart_pointer lists; migration deferred. |
+Phase 4 migrated: Dragon (vDr unique_ptr, Castle::pDrag raw), TimedFireballBonus
+(unique_ptr at Dragon and DGC), Fireball/ChainExplosion/KnightOnFire/CircularFireball
+(level-owned via AddOwnedBoth), FireballBonusAnimation, Slime/Sliminess/MegaSlime/MegaSliminess
+(level-owned), generators (LevelController-owned; SkellyGenerator via AddSpawnedGenerator).
+SP_Info removed from FireballBonus (no smart_pointer<FireballBonus> in codebase).
 
-Doc-only (03-03 DOC-01).
+## Types still using smart_pointer (post–Phase 4)
+
+| Type | Where / rationale |
+|------|-------------------|
+| ConsumableEntity | EntityListController::lsPpl; consumables (Princess, Knight, Trader, Mage, etc.) created by generators and added via AddE/AddBoth. Single owner is lsPpl; migration to unique_ptr deferred to Phase 5+. |
+| VisualEntity / EventEntity | EntityListController::lsDraw, lsUpdate; base lists still smart_pointer; migration deferred. |
+| GameController (and subclasses) | DragonGameController::vCnt, pMenu; controller hierarchy. |
+| FancyCritter | Cutscene pCrRun, pCrFollow; basic_controllers. |
+| Knight, Princess, Mage, Trader, etc. | Created in critter_generators/critters with make_smart and AddBoth/AddE; stored in lsPpl/lsUpdate. |
+| Ghostiness, AnimationOnce, FloatingSlime, Sliminess (one site) | Various critter/spawn paths; AddE or member. |
+| LevelController, BuyNowController, MenuController, DragonScoreController, EntityListController | DGC Init; vCnt and pMenu. |
+| GameRunner | game_runner_interface_impl. |
+
+Doc-only (Phase 4 DOC-01). Phase 4 success criteria met: critter/generator/fireball/level ownership
+migrated where planned; SP_Info removed from FireballBonus; build and tests pass.

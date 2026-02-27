@@ -147,10 +147,9 @@ struct DragonGameController {
   /** Leave behind all treasures meant for the next chapter. */
   void ClearBonusesToCarryOver();
   /** Add a treasure to carry into the next chapter. */
-  void AddBonusToCarryOver(smart_pointer<TimedFireballBonus> b);
-  /** The pack of treasures bound for the next chapter (gaze but do not alter). */
-  const std::list<smart_pointer<TimedFireballBonus>> &
-  GetBonusesToCarryOver() const;
+  void AddBonusToCarryOver(std::unique_ptr<TimedFireballBonus> b);
+  /** Take all treasures bound for the next chapter (moves ownership to caller). */
+  std::list<std::unique_ptr<TimedFireballBonus>> TakeBonusesToCarryOver();
 
   Index &GetImg(std::string key);
   ImageSequence &GetImgSeq(std::string key);
@@ -188,7 +187,7 @@ private:
 
   BackgroundMusicPlayer plr;
 
-  std::list<smart_pointer<TimedFireballBonus>> lsBonusesToCarryOver;
+  std::list<std::unique_ptr<TimedFireballBonus>> lsBonusesToCarryOver;
 
   TowerDataWrap *pWrp;
 

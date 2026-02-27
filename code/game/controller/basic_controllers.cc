@@ -21,6 +21,13 @@ void EntityListController::AddE(smart_pointer<EventEntity> pEv) {
   lsUpdate.push_back(pEv);
 }
 
+std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
+  std::vector<ConsumableEntity *> out;
+  for (auto &p : lsPpl)
+    out.push_back(p.get());
+  return out;
+}
+
 void EntityListController::AddOwnedVisualEntity(
     std::unique_ptr<VisualEntity> p) {
   VisualEntity *raw = p.get();

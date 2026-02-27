@@ -14,7 +14,7 @@ struct Castle : public Critter {
   std::string get_class_name() override { return "Castle"; }
   unsigned nPrincesses;
   LevelController *pAv;
-  smart_pointer<Dragon> pDrag;
+  Dragon *pDrag;
 
   bool bBroken;
 
@@ -223,6 +223,9 @@ struct MegaSliminess : public EventEntity {
   MegaSliminess(Point p_, LevelController *pAdv_);
 
   /*virutal*/ void Update();
+
+  Point GetPosition() { return p; }
+  void Kill();
 };
 
 /** A drifting slime that moves with position and velocity (e.g. in the menu). */

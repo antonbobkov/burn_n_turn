@@ -2,6 +2,7 @@
 #define TOWER_DEFENSE_LEVEL_CONTROLLER_H
 
 #include "game/controller/basic_controllers.h"
+#include "game/critter_generators.h"
 #include "game/level.h"
 #include "game_utils/mouse_utils.h"
 #include "utils/smart_pointer.h"
@@ -9,17 +10,19 @@
 #include "wrappers/color.h"
 #include "wrappers/geometry.h"
 #include "wrappers/gui_key_type.h"
+#include <list>
 #include <memory>
+#include <vector>
 
 struct Castle;
 struct Dragon;
 struct DragonGameController;
 struct FireballBonusAnimation;
-struct KnightGenerator;
-struct MageGenerator;
 struct Road;
 struct Slime;
+struct MegaSlime;
 struct Sliminess;
+struct MegaSliminess;
 struct SoundControls;
 struct TutorialLevelOne;
 struct TutorialLevelTwo;
@@ -30,12 +33,14 @@ struct TutorialTextEntity;
 struct LevelController : public EntityListController {
   std::string get_class_name() override { return "LevelController"; }
   std::vector<std::unique_ptr<Castle>> vCs;
-  std::vector<smart_pointer<Road>> vRd;
-  std::vector<smart_pointer<Dragon>> vDr;
+  std::vector<std::unique_ptr<Road>> vRd;
+  std::vector<std::unique_ptr<Dragon>> vDr;
 
-  std::list<smart_pointer<FireballBonusAnimation>> lsBonus;
-  std::list<smart_pointer<Slime>> lsSlimes;
-  std::list<smart_pointer<Sliminess>> lsSliminess;
+  std::list<std::unique_ptr<FireballBonusAnimation>> lsBonus;
+  std::list<std::unique_ptr<Slime>> lsSlimes;
+  std::list<std::unique_ptr<MegaSlime>> lsMegaSlimes;
+  std::list<std::unique_ptr<Sliminess>> lsSliminess;
+  std::list<std::unique_ptr<MegaSliminess>> lsMegaSliminess;
 
   TrackballTracker tr;
 
@@ -64,8 +69,13 @@ struct LevelController : public EntityListController {
 
   Timer tLoseTimer;
 
+  std::unique_ptr<KnightGenerator> pKnightGen;
+  std::unique_ptr<PrincessGenerator> pPGen;
+  std::unique_ptr<TraderGenerator> pTGen;
+  std::unique_ptr<MageGenerator> pMGen;
   KnightGenerator *pGr;
   MageGenerator *pMgGen;
+  std::list<std::unique_ptr<EventEntity>> lsSpawnedGenerators;
   std::unique_ptr<SoundControls> pSc;
 
   LevelController *pSelf;
@@ -83,8 +93,18 @@ struct LevelController : public EntityListController {
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
 
-  /** Find the dragon in our list that matches p, or return nothing. */
-  smart_pointer<Dragon> FindDragon(Dragon *p);
+  void AddBonusAnimation(std::unique_ptr<FireballBonusAnimation> p);
+  std::vector<FireballBonusAnimation *> GetBonusAnimations();
+  void AddSlime(std::unique_ptr<Slime> p);
+  void AddMegaSlime(std::unique_ptr<MegaSlime> p);
+  void AddSliminess(std::unique_ptr<Sliminess> p);
+  void AddMegaSliminess(std::unique_ptr<MegaSliminess> p);
+  void AddSpawnedGenerator(std::unique_ptr<EventEntity> p);
+
+  std::vector<ConsumableEntity *> GetConsumablePointers() override;
+
+  /** Find the dragon in our list that matches p, or nullptr. */
+  Dragon *FindDragon(Dragon *p);
 
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 

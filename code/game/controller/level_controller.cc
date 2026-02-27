@@ -74,8 +74,6 @@ struct AdNumberDrawer : public VisualEntity {
 };
 
 struct BonusDrawer : public VisualEntity {
-  typedef std::list<smart_pointer<TimedFireballBonus>> BonusList;
-
   LevelController *pAd;
 
   Timer t;
@@ -93,9 +91,10 @@ struct BonusDrawer : public VisualEntity {
     Point p(1, 3);
 
     for (unsigned nDr = 0; nDr < pAd->vDr.size(); ++nDr) {
-      BonusList &lst = pAd->vDr[nDr]->lsBonuses;
+      auto &lst = pAd->vDr[nDr]->lsBonuses;
 
-      for (smart_pointer<TimedFireballBonus> pBns : lst) {
+      for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
+        TimedFireballBonus *pBns = itr->get();
 
         if (pBns->t.nPeriod &&
             (pBns->t.nPeriod - pBns->t.nTimer) < 4 * nFramesInSecond)
@@ -134,18 +133,18 @@ static const float fSpreadFactor = 2.0f;
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  Color c, const LevelLayout &lvl)
     : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
-      nSlimeNum(0), bFirstUpdate(true), bLeftDown(false),
-      bRightDown(false), nLastDir(0), bWasDirectionalInput(0),
-      bGhostTime(false), bBlink(true), pGr(0), bLeft(false),
-      bTakeOffToggle(false), tutOne(std::make_unique<TutorialLevelOne>()),
+      nSlimeNum(0), bFirstUpdate(true), bLeftDown(false), bRightDown(false),
+      nLastDir(0), bWasDirectionalInput(0), bGhostTime(false), bBlink(true),
+      pGr(0), bLeft(false), bTakeOffToggle(false),
+      tutOne(std::make_unique<TutorialLevelOne>()),
       tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
       mc(pGl->GetImgSeq("claw"), Point()), bTimerFlash(false) {}
 
-smart_pointer<Dragon> LevelController::FindDragon(Dragon *p) {
+Dragon *LevelController::FindDragon(Dragon *p) {
   for (size_t i = 0; i < vDr.size(); ++i)
     if (vDr[i].get() == p)
-      return vDr[i];
-  return smart_pointer<Dragon>();
+      return vDr[i].get();
+  return nullptr;
 }
 
 void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
@@ -157,37 +156,35 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   AddOwnedVisualEntity(std::make_unique<AdNumberDrawer>(pSelf));
   AddOwnedVisualEntity(std::make_unique<BonusDrawer>(pSelf));
 
-  smart_pointer<KnightGenerator> pGen = make_smart(
-      new KnightGenerator(lvl.vFreq.at(0), rBound, pSelf, lvl.blKnightGen));
-  smart_pointer<PrincessGenerator> pPGen =
-      make_smart(new PrincessGenerator(lvl.vFreq.at(1), rBound, pSelf));
-  smart_pointer<TraderGenerator> pTGen =
-      make_smart(new TraderGenerator(lvl.vFreq.at(2), rBound, pSelf));
-  smart_pointer<MageGenerator> pMGen = make_smart(
-      new MageGenerator(lvl.vFreq.at(3), lvl.vFreq.at(4), rBound, pSelf));
+  pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
+                                                 lvl.blKnightGen);
+  pPGen = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, pSelf);
+  pTGen = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, pSelf);
+  pMGen = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
+                                          rBound, pSelf);
 
-  pGr = pGen.get();
+  pGr = pKnightGen.get();
   pMgGen = pMGen.get();
 
   unsigned i;
   for (i = 0; i < lvl.vRoadGen.size(); ++i)
-    vRd.push_back(make_smart(new FancyRoad(lvl.vRoadGen[i], pSelf)));
+    vRd.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], pSelf));
 
   for (i = 0; i < lvl.vCastleLoc.size(); ++i)
     vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
 
   t = Timer(lvl.nTimer);
 
-  vDr.push_back(make_smart(
-      new Dragon(vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"),
-                 pGl->GetImgSeq("dragon_fly"),
-                 ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' '))));
+  vDr.push_back(std::make_unique<Dragon>(
+      vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"),
+      pGl->GetImgSeq("dragon_fly"),
+      ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr.back()->pCs != nullptr)
-    vDr.back()->pCs->pDrag = vDr.back();
+    vDr.back()->pCs->pDrag = vDr.back().get();
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
-  pTutorialText = std::make_unique<TutorialTextEntity>(
-      1, pos, pGl->GetNumberDrawer(), pGl);
+  pTutorialText =
+      std::make_unique<TutorialTextEntity>(1, pos, pGl->GetNumberDrawer(), pGl);
 
 #ifdef PC_VERSION
 
@@ -202,16 +199,6 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   }
 
 #endif
-
-  AddE(pGen);
-  AddE(pPGen);
-  AddE(pTGen);
-  AddE(pMGen);
-
-  for (i = 0; i < vRd.size(); ++i)
-    AddV(vRd[i]);
-  for (i = 0; i < vDr.size(); ++i)
-    AddBoth(vDr[i]);
 }
 
 /*virtual*/ void LevelController::OnKey(GuiKeyType c, bool bUp) {
@@ -403,6 +390,48 @@ float LevelController::GetCompletionRate() {
   return fCap;
 }
 
+void LevelController::AddBonusAnimation(
+    std::unique_ptr<FireballBonusAnimation> p) {
+  lsBonus.push_back(std::move(p));
+}
+
+std::vector<FireballBonusAnimation *> LevelController::GetBonusAnimations() {
+  std::vector<FireballBonusAnimation *> out;
+  for (auto &u : lsBonus)
+    out.push_back(u.get());
+  return out;
+}
+
+void LevelController::AddSlime(std::unique_ptr<Slime> p) {
+  lsSlimes.push_back(std::move(p));
+}
+
+void LevelController::AddSliminess(std::unique_ptr<Sliminess> p) {
+  lsSliminess.push_back(std::move(p));
+}
+
+void LevelController::AddMegaSlime(std::unique_ptr<MegaSlime> p) {
+  lsMegaSlimes.push_back(std::move(p));
+}
+
+void LevelController::AddMegaSliminess(std::unique_ptr<MegaSliminess> p) {
+  lsMegaSliminess.push_back(std::move(p));
+}
+
+void LevelController::AddSpawnedGenerator(std::unique_ptr<EventEntity> p) {
+  lsSpawnedGenerators.push_back(std::move(p));
+}
+
+std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
+  std::vector<ConsumableEntity *> out =
+      EntityListController::GetConsumablePointers();
+  for (auto &u : lsSlimes)
+    out.push_back(u.get());
+  for (auto &u : lsMegaSlimes)
+    out.push_back(u.get());
+  return out;
+}
+
 std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
   std::vector<EventEntity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
@@ -411,6 +440,31 @@ std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
     out.push_back(pTutorialText.get());
   if (pSc)
     out.push_back(pSc.get());
+  for (auto &u : lsBonus)
+    out.push_back(u.get());
+  for (auto &u : lsSlimes)
+    out.push_back(u.get());
+  for (auto &u : lsMegaSlimes)
+    out.push_back(u.get());
+  for (auto &u : lsSliminess)
+    out.push_back(u.get());
+  for (auto &u : lsMegaSliminess)
+    out.push_back(u.get());
+  for (size_t i = 0; i < vDr.size(); ++i)
+    out.push_back(vDr[i].get());
+  for (size_t i = 0; i < vDr.size(); ++i)
+    for (auto &u : vDr[i]->lsBonuses)
+      out.push_back(u.get());
+  if (pKnightGen)
+    out.push_back(pKnightGen.get());
+  if (pPGen)
+    out.push_back(pPGen.get());
+  if (pTGen)
+    out.push_back(pTGen.get());
+  if (pMGen)
+    out.push_back(pMGen.get());
+  for (auto &u : lsSpawnedGenerators)
+    out.push_back(u.get());
   return out;
 }
 
@@ -418,8 +472,19 @@ std::vector<VisualEntity *> LevelController::GetNonOwnedDrawEntities() {
   std::vector<VisualEntity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
+  for (size_t i = 0; i < vRd.size(); ++i)
+    out.push_back(vRd[i].get());
   if (pTutorialText)
     out.push_back(pTutorialText.get());
+  for (auto &u : lsBonus)
+    out.push_back(u.get());
+  for (auto &u : lsSlimes)
+    out.push_back(u.get());
+  for (auto &u : lsMegaSlimes)
+    out.push_back(u.get());
+  for (size_t i = 0; i < vDr.size(); ++i)
+    out.push_back(vDr[i].get());
+  /* Sliminess / MegaSliminess are EventEntity only, not VisualEntity */
   return out;
 }
 
@@ -431,13 +496,16 @@ void LevelController::MegaGeneration() {
 }
 
 void LevelController::MegaGeneration(Point p) {
-  smart_pointer<MegaSliminess> pSlm = make_smart(new MegaSliminess(p, pSelf));
-  AddE(pSlm);
+  AddMegaSliminess(std::make_unique<MegaSliminess>(p, pSelf));
 }
 
 /*virtual*/ void LevelController::Update() {
+  CleanUp(lsBonus);
   CleanUp(lsSlimes);
+  CleanUp(lsMegaSlimes);
   CleanUp(lsSliminess);
+  CleanUp(lsMegaSliminess);
+  CleanUp(lsSpawnedGenerators);
 
   pt.Update();
 

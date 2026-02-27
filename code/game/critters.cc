@@ -28,9 +28,8 @@ void SummonSkeletons(LevelController *pAc, Point p) {
     f.Normalize(15);
 
     pAc->pGl->PlaySound("slime_summon");
-    smart_pointer<SkellyGenerator> pSkel =
-        make_smart(new SkellyGenerator(p + f.ToPnt(), pAc));
-    pAc->AddE(pSkel);
+    pAc->AddSpawnedGenerator(
+        std::make_unique<SkellyGenerator>(p + f.ToPnt(), pAc));
   }
 }
 
@@ -145,14 +144,13 @@ void Trader::OnHit(char cWhat) {
                  : pAc->pGl->GetImgSeq("trader_die_f"),
       unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
-  smart_pointer<FireballBonusAnimation> pFb = make_smart(
-      new FireballBonusAnimation(GetPosition(), RandomBonus(false), pAc));
+  auto pFb = std::make_unique<FireballBonusAnimation>(
+      GetPosition(), RandomBonus(false), pAc);
   if (bFirstBns) {
     pFb->sUnderText = "loot";
     bFirstBns = false;
   }
-  pAc->AddBoth(pFb);
-  pAc->lsBonus.push_back(pFb);
+  pAc->AddBonusAnimation(std::move(pFb));
 }
 
 void Trader::Draw(ScalingDrawer *pDr) {
@@ -194,28 +192,28 @@ void Knight::Update() {
   if (cType == 'S') {
     CleanUp(pAc->lsPpl);
 
-    for (smart_pointer<ConsumableEntity> entity : pAc->lsPpl) {
-      if (!entity->bExist)
+    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+             pAc->lsPpl.begin();
+         itr != pAc->lsPpl.end(); ++itr) {
+      if (!(*itr)->bExist)
         continue;
 
-      if (this->HitDetection(entity.get())) {
+      if (this->HitDetection(itr->get())) {
 
-        if (entity->GetType() == 'P' || entity->GetType() == 'T') {
+        if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
           pAc->pGl->PlaySound("death");
-          entity->OnHit('S');
+          (*itr)->OnHit('S');
         }
       }
     }
 
-    CleanUp(pAc->lsBonus);
-
-    for (smart_pointer<FireballBonusAnimation> bonus : pAc->lsBonus) {
-      if (!bonus->bExist)
+    for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
+      if (!ptr->bExist)
         continue;
 
-      if (this->HitDetection(bonus.get())) {
+      if (this->HitDetection(ptr)) {
         pAc->pGl->PlaySound("skeleton_bonus");
-        bonus->bExist = false;
+        ptr->bExist = false;
       }
     }
   }
@@ -295,14 +293,12 @@ void MegaSlime::RandomizeVelocity() {
 }
 
 void MegaSlime::Update() {
-  CleanUp(pAc->lsBonus);
-
-  for (smart_pointer<FireballBonusAnimation> bonus : pAc->lsBonus) {
-    if (!bonus->bExist)
+  for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
+    if (!ptr->bExist)
       continue;
 
-    if (this->HitDetection(bonus.get())) {
-      bonus->bExist = false;
+    if (this->HitDetection(ptr)) {
+      ptr->bExist = false;
       pAc->pGl->PlaySound("megaslime_bonus");
     }
   }
@@ -401,12 +397,14 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (smart_pointer<ConsumableEntity> entity : pAc->lsPpl) {
-    if (!entity->bExist)
+  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
+           pAc->lsPpl.begin();
+       itr != pAc->lsPpl.end(); ++itr) {
+    if (!(*itr)->bExist)
       continue;
 
-    if (this->HitDetection(entity.get())) {
-      if (entity->GetType() == 'K') {
+    if (this->HitDetection(itr->get())) {
+      if ((*itr)->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 
         bExist = false;
@@ -427,20 +425,36 @@ void Slime::OnHit(char cWhat) {
   if (pAc->nSlimeNum >= nSlimeMax && cWhat != 'M') {
     std::vector<Point> vDeadSlimes;
 
-    for (smart_pointer<Slime> slime : pAc->lsSlimes) {
-      if (!slime->bExist)
+    for (auto &u : pAc->lsSlimes) {
+      if (!u->bExist)
         continue;
 
-      vDeadSlimes.push_back(slime->GetPosition());
-      slime->OnHit('M');
+      vDeadSlimes.push_back(u->GetPosition());
+      u->OnHit('M');
     }
 
-    for (smart_pointer<Sliminess> s : pAc->lsSliminess) {
-      if (!s->bExist)
+    for (auto &u : pAc->lsMegaSlimes) {
+      if (!u->bExist)
         continue;
 
-      vDeadSlimes.push_back(s->GetPosition());
-      s->Kill();
+      vDeadSlimes.push_back(u->GetPosition());
+      u->OnHit('M');
+    }
+
+    for (auto &u : pAc->lsSliminess) {
+      if (!u->bExist)
+        continue;
+
+      vDeadSlimes.push_back(u->GetPosition());
+      u->Kill();
+    }
+
+    for (auto &u : pAc->lsMegaSliminess) {
+      if (!u->bExist)
+        continue;
+
+      vDeadSlimes.push_back(u->GetPosition());
+      u->Kill();
     }
 
     if (vDeadSlimes.empty())
@@ -484,10 +498,8 @@ void Slime::OnHit(char cWhat) {
     fPoint f = RandomAngle();
     f.Normalize(4);
 
-    smart_pointer<Sliminess> pSlm = make_smart(
-        new Sliminess(GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
-    pAc->AddE(pSlm);
-    pAc->lsSliminess.push_back(pSlm);
+    pAc->AddSliminess(std::make_unique<Sliminess>(
+        GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
   }
 }
 
@@ -512,11 +524,8 @@ void Sliminess::Update() {
   if (t.Tick()) {
     bExist = false;
 
-    smart_pointer<Slime> pSlm =
-        make_smart(new Slime(p, pAdv->rBound, pAdv, nGeneration));
-    pAdv->AddBoth(pSlm);
-    pAdv->lsPpl.push_back(pSlm);
-    pAdv->lsSlimes.push_back(pSlm);
+    pAdv->AddSlime(
+        std::make_unique<Slime>(p, pAdv->rBound, pAdv, nGeneration));
   }
 }
 
@@ -546,11 +555,15 @@ void MegaSliminess::Update() {
   if (pSlm->bExist == false) {
     bExist = false;
 
-    smart_pointer<MegaSlime> pSlm =
-        make_smart(new MegaSlime(p, pAdv->rBound, pAdv));
-    pAdv->AddBoth(pSlm);
-    pAdv->lsPpl.push_back(pSlm);
+    pAdv->AddMegaSlime(
+        std::make_unique<MegaSlime>(p, pAdv->rBound, pAdv));
   }
+}
+
+void MegaSliminess::Kill() {
+  bExist = false;
+  if (pSlm.get())
+    pSlm->bExist = false;
 }
 
 FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
@@ -611,9 +624,8 @@ void Mage::SummonSlimes() {
     fPoint f = RandomAngle();
     f.Normalize(10);
 
-    smart_pointer<Sliminess> pSlm =
-        make_smart(new Sliminess(GetPosition() + f.ToPnt(), pAc, true, 0));
-    pAc->AddE(pSlm);
+    pAc->AddSliminess(std::make_unique<Sliminess>(
+        GetPosition() + f.ToPnt(), pAc, true, 0));
   }
 }
 
@@ -638,7 +650,7 @@ void Castle::OnKnight(char cWhat) {
     bBroken = true;
     nPrincesses = 0;
 
-    if (!pDrag.is_null()) {
+    if (pDrag != nullptr) {
 
       pDrag->bFly = true;
       pDrag->bTookOff = true;
@@ -653,13 +665,13 @@ void Castle::OnKnight(char cWhat) {
         pDrag->fVel = fPoint(0, -1);
       pDrag->fVel.Normalize(pDrag->leash.speed);
 
-      pDrag = smart_pointer<Dragon>();
+      pDrag = nullptr;
     }
 
     return;
   }
 
-  if (!pDrag.is_null()) {
+  if (pDrag != nullptr) {
     pAv->pGl->PlaySound("one_princess");
 
     --nPrincesses;

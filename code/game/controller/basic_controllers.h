@@ -70,6 +70,9 @@ struct EntityListController : public GameController {
   virtual std::vector<EventEntity *> GetNonOwnedUpdateEntities() { return {}; }
   virtual std::vector<VisualEntity *> GetNonOwnedDrawEntities() { return {}; }
 
+  /** Pointers to consumable entities for hit detection (e.g. fireball). */
+  virtual std::vector<ConsumableEntity *> GetConsumablePointers();
+
   /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
 
   /*virtual*/ void OnMouseDown(Point pPos);
