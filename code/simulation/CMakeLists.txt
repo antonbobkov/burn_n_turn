@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 project(Simulation LANGUAGES CXX)
 
 add_library(Simulation simulation.cc)
-target_include_directories(Simulation PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(Simulation PUBLIC
   GameCore
   GuiMock
@@ -12,7 +11,6 @@ target_link_libraries(Simulation PUBLIC
 )
 
 add_executable(simulation_test simulation_test.cc)
-target_include_directories(simulation_test PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(simulation_test PRIVATE
   Simulation Catch2::Catch2WithMain
 )

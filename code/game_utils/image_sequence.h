@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "utils/index.h"
-#include "utils/timer.h"
+#include "../utils/index.h"
+#include "../utils/timer.h"
 
 /** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
  */

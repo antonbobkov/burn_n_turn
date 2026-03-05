@@ -1,6 +1,6 @@
 #include "GuiSdl.h"
 
-#include "wrappers/color.h"
+#include "../wrappers/color.h"
 
 SDL_Rect ToSdl(Rectangle r) {
   SDL_Rect ret;

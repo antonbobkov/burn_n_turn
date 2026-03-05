@@ -6,7 +6,7 @@
 #include "GuiMock.h"
 #include "SuiMock.h"
 
-#include "wrappers/color.h"
+#include "../wrappers/color.h"
 #include <catch2/catch.hpp>
 
 TEST_CASE("MockGraphicalInterface LoadImage returns unique key per call",

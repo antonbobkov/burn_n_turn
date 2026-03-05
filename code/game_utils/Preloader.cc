@@ -1,9 +1,9 @@
-#include "game_utils/Preloader.h"
-#include "utils/smart_pointer.h"
+#include "Preloader.h"
+#include "../utils/smart_pointer.h"
 
-#include "utils/exception.h"
-#include "utils/string_utils.h"
-#include "wrappers/color.h"
+#include "../utils/exception.h"
+#include "../utils/string_utils.h"
+#include "../wrappers/color.h"
 
 // --- ImageFlipper ---
 

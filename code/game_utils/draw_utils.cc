@@ -1,7 +1,7 @@
-#include "game_utils/draw_utils.h"
-#include "utils/file_utils.h"
-#include "wrappers/GuiGen.h"
-#include "wrappers/color.h"
+#include "draw_utils.h"
+#include "../utils/file_utils.h"
+#include "../wrappers/GuiGen.h"
+#include "../wrappers/color.h"
 
 #include <algorithm>
 

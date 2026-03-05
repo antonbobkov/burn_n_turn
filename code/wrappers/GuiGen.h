@@ -20,9 +20,9 @@
 
 #include "color.h"
 #include "geometry.h"
-#include "utils/exception.h"
-#include "utils/file_utils.h"
-#include "utils/index.h"
+#include "../utils/exception.h"
+#include "../utils/file_utils.h"
+#include "../utils/index.h"
 
 typedef unsigned char Byte;
 

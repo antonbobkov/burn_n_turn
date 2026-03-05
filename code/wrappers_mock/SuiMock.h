@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "wrappers/SuiGen.h"
+#include "../wrappers/SuiGen.h"
 
 /* Sound backend that does no real sound. LoadSound returns the path string;
  * other ops are no-op. */

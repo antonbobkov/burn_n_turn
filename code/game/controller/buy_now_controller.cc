@@ -1,12 +1,12 @@
-#include "game_utils/game_runner_interface.h"
-#include "game/controller/buy_now_controller.h"
-#include "game/controller/dragon_game_controller.h"
-#include "game/dragon_constants.h"
-#include "game/entities.h"
-#include "utils/random_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/color.h"
-#include "wrappers/geometry.h"
+#include "../../game_utils/game_runner_interface.h"
+#include "buy_now_controller.h"
+#include "dragon_game_controller.h"
+#include "../dragon_constants.h"
+#include "../entities.h"
+#include "../../utils/random_utils.h"
+#include "../../utils/smart_pointer.h"
+#include "../../wrappers/color.h"
+#include "../../wrappers/geometry.h"
 
 BuyNowController::BuyNowController(DragonGameController *pGl_, Rectangle rBound,
                                    Color c)

@@ -7,7 +7,7 @@
  */
 
 #include "GuiSdl.h"
-#include "wrappers/color.h"
+#include "../wrappers/color.h"
 
 #include <iostream>
 #include <memory>

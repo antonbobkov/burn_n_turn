@@ -5,13 +5,13 @@
  * and side chambers; the menu keeper ties display and cursor to the list.
  */
 
-#include "wrappers/color.h"
-#include "game/controller/basic_controllers.h"
-#include "game_utils/draw_utils.h"
-#include "game/entities.h"
-#include "wrappers/gui_key_type.h"
-#include "game_utils/mouse_utils.h"
-#include "utils/smart_pointer.h"
+#include "../../wrappers/color.h"
+#include "basic_controllers.h"
+#include "../../game_utils/draw_utils.h"
+#include "../entities.h"
+#include "../../wrappers/gui_key_type.h"
+#include "../../game_utils/mouse_utils.h"
+#include "../../utils/smart_pointer.h"
 #include <memory>
 #include <vector>
 

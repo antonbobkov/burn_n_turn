@@ -1,11 +1,11 @@
 #include "dragon_constants.h"
 #include "dragon_macros.h"
-#include "game/dragon_game_runner.h"
-#include "game_utils/game_runner_interface.h"
-#include "utils/configuration_file.h"
-#include "utils/file_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/geometry.h"
+#include "dragon_game_runner.h"
+#include "../game_utils/game_runner_interface.h"
+#include "../utils/configuration_file.h"
+#include "../utils/file_utils.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/geometry.h"
 
 ProgramInfo GetProgramInfo() {
   ProgramInfo inf;

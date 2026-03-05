@@ -1,15 +1,15 @@
 #include "simulation.h"
-#include "utils/smart_pointer.h"
+#include "../utils/smart_pointer.h"
 
-#include "game/controller/dragon_game_controller.h"
-#include "game/dragon_game_runner.h"
-#include "game_utils/MessageWriter.h"
-#include "game_utils/game_runner_interface.h"
-#include "utils/file_utils.h"
-#include "wrappers/gui_key_type.h"
+#include "../game/controller/dragon_game_controller.h"
+#include "../game/dragon_game_runner.h"
+#include "../game_utils/MessageWriter.h"
+#include "../game_utils/game_runner_interface.h"
+#include "../utils/file_utils.h"
+#include "../wrappers/gui_key_type.h"
 
-#include "wrappers_mock/GuiMock.h"
-#include "wrappers_mock/SuiMock.h"
+#include "../wrappers_mock/GuiMock.h"
+#include "../wrappers_mock/SuiMock.h"
 
 #include <iostream>
 #include <memory>

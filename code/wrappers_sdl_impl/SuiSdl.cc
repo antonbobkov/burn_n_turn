@@ -1,6 +1,6 @@
 #include "SuiSdl.h"
 
-#include "utils/exception.h"
+#include "../utils/exception.h"
 
 SdlSoundInterface::SdlSoundInterface() {
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 65536);

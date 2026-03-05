@@ -7,9 +7,9 @@
  * Dependencies: Color -> wrappers/color.h; Point -> wrappers/geometry.h;
  * Index -> utils/index.h. */
 
-#include "utils/index.h"
-#include "wrappers/color.h"
-#include "wrappers/geometry.h"
+#include "../utils/index.h"
+#include "../wrappers/color.h"
+#include "../wrappers/geometry.h"
 #include <map>
 #include <vector>
 

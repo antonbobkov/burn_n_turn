@@ -1,14 +1,14 @@
 #ifndef TOWER_DEFENSE_LEVEL_CONTROLLER_H
 #define TOWER_DEFENSE_LEVEL_CONTROLLER_H
 
-#include "game/controller/basic_controllers.h"
-#include "game/level.h"
-#include "game_utils/mouse_utils.h"
-#include "utils/smart_pointer.h"
-#include "utils/timer.h"
-#include "wrappers/color.h"
-#include "wrappers/geometry.h"
-#include "wrappers/gui_key_type.h"
+#include "basic_controllers.h"
+#include "../level.h"
+#include "../../game_utils/mouse_utils.h"
+#include "../../utils/smart_pointer.h"
+#include "../../utils/timer.h"
+#include "../../wrappers/color.h"
+#include "../../wrappers/geometry.h"
+#include "../../wrappers/gui_key_type.h"
 #include <memory>
 
 struct Castle;

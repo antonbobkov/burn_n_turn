@@ -12,13 +12,10 @@ add_library(GuiGen
   GuiGen.cc
 )
 
-target_include_directories(GuiGen PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(GuiGen PRIVATE Utils)
 
 add_library(SuiGen
   SuiGen.h
   SuiGen.cc
 )
-
-target_include_directories(SuiGen PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(SuiGen PRIVATE Utils)

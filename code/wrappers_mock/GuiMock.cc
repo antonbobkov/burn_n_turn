@@ -1,6 +1,6 @@
 #include "GuiMock.h"
 
-#include "wrappers/color.h"
+#include "../wrappers/color.h"
 
 MockImage::MockImage(std::string name, Size sz) : Image(sz), name_(name) {}
 

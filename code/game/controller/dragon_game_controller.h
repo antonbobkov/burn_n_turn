@@ -1,11 +1,11 @@
 #ifndef TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 #define TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 
-#include "game/level.h"
-#include "game_utils/sound_utils.h"
-#include "utils/file_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/geometry.h"
+#include "../level.h"
+#include "../../game_utils/sound_utils.h"
+#include "../../utils/file_utils.h"
+#include "../../utils/smart_pointer.h"
+#include "../../wrappers/geometry.h"
 #include <list>
 #include <memory>
 #include <string>

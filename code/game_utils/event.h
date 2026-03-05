@@ -2,7 +2,7 @@
 #define EVENT_HEADER_08_27_10_06_16
 
 #include "Preloader.h"
-#include "utils/smart_pointer.h"
+#include "../utils/smart_pointer.h"
 
 class Event : virtual public SP_Info {
   friend void Trigger(smart_pointer<Event> pE);

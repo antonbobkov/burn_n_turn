@@ -1,4 +1,4 @@
-#include "game_utils/image_sequence.h"
+#include "image_sequence.h"
 
 void ImageSequence::INIT() {
   nActive = 0;

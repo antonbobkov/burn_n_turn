@@ -2,7 +2,7 @@
 
 #include "GuiGen.h"
 #include "color.h"
-#include "utils/smart_pointer.h"
+#include "../utils/smart_pointer.h"
 
 std::string MatrixErrorInfo::GetErrorMessage() const {
   std::ostringstream ostr;

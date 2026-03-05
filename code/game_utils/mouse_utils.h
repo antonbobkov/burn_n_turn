@@ -6,9 +6,9 @@
  * Uses geometry.h for Point, fPoint. Defines MouseTracker. */
 
 #include "Preloader.h"
-#include "game_utils/image_sequence.h"
-#include "utils/index.h"
-#include "wrappers/geometry.h"
+#include "image_sequence.h"
+#include "../utils/index.h"
+#include "../wrappers/geometry.h"
 
 
 #include <list>

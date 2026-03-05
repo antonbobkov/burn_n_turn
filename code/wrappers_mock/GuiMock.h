@@ -5,8 +5,8 @@
 #include <memory>
 #include <string>
 
-#include "wrappers/GuiGen.h"
-#include "wrappers/color.h"
+#include "../wrappers/GuiGen.h"
+#include "../wrappers/color.h"
 
 
 /* Fake image so GetImage can return a valid pointer. No real drawing.

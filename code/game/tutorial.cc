@@ -1,7 +1,7 @@
 #include "tutorial.h"
-#include "game/controller/dragon_game_controller.h"
+#include "controller/dragon_game_controller.h"
 #include "dragon_macros.h"
-#include "game_utils/draw_utils.h"
+#include "../game_utils/draw_utils.h"
 
 namespace {
 

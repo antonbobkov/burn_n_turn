@@ -2,15 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 project(WrappersMock LANGUAGES CXX)
 
 add_library(GuiMock GuiMock.h GuiMock.cc)
-target_include_directories(GuiMock PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(GuiMock PRIVATE GuiGen Utils)
 
 add_library(SuiMock SuiMock.h SuiMock.cc)
-target_include_directories(SuiMock PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(SuiMock PRIVATE SuiGen Utils)
 
 add_executable(wrappers_mock_test wrappers_mock_test.cc)
-target_include_directories(wrappers_mock_test PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(wrappers_mock_test PRIVATE
   Catch2::Catch2WithMain GuiMock SuiMock Utils
 )

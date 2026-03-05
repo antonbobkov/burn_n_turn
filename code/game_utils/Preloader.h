@@ -26,14 +26,14 @@
 #include <string>
 #include <vector>
 
-#include "game_utils/image_sequence.h"
-#include "game_utils/sound_sequence.h"
-#include "utils/file_utils.h"
-#include "utils/index.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/GuiGen.h"
-#include "wrappers/SuiGen.h"
-#include "wrappers/color.h"
+#include "image_sequence.h"
+#include "sound_sequence.h"
+#include "../utils/file_utils.h"
+#include "../utils/index.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/GuiGen.h"
+#include "../wrappers/SuiGen.h"
+#include "../wrappers/color.h"
 
 /** Functor that flips an image horizontally via the graphical interface. */
 struct ImageFlipper {

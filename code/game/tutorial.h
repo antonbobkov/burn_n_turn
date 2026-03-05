@@ -1,7 +1,7 @@
 #ifndef TOWER_DEFENSE_TUTORIAL_H
 #define TOWER_DEFENSE_TUTORIAL_H
 
-#include "game_utils/draw_utils.h"
+#include "../game_utils/draw_utils.h"
 #include "entities.h"
 
 struct DragonGameController;
