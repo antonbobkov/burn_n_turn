@@ -14,7 +14,7 @@ public:
   virtual void PlaySound(SndHndl snd, int nChannel = -1,
                          bool bLoop = false) = 0;
   virtual void StopSound(int channel = -1) = 0;
-  virtual void SetVolume(float fVolume) {}
+  virtual void SetVolume(float /*fVolume*/) {}
 };
 
 template <class SndHndl>
@@ -38,14 +38,14 @@ public:
 };
 
 template <class T> class DummySoundInterface : public SoundInterface<T> {
-  /*virtual*/ void DeleteSound(T snd){};
-  /*virtual*/ T LoadSound(std::string sFile) { return T(); }
+  /*virtual*/ void DeleteSound(T /*snd*/){};
+  /*virtual*/ T LoadSound(std::string /*sFile*/) { return T(); }
 
-  /*virtual*/ void PlaySound(T snd, int nChannel = -1, bool bLoop = false) {}
+  /*virtual*/ void PlaySound(T /*snd*/, int /*nChannel*/ = -1, bool /*bLoop*/ = false) {}
 };
 
 template <class SndHndl>
-void SimpleSoundInterface<SndHndl>::DeleteSound(Index snd) {}
+void SimpleSoundInterface<SndHndl>::DeleteSound(Index /*snd*/) {}
 
 template <class SndHndl>
 Index SimpleSoundInterface<SndHndl>::LoadSound(std::string sFile) {

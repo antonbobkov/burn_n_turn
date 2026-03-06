@@ -68,7 +68,7 @@ void spawnRandomSquare(vector<square> &squares) {
   squares.push_back(s);
 }
 
-int main(int argc, char **args) {
+int main(int /*argc*/, char** /*args*/) {
 
   cout << "[SDL_ex2_interactive] Starting...\n";
 
@@ -175,7 +175,7 @@ void loop() {
     }
 
     // Physics loop
-    for (int index = 0; index < squares.size(); index++) {
+    for (size_t index = 0; index < squares.size(); index++) {
       square &s = squares[index];
 
       Uint32 time = SDL_GetTicks();

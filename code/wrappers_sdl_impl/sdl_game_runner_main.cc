@@ -55,7 +55,7 @@ void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
   vSdlMapper[SDLK_DELETE] = GUI_DELETE;
 }
 
-int main(int argc, char *argv[]) {
+int main(int /*argc*/, char * /*argv*/[]) {
   srand((unsigned)time(NULL));
 
   SDL_Event event;

@@ -28,10 +28,6 @@ const std::string kGameDataFile("game_data.txt");
 const unsigned kKeyPressFrames[] = {8, 18, 28};
 const unsigned kKeyPressCount = 3;
 
-/* Tower center in screen coords (scale 2: 480,300 logical -> 960,600 screen).
- */
-const Crd kTowerX = kScreenW / 2;
-const Crd kTowerY = kScreenH * 3 / 4;
 
 void LogState(DragonGameRunner *ctrl) {
   DragonGameController *twr = ctrl->GetTowerController();

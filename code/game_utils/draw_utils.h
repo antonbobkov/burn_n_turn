@@ -22,6 +22,7 @@ struct Drawer {
   GraphicalInterface<Index> *pGr;
 
   Drawer() : pGr(nullptr) {}
+  virtual ~Drawer() = default;
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
 };
 
@@ -39,9 +40,9 @@ struct ScalingDrawer : public Drawer {
 
   void Scale(Index &pImg, int nFactor_ = -1);
 
-  /*virtual*/ void Draw(Index nImg, Point p, bool bCentered = true);
+  void Draw(Index nImg, Point p, bool bCentered = true) override;
 
-  /*virtual*/ Index LoadImage(std::string strFile);
+  virtual Index LoadImage(std::string strFile);
 };
 
 /** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for

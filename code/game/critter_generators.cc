@@ -12,7 +12,7 @@
 #include "../wrappers/geometry.h"
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
-    : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(pAdv_) {
+    : t(unsigned(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
   pAdv_->AddOwnedBoth(std::make_unique<AnimationOnce>(
       2.F, pAdv->pGl->GetImgSeq("skelly_summon"),
       unsigned(.1F * nFramesInSecond), p_, true));
@@ -32,8 +32,8 @@ float KnightGenerator::GetRate() {
 
 KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_, const BrokenLine &bl_)
-    : dRate(dRate_), rBound(rBound_), pBc(pBc_),
-      seq(pBc_->pGl->GetImgSeq("knight")), bl(bl_), tm(1), bFirst(false) {
+    : bFirst(false), dRate(dRate_), rBound(rBound_), pBc(pBc_),
+      seq(pBc_->pGl->GetImgSeq("knight")), tm(1), bl(bl_) {
   if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
 #ifdef TRIAL_VERSION

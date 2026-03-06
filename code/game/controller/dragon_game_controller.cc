@@ -19,10 +19,10 @@
 #include "wrappers/geometry.h"
 #include "wrappers/font_writer.h"
 
-static void DrawStuff(Rectangle rBound,
-                      GraphicalInterface<Index> *pGraph,
-                      SoundInterface<Index> *pSnd, Preloader &pr,
-                      int n) {
+static void DrawStuff([[maybe_unused]] Rectangle rBound,
+                      [[maybe_unused]] GraphicalInterface<Index> *pGraph,
+                      [[maybe_unused]] SoundInterface<Index> *pSnd, [[maybe_unused]] Preloader &pr,
+                      [[maybe_unused]] int n) {
 #ifdef LOADING_SCREEN
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;
@@ -74,13 +74,14 @@ DragonGameController::DragonGameController(
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     TowerDataWrap *pWrp_, FilePath *fp, ConfigurationFile *config,
     ConfigurationFile *game_data)
-    : nActive(1), nResumePosition(0), pDr(pDr_), pGraph(pDr_ ? pDr_->pGr : 0),
-      pNum(pNum_), pBigNum(pBigNum_),
-      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)),
-      pSndRaw(pSndRaw_), pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
-      nScore(0), vLvl(vLvl_), rBound(rBound_), bAngry(false), nHighScore(0),
-      settings_(game_data), pFancyNum(pFancyNum_), pWrp(pWrp_), p_config_(config),
-      pMenu(), vLevelPointers(3), pSelf(nullptr) {
+    : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(),
+      pGraph(pDr_ ? pDr_->pGr : 0), pDr(pDr_),
+      pNum(pNum_), pBigNum(pBigNum_), pFancyNum(pFancyNum_),
+      pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
+      vLvl(vLvl_), nScore(0), nHighScore(0), bAngry(false),
+      settings_(game_data), rBound(rBound_),
+      pWrp(pWrp_), p_config_(config), pSelf(nullptr),
+      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)) {
   nHighScore = settings_.snHighScore.Get();
 
   typedef ImagePainter::ColorMap ColorMap;
@@ -568,7 +569,7 @@ void DragonGameController::Next() {
     ++nActive;
 
     for (unsigned i = 0; i < vLevelPointers.size(); ++i) {
-      if (nActive == vLevelPointers.at(i) &&
+      if (static_cast<int>(nActive) == vLevelPointers.at(i) &&
           settings_.snProgress.Get() < int(i)) {
         settings_.snProgress.Set(i);
         if (pMenu->pMenuDisplay)

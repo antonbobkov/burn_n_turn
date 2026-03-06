@@ -33,7 +33,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
   }
 }
 
-void Princess::OnHit(char cWhat) {
+void Princess::OnHit(char /*cWhat*/) {
   pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
   bExist = false;
@@ -66,7 +66,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
   pAc->pGl->SetAngry();
 }
 
-void Mage::OnHit(char cWhat) {
+void Mage::OnHit(char /*cWhat*/) {
   bExist = false;
 
   pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
@@ -131,7 +131,7 @@ unsigned RandomBonus(bool bInTower) {
   return GetRandFromDistribution(v);
 }
 
-void Trader::OnHit(char cWhat) {
+void Trader::OnHit(char /*cWhat*/) {
   pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
 
   bExist = false;
@@ -234,7 +234,7 @@ void Knight::Update() {
   pPrev = p;
 }
 
-void Knight::OnHit(char cWhat) {
+void Knight::OnHit(char /*cWhat*/) {
   if (cType == 'W') {
     KnockBack();
     if (nGolemHealth > 0) {
@@ -317,7 +317,7 @@ void MegaSlime::Update() {
   }
 }
 
-void MegaSlime::OnHit(char cWhat) {
+void MegaSlime::OnHit(char /*cWhat*/) {
   if (nHealth > 0) {
     --nHealth;
     pAc->pGl->PlaySound("megaslime_hit");
@@ -505,7 +505,7 @@ void Slime::OnHit(char cWhat) {
 
 Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
-    : p(p_), pAdv(pAdv_), bFast(bFast_), nGeneration(nGeneration_), pSlm() {
+    : p(p_), bFast(bFast_), nGeneration(nGeneration_), pAdv(pAdv_), pSlm() {
   ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
                             : pAdv->pGl->GetImgSeq("slime_reproduce");
 

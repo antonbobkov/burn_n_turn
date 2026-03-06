@@ -189,15 +189,14 @@ FireballBonus Dragon::GetAllBonuses() {
 
 Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
                ImageSequence imgFly_, ButtonSet bt_)
-    : pAd(pAd_), imgStable(imgStable_), imgFly(imgFly_),
-      Critter(13,
+    : Critter(13,
               pCs_ == nullptr ? pAd_->vCs[0]->GetPosition()
                               : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
-      bFly(), bCarry(false), cCarry(' '), nTimer(0), pCs(pCs_), bt(bt_),
-      nFireballCount(0), tFireballRegen(1), bTookOff(false), nPrCr(0),
-      nExtraFireballs(0), bRegenLocked(false),
-      tRegenUnlock(nFramesInSecond * nRegenDelay / 10) {
+      bFly(), bCarry(false), cCarry(' '), nPrCr(0), nExtraFireballs(0),
+      nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
+      bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
+      pAd(pAd_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_), bt(bt_) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
   if (pCs != nullptr && pCs->pDrag == nullptr) {

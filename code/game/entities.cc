@@ -15,7 +15,7 @@ void TextDrawEntity::SetText(std::string sText) {
   vText = BreakUpString(sText);
 }
 
-void TextDrawEntity::Draw(ScalingDrawer *pDr) {
+void TextDrawEntity::Draw(ScalingDrawer * /*pDr*/) {
   Point p = pos;
   for (unsigned i = 0; i < vText.size(); ++i) {
     pNum->DrawWord(vText[i], p, bCenter);
@@ -123,8 +123,8 @@ void FancyCritter::Move() {
 }
 
 BonusScore::BonusScore(LevelController *pAc_, Point p_, unsigned nScore_)
-    : p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0),
-      pAc(pAc_), c(255, 255, 0), nScore(nScore_), nScoreSoFar(0) {
+    : pAc(pAc_), nScore(nScore_), nScoreSoFar(0),
+      p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0), c(255, 255, 0) {
   std::ostringstream ostr(sText);
   ostr << '+' << nScore;
   sText = ostr.str();
@@ -137,7 +137,7 @@ void SoundControls::Update() {
     plr.StopMusic();
 }
 
-/*virtual*/ void HighScoreShower::Draw(ScalingDrawer *pDr) {
+/*virtual*/ void HighScoreShower::Draw(ScalingDrawer * /*pDr*/) {
   int nScale = 2;
   int nCharWidth = 4;
 
@@ -164,7 +164,7 @@ void SoundControls::Update() {
   pGl->GetBigNumberDrawer()->DrawNumber(pGl->GetHighScore(), p2, 7);
 }
 
-/*virtual*/ void IntroTextShower::Draw(ScalingDrawer *pDr) {
+/*virtual*/ void IntroTextShower::Draw(ScalingDrawer * /*pDr*/) {
   int nScale = 2;
 
   Point pCnt = Point(rBound.sz.x / 2 * nScale, rBound.sz.y / 2 * nScale);
@@ -206,7 +206,7 @@ void SoundControls::Update() {
   }
 }
 
-/*virtual*/ void BonusScore::Draw(ScalingDrawer *pDr) {
+/*virtual*/ void BonusScore::Draw(ScalingDrawer * /*pDr*/) {
   if (nC < 11)
     pAc->pGl->GetNumberDrawer()->DrawWord(sText, p, true);
   else

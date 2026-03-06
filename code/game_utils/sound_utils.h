@@ -21,7 +21,7 @@ class SoundInterfaceProxy : virtual public SP_Info {
 public:
   std::string get_class_name() override { return "SoundInterfaceProxy"; }
   SoundInterfaceProxy(SoundInterface<Index> *pSndRaw_)
-      : pSndRaw(pSndRaw_), bSoundOn(true) {}
+      : bSoundOn(true), pSndRaw(pSndRaw_) {}
 
   void PlaySound(Index i, int nChannel = -1, bool bLoop = false);
 

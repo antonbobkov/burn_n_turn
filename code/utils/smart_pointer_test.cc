@@ -131,7 +131,10 @@ TEST_CASE("smart_pointer multiple copies all released then object deleted",
 TEST_CASE("smart_pointer self-assign leaves ref count one", "[smart_pointer]") {
   smart_pointer<TestObj> p = make_smart<TestObj>(new TestObj(9));
   CHECK(ref_count(p) == 1);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
   p = p;
+#pragma clang diagnostic pop
   CHECK(ref_count(p) == 1);
   REQUIRE(!p.is_null());
   CHECK(p->value == 9);

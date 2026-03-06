@@ -31,12 +31,12 @@ struct BuyNowController : public EntityListController {
    * The usual tick: now and then some slimes choose a new path. All slimes
    * move and dance. The countdown runs. The vista is refreshed.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  void OnKey(GuiKeyType c, bool bUp) override;
 
-  /*virtual*/ void OnMouseDown(Point pPos);
-  /*virtual*/ std::string GetControllerName() const { return "buy"; }
+  void OnMouseDown(Point pPos) override;
+  std::string GetControllerName() const override { return "buy"; }
 };
 
 /** A sight that paints the slime dances on the buy-now screen. */

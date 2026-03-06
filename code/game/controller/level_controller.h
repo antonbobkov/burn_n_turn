@@ -106,16 +106,16 @@ struct LevelController : public EntityListController {
   /** Find the dragon in our list that matches p, or nullptr. */
   Dragon *FindDragon(Dragon *p);
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  void OnKey(GuiKeyType c, bool bUp) override;
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnMouse(Point pPos);
+  void OnMouse(Point pPos) override;
 
-  /*virtual*/ void OnMouseDown(Point pPos);
-  /*virtual*/ void OnMouseUp();
-  /*virtual*/ void Fire();
-  /*virtual*/ std::string GetControllerName() const { return "level"; }
+  void OnMouseDown(Point pPos) override;
+  void OnMouseUp() override;
+  void Fire() override;
+  std::string GetControllerName() const override { return "level"; }
 
   float GetCompletionRate();
 

@@ -26,8 +26,8 @@ struct ProgramInfo {
               bool bMouseCapture_ = false, bool bFullScreen_ = false,
               bool bFlexibleResolution_ = false, bool bBlackBox_ = false)
       : szScreenRez(szScreenRez_), strTitle(strTitle_), nFramerate(nFramerate_),
-        bBlackBox(bBlackBox_), bMouseCapture(bMouseCapture_),
-        bFullScreen(bFullScreen_), bFlexibleResolution(bFlexibleResolution_) {}
+        bMouseCapture(bMouseCapture_), bFullScreen(bFullScreen_),
+        bFlexibleResolution(bFlexibleResolution_), bBlackBox(bBlackBox_) {}
 };
 
 ProgramInfo GetProgramInfo();
@@ -75,11 +75,11 @@ public:
   std::string get_class_name() override { return "GameRunner"; }
   virtual void Update() = 0;
 
-  virtual void KeyDown(GuiKeyType nCode) {}
-  virtual void KeyUp(GuiKeyType nCode) {}
-  virtual void MouseMove(Point p) {}
-  virtual void MouseClick(Point p) {}
-  virtual void MouseDown(Point p) {}
+  virtual void KeyDown(GuiKeyType /*nCode*/) {}
+  virtual void KeyUp(GuiKeyType /*nCode*/) {}
+  virtual void MouseMove(Point /*p*/) {}
+  virtual void MouseClick(Point /*p*/) {}
+  virtual void MouseDown(Point /*p*/) {}
   virtual void MouseUp() {}
   virtual void DoubleClick() {}
   virtual void Fire() {}

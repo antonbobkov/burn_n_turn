@@ -65,10 +65,10 @@ struct Road : virtual public VisualEntity {
   Road &operator=(const Road &) = default;
   Road &operator=(Road &&) = delete;
 
-  /*virtual*/ float GetPriority() { return 0; }
-  /*virtual*/ Point GetPosition() { return Point(); }
+  float GetPriority() override { return 0; }
+  Point GetPosition() override { return Point(); }
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
   void RoadMap(Point &p, Point &v);
 };

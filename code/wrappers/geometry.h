@@ -67,7 +67,7 @@ std::istream &operator>>(std::istream &ifs, fPoint &f);
 struct Polar {
   float r, a;
   Polar() : r(0), a(0) {}
-  Polar(float a_, float r_) : a(a_), r(r_) {}
+  Polar(float a_, float r_) : r(r_), a(a_) {}
   Polar(fPoint p);
   Polar operator*(Polar p) { return Polar(a + p.a, r * p.r); }
 

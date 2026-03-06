@@ -22,7 +22,7 @@ struct Castle : public Critter {
 
   void OnKnight(char cWhat);
 
-  /*unsigned*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 };
 
 /** The princess: a soul the dragon can rescue and carry to the castle. */
@@ -32,14 +32,14 @@ struct Princess : public Critter, public ConsumableEntity {
 
   Princess(const Critter &cr, LevelController *pAc_) : Critter(cr), pAc(pAc_) {}
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() { return 'P'; }
+  char GetType() override { return 'P'; }
 
   /** When hit: show the bonus tally and vanish from the world. */
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 };
 
 struct Mage : public Critter, public ConsumableEntity {
@@ -56,15 +56,15 @@ struct Mage : public Critter, public ConsumableEntity {
 
   Mage(const Critter &cr, LevelController *pAc_, bool bAngry_);
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
   void SummonSlimes();
 
-  /*virtual*/ char GetType() { return 'M'; }
+  char GetType() override { return 'M'; }
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 };
 
 unsigned RandomBonus(bool bInTower = true);
@@ -80,13 +80,13 @@ struct Trader : public Critter, public ConsumableEntity {
   Trader(const Critter &cr, LevelController *pAc_, bool &bFirstBns_)
       : Critter(cr), pAc(pAc_), bFirstBns(bFirstBns_) {}
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() { return 'T'; }
+  char GetType() override { return 'T'; }
 
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 };
 
 /** The knight: chases princess and castle, and may rise again as a ghost. */
@@ -103,7 +103,7 @@ struct Knight : public Critter, public ConsumableEntity {
       : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(1),
         nGolemHealth(nGolemHealthMax) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
   /** Push the knight back one step along his path. */
   void KnockBack();
@@ -114,13 +114,13 @@ struct Knight : public Critter, public ConsumableEntity {
    * or slay princess and trader on touch, and gather bonus pickups. When he
    * moves, advance the walk and play the step at the right moment.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() { return cType; }
+  char GetType() override { return cType; }
 };
 
 /** The great slime: it may split or merge in the dance of the MegaSlime. */
@@ -132,7 +132,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 
   MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_);
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr) { Critter::Draw(pDr); }
+  void Draw(ScalingDrawer *pDr) override { Critter::Draw(pDr); }
 
   void RandomizeVelocity();
 
@@ -141,13 +141,13 @@ struct MegaSlime : public Critter, public ConsumableEntity {
    * is gone and a sound plays. Each tick: advance the dance; on jump and land,
    * play sounds and either change direction or stand still.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() { return 'E'; }
+  char GetType() override { return 'E'; }
 };
 
 /** The ghost's echo: a brief shimmer where the knight fell. */
@@ -163,7 +163,7 @@ struct Ghostiness : public EventEntity {
 
   Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_, int nGhostHit_);
 
-  /*virutal*/ void Update();
+  void Update() override;
 };
 
 /** A slime: it drifts toward its prey, a timer guiding its steps. */
@@ -179,13 +179,13 @@ struct Slime : public Critter, public ConsumableEntity {
 
   void RandomizeVelocity();
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnHit(char cWhat);
+  void OnHit(char cWhat) override;
 
-  /*virtual*/ Index GetImage() { return seq.vImage[0]; }
+  Index GetImage() override { return seq.vImage[0]; }
 
-  /*virtual*/ char GetType() { return 'L'; }
+  char GetType() override { return 'L'; }
 
   ~Slime();
 };
@@ -203,7 +203,7 @@ struct Sliminess : public EventEntity {
 
   Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
-  /*virutal*/ void Update();
+  void Update() override;
 
   /** End the summoning; the spawn and its shimmer are gone. */
   void Kill();
@@ -222,7 +222,7 @@ struct MegaSliminess : public EventEntity {
 
   MegaSliminess(Point p_, LevelController *pAdv_);
 
-  /*virutal*/ void Update();
+  void Update() override;
 
   Point GetPosition() { return p; }
   void Kill();
@@ -238,8 +238,8 @@ struct FloatingSlime : public SimpleVisualEntity {
 
   FloatingSlime(ImageSequence seq, Point pStart, Point pEnd, unsigned nTime);
 
-  /*virtual*/ Point GetPosition() { return fPos.ToPnt(); }
-  /*virtual*/ void Update();
+  Point GetPosition() override { return fPos.ToPnt(); }
+  void Update() override;
 };
 
 void SummonSkeletons(LevelController *pAc, Point p);

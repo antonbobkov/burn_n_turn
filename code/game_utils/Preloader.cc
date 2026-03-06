@@ -73,7 +73,7 @@ std::string PreloaderExceptionLoad::GetErrorMessage() const {
 
 Preloader::Preloader(GraphicalInterface<Index> *pGr_,
                      SoundInterface<Index> *pSn_, FilePath *fp)
-    : pGr(pGr_), pSn(pSn_), nScale(1), fp_(fp) {}
+    : nScale(1), fp_(fp), pGr(pGr_), pSn(pSn_) {}
 
 void Preloader::AddTransparent(Color c) { vTr.push_back(c); }
 

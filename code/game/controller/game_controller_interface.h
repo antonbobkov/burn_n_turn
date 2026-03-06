@@ -23,9 +23,9 @@ struct GameController : virtual public SP_Info {
       : pGl(pGl_), rBound(rBound_) {}
 
   virtual void Update() {}
-  virtual void OnKey(GuiKeyType c, bool bUp) {}
-  virtual void OnMouse(Point pPos) {}
-  virtual void OnMouseDown(Point pPos) {}
+  virtual void OnKey(GuiKeyType /*c*/, bool /*bUp*/) {}
+  virtual void OnMouse(Point /*pPos*/) {}
+  virtual void OnMouseDown(Point /*pPos*/) {}
   virtual void OnMouseUp() {}
   virtual void DoubleClick() {}
   virtual void Fire() {}

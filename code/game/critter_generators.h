@@ -18,7 +18,7 @@ struct SkellyGenerator : public EventEntity {
 
   SkellyGenerator(Point p_, LevelController *pAdv_);
 
-  /*virutal*/ void Update();
+  void Update() override;
 };
 
 /** Summons knights along the path on a timer. */
@@ -44,7 +44,7 @@ struct KnightGenerator : virtual public EventEntity {
   /** Summon one knight (or golem or ghost) on the path and add to the realm. */
   void Generate(bool bGolem = false);
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** Summons princesses at a rate within the chapter bounds. */
@@ -63,7 +63,7 @@ struct PrincessGenerator : virtual public EventEntity {
    * toward the castles. The first princess bears the "capture" hint. Add her to
    * the realm, play the arrival tune, and tell the wise one.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 struct MageGenerator : virtual public EventEntity {
@@ -76,7 +76,7 @@ struct MageGenerator : virtual public EventEntity {
   MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
                  LevelController *pBc_);
 
-  /*virtual*/ void Update();
+  void Update() override;
 
   /** Summon one mage on a random road and add to the realm. */
   void MageGenerate();
@@ -96,7 +96,7 @@ struct TraderGenerator : virtual public EventEntity {
 
   TraderGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 #endif

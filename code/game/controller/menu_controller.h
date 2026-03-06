@@ -81,11 +81,11 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
               bool bCheatsUnlocked_);
 
   /** Draw the choices on the wall and the caret at the chosen line. */
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ float GetPriority() { return 0; }
+  float GetPriority() override { return 0; }
 
-  /*virtual*/ void Update() { pCurr->vEntries.at(0).bDisabled = false; }
+  void Update() override { pCurr->vEntries.at(0).bDisabled = false; }
 
   /** Move the caret to the choice under the mouse. */
   void OnMouseMove(Point pMouse);
@@ -140,12 +140,12 @@ struct MenuController : public EntityListController {
   std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
   std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ void OnMouse(Point pPos);
-  /*virtual*/ void OnMouseDown(Point pPos);
+  void OnKey(GuiKeyType c, bool bUp) override;
+  void OnMouse(Point pPos) override;
+  void OnMouseDown(Point pPos) override;
 
-  /*virtual*/ void Update();
-  /*virtual*/ std::string GetControllerName() const { return "menu"; }
+  void Update() override;
+  std::string GetControllerName() const override { return "menu"; }
 };
 
 #endif

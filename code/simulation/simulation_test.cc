@@ -56,7 +56,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
   try {
   srand(12345);
 
-  int counter_before = nGlobalSuperMegaCounter;
+  [[maybe_unused]] int counter_before = nGlobalSuperMegaCounter;
 
   {
     auto p_mock_gr = std::make_unique<MockGraphicalInterface>();

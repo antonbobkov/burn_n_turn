@@ -38,7 +38,7 @@ template <class A, class B> class SwitchEvent : public Event {
 public:
   std::string get_class_name() override { return "SwitchEvent"; }
   SwitchEvent(A &objCurr_, B &objNew_) : objCurr(objCurr_), objNew(objNew_) {}
-  /*virtual*/ void Trigger() { objCurr = objNew; }
+  void Trigger() override { objCurr = objNew; }
 };
 
 template <class A, class B>
@@ -53,7 +53,7 @@ template <class A, class B> class CpSwitchEvent : public Event {
 public:
   std::string get_class_name() override { return "CpSwitchEvent"; }
   CpSwitchEvent(A &objCurr_, B objNew_) : objCurr(objCurr_), objNew(objNew_) {}
-  /*virtual*/ void Trigger() { objCurr = objNew; }
+  void Trigger() override { objCurr = objNew; }
 };
 
 template <class A, class B>
@@ -64,7 +64,7 @@ CpSwitchEvent<A, B> *NewCpSwitchEvent(A &objCurr_, B objNew_) {
 struct SequenceOfEvents : public Event {
   std::string get_class_name() override { return "SequenceOfEvents"; }
   std::vector<smart_pointer<Event>> vEv;
-  /*virtual*/ void Trigger();
+  void Trigger() override;
   SequenceOfEvents() {}
   SequenceOfEvents(smart_pointer<Event> pEv1, smart_pointer<Event> pEv2) {
     vEv.push_back(pEv1);

@@ -115,8 +115,8 @@ void KnightOnFire::RandomizeVelocity() {
 
 KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
                            unsigned nTimer_, Chain c_)
-    : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_), c(c_),
-      t(nFramesInSecond / 5) {
+    : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_),
+      t(nFramesInSecond / 5), c(c_) {
   Critter::seq = pBc->pGl->GetImgSeq("knight_fire");
   RandomizeVelocity();
 }
@@ -357,7 +357,7 @@ void CircularFireball::Update() {
 FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
                                                LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
-      bBlink(false), pAd(pAd_), tm(nBonusOnGroundTime), sUnderText("") {
+      tm(nBonusOnGroundTime), bBlink(false), pAd(pAd_), sUnderText("") {
   seq = pAd->pGl->GetImgSeq(GetBonusImage(n));
   coronaSeq = pAd->pGl->GetImgSeq("corona");
 }

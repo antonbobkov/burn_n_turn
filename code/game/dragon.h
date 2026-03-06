@@ -90,11 +90,11 @@ struct Dragon : public Critter {
   Dragon(Castle *pCs_, LevelController *pAd_,
          ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
-  /*vrtual*/ void Update();
+  void Update() override;
 
-  /*vrtual*/ Point GetPosition();
+  Point GetPosition() override;
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
   void AddBonus(std::unique_ptr<TimedFireballBonus> pBonus, bool bSilent = false);
 

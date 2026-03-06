@@ -19,15 +19,15 @@ class Preloader;
 struct ImageSequence;
 struct SoundSequence;
 struct TimedFireballBonus;
-struct TowerDataWrap;
+class TowerDataWrap;
 class FilePath;
 class Index;
-class ScalingDrawer;
-class NumberDrawer;
-class FontWriter;
-template <typename T> struct GraphicalInterface;
-template <typename T> struct SoundInterface;
-struct SoundInterfaceProxy;
+struct ScalingDrawer;
+struct NumberDrawer;
+struct FontWriter;
+template <typename T> class GraphicalInterface;
+template <typename T> class SoundInterface;
+class SoundInterfaceProxy;
 
 /** The realm's scroll of choices—sound, music, tutorial, fullscreen, cheats.
  * The menu keeper reads and writes these; they are saved between sessions.
@@ -171,7 +171,6 @@ private:
   NumberDrawer *pBigNum;
   FontWriter *pFancyNum;
 
-  SoundInterface<Index> *pSndRaw;
   std::unique_ptr<SoundInterfaceProxy> pSnd;
 
   std::vector<LevelLayout> vLvl;

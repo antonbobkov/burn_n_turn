@@ -26,8 +26,7 @@ struct AdNumberDrawer : public VisualEntity {
   AdNumberDrawer() : pAd(0) {}
   explicit AdNumberDrawer(LevelController *ad) : pAd(ad) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr) {
-    unsigned n = pDr->nFactor;
+  void Draw(ScalingDrawer * /*pDr*/) override {
 
 #ifdef FULL_VERSION
     pAd->pGl->GetNumberDrawer()->DrawNumber(
@@ -69,8 +68,8 @@ struct AdNumberDrawer : public VisualEntity {
                                           Point(pAd->rBound.sz.x - 9 * 4, 4));
 #endif
   }
-  /*virtual*/ Point GetPosition() { return Point(); }
-  /*virtual*/ float GetPriority() { return 10; }
+  Point GetPosition() override { return Point(); }
+  float GetPriority() override { return 10; }
 };
 
 struct BonusDrawer : public VisualEntity {
@@ -84,7 +83,7 @@ struct BonusDrawer : public VisualEntity {
   explicit BonusDrawer(LevelController *ad)
       : pAd(ad), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr) {
+  void Draw(ScalingDrawer *pDr) override {
     if (t.Tick())
       ++nAnimationCounter;
 
@@ -124,21 +123,24 @@ struct BonusDrawer : public VisualEntity {
       p.x = 0;
     }
   }
-  /*virtual*/ Point GetPosition() { return Point(); }
-  /*virtual*/ float GetPriority() { return 10; }
+  Point GetPosition() override { return Point(); }
+  float GetPriority() override { return 10; }
 };
 
+#ifdef KEYBOARD_CONTROLS
 static const float fSpreadFactor = 2.0f;
+#endif
 
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  Color c, const LevelLayout &lvl)
-    : EntityListController(pGl_, rBound, c), bCh(false), nLvl(lvl.nLvl),
-      nSlimeNum(0), bFirstUpdate(true), bLeftDown(false), bRightDown(false),
-      nLastDir(0), bWasDirectionalInput(0), bGhostTime(false), bBlink(true),
-      pGr(0), bLeft(false), bTakeOffToggle(false),
+    : EntityListController(pGl_, rBound, c),
+      bFirstUpdate(true), bGhostTime(false), bTimerFlash(false), bBlink(true),
+      bLeft(false), bCh(false), bLeftDown(false), bRightDown(false),
+      nLastDir(0), bWasDirectionalInput(0), nLvl(lvl.nLvl), nSlimeNum(0),
+      pGr(0), bTakeOffToggle(false),
       tutOne(std::make_unique<TutorialLevelOne>()),
       tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
-      mc(pGl->GetImgSeq("claw"), Point()), bTimerFlash(false) {}
+      mc(pGl->GetImgSeq("claw"), Point()) {}
 
 Dragon *LevelController::FindDragon(Dragon *p) {
   for (size_t i = 0; i < vDr.size(); ++i)
@@ -201,7 +203,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 #endif
 }
 
-/*virtual*/ void LevelController::OnKey(GuiKeyType c, bool bUp) {
+void LevelController::OnKey(GuiKeyType c, bool bUp) {
 
 #ifdef KEYBOARD_CONTROLS
   if (!bUp) {
@@ -499,7 +501,7 @@ void LevelController::MegaGeneration(Point p) {
   AddMegaSliminess(std::make_unique<MegaSliminess>(p, pSelf));
 }
 
-/*virtual*/ void LevelController::Update() {
+void LevelController::Update() {
   CleanUp(lsBonus);
   CleanUp(lsSlimes);
   CleanUp(lsMegaSlimes);

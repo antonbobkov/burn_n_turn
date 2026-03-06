@@ -12,6 +12,7 @@ class MessageWriter {
 public:
   MessageWriter(WriteType wt_def_ = WT_DEBUG) : wt_def(wt_def_) {}
 
+  virtual ~MessageWriter() = default;
   virtual void Write(WriteType wt, std::string strMsg) = 0;
   void Write(std::string strMsg) { Write(wt_def, strMsg); }
 
@@ -20,12 +21,12 @@ public:
 
 class EmptyWriter : public MessageWriter {
 public:
-  /*virtual*/ void Write(WriteType wt, std::string strMsg) {}
+  void Write(WriteType /*wt*/, std::string /*strMsg*/) override {}
 };
 
 class IoWriter : public MessageWriter {
 public:
-  /*virtual*/ void Write(WriteType wt, std::string strMsg);
+  void Write(WriteType wt, std::string strMsg) override;
 };
 
 extern MessageWriter *pWr;

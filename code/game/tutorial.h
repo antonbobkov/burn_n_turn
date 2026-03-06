@@ -29,7 +29,7 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
   TutorialTextEntity(float dPriority_, Point pos_, NumberDrawer *pNum_,
                      DragonGameController *pGl_)
       : dPriority(dPriority_), pos(pos_), pNum(pNum_), t(1), nOffset(0),
-        nTextVerticalSpacing(7), nDelta(1), pGl(pGl_) {}
+        nDelta(1), nTextVerticalSpacing(7), pGl(pGl_) {}
 
   /** Set the scroll's words to v; scroll from current lines to v or set if
    * empty. */
@@ -37,13 +37,13 @@ struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
 
   /** Draw the lines with a vertical offset; skip if the wise one's guidance is
    * off. */
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ float GetPriority() { return dPriority; }
+  float GetPriority() override { return dPriority; }
 
   /** Advance the scroll each tick; when it ends, the new words replace the
    * old. */
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** First tale: tracks when the knight falls, when the dragon flies, when the

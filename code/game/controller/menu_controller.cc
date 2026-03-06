@@ -23,7 +23,7 @@ std::string MusicString() { return "music: "; }
 std::string TutorialString() { return "tutorial: "; }
 std::string FullTextString() { return "full screen: "; }
 
-void MenuDisplay::Draw(ScalingDrawer *pDr) {
+void MenuDisplay::Draw(ScalingDrawer * /*pDr*/) {
   Point p = pLeftTop;
   for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
     if (!pCurr->vEntries[i].bDisabled)
@@ -32,7 +32,7 @@ void MenuDisplay::Draw(ScalingDrawer *pDr) {
       pNum->DrawColorWord(pCurr->vEntries[i].sText, p, Color(125, 125, 125),
                           false);
 
-    if (pCurr->nMenuPosition == i && pMenuCaret)
+    if (pCurr->nMenuPosition == static_cast<int>(i) && pMenuCaret)
       pMenuCaret->pos = p + Point(-11, pCurr->vEntries[i].szSize.y / 4);
 
     p.y += pCurr->vEntries[i].szSize.y;
@@ -112,9 +112,9 @@ void MenuController::OnKey(GuiKeyType c, bool bUp) {
   }
 }
 
-void MenuController::OnMouse(Point pPos) {}
+void MenuController::OnMouse(Point /*pPos*/) {}
 
-void MenuController::OnMouseDown(Point pPos) {}
+void MenuController::OnMouseDown(Point /*pPos*/) {}
 
 void MenuController::Update() {
   EntityListController::Update();
@@ -136,9 +136,9 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
                          Animation *pMenuCaret_,
                          MenuController *pMenuController_,
                          bool bCheatsUnlocked_)
-    : pLeftTop(pLeftTop_), pNum(pNum_), pMenuCaret(pMenuCaret_),
-      pMenuController(pMenuController_), pCurr(&memMain),
-      bCheatsUnlocked(bCheatsUnlocked_) {
+    : pCurr(&memMain), bCheatsUnlocked(bCheatsUnlocked_),
+      pLeftTop(pLeftTop_), pNum(pNum_), pMenuCaret(pMenuCaret_),
+      pMenuController(pMenuController_) {
   Size szSpacing(50, 10);
   memMain.vEntries.push_back(
       MenuEntry(szSpacing, "continue", &MenuDisplay::Continue));

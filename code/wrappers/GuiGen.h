@@ -697,7 +697,7 @@ Index SimpleGraphicalInterface<ImageHndl>::New(ImageHndl pImg) {
 }
 
 template <class ImageHndl>
-void SimpleGraphicalInterface<ImageHndl>::DeleteImage(Index pImg) {}
+void SimpleGraphicalInterface<ImageHndl>::DeleteImage(Index /*pImg*/) {}
 
 template <class ImageHndl>
 Index SimpleGraphicalInterface<ImageHndl>::CopyImage(Index pImg) {

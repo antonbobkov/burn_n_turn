@@ -64,7 +64,7 @@ struct EntityListController : public GameController {
    * update everyone. Draw from back to front. Refresh the vista unless
    * refresh is stilled.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 
   /** Creatures and sights that tick and draw here but are owned elsewhere. */
   virtual std::vector<EventEntity *> GetNonOwnedUpdateEntities() { return {}; }
@@ -73,10 +73,10 @@ struct EntityListController : public GameController {
   /** Pointers to consumable entities for hit detection (e.g. fireball). */
   virtual std::vector<ConsumableEntity *> GetConsumablePointers();
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  void OnKey(GuiKeyType c, bool bUp) override;
 
-  /*virtual*/ void OnMouseDown(Point pPos);
-  /*virtual*/ std::string GetControllerName() const { return "basic"; }
+  void OnMouseDown(Point pPos) override;
+  std::string GetControllerName() const override { return "basic"; }
 };
 
 struct StartScreenController : public EntityListController {
@@ -87,10 +87,10 @@ struct StartScreenController : public EntityListController {
   /** Step to the next screen and let the bard play the start_game tune. */
   void Next();
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  void OnKey(GuiKeyType c, bool bUp) override;
 
-  /*virtual*/ void OnMouseDown(Point pPos) { Next(); }
-  /*virtual*/ std::string GetControllerName() const { return "start"; }
+  void OnMouseDown(Point /*pPos*/) override { Next(); }
+  std::string GetControllerName() const override { return "start"; }
 };
 
 struct Cutscene : public EntityListController {
@@ -111,10 +111,10 @@ struct Cutscene : public EntityListController {
   Cutscene(DragonGameController *pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false);
 
-  /*virtual*/ void Update();
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ void OnMouseDown(Point pPos) {}
-  /*virtual*/ std::string GetControllerName() const { return "cutscene"; }
+  void Update() override;
+  void OnKey(GuiKeyType c, bool bUp) override;
+  void OnMouseDown(Point /*pPos*/) override {}
+  std::string GetControllerName() const override { return "cutscene"; }
 };
 
 /** A screen that shows the dragon's tally and leaves on click or when time
@@ -127,12 +127,12 @@ struct DragonScoreController : public EntityListController {
   DragonScoreController(DragonGameController *pGl_, Rectangle rBound, Color c,
                         bool bScoreShow);
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
-  /*virtual*/ void Update();
-  /*virtual*/ void DoubleClick();
+  void OnKey(GuiKeyType c, bool bUp) override;
+  void Update() override;
+  void DoubleClick() override;
 
-  /*virtual*/ void OnMouseDown(Point pPos);
-  /*virtual*/ std::string GetControllerName() const { return "score"; }
+  void OnMouseDown(Point pPos) override;
+  std::string GetControllerName() const override { return "score"; }
 };
 
 /** A controller that steps to the next screen when only the veil remains, or
@@ -142,12 +142,12 @@ struct AutoAdvanceController : public EntityListController {
   AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void OnKey(GuiKeyType c, bool bUp);
+  void OnKey(GuiKeyType c, bool bUp) override;
 
-  /*virtual*/ void OnMouseDown(Point pPos);
-  /*virtual*/ std::string GetControllerName() const { return "logo"; }
+  void OnMouseDown(Point pPos) override;
+  std::string GetControllerName() const override { return "logo"; }
 };
 
 #endif

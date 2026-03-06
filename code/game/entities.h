@@ -39,7 +39,7 @@ struct ScreenEntity : virtual public Entity, virtual public SP_Info {
 
 struct VisualEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "VisualEntity"; }
-  virtual void Draw(ScalingDrawer *pDr) {}
+  virtual void Draw(ScalingDrawer * /*pDr*/) {}
   virtual float GetPriority() { return 0; }
   VisualEntity() = default;
   VisualEntity(const VisualEntity &) = default;
@@ -64,9 +64,9 @@ struct TextDrawEntity : virtual public VisualEntity {
 
   void SetText(std::string sText);
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ float GetPriority() { return dPriority; }
+  float GetPriority() override { return dPriority; }
 };
 
 /** A sight with a sequence of images: draws the current frame; Update steps
@@ -86,22 +86,22 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
                      unsigned nPeriod_)
-      : dPriority(dPriority_), seq(seq_), nPeriod(nPeriod_),
-        t(nPeriod_ * seq_.GetTime()), bCenter(bCenter_), bTimer(true),
-        bStep(false), bImageToggle(false) {}
+      : dPriority(dPriority_), nPeriod(nPeriod_),
+        t(nPeriod_ * seq_.GetTime()), bTimer(true),
+        bStep(false), bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
                      bool bStep_ = false)
-      : dPriority(dPriority_), seq(seq_), bCenter(bCenter_), bTimer(false),
-        bStep(bStep_), nPeriod(1), bImageToggle(false) {}
+      : dPriority(dPriority_), nPeriod(1), bTimer(false),
+        bStep(bStep_), bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ float GetPriority() { return dPriority; }
+  float GetPriority() override { return dPriority; }
 
   bool bImageToggle;
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** A thing that plays a sound sequence on a timer; it vanishes when the tune
@@ -116,10 +116,10 @@ struct SimpleSoundEntity : virtual public EventEntity {
 
   SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
                     SoundInterfaceProxy *pSnd_)
-      : seq(seq_), nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()), pSnd(pSnd_) {
+      : nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()), seq(seq_), pSnd(pSnd_) {
   }
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** A sight that stays in one place and cycles through frames. */
@@ -133,7 +133,7 @@ struct Animation : public SimpleVisualEntity {
   Animation(const Animation &) = default;
   Animation &operator=(const Animation &) = default;
 
-  /*virtual*/ Point GetPosition() { return pos; }
+  Point GetPosition() override { return pos; }
 };
 
 /** An animation that plays once to the end, then vanishes. */
@@ -147,8 +147,8 @@ struct AnimationOnce : public SimpleVisualEntity {
       : SimpleVisualEntity(dPriority_, seq, bCenter, nTimeMeasure_), pos(p),
         bOnce(true) {}
 
-  /*virtual*/ Point GetPosition() { return pos; }
-  /*virtual*/ void Update();
+  Point GetPosition() override { return pos; }
+  void Update() override;
 };
 
 /** A sight that shows one image at a fixed point. */
@@ -165,11 +165,11 @@ struct StaticImage : public VisualEntity {
   StaticImage(const StaticImage &) = default;
   StaticImage &operator=(const StaticImage &) = default;
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ Point GetPosition() { return p; }
+  Point GetPosition() override { return p; }
 
-  /*virtual*/ float GetPriority() { return dPriority; }
+  float GetPriority() override { return dPriority; }
 };
 
 /** A sight that draws a filled rectangle (covers the vista, no single spot). */
@@ -180,13 +180,13 @@ struct StaticRectangle : public VisualEntity {
   Color c;
 
   StaticRectangle(Rectangle r_, Color c_, float dPriority_ = 0)
-      : r(r_), c(c_), dPriority(dPriority_) {}
+      : dPriority(dPriority_), r(r_), c(c_) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ Point GetPosition() { return Point(0, 0); }
+  Point GetPosition() override { return Point(0, 0); }
 
-  /*virtual*/ float GetPriority() { return dPriority; }
+  float GetPriority() override { return dPriority; }
 };
 
 /** A thing on the vista with a radius—so we can tell when it touches another. */
@@ -219,20 +219,20 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
 
   std::string sUnderText;
 
-  /*virtual*/ unsigned int GetRadius() { return nRadius; }
-  /*virtual*/ Point GetPosition() { return fPos.ToPnt(); }
-  /*virtual*/ void Move();
+  unsigned int GetRadius() override { return nRadius; }
+  Point GetPosition() override { return fPos.ToPnt(); }
+  void Move() override;
 
   Critter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
           float dPriority, const ImageSequence &seq, unsigned nPeriod)
-      : SimpleVisualEntity(dPriority, seq, true, nPeriod), rBound(rBound_),
-        nRadius(nRadius_), fPos(fPos_), fVel(fVel_), bDieOnExit(true),
+      : SimpleVisualEntity(dPriority, seq, true, nPeriod), nRadius(nRadius_),
+        fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         sUnderText("") {}
 
   Critter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
-          float dPriority, const ImageSequence &seq, bool bStep = false)
-      : SimpleVisualEntity(dPriority, seq, true, true), rBound(rBound_),
-        nRadius(nRadius_), fPos(fPos_), fVel(fVel_), bDieOnExit(true),
+          float dPriority, const ImageSequence &seq, bool /*bStep*/ = false)
+      : SimpleVisualEntity(dPriority, seq, true, true), nRadius(nRadius_),
+        fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         sUnderText("") {}
 };
 
@@ -248,14 +248,14 @@ struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
 
   Timer tm;
 
-  /*virtual*/ unsigned int GetRadius() { return nRadius; }
-  /*virtual*/ Point GetPosition() { return fPos.ToPnt(); }
-  /*virtual*/ void Move();
+  unsigned int GetRadius() override { return nRadius; }
+  Point GetPosition() override { return fPos.ToPnt(); }
+  void Move() override;
 
   FancyCritter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
                float dPriority, const ImageSequence &seq, unsigned nPeriod)
-      : SimpleVisualEntity(dPriority, seq, true, false), rBound(rBound_),
-        nRadius(nRadius_), fPos(fPos_), fVel(fVel_), bDieOnExit(true),
+      : SimpleVisualEntity(dPriority, seq, true, false), nRadius(nRadius_),
+        fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         tm(nPeriod) {}
 };
 
@@ -287,13 +287,13 @@ struct BonusScore : public EventEntity, public VisualEntity {
 
   BonusScore(LevelController *pAc_, Point p_, unsigned nScore_);
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ float GetPriority() { return 5; }
+  float GetPriority() override { return 5; }
 
-  /*virtual*/ Point GetPosition() { return p; }
+  Point GetPosition() override { return p; }
 };
 
 struct SoundControls : public EventEntity {
@@ -304,9 +304,9 @@ struct SoundControls : public EventEntity {
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
       : plr(plr_), nTheme(nTheme_) {}
   SoundControls(const SoundControls &) = default;
-  SoundControls &operator=(const SoundControls &) = default;
+  SoundControls &operator=(const SoundControls &) = delete;
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** Paints the finest tally yet within a rectangle on the vista. */
@@ -318,7 +318,7 @@ struct HighScoreShower : public VisualEntity {
   HighScoreShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 };
 
 struct IntroTextShower : public VisualEntity {
@@ -329,7 +329,7 @@ struct IntroTextShower : public VisualEntity {
   IntroTextShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 };
 
 /** Clear from the list all that have left the realm (bExist is false). */

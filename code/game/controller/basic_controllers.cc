@@ -127,14 +127,14 @@ void EntityListController::Update() {
     pGl->RefreshAll();
 }
 
-void EntityListController::OnKey(GuiKeyType c, bool bUp) {
+void EntityListController::OnKey(GuiKeyType /*c*/, bool bUp) {
   if (bUp)
     return;
 
   pGl->Next();
 }
 
-void EntityListController::OnMouseDown(Point pPos) { pGl->Next(); }
+void EntityListController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }
 
 void StartScreenController::Next() {
   pGl->Next();
@@ -154,7 +154,7 @@ void StartScreenController::OnKey(GuiKeyType c, bool bUp) {
 Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
                    std::string sRun, std::string sChase, bool bFlip)
     : EntityListController(pGl_, rBound_, Color(0, 0, 0)), pCrRun(),
-      pCrFollow(), bRelease(false), tm(nFramesInSecond / 5), Beepy(true) {
+      pCrFollow(), tm(nFramesInSecond / 5), Beepy(true), bRelease(false) {
   ImageSequence seq1 = pGl_->GetImgSeq(sRun);
 
   int xPos = 5;
@@ -210,7 +210,7 @@ void Cutscene::OnKey(GuiKeyType c, bool bUp) {
     pGl->Next();
 }
 
-void DragonScoreController::OnMouseDown(Point pPos) {
+void DragonScoreController::OnMouseDown(Point /*pPos*/) {
   if (bClickToExit)
     pGl->Next();
 }
@@ -228,7 +228,7 @@ DragonScoreController::DragonScoreController(DragonGameController *pGl_,
         std::make_unique<IntroTextShower>(pGl, rBound));
 }
 
-void DragonScoreController::OnKey(GuiKeyType c, bool bUp) {
+void DragonScoreController::OnKey(GuiKeyType /*c*/, bool bUp) {
   if (!bUp)
     pGl->Next();
 }
@@ -255,9 +255,9 @@ void AutoAdvanceController::Update() {
   EntityListController::Update();
 }
 
-void AutoAdvanceController::OnKey(GuiKeyType c, bool bUp) {
+void AutoAdvanceController::OnKey(GuiKeyType /*c*/, bool bUp) {
   if (!bUp)
     pGl->Next();
 }
 
-void AutoAdvanceController::OnMouseDown(Point pPos) { pGl->Next(); }
+void AutoAdvanceController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }

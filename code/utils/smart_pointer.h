@@ -33,11 +33,11 @@ class SP_Info {
 public:
   std::string _SP_INFO_STRING;
 
-  SP_Info(const SP_Info &inf) : _SP_INFO_COUNTER(0) {
+  SP_Info(const SP_Info& /*inf*/) : _SP_INFO_COUNTER(0) {
     ++nGlobalSuperMegaCounter;
   }
   SP_Info() : _SP_INFO_COUNTER(0) { ++nGlobalSuperMegaCounter; }
-  SP_Info(std::string sStr_) : _SP_INFO_STRING(sStr_), _SP_INFO_COUNTER(0) {
+  SP_Info(std::string sStr_) : _SP_INFO_COUNTER(0), _SP_INFO_STRING(std::move(sStr_)) {
     ++nGlobalSuperMegaCounter;
   }
 

@@ -63,17 +63,17 @@ struct ChainExplosion : virtual public AnimationOnce,
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
                  EntityListController *pBc_, Chain ch_ = Chain())
-      : AnimationOnce(av), r(r_), r_in(r_), delta(delta_), pBc(pBc_), ch(ch_) {}
+      : AnimationOnce(av), r_in(r_), r(r_), delta(delta_), ch(ch_), pBc(pBc_) {}
 
-  /*virtual*/ unsigned GetRadius() { return unsigned(r); }
+  unsigned GetRadius() override { return unsigned(r); }
   /**
    * Each tick the blast may grow. Clear the fallen. For each soul inside
    * (save golems and great slimes): deal fire and maybe birth another blast
    * for a chain. Then advance the blast's dance.
    */
-  /*virtual*/ void Update();
+  void Update() override;
 
-  void Draw(ScalingDrawer *pDr) { AnimationOnce::Draw(pDr); }
+  void Draw(ScalingDrawer *pDr) override { AnimationOnce::Draw(pDr); }
 };
 
 struct KnightOnFire : public Critter {
@@ -89,7 +89,7 @@ struct KnightOnFire : public Critter {
   KnightOnFire(const Critter &cr, EntityListController *pBc_,
                 unsigned nTimer_, Chain c_);
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** The dragon's fireball: may pass through or stop on first hit; strikes
@@ -104,13 +104,13 @@ struct Fireball : public Critter {
   unsigned nChain;
 
   Fireball(const Fireball &f)
-      : pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch), nChain(f.nChain),
-        Critter(f) {}
+      : Critter(f), pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
+        nChain(f.nChain) {}
 
   Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
            Chain ch_ = Chain(), unsigned nChain_ = 1);
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** A fire strength that fades with time (e.g. a temporary boon). */
@@ -121,7 +121,7 @@ struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   TimedFireballBonus(const FireballBonus &fb, unsigned nPeriod)
       : FireballBonus(fb), t(nPeriod) {}
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** A fireball that circles at a fixed radius around the dragon. */
@@ -136,7 +136,7 @@ struct CircularFireball : virtual public Fireball,
       : Fireball(f), TimedFireballBonus(FireballBonus(8, false), nPeriod),
         fRadius(fRadius_), i_pos(f.fPos), t(nPeriod) {}
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 /** A treasure shimmer with a radius; when the dragon touches it, the treasure
@@ -153,11 +153,11 @@ struct FireballBonusAnimation : public Animation,
 
   FireballBonusAnimation(Point p_, unsigned n_, LevelController *pAd_);
 
-  /*virtual*/ unsigned GetRadius() { return 20U; }
+  unsigned GetRadius() override { return 20U; }
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
+  void Draw(ScalingDrawer *pDr) override;
 
-  /*virtual*/ void Update();
+  void Update() override;
 };
 
 int GetFireballRaduis(FireballBonus &fb);

@@ -89,7 +89,7 @@ struct MouseCursor {
   Point pCursorPos;
 
   MouseCursor(ImageSequence imgCursor_, Point pCursorPos_)
-      : imgCursor(imgCursor_), pCursorPos(pCursorPos_), bPressed(false) {}
+      : bPressed(false), imgCursor(imgCursor_), pCursorPos(pCursorPos_) {}
 
   void DrawCursor(GraphicalInterface<Index> *pGr);
   void SetCursorPos(Point pPos);

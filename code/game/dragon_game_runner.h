@@ -55,15 +55,15 @@ public:
   DragonGameRunner(ProgramEngine const& pe);
   ~DragonGameRunner();
 
-  /*virtual*/ void Update();
+  void Update() override;
 
-  /*virtual*/ void KeyDown(GuiKeyType nCode);
-  /*virtual*/ void KeyUp(GuiKeyType nCode);
-  /*virtual*/ void MouseMove(Point pPos);
-  /*virtual*/ void MouseDown(Point pPos);
-  /*virtual*/ void MouseUp();
-  /*virtual*/ void DoubleClick();
-  /*virtual*/ void Fire();
+  void KeyDown(GuiKeyType nCode) override;
+  void KeyUp(GuiKeyType nCode) override;
+  void MouseMove(Point pPos) override;
+  void MouseDown(Point pPos) override;
+  void MouseUp() override;
+  void DoubleClick() override;
+  void Fire() override;
 
   /** For scribes and trials: who holds the tower now (levels, menu, etc.). */
   DragonGameController *GetTowerController() const;

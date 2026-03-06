@@ -239,7 +239,6 @@ void SdlGraphicalInterface::DrawImage(Point p, SdlImage *pImg, Rectangle r,
     AdjustImageOverlap(pScreenImage->GetSize(), pImg->GetSize(), p, r);
     ImageOnto(pScreenImage, p, pImg, r);
 
-    Size sz = pImg->GetSize();
     if (bRefresh)
       RefreshScreen();
     // SDL_UpdateRect(pScreen->pImg, p.x, p.y, r.sz.x, r.sz.y);
