@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ctest --output-on-failure)"
+      "Bash(ctest --output-on-failure)",
+      "Bash(cmake --preset debug)",
+      "Bash(cmake --build --preset debug)",
+      "Bash(cmake --preset strict)",
+      "Bash(cmake --build build/strict)",
+      "Bash(cmake --build build/strict -- -k)"
     ]
   }
 }
