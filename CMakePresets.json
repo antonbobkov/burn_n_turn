@@ -17,15 +17,6 @@
       "displayName": "Clang Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-g"
-      }
-    },
-    {
-      "name": "strict",
-      "inherits": "base",
-      "displayName": "Clang Strict",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -g -Werror"
       }
     },
