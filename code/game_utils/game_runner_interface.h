@@ -2,13 +2,13 @@
 #define GAME_RUNNER_INTERFACE_H
 
 #include "event.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/gui_key_type.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/gui_key_type.h"
 
 #include <memory>
 #include "MessageWriter.h"
-#include "wrappers/GuiGen.h"
-#include "wrappers/SuiGen.h"
+#include "../wrappers/GuiGen.h"
+#include "../wrappers/SuiGen.h"
 
 class FileManager;
 struct ProgramInfo {

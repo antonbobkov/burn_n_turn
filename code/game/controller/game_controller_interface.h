@@ -1,9 +1,9 @@
 #ifndef TOWER_DEFENSE_GAME_CONTROLLER_INTERFACE_H
 #define TOWER_DEFENSE_GAME_CONTROLLER_INTERFACE_H
 
-#include "utils/smart_pointer.h"
-#include "wrappers/geometry.h"
-#include "wrappers/gui_key_type.h"
+#include "../../utils/smart_pointer.h"
+#include "../../wrappers/geometry.h"
+#include "../../wrappers/gui_key_type.h"
 
 struct DragonGameController;
 

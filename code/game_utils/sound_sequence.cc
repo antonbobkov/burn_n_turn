@@ -1,4 +1,4 @@
-#include "game_utils/sound_sequence.h"
+#include "sound_sequence.h"
 
 SoundSequence::SoundSequence() : nActive(0) {}
 

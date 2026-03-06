@@ -2,14 +2,14 @@
 #include "critters.h"
 #include "dragon_constants.h"
 #include "dragon_macros.h"
-#include "game/controller/dragon_game_controller.h"
-#include "game/controller/level_controller.h"
-#include "game/entities.h"
-#include "game/level.h"
-#include "game/tutorial.h"
-#include "utils/random_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/geometry.h"
+#include "controller/dragon_game_controller.h"
+#include "controller/level_controller.h"
+#include "entities.h"
+#include "level.h"
+#include "tutorial.h"
+#include "../utils/random_utils.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/geometry.h"
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
     : p(p_), t(unsigned(.7F * nFramesInSecond)), pAdv(pAdv_) {

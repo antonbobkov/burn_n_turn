@@ -1,7 +1,7 @@
 #ifndef SUIGEN_ALREADY_INCLUDED_08_25
 #define SUIGEN_ALREADY_INCLUDED_08_25
 
-#include "utils/index.h"
+#include "../utils/index.h"
 #include <string>
 
 template <class SndHndl> class SoundInterface {

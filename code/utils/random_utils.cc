@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <string>
 
-#include "utils/random_utils.h"
+#include "random_utils.h"
 
 unsigned GetRandNum(unsigned nRange) {
   return unsigned(float(rand()) / (float(RAND_MAX) + 1) * nRange);

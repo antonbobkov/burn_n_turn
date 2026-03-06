@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "geometry.h"
-#include "utils/math_utils.h"
+#include "../utils/math_utils.h"
 
 /* Point */
 Point::Point() : x(0), y(0) {}

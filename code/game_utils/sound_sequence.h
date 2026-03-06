@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "utils/index.h"
+#include "../utils/index.h"
 
 /** Sequence of sound indices with per-sound intervals; for multi-sound
  * effects. */

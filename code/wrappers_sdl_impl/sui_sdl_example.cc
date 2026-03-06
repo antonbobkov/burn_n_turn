@@ -8,7 +8,7 @@
  */
 
 #include "SuiSdl.h"
-#include "utils/exception.h"
+#include "../utils/exception.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>

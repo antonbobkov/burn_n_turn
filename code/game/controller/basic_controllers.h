@@ -1,13 +1,13 @@
 #ifndef TOWER_DEFENSE_BASIC_CONTROLLERS_H
 #define TOWER_DEFENSE_BASIC_CONTROLLERS_H
 
-#include "game/controller/game_controller_interface.h"
-#include "utils/index.h"
-#include "utils/smart_pointer.h"
-#include "utils/timer.h"
-#include "wrappers/color.h"
-#include "wrappers/geometry.h"
-#include "wrappers/gui_key_type.h"
+#include "game_controller_interface.h"
+#include "../../utils/index.h"
+#include "../../utils/smart_pointer.h"
+#include "../../utils/timer.h"
+#include "../../wrappers/color.h"
+#include "../../wrappers/geometry.h"
+#include "../../wrappers/gui_key_type.h"
 #include <list>
 #include <memory>
 #include <vector>

@@ -2,7 +2,7 @@
  * string_utils.cc - BreakUpString implementation.
  */
 
-#include "utils/string_utils.h"
+#include "string_utils.h"
 
 std::vector<std::string> BreakUpString(std::string s) {
   s += '\n';

@@ -1,7 +1,7 @@
-#include "game_utils/sound_utils.h"
-#include "utils/exception.h"
-#include "utils/string_utils.h"
-#include "wrappers/SuiGen.h"
+#include "sound_utils.h"
+#include "../utils/exception.h"
+#include "../utils/string_utils.h"
+#include "../wrappers/SuiGen.h"
 
 void SoundInterfaceProxy::PlaySound(Index i, int nChannel, bool bLoop) {
   if (bSoundOn)

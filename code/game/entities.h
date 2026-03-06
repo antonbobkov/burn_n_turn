@@ -1,15 +1,15 @@
 #ifndef TOWER_DEFENSE_ENTITIES_H
 #define TOWER_DEFENSE_ENTITIES_H
 
-#include "game_utils/draw_utils.h"
-#include "game_utils/image_sequence.h"
-#include "game_utils/sound_sequence.h"
-#include "game_utils/sound_utils.h"
-#include "utils/index.h"
-#include "utils/smart_pointer.h"
-#include "utils/timer.h"
-#include "wrappers/color.h"
-#include "wrappers/geometry.h"
+#include "../game_utils/draw_utils.h"
+#include "../game_utils/image_sequence.h"
+#include "../game_utils/sound_sequence.h"
+#include "../game_utils/sound_utils.h"
+#include "../utils/index.h"
+#include "../utils/smart_pointer.h"
+#include "../utils/timer.h"
+#include "../wrappers/color.h"
+#include "../wrappers/geometry.h"
 
 #include <list>
 

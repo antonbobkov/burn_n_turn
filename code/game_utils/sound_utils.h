@@ -7,8 +7,8 @@
  * Dependencies (include required): SP_Info -> utils/smart_pointer.h;
  * Index -> utils/index.h; smart_pointer -> utils/smart_pointer.h. */
 
-#include "utils/index.h"
-#include "utils/smart_pointer.h"
+#include "../utils/index.h"
+#include "../utils/smart_pointer.h"
 
 template <class T> class SoundInterface;
 

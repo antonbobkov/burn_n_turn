@@ -3,16 +3,16 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
-#include "game/controller/dragon_game_controller.h"
-#include "game/dragon_game_runner.h"
-#include "game_utils/MessageWriter.h"
-#include "game_utils/game_runner_interface.h"
-#include "utils/exception.h"
-#include "utils/file_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/gui_key_type.h"
-#include "wrappers_mock/GuiMock.h"
-#include "wrappers_mock/SuiMock.h"
+#include "../game/controller/dragon_game_controller.h"
+#include "../game/dragon_game_runner.h"
+#include "../game_utils/MessageWriter.h"
+#include "../game_utils/game_runner_interface.h"
+#include "../utils/exception.h"
+#include "../utils/file_utils.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/gui_key_type.h"
+#include "../wrappers_mock/GuiMock.h"
+#include "../wrappers_mock/SuiMock.h"
 
 #include <algorithm>
 #include <catch2/catch.hpp>

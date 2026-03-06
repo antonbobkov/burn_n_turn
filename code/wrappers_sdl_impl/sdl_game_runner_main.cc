@@ -4,13 +4,13 @@
 #include <time.h>
 #include <vector>
 
-#include "game_utils/event.h"
-#include "game_utils/game_runner_interface.h"
-#include "game_utils/MessageWriter.h"
-#include "utils/file_utils.h"
-#include "utils/smart_pointer.h"
-#include "wrappers/color.h"
-#include "wrappers/gui_key_type.h"
+#include "../game_utils/event.h"
+#include "../game_utils/game_runner_interface.h"
+#include "../game_utils/MessageWriter.h"
+#include "../utils/file_utils.h"
+#include "../utils/smart_pointer.h"
+#include "../wrappers/color.h"
+#include "../wrappers/gui_key_type.h"
 
 
 #include "GuiSdl.h"

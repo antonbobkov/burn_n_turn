@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ctest --output-on-failure)"
+    ]
+  }
+}

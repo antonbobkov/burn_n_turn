@@ -21,7 +21,6 @@ add_library(Utils
   smart_pointer.cc
 )
 
-target_include_directories(Utils PUBLIC ${CMAKE_SOURCE_DIR})
 
 add_executable(configuration_file_test configuration_file_test.cc)
 target_link_libraries(configuration_file_test PRIVATE Utils Catch2::Catch2WithMain)

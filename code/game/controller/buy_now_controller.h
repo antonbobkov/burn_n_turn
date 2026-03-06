@@ -1,10 +1,10 @@
 #ifndef TOWER_DEFENSE_BUY_NOW_CONTROLLER_H
 #define TOWER_DEFENSE_BUY_NOW_CONTROLLER_H
 
-#include "game/controller/basic_controllers.h"
-#include "game/entities.h"
-#include "game_utils/draw_utils.h"
-#include "utils/smart_pointer.h"
+#include "basic_controllers.h"
+#include "../entities.h"
+#include "../../game_utils/draw_utils.h"
+#include "../../utils/smart_pointer.h"
 #include <memory>
 
 /** The keeper of the buy-now screen: slime dances and a countdown. */
