@@ -89,4 +89,16 @@ add_custom_command(TARGET copy_sdl_dlls POST_BUILD
       "${SDL_MIXER_BIN_ABS}/SDL2_mixer.dll"
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+# Copy bin_files/ contents next to the executables (skips files that are already up to date)
+add_custom_target(copy_bin_files
+  COMMAND ${CMAKE_COMMAND} -E make_directory
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CMAKE_SOURCE_DIR}/bin_files/config.txt"
+      "${CMAKE_SOURCE_DIR}/bin_files/test_image.bmp"
+      "${CMAKE_SOURCE_DIR}/bin_files/test_music.wav"
+      "${CMAKE_SOURCE_DIR}/bin_files/test_sound.wav"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  COMMENT "Copying bin_files/ to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 add_subdirectory(code)

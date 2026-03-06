@@ -18,4 +18,5 @@ add_library(GameUtils
   sound_utils.cc
 )
 
+target_include_directories(GameUtils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(GameUtils PRIVATE Utils GuiGen SuiGen)
