@@ -28,6 +28,8 @@ and delegates input/update to the active controller.
 **Recommendation:** A or C — single owner at entry; migrate to unique_ptr
 (Phase 6 entry-point goal). B is a larger refactor.
 
+**Selected: Option A** — Entry point holds `unique_ptr<GameRunner>`; GetGameRunner returns `unique_ptr<GameRunner>`.
+
 ---
 
 ## 2. TowerDataWrap
@@ -45,6 +47,8 @@ paths, level layouts, and `unique_ptr<DragonGameController>`.
 **Recommendation:** A (Runner owns unique_ptr<TowerDataWrap>) or B (merge into
 Runner). Current raw pData fits A with minimal change.
 
+**Selected: Option B** — TowerDataWrap is merged into DragonGameRunner; its members become direct members of the runner class.
+
 ---
 
 ## 3. DragonGameController (DGC)
@@ -61,6 +65,8 @@ preloader, bonuses to carry over.
 
 **Recommendation:** A or B — single owner above DGC (Runner or its data wrap).
 No shared ownership.
+
+**Selected: Option B** — Because TowerDataWrap is merged into Runner (decision 2B), Runner directly holds `unique_ptr<DragonGameController>`.
 
 ---
 
@@ -80,6 +86,8 @@ minimal behavior change. B simplifies ownership but changes lifecycle (recreate
 on each transition). C is possible if we want lazy creation without keeping
 every screen alive.
 
+**Selected: Option A** — DGC owns `vector<unique_ptr<GameController>>`; active controller identified by index.
+
 ---
 
 ## 5. MenuController (pMenu)
@@ -98,6 +106,14 @@ stack" (only in vCnt). A/C: keep single unique_ptr<MenuController> in DGC;
 vCnt either does not own menu or holds raw ptr to it. B: no pMenu; create
 MenuController when entering menu and push into vCnt (then need to track which
 element is menu for ExitMenuResume).
+
+**Selected: Option B modified** — `pMenu` is kept as a convenience member on
+DGC but is a **raw (non-owning) pointer** (`MenuController*`). Ownership lives
+exclusively in `vCnt` (`vector<unique_ptr<GameController>>`; decision 4A). When
+MenuController is created it is pushed into `vCnt` as a `unique_ptr`; `pMenu`
+is then set to point at that same object. This gives DGC typed access to the
+menu without a second owner. `pMenu` must be cleared (set to `nullptr`) if the
+menu entry is ever removed from `vCnt`.
 
 ---
 
@@ -119,6 +135,9 @@ its screen (MenuDisplay, level critters, etc.); shared resources (drawers,
 fonts) owned above and passed as raw ptr. Migrate remaining smart_pointer in
 EntityListController to unique_ptr where controller is sole owner.
 
+**Selected: No change in this pass** — view entity ownership inside controllers
+is out of scope for Phase 5. Keep as-is.
+
 ---
 
 ## 7. Shared resources (drawers, fonts, config)
@@ -136,6 +155,8 @@ owned by TowerDataWrap; DGC and controllers use raw pointers.
 **Recommendation:** A — keep ownership in TowerDataWrap (or Runner). DGC and
 controllers stay non-owning. Easiest and matches current layout.
 
+**Selected: Option A** — Runner (after merging TowerDataWrap, decision 2B) owns drawers, config, and fonts. DGC and all controllers receive raw pointers.
+
 ---
 
 ## 8. GameRunner interface and GetGameRunner
@@ -151,6 +172,8 @@ callers (main, tests) hold that.
 | C | Keep smart_pointer return for Phase 5; migrate in Phase 6 | Phase 5 only migrates controller/runner internals; GetGameRunner and entry ownership in Phase 6. |
 
 **Recommendation:** A for Phase 6; Phase 5 can leave GetGameRunner signature as-is (smart_pointer) and migrate internals only, or switch to unique_ptr in Phase 5 if entry-point call sites are touched anyway.
+
+**Selected: Option A** — GetGameRunner returns `unique_ptr<GameRunner>`; entry points (main, simulation_test) take ownership.
 
 ---
 
@@ -171,6 +194,8 @@ borrowed.
 non-owning lists for iteration. Matches Phase 3 direction (GetNonOwned*,
 AddOwned*). Remove smart_pointer from lsDraw/lsUpdate/lsPpl.
 
+**Selected: No change in this pass** — lsDraw/lsUpdate/lsPpl migration is out of scope for Phase 5. Keep as-is.
+
 ---
 
 ## 10. Cutscene::pCrRun, pCrFollow (FancyCritter)
@@ -185,6 +210,8 @@ smart_pointer<FancyCritter>.
 
 **Recommendation:** A or B — Cutscene owns both; migrate to unique_ptr (or
 owned_*). No shared ownership.
+
+**Selected: Option A** — `pCrRun` and `pCrFollow` become `unique_ptr<FancyCritter>` members directly on Cutscene. They are registered into the update and draw lists via `GetNonOwned*` (raw pointers).
 
 ---
 
@@ -216,21 +243,22 @@ for mute/music control.
 
 ---
 
-## Summary table (suggested single-owner choices)
+## Summary table (final decisions)
 
-| Object(s) | Suggested owner | Migration note |
-|-----------|-----------------|-----------------|
-| DragonGameRunner | Entry (main / test) | unique_ptr at entry; Phase 5 or 6. |
-| TowerDataWrap | DragonGameRunner | unique_ptr<TowerDataWrap> in Runner. |
-| DragonGameController | TowerDataWrap (or Runner) | Already unique_ptr in TowerDataWrap. |
-| vCnt (controller list) | DGC | vector<unique_ptr<GameController>>; active = index. |
-| MenuController | DGC (pMenu) | unique_ptr<MenuController>; vCnt refers to it or holds raw. |
-| View entities per controller | That controller | unique_ptr / owned_* in controller; ls* non-owning. |
-| Shared resources (drawers, config) | TowerDataWrap / Runner | DGC and controllers get raw ptrs. |
-| GetGameRunner return | Caller (entry) | unique_ptr<GameRunner> in Phase 6. |
-| lsDraw / lsUpdate / lsPpl | Non-owning; ownership in owned_* | Migrate to raw ptr lists; owned_* hold unique_ptr. |
-| Cutscene pCrRun/pCrFollow | Cutscene | unique_ptr or owned_*. |
-| Preloader, SoundInterfaceProxy | DGC | Keep as unique_ptr in DGC. |
+| # | Object(s) | Decision | Owner / mechanism |
+|---|-----------|----------|-------------------|
+| 1 | DragonGameRunner | **A** | Entry (main / test) holds `unique_ptr<GameRunner>`; `GetGameRunner` returns `unique_ptr<GameRunner>`. |
+| 2 | TowerDataWrap | **B** | Merged into DragonGameRunner; no separate type. |
+| 3 | DragonGameController | **B** | Runner holds `unique_ptr<DragonGameController>` directly (follows from 2B). |
+| 4 | vCnt (controller list) | **A** | DGC owns `vector<unique_ptr<GameController>>`; active = index. |
+| 5 | MenuController (pMenu) | **B modified** | vCnt owns the object (`unique_ptr`); `pMenu` is a raw non-owning `MenuController*` on DGC for typed access. Must be kept in sync with vCnt. |
+| 6 | View entities per controller | **no change** | Out of scope for Phase 5; keep as-is. |
+| 7 | Shared resources (drawers, config) | **A** | Runner (merged from TowerDataWrap) owns drawers, config, fonts. DGC and controllers get raw pointers. |
+| 8 | GetGameRunner / GameRunner interface | **A** | `GetGameRunner` returns `unique_ptr<GameRunner>`; entry holds ownership. |
+| 9 | lsDraw / lsUpdate / lsPpl | **no change** | Out of scope for Phase 5; keep as-is. |
+| 10 | Cutscene pCrRun / pCrFollow | **A** | `unique_ptr<FancyCritter>` members on Cutscene; registered into update/draw lists via `GetNonOwned*` (non-owning). |
+| 11 | Preloader | **A** | DGC keeps `unique_ptr<Preloader>`; no change. |
+| 12 | SoundInterfaceProxy | **A** | DGC keeps `unique_ptr<SoundInterfaceProxy>`; no change. |
 
 ---
 
