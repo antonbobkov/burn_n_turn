@@ -103,7 +103,7 @@ int main(int /*argc*/, char * /*argv*/[]) {
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);
 
-    smart_pointer<GameRunner> pGl = GetGameRunner(pe);
+    std::unique_ptr<GameRunner> pGl = GetGameRunner(pe);
 
     std::map<int, GuiKeyType> vSdlMapper;
     SdlMapKeys(vSdlMapper);
@@ -112,7 +112,7 @@ int main(int /*argc*/, char * /*argv*/[]) {
 
     Point pMousePos = Point(0, 0);
     while (!bExit) {
-      if (SDL_GetTicks() - nTimer > inf.nFramerate) {
+      if (SDL_GetTicks() - nTimer > static_cast<Uint32>(inf.nFramerate)) {
         nTimer = SDL_GetTicks();
         pGl->Update();
       }
