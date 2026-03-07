@@ -114,7 +114,7 @@ void KnightOnFire::RandomizeVelocity() {
 }
 
 KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
-                           unsigned nTimer_, Chain c_)
+                           int nTimer_, Chain c_)
     : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_),
       t(nFramesInSecond / 5), c(c_) {
   Critter::seq = pBc->pGl->GetImgSeq("knight_fire");
@@ -151,7 +151,7 @@ void KnightOnFire::Update() {
 
     pBc->AddOwnedBoth(std::make_unique<AnimationOnce>(
         dPriority, pBc->pGl->GetImgSeq("knight_die"),
-        unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+        int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
   }
 
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
@@ -216,7 +216,7 @@ float GetExplosionExpansionRate(FireballBonus &fb) {
   return 3.9F * fCf;
 }
 
-unsigned GetFireballChainNum(FireballBonus &fb) {
+int GetFireballChainNum(FireballBonus &fb) {
   int nRet = fb.uMap["fireballchainnum"];
 
   if (nRet != 0)
@@ -226,7 +226,7 @@ unsigned GetFireballChainNum(FireballBonus &fb) {
 }
 
 Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
-                   Chain ch_, unsigned nChain_)
+                   Chain ch_, int nChain_)
     : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
               nFramesInSecond / 10),
       pBc(pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
@@ -236,7 +236,7 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
     Critter::seq = pBc->pGl->GetImgSeq("fireball" + GetSizeSuffix(fb));
   else {
     Polar pol(Critter::fVel);
-    unsigned n = DiscreetAngle(pol.a, 16);
+    int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
         pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
@@ -288,7 +288,7 @@ void Fireball::Update() {
         if (bKeepGoing) {
           fPoint v = fVel;
 
-          for (unsigned i = 0; i < nChain; ++i) {
+          for (int i = 0; i < nChain; ++i) {
             pBc->AddOwnedBoth(std::make_unique<Fireball>(
                 ptr->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
                 pBc, fb, Chain(), nChain));
@@ -348,13 +348,13 @@ void CircularFireball::Update() {
 
   if (fb.bMap["laser"]) {
     Polar pol(Critter::fVel);
-    unsigned n = DiscreetAngle(pol.a, 16);
+    int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
         pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
   }
 }
 
-FireballBonusAnimation::FireballBonusAnimation(Point p_, unsigned n_,
+FireballBonusAnimation::FireballBonusAnimation(Point p_, int n_,
                                                LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       tm(nBonusOnGroundTime), bBlink(false), pAd(pAd_), sUnderText("") {
@@ -387,11 +387,11 @@ void FireballBonusAnimation::Update() {
 
     ImageSequence img;
 
-    unsigned nSz = seq.vImage.size();
+    int nSz = (int)seq.vImage.size();
 
-    for (unsigned i = 0; i < nSz; ++i) {
+    for (int i = 0; i < nSz; ++i) {
       int nLm = 1;
-      if (seq.vIntervals.size() > i)
+      if ((int)seq.vIntervals.size() > i)
         nLm = seq.vIntervals[i];
       if (nLm == 0)
         nLm = 1;

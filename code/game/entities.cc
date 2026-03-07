@@ -17,7 +17,7 @@ void TextDrawEntity::SetText(std::string sText) {
 
 void TextDrawEntity::Draw(ScalingDrawer * /*pDr*/) {
   Point p = pos;
-  for (unsigned i = 0; i < vText.size(); ++i) {
+  for (int i = 0; i < (int)vText.size(); ++i) {
     pNum->DrawWord(vText[i], p, bCenter);
     p.y += 7;
   }
@@ -57,7 +57,7 @@ void SimpleSoundEntity::Update() {
   if (t.Tick()) {
     pSnd->PlaySound(seq.GetSound());
 
-    if (seq.nActive == seq.vSounds.size() - 1) {
+    if (seq.nActive == (int)seq.vSounds.size() - 1) {
       bExist = false;
       return;
     }
@@ -82,8 +82,8 @@ bool PhysicalEntity::HitDetection(PhysicalEntity *pPh) {
   if (pPh == nullptr)
     return false;
   Point d = GetPosition() - pPh->GetPosition();
-  unsigned r1 = GetRadius(), r2 = pPh->GetRadius();
-  return unsigned(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);
+  int r1 = GetRadius(), r2 = pPh->GetRadius();
+  return int(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);
 }
 
 void Critter::Move() {
@@ -122,9 +122,9 @@ void FancyCritter::Move() {
   }
 }
 
-BonusScore::BonusScore(LevelController *pAc_, Point p_, unsigned nScore_)
+BonusScore::BonusScore(LevelController *pAc_, Point p_, int nScore_)
     : pAc(pAc_), nScore(nScore_), nScoreSoFar(0),
-      p(p_ + Point(0, -5)), t(unsigned(.1F * nFramesInSecond)), nC(0), c(255, 255, 0) {
+      p(p_ + Point(0, -5)), t(int(.1F * nFramesInSecond)), nC(0), c(255, 255, 0) {
   std::ostringstream ostr(sText);
   ostr << '+' << nScore;
   sText = ostr.str();
@@ -200,7 +200,7 @@ void SoundControls::Update() {
 
   pCnt.y -= (vText.size() * nHeight) / 2;
 
-  for (unsigned i = 0; i < vText.size(); ++i) {
+  for (int i = 0; i < (int)vText.size(); ++i) {
     pGl->GetFancyFont()->DrawWord(vText[i], pCnt, true);
     pCnt.y += nHeight;
   }

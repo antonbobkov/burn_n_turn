@@ -28,11 +28,11 @@ struct Drawer {
 
 /** Drawer that scales images by nFactor and uses cTr as transparency key. */
 struct ScalingDrawer : public Drawer {
-  unsigned nFactor;
+  int nFactor;
   Color cTr;
 
   ScalingDrawer(GraphicalInterface<Index> *pGr_,
-                unsigned nFactor_,
+                int nFactor_,
                 Color cTr_ = Color(0, 255, 255))
       : nFactor(nFactor_), cTr(cTr_) {
     pGr = pGr_;
@@ -59,13 +59,13 @@ struct NumberDrawer {
   NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
                std::string sFontPath, std::string sFontName);
 
-  std::string GetNumber(unsigned n, unsigned nDigits = 0);
+  std::string GetNumber(int n, int nDigits = 0);
 
-  void DrawNumber(unsigned n, Point p, unsigned nDigits = 0) {
+  void DrawNumber(int n, Point p, int nDigits = 0) {
     DrawWord(GetNumber(n, nDigits), p);
   }
 
-  void DrawColorNumber(unsigned n, Point p, Color c, unsigned nDigits = 0) {
+  void DrawColorNumber(int n, Point p, Color c, int nDigits = 0) {
     DrawColorWord(GetNumber(n, nDigits), p, c);
   }
 

@@ -33,7 +33,7 @@ void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {
 }
 
 void BuyNowController::DrawSlimes() {
-  for (unsigned i = 0; i < mSlimes.size(); i++)
+  for (int i = 0; i < (int)mSlimes.size(); i++)
     mSlimes[i]->Draw(pGl->GetDrawer());
 }
 
@@ -41,12 +41,12 @@ void BuyNowController::Update() {
   EntityListController::Update();
 
   if (tVel.Tick()) {
-    for (unsigned i = 0; i < mSlimes.size(); i++)
+    for (int i = 0; i < (int)mSlimes.size(); i++)
       if (float(rand()) / RAND_MAX < .25)
         RandomizeVelocity(mSlimeVel[i], mSlimePos[i]);
   }
 
-  for (unsigned i = 0; i < mSlimes.size(); i++) {
+  for (int i = 0; i < (int)mSlimes.size(); i++) {
     mSlimes[i]->Update();
     mSlimePos[i] += mSlimeVel[i];
     mSlimes[i]->pos = mSlimePos[i].ToPnt();

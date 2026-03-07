@@ -75,12 +75,12 @@ struct Polar {
 };
 
 fPoint ComposeDirection(int dir1, int dir2);
-fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
-                    unsigned nHowMany);
+fPoint GetWedgeAngle(fPoint fDir, float dWidth, int nWhich,
+                    int nHowMany);
 fPoint RandomAngle(fPoint fDir = fPoint(1, 0), float fRange = 1.F);
 
-inline unsigned DiscreetAngle(float a, unsigned nDiv) {
-  return unsigned((-a / 2 / 3.1415 + 2 - 1.0 / 4 + 1.0 / 2 / nDiv) * nDiv) %
+inline int DiscreetAngle(float a, int nDiv) {
+  return int((-a / 2 / 3.1415 + 2 - 1.0 / 4 + 1.0 / 2 / nDiv) * nDiv) %
          nDiv;
 }
 

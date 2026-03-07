@@ -12,7 +12,7 @@ struct Dragon;
 
 struct Castle : public Critter {
   std::string get_class_name() override { return "Castle"; }
-  unsigned nPrincesses;
+  int nPrincesses;
   LevelController *pAv;
   Dragon *pDrag;
 
@@ -67,7 +67,7 @@ struct Mage : public Critter, public ConsumableEntity {
   void OnHit(char cWhat) override;
 };
 
-unsigned RandomBonus(bool bInTower = true);
+int RandomBonus(bool bInTower = true);
 
 std::string GetBonusImage(int n);
 
@@ -236,7 +236,7 @@ struct FloatingSlime : public SimpleVisualEntity {
 
   Timer tTermination;
 
-  FloatingSlime(ImageSequence seq, Point pStart, Point pEnd, unsigned nTime);
+  FloatingSlime(ImageSequence seq, Point pStart, Point pEnd, int nTime);
 
   Point GetPosition() override { return fPos.ToPnt(); }
   void Update() override;
@@ -244,7 +244,7 @@ struct FloatingSlime : public SimpleVisualEntity {
 
 void SummonSkeletons(LevelController *pAc, Point p);
 
-inline unsigned GetTimeUntillSpell() {
+inline int GetTimeUntillSpell() {
   return 8 * nFramesInSecond + rand() % (3 * nFramesInSecond);
 }
 

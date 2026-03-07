@@ -56,10 +56,10 @@ std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
 struct Road : virtual public VisualEntity {
   std::string get_class_name() override { return "Road"; }
   bool bVertical;
-  unsigned nCoord;
+  int nCoord;
   Rectangle rBound;
 
-  Road(bool bVertical_, unsigned nCoord_, Rectangle rBound_)
+  Road(bool bVertical_, int nCoord_, Rectangle rBound_)
       : bVertical(bVertical_), nCoord(nCoord_), rBound(rBound_) {}
   Road(const Road &) = default;
   Road &operator=(const Road &) = default;
@@ -96,14 +96,14 @@ struct FancyRoad : public Road {
 struct LevelLayout {
   Rectangle sBound;
 
-  unsigned nLvl;
+  int nLvl;
 
   LevelLayout(Rectangle sBound_) : sBound(sBound_) {}
 
   BrokenLine blKnightGen;
   std::vector<Point> vCastleLoc;
   std::vector<Road> vRoadGen;
-  unsigned nTimer;
+  int nTimer;
 
   std::vector<float> vFreq;
 

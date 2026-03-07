@@ -92,7 +92,7 @@ DragonGameController::DragonGameController(
   vColors.push_back(ColorMap(Color(0, 127, 0), Color(0, 0, 127)));
   vColors.push_back(ColorMap(Color(0, 191, 0), Color(0, 0, 191)));
 
-  unsigned nScale = 2;
+  int nScale = 2;
 
   pr->AddTransparent(Color(0, 0, 0));
   pr->SetScale(nScale);
@@ -491,7 +491,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   vCnt.push_back(pIntro); // tutorial screen
 #endif
 
-  for (unsigned i = 0; i < vLvl.size(); ++i) {
+  for (int i = 0; i < (int)vLvl.size(); ++i) {
     smart_pointer<LevelController> pAd =
         make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
     pAd->Init(pAd.get(), vLvl[i]);
@@ -563,12 +563,12 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 }
 
 void DragonGameController::Next() {
-  if (nActive == vCnt.size() - 1)
+  if (nActive == (int)vCnt.size() - 1)
     Restart();
   else {
     ++nActive;
 
-    for (unsigned i = 0; i < vLevelPointers.size(); ++i) {
+    for (int i = 0; i < (int)vLevelPointers.size(); ++i) {
       if (static_cast<int>(nActive) == vLevelPointers.at(i) &&
           settings_.snProgress.Get() < int(i)) {
         settings_.snProgress.Set(i);
@@ -610,7 +610,7 @@ void DragonGameController::ShowGameOverScreen() {
 }
 
 GameController *DragonGameController::GetActiveController() const {
-  if (nActive >= vCnt.size())
+  if (nActive >= (int)vCnt.size())
     return nullptr;
   return vCnt[nActive].get();
 }
@@ -623,7 +623,7 @@ std::string DragonGameController::GetActiveControllerName() const {
 bool DragonGameController::IsOnGameOverScreen() const {
   if (vCnt.size() < 2)
     return false;
-  unsigned gameOverIndex = vCnt.size() - 2;
+  int gameOverIndex = int(vCnt.size()) - 2;
   return nActive == gameOverIndex &&
          GetActiveController() &&
          GetActiveController()->GetControllerName() == "logo";
@@ -642,7 +642,7 @@ ScalingDrawer *DragonGameController::GetDrawer() const {
   return pDr;
 }
 
-unsigned DragonGameController::GetDrawScaleFactor() const {
+int DragonGameController::GetDrawScaleFactor() const {
   return pDr ? pDr->nFactor : 0;
 }
 

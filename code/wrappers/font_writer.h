@@ -20,11 +20,11 @@ struct FontWriter {
   int nGap;
 
   FontWriter(FilePath *fp, std::string sFont,
-             GraphicalInterface<Index> *pGr_, unsigned nZoom = 1);
+             GraphicalInterface<Index> *pGr_, int nZoom = 1);
 
   Size GetSize(std::string s);
 
-  std::string GetNumber(int n, unsigned nDigits = 0);
+  std::string GetNumber(int n, int nDigits = 0);
 
   // NOTE: bug - colored words have non-transparent background
   void DrawColorWord(std::string s, Point p, Color c = Color(0, 0, 0, 0),

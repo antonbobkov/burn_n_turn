@@ -9,7 +9,7 @@
 
 FontWriter::FontWriter(FilePath *fp, std::string sFont,
                        GraphicalInterface<Index> *pGr_,
-                       unsigned nZoom)
+                       int nZoom)
     : vImgIndx(256, -1), pGr(pGr_) {
   sFont = fp->GetRelativePath(sFont);
 
@@ -46,7 +46,7 @@ FontWriter::FontWriter(FilePath *fp, std::string sFont,
   szSymbol.y *= nZoom;
   nGap *= nZoom;
 
-  unsigned n;
+  int n;
   unsigned char c;
   for (n = 0; c = ifs.get(), !ifs.fail(); ++n)
     vImgIndx[c] = n;
@@ -56,7 +56,7 @@ FontWriter::FontWriter(FilePath *fp, std::string sFont,
   Image *pImg = pGr->GetImage(nImg);
   pImg->ChangeColor(cTransp, Color(0, 0, 0, 0));
 
-  for (unsigned i = 0; i < n; ++i) {
+  for (int i = 0; i < n; ++i) {
     Index nCurr = pGr->GetBlankImage(szSymbol);
     Image *pCurr = pGr->GetImage(nCurr);
 
@@ -69,14 +69,14 @@ FontWriter::FontWriter(FilePath *fp, std::string sFont,
   }
 }
 
-std::string FontWriter::GetNumber(int n, unsigned nDigits /* = 0*/) {
+std::string FontWriter::GetNumber(int n, int nDigits /* = 0*/) {
   std::string s;
   std::ostringstream ostr(s);
   ostr << n;
   std::string sRes = ostr.str();
-  if (sRes.length() >= nDigits)
+  if ((int)sRes.length() >= nDigits)
     return sRes;
-  return std::string(nDigits - sRes.length(), '0') + sRes;
+  return std::string(nDigits - (int)sRes.length(), '0') + sRes;
 }
 
 Size FontWriter::GetSize(std::string s) {
@@ -96,7 +96,7 @@ void FontWriter::DrawColorWord(std::string s, Point p,
     p.y -= szWord.y / 2;
   }
 
-  for (unsigned i = 0; i < s.length(); ++i) {
+  for (int i = 0; i < (int)s.length(); ++i) {
     int n = int(s[i]);
 
     if (vImgIndx[n] == -1)
@@ -114,7 +114,7 @@ void FontWriter::DrawColorWord(std::string s, Point p,
 }
 
 void FontWriter::Recolor(Color c) {
-  for (unsigned i = 0; i < vImg.size(); ++i)
+  for (int i = 0; i < (int)vImg.size(); ++i)
     pGr->GetImage(vImg[i])->ChangeColor(clSymbol, c);
   clSymbol = c;
 }

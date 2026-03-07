@@ -16,8 +16,8 @@
  */
 struct ImageSequence {
   std::vector<Index> vImage;
-  std::vector<unsigned> vIntervals;
-  unsigned nActive;
+  std::vector<int> vIntervals;
+  int nActive;
 
   Timer t;
 
@@ -27,11 +27,11 @@ struct ImageSequence {
   bool ToggleTimed();
 
   Index GetImage();
-  unsigned GetTime() const;
+  int GetTime() const;
   /** Sum of all frame intervals; 1 if empty. */
-  unsigned GetTotalTime() const;
+  int GetTotalTime() const;
 
-  void Add(Index nImg, unsigned nTime = 1);
+  void Add(Index nImg, int nTime = 1);
   void INIT();
 
   ImageSequence();
@@ -48,7 +48,7 @@ inline ImageSequence Reset(ImageSequence imgSeq) {
 
 /** Applies a functor to each image index in an ImageSequence. */
 template <class T> void ForEachImage(ImageSequence &img, T t) {
-  for (unsigned i = 0; i < img.vImage.size(); ++i)
+  for (int i = 0; i < (int)img.vImage.size(); ++i)
     t(img.vImage[i]);
 }
 

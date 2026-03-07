@@ -75,7 +75,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "SimpleVisualEntity"; }
   float dPriority;
 
-  unsigned nPeriod;
+  int nPeriod;
   Timer t;
 
   bool bTimer, bStep, bCenter;
@@ -85,7 +85,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
   ImageSequence seq;
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
-                     unsigned nPeriod_)
+                     int nPeriod_)
       : dPriority(dPriority_), nPeriod(nPeriod_),
         t(nPeriod_ * seq_.GetTime()), bTimer(true),
         bStep(false), bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
@@ -108,13 +108,13 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
  * ends. */
 struct SimpleSoundEntity : virtual public EventEntity {
   std::string get_class_name() override { return "SimpleSoundEntity"; }
-  unsigned nPeriod;
+  int nPeriod;
   Timer t;
 
   SoundSequence seq;
   SoundInterfaceProxy *pSnd;
 
-  SimpleSoundEntity(const SoundSequence &seq_, unsigned nPeriod_,
+  SimpleSoundEntity(const SoundSequence &seq_, int nPeriod_,
                     SoundInterfaceProxy *pSnd_)
       : nPeriod(nPeriod_), t(nPeriod * seq_.GetTime()), seq(seq_), pSnd(pSnd_) {
   }
@@ -127,7 +127,7 @@ struct Animation : public SimpleVisualEntity {
   std::string get_class_name() override { return "Animation"; }
   Point pos;
 
-  Animation(float dPriority_, const ImageSequence &seq, unsigned nTimeMeasure_,
+  Animation(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
             Point p, bool bCenter = false)
       : SimpleVisualEntity(dPriority_, seq, bCenter, nTimeMeasure_), pos(p) {}
   Animation(const Animation &) = default;
@@ -143,7 +143,7 @@ struct AnimationOnce : public SimpleVisualEntity {
   bool bOnce;
 
   AnimationOnce(float dPriority_, const ImageSequence &seq,
-                unsigned nTimeMeasure_, Point p, bool bCenter = false)
+                int nTimeMeasure_, Point p, bool bCenter = false)
       : SimpleVisualEntity(dPriority_, seq, bCenter, nTimeMeasure_), pos(p),
         bOnce(true) {}
 
@@ -192,7 +192,7 @@ struct StaticRectangle : public VisualEntity {
 /** A thing on the vista with a radius—so we can tell when it touches another. */
 struct PhysicalEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "PhysicalEntity"; }
-  virtual unsigned GetRadius() { return 0; }
+  virtual int GetRadius() { return 0; }
 
   bool HitDetection(PhysicalEntity *pPh);
 };
@@ -210,7 +210,7 @@ struct ConsumableEntity : virtual public PhysicalEntity {
  * and clamps or removes it when it leaves the realm. */
 struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
   std::string get_class_name() override { return "Critter"; }
-  unsigned nRadius;
+  int nRadius;
   fPoint fPos;
   fPoint fVel;
 
@@ -219,17 +219,17 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
 
   std::string sUnderText;
 
-  unsigned int GetRadius() override { return nRadius; }
+  int GetRadius() override { return nRadius; }
   Point GetPosition() override { return fPos.ToPnt(); }
   void Move() override;
 
-  Critter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
-          float dPriority, const ImageSequence &seq, unsigned nPeriod)
+  Critter(int nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
+          float dPriority, const ImageSequence &seq, int nPeriod)
       : SimpleVisualEntity(dPriority, seq, true, nPeriod), nRadius(nRadius_),
         fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         sUnderText("") {}
 
-  Critter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
+  Critter(int nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
           float dPriority, const ImageSequence &seq, bool /*bStep*/ = false)
       : SimpleVisualEntity(dPriority, seq, true, true), nRadius(nRadius_),
         fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
@@ -239,7 +239,7 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
 /** A creature that steps and flips frames by a timer. */
 struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
   std::string get_class_name() override { return "FancyCritter"; }
-  unsigned nRadius;
+  int nRadius;
   fPoint fPos;
   fPoint fVel;
 
@@ -248,12 +248,12 @@ struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
 
   Timer tm;
 
-  unsigned int GetRadius() override { return nRadius; }
+  int GetRadius() override { return nRadius; }
   Point GetPosition() override { return fPos.ToPnt(); }
   void Move() override;
 
-  FancyCritter(unsigned nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
-               float dPriority, const ImageSequence &seq, unsigned nPeriod)
+  FancyCritter(int nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
+               float dPriority, const ImageSequence &seq, int nPeriod)
       : SimpleVisualEntity(dPriority, seq, true, false), nRadius(nRadius_),
         fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         tm(nPeriod) {}
@@ -278,14 +278,14 @@ struct BonusScore : public EventEntity, public VisualEntity {
   std::string get_class_name() override { return "BonusScore"; }
   LevelController *pAc;
   std::string sText;
-  unsigned nScore;
-  unsigned nScoreSoFar;
+  int nScore;
+  int nScoreSoFar;
   Point p;
   Timer t;
-  unsigned nC;
+  int nC;
   Color c;
 
-  BonusScore(LevelController *pAc_, Point p_, unsigned nScore_);
+  BonusScore(LevelController *pAc_, Point p_, int nScore_);
 
   void Update() override;
 

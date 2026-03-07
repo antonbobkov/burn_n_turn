@@ -79,9 +79,9 @@ struct BonusDrawer : public VisualEntity {
   int nAnimationCounter;
 
   BonusDrawer()
-      : pAd(0), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
+      : pAd(0), t(int(nFramesInSecond * .1F)), nAnimationCounter(0) {}
   explicit BonusDrawer(LevelController *ad)
-      : pAd(ad), t(unsigned(nFramesInSecond * .1F)), nAnimationCounter(0) {}
+      : pAd(ad), t(int(nFramesInSecond * .1F)), nAnimationCounter(0) {}
 
   void Draw(ScalingDrawer *pDr) override {
     if (t.Tick())
@@ -89,7 +89,7 @@ struct BonusDrawer : public VisualEntity {
 
     Point p(1, 3);
 
-    for (unsigned nDr = 0; nDr < pAd->vDr.size(); ++nDr) {
+    for (int nDr = 0; nDr < (int)pAd->vDr.size(); ++nDr) {
       auto &lst = pAd->vDr[nDr]->lsBonuses;
 
       for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
@@ -168,11 +168,11 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   pGr = pKnightGen.get();
   pMgGen = pMGen.get();
 
-  unsigned i;
-  for (i = 0; i < lvl.vRoadGen.size(); ++i)
+  int i;
+  for (i = 0; i < (int)lvl.vRoadGen.size(); ++i)
     vRd.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], pSelf));
 
-  for (i = 0; i < lvl.vCastleLoc.size(); ++i)
+  for (i = 0; i < (int)lvl.vCastleLoc.size(); ++i)
     vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
 
   t = Timer(lvl.nTimer);
@@ -247,7 +247,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       t.nTimer = t.nPeriod - 1;
 
     if (c >= GUI_F1 && c <= GUI_F10)
-      for (unsigned i = 0; i < vDr.size(); ++i)
+      for (int i = 0; i < (int)vDr.size(); ++i)
         vDr[i]->AddBonus(vDr[i]->GetBonus(c - GUI_F1 + 1, nBonusCheatTime));
   }
 
@@ -256,7 +256,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
     pGl->EnterMenu();
 #endif
 
-  for (unsigned i = 0; i < vDr.size(); ++i)
+  for (int i = 0; i < (int)vDr.size(); ++i)
     if (vDr[i]->bt.IsSpace(c)) {
       if (!vDr[i]->bFly)
         vDr[i]->Toggle();
@@ -384,7 +384,7 @@ void LevelController::Fire() {
 
 float LevelController::GetCompletionRate() {
   float fCap = 0;
-  for (unsigned i = 0; i < vCs.size(); ++i)
+  for (int i = 0; i < (int)vCs.size(); ++i)
     fCap += vCs[i]->nPrincesses;
 
   fCap /= (4 * vCs.size());

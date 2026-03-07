@@ -45,7 +45,7 @@ private:
   /* Handle string -> fake image. */
   std::map<std::string, std::unique_ptr<MockImage>> images_;
   /* Unique suffix for LoadImage and GetBlankImage keys (_0, _1, ...). */
-  unsigned next_id_;
+  int next_id_;
 };
 
 #endif

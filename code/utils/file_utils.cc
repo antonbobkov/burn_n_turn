@@ -97,18 +97,18 @@ FilePath::FilePath(bool inLinux, std::string path, FileManager *fm)
   str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   str += "1234567890";
   str += " .-_()?<>+,\\/#:";
-  for (unsigned i = 0; i < str.length(); ++i)
+  for (int i = 0; i < (int)str.length(); ++i)
     allowed_.insert(str[i]);
   path_ = Format(path_);
 }
 
 void FilePath::Slash(std::string &s) const {
   if (!in_linux_) {
-    for (unsigned i = 0; i < s.length(); ++i)
+    for (int i = 0; i < (int)s.length(); ++i)
       if (s[i] == '/')
         s[i] = '\\';
   } else {
-    for (unsigned i = 0; i < s.length(); ++i)
+    for (int i = 0; i < (int)s.length(); ++i)
       if (s[i] == '\\')
         s[i] = '/';
   }
@@ -171,7 +171,7 @@ std::string FilePath::GetParse(std::string s) const {
 std::string FilePath::Format(std::string s) const { return GetFormatted(s); }
 
 std::string FilePath::GetFormatted(std::string s) const {
-  for (unsigned i = 0; i < s.length(); ++i) {
+  for (int i = 0; i < (int)s.length(); ++i) {
     if (allowed_.find(s[i]) == allowed_.end()) {
       std::string msg = "path contains disallowed character '";
       msg += s[i];
@@ -305,7 +305,7 @@ std::ostream &operator<<(std::ostream &ofs, const FilePath &fp) {
 void Separate(std::string &strFile, std::string &strFolder) {
   std::string strRet;
   strFolder = "";
-  for (unsigned i = 0; i < strFile.size(); ++i) {
+  for (int i = 0; i < (int)strFile.size(); ++i) {
     strRet += strFile[i];
     if (strFile[i] == '\\' || strFile[i] == '/') {
       strFolder += strRet;

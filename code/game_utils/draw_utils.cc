@@ -62,7 +62,7 @@ NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
   std::unique_ptr<InStreamHandler> ih = fp->ReadFile(txtPath);
   std::istream &ifs = ih->GetStream();
 
-  unsigned n;
+  int n;
   unsigned char c;
   for (n = 0; c = ifs.get(), !ifs.fail(); ++n)
     vImgIndx[c] = n;
@@ -70,7 +70,7 @@ NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
   std::string bmpPath = fp->GetRelativePath(sFontPath + sFontName + ".bmp");
   Index nImg = pDr->LoadImage(bmpPath);
   Image *pImg = pDr->pGr->GetImage(nImg);
-  for (unsigned i = 0; i < n; ++i) {
+  for (int i = 0; i < n; ++i) {
     Index nCurr = pDr->pGr->GetBlankImage(Size(3, 5));
     Image *pCurr = pDr->pGr->GetImage(nCurr);
 
@@ -85,7 +85,7 @@ NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
   pDr->pGr->DeleteImage(nImg);
 }
 
-std::string NumberDrawer::GetNumber(unsigned n, unsigned nDigits) {
+std::string NumberDrawer::GetNumber(int n, int nDigits) {
   std::string s;
   if (n == 0)
     s += '0';
@@ -94,7 +94,7 @@ std::string NumberDrawer::GetNumber(unsigned n, unsigned nDigits) {
     n /= 10;
   }
 
-  unsigned i, sz = unsigned(s.size());
+  int i, sz = int(s.size());
   for (i = 0; int(i) < int(nDigits) - int(sz); ++i)
     s += '0';
 
@@ -109,7 +109,7 @@ void NumberDrawer::DrawWord(std::string s, Point p, bool bCenter) {
     p.y -= 2;
   }
 
-  for (unsigned i = 0; i < s.length(); ++i) {
+  for (int i = 0; i < (int)s.length(); ++i) {
     int n = int(s[i]);
 
     if (vImgIndx[n] == -1)
@@ -138,7 +138,7 @@ void NumberDrawer::DrawColorWord(std::string s, Point p, Color c,
     pImageVector = &(itr->second);
   }
 
-  for (unsigned i = 0; i < s.length(); ++i) {
+  for (int i = 0; i < (int)s.length(); ++i) {
     int n = int(s[i]);
 
     if (vImgIndx[n] == -1)

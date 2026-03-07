@@ -52,7 +52,7 @@ struct Dragon : public Critter {
 
   DragonLeash leash;
 
-  std::unique_ptr<TimedFireballBonus> GetBonus(unsigned n, unsigned nTime);
+  std::unique_ptr<TimedFireballBonus> GetBonus(int n, int nTime);
 
   void FlushBonuses();
 
@@ -68,7 +68,7 @@ struct Dragon : public Critter {
 
   int nExtraFireballs;
 
-  unsigned nTimer;
+  int nTimer;
   Index imgCarry;
 
   bool bTookOff;

@@ -17,16 +17,16 @@
 
 namespace {
 
-const unsigned kSimulationFrames = 900;
-const unsigned kScreenW = 960;
-const unsigned kScreenH = 600;
+const int kSimulationFrames = 900;
+const int kScreenW = 960;
+const int kScreenH = 600;
 
 const std::string kGameDataFile("game_data.txt");
 
 /* Frames at which to press Enter to advance menu (logo1 -> logo2 -> start ->
  * first level). */
-const unsigned kKeyPressFrames[] = {8, 18, 28};
-const unsigned kKeyPressCount = 3;
+const int kKeyPressFrames[] = {8, 18, 28};
+const int kKeyPressCount = 3;
 
 
 void LogState(DragonGameRunner *ctrl) {
@@ -75,10 +75,10 @@ void RunSimulation() {
   std::cout
       << "[sim] Running " << kSimulationFrames
       << " frames (keys to level, keyboard take off, fly & shoot, menu)\n";
-  for (unsigned i = 0; i < kSimulationFrames && !b_exit; ++i) {
+  for (int i = 0; i < kSimulationFrames && !b_exit; ++i) {
     std::string screen_name = p_gl->GetActiveControllerName();
 
-    for (unsigned k = 0; k < kKeyPressCount; ++k)
+    for (int k = 0; k < kKeyPressCount; ++k)
       if (i == kKeyPressFrames[k])
         p_gl->KeyDown(GUI_RETURN);
 

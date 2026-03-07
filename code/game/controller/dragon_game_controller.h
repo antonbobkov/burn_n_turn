@@ -82,7 +82,7 @@ struct DragonGameController {
   /** The drawer that fits sprites to the screen's measure. */
   ScalingDrawer *GetDrawer() const;
   /** How much to magnify the realm when drawing (e.g. 1, 2). */
-  unsigned GetDrawScaleFactor() const;
+  int GetDrawScaleFactor() const;
 
   /** Small runes for the score and the hero's interface. */
   NumberDrawer *GetNumberDrawer() const;
@@ -158,8 +158,8 @@ struct DragonGameController {
 
 private:
   std::vector<smart_pointer<GameController>> vCnt;
-  unsigned nActive;
-  unsigned nResumePosition;
+  int nActive;
+  int nResumePosition;
 
   std::vector<int> vLevelPointers;
 

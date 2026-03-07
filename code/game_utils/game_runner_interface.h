@@ -14,7 +14,7 @@ class FileManager;
 struct ProgramInfo {
   Size szScreenRez;
   std::string strTitle;
-  unsigned nFramerate;
+  int nFramerate;
   bool bMouseCapture;
   bool bFullScreen;
   bool bFlexibleResolution;
@@ -22,7 +22,7 @@ struct ProgramInfo {
 
   ProgramInfo()
       : bMouseCapture(false), bFullScreen(false), bFlexibleResolution(false) {}
-  ProgramInfo(Size szScreenRez_, std::string strTitle_, unsigned nFramerate_,
+  ProgramInfo(Size szScreenRez_, std::string strTitle_, int nFramerate_,
               bool bMouseCapture_ = false, bool bFullScreen_ = false,
               bool bFlexibleResolution_ = false, bool bBlackBox_ = false)
       : szScreenRez(szScreenRez_), strTitle(strTitle_), nFramerate(nFramerate_),

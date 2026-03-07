@@ -14,15 +14,15 @@
  * effects. */
 struct SoundSequence {
   std::vector<Index> vSounds;
-  std::vector<unsigned> vIntervals;
-  unsigned nActive;
+  std::vector<int> vIntervals;
+  int nActive;
 
   /** Advance to next sound; wraps to 0 at end. Returns true on wrap. */
   bool Toggle();
   Index GetSound();
   /** Interval for current sound; 1 if none defined. */
-  unsigned GetTime() const;
-  void Add(Index iSnd, unsigned nTime = 1);
+  int GetTime() const;
+  void Add(Index iSnd, int nTime = 1);
 
   SoundSequence();
 };

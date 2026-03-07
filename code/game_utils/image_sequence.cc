@@ -27,22 +27,22 @@ ImageSequence::ImageSequence(Index img1, Index img2, Index img3) {
 
 Index ImageSequence::GetImage() { return vImage[nActive]; }
 
-unsigned ImageSequence::GetTime() const {
+int ImageSequence::GetTime() const {
   if (vIntervals.empty())
     return 1;
   return vIntervals[nActive];
 }
 
-unsigned ImageSequence::GetTotalTime() const {
+int ImageSequence::GetTotalTime() const {
   int nRet = 0;
-  for (unsigned i = 0; i < vIntervals.size(); ++i)
+  for (int i = 0; i < (int)vIntervals.size(); ++i)
     nRet += vIntervals[i];
   if (nRet == 0)
     return 1;
   return nRet;
 }
 
-void ImageSequence::Add(Index nImg, unsigned nTime) {
+void ImageSequence::Add(Index nImg, int nTime) {
   vImage.push_back(nImg);
   vIntervals.push_back(nTime);
 }
@@ -50,7 +50,7 @@ void ImageSequence::Add(Index nImg, unsigned nTime) {
 bool ImageSequence::Toggle() {
   if (vImage.empty())
     return true;
-  if (nActive == vImage.size() - 1) {
+  if (nActive == (int)vImage.size() - 1) {
     nActive = 0;
     return true;
   }

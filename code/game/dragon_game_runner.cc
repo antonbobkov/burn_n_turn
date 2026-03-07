@@ -39,7 +39,7 @@ TowerDataWrap::TowerDataWrap(ProgramEngine const& pe) {
   game_data_ = std::make_unique<ConfigurationFile>(p_fm_, "game_data.txt");
 
   Rectangle sBound = Rectangle(pe.szScreenRez);
-  unsigned nScale = 2;
+  int nScale = 2;
   Rectangle rBound =
       Rectangle(0, 0, sBound.sz.x / nScale, sBound.sz.y / nScale);
 

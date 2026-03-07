@@ -5,7 +5,7 @@
  * index.h - Reference-counted index and index pool for the Gui namespace.
  * Index notifies an IndexRemover when the last reference is destroyed, so
  * resources (e.g. images, sounds) can be freed. IndexKeeper is a pool of
- * objects indexed by unsigned, with a free list for reuse.
+ * objects indexed by int, with a free list for reuse.
  */
 
 #include <list>
@@ -24,20 +24,20 @@ struct IndexRemover {
  * is destroyed, the IndexRemover is notified so the slot can be freed.
  * GetIndex() returns the slot number; operator!() is true when invalid. */
 class Index {
-  unsigned nI;
-  unsigned *pCounter;
+  int nI;
+  int *pCounter;
   IndexRemover *pRm;
 
 public:
   /* Return the underlying slot index. */
-  unsigned GetIndex() const { return nI; }
+  int GetIndex() const { return nI; }
 
   /* Default: invalid index (no slot). */
   Index() : nI(-1), pCounter(0), pRm(0) {}
 
   /* Create an index for slot nI_ that will notify pRm_ when destroyed. */
-  Index(unsigned nI_, IndexRemover *pRm_)
-      : nI(nI_), pCounter(new unsigned(1)), pRm(pRm_) {}
+  Index(int nI_, IndexRemover *pRm_)
+      : nI(nI_), pCounter(new int(1)), pRm(pRm_) {}
 
   Index(const Index &i);
   ~Index();
@@ -51,46 +51,46 @@ public:
   bool operator!() { return pCounter == 0; }
 };
 
-/* Pool of T objects indexed by unsigned. GetNewIndex() allocates a slot
+/* Pool of T objects indexed by int. GetNewIndex() allocates a slot
  * (reusing a freed one if any) and returns its index. GetElement/FreeElement
  * access or release a slot. Used with Index so that Index(GetNewIndex(), this)
  * gives a reference-counted handle that calls DeleteIndex (and thus
  * FreeElement) when the last copy is destroyed. */
 template <class T> class IndexKeeper {
   std::vector<T> vStuff;
-  std::list<unsigned> lsFree;
+  std::list<int> lsFree;
 
 public:
   /* Allocate a new slot (reuse from free list or grow vStuff). */
-  unsigned GetNewIndex();
+  int GetNewIndex();
   /* Return the object at the given slot. */
-  T &GetElement(unsigned n);
-  const T &GetElement(unsigned n) const;
+  T &GetElement(int n);
+  const T &GetElement(int n) const;
   /* Release the slot and put it on the free list. */
-  void FreeElement(unsigned n);
+  void FreeElement(int n);
 };
 
-template <class T> unsigned IndexKeeper<T>::GetNewIndex() {
+template <class T> int IndexKeeper<T>::GetNewIndex() {
   if (lsFree.size()) {
-    unsigned n = lsFree.front();
+    int n = lsFree.front();
     lsFree.pop_front();
     return n;
   }
 
   vStuff.push_back(T());
 
-  return unsigned(vStuff.size() - 1);
+  return int(vStuff.size() - 1);
 }
 
-template <class T> T &IndexKeeper<T>::GetElement(unsigned n) {
+template <class T> T &IndexKeeper<T>::GetElement(int n) {
   return vStuff.at(n);
 }
 
-template <class T> const T &IndexKeeper<T>::GetElement(unsigned n) const {
+template <class T> const T &IndexKeeper<T>::GetElement(int n) const {
   return vStuff.at(n);
 }
 
-template <class T> void IndexKeeper<T>::FreeElement(unsigned n) {
+template <class T> void IndexKeeper<T>::FreeElement(int n) {
   vStuff.at(n) = T();
   lsFree.push_back(n);
 }

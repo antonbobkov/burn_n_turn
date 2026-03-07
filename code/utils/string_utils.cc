@@ -10,7 +10,7 @@ std::vector<std::string> BreakUpString(std::string s) {
   std::vector<std::string> vRet;
   std::string sCurr;
 
-  for (unsigned i = 0; i < s.size(); ++i) {
+  for (int i = 0; i < (int)s.size(); ++i) {
     if (s[i] == '\n') {
       vRet.push_back(sCurr);
       sCurr = "";

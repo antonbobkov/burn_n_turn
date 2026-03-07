@@ -9,7 +9,7 @@
 #include "../wrappers/geometry.h"
 
 void Road::Draw(ScalingDrawer *pDr) {
-  unsigned n = pDr->nFactor;
+  int n = pDr->nFactor;
   if (bVertical)
     pDr->pGr->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
                                       (nCoord + 5) * n, rBound.sz.y * n),
@@ -59,7 +59,7 @@ void BrokenLine::Add(fPoint p) {
 }
 
 void BrokenLine::Join(const BrokenLine &b) {
-  for (unsigned i = 0; i < b.vEdges.size(); ++i)
+  for (int i = 0; i < (int)b.vEdges.size(); ++i)
     vEdges.push_back(b.vEdges[i]);
 }
 
@@ -95,13 +95,13 @@ fPoint BrokenLine::RandomByLength() {
                                  "Invalid (empty) segment arrays");
 
   float fLength = 0;
-  for (unsigned i = 0; i < vEdges.size(); ++i) {
+  for (int i = 0; i < (int)vEdges.size(); ++i) {
     if (vEdges[i].empty())
       throw SegmentSimpleException("RandomByLength",
                                    "Invalid (empty) segment arrays");
     if (vEdges[i].size() == 1)
       continue;
-    for (unsigned j = 1; j < vEdges[i].size(); ++j)
+    for (int j = 1; j < (int)vEdges[i].size(); ++j)
       fLength += (vEdges[i][j] - vEdges[i][j - 1]).Length();
   }
 
@@ -110,11 +110,11 @@ fPoint BrokenLine::RandomByLength() {
 
   fLength = fLength * rand() / RAND_MAX;
 
-  for (unsigned i = 0; i < vEdges.size(); ++i) {
+  for (int i = 0; i < (int)vEdges.size(); ++i) {
     if (vEdges[i].size() == 1)
       continue;
 
-    for (unsigned j = 1; j < vEdges[i].size(); ++j) {
+    for (int j = 1; j < (int)vEdges[i].size(); ++j) {
       fPoint f = vEdges[i][j] - vEdges[i][j - 1];
       if (fLength <= f.Length()) {
         f.Normalize(fLength);
@@ -133,7 +133,7 @@ fPoint BrokenLine::RandomBySegment() {
     throw SegmentSimpleException("RandomBySegment",
                                  "Invalid (empty) segment arrays");
 
-  unsigned nSegment = rand() % vEdges.size();
+  int nSegment = rand() % (int)vEdges.size();
 
   if (vEdges[nSegment].size() == 0)
     throw SegmentSimpleException("RandomBySegment",
@@ -141,7 +141,7 @@ fPoint BrokenLine::RandomBySegment() {
   if (vEdges[nSegment].size() == 1)
     return vEdges[nSegment][0];
 
-  unsigned nSegment2 = rand() % (vEdges[nSegment].size() - 1);
+  int nSegment2 = rand() % int(vEdges[nSegment].size() - 1);
 
   fPoint f = vEdges[nSegment][nSegment2 + 1] - vEdges[nSegment][nSegment2];
   f.Normalize(f.Length() * rand() / RAND_MAX);
@@ -149,8 +149,8 @@ fPoint BrokenLine::RandomBySegment() {
 }
 
 std::ostream &operator<<(std::ostream &ofs, const BrokenLine &bl) {
-  for (unsigned i = 0; i < bl.vEdges.size(); ++i) {
-    for (unsigned j = 0; j < bl.vEdges[i].size(); ++j)
+  for (int i = 0; i < (int)bl.vEdges.size(); ++i) {
+    for (int j = 0; j < (int)bl.vEdges[i].size(); ++j)
       ofs << bl.vEdges[i][j] << " ";
     ofs << "| ";
   }
@@ -194,20 +194,20 @@ void LevelLayout::Convert(int n) {
   float p1 = float(sBound.sz.x) / n;
   float p2 = float(sBound.sz.y) / n;
 
-  unsigned i, j;
+  int i, j;
 
-  for (i = 0; i < blKnightGen.vEdges.size(); ++i)
-    for (j = 0; j < blKnightGen.vEdges[i].size(); ++j) {
+  for (i = 0; i < (int)blKnightGen.vEdges.size(); ++i)
+    for (j = 0; j < (int)blKnightGen.vEdges[i].size(); ++j) {
       blKnightGen.vEdges[i][j].x *= p1;
       blKnightGen.vEdges[i][j].y *= p2;
     }
 
-  for (i = 0; i < vCastleLoc.size(); ++i) {
+  for (i = 0; i < (int)vCastleLoc.size(); ++i) {
     vCastleLoc[i].x = Crd(vCastleLoc[i].x * p1);
     vCastleLoc[i].y = Crd(vCastleLoc[i].y * p2);
   }
 
-  for (i = 0; i < vRoadGen.size(); ++i)
+  for (i = 0; i < (int)vRoadGen.size(); ++i)
     if (vRoadGen[i].bVertical)
       vRoadGen[i].nCoord = Crd(vRoadGen[i].nCoord * p1);
     else
@@ -218,19 +218,19 @@ std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f) {
   ofs << "LEVEL " << f.nLvl << "\n\n";
 
   ofs << "FREQ ";
-  for (unsigned k = 0; k < f.vFreq.size(); ++k)
+  for (int k = 0; k < (int)f.vFreq.size(); ++k)
     ofs << f.vFreq[k] / nFramesInSecond << " ";
   ofs << "\n";
 
   ofs << "SPWN " << f.blKnightGen << "\n";
 
   ofs << "CSTL ";
-  for (unsigned i = 0; i < f.vCastleLoc.size(); ++i)
+  for (int i = 0; i < (int)f.vCastleLoc.size(); ++i)
     ofs << f.vCastleLoc[i] << " ";
   ofs << "\n";
 
   ofs << "ROAD ";
-  for (unsigned j = 0; j < f.vRoadGen.size(); ++j)
+  for (int j = 0; j < (int)f.vRoadGen.size(); ++j)
     ofs << f.vRoadGen[j] << " ";
   ofs << "\n";
 
@@ -303,7 +303,7 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
 }
 
 void FancyRoad::Draw(ScalingDrawer *pDr) {
-  unsigned n = pDr->nFactor;
+  int n = pDr->nFactor;
   Image *p = pDr->pGr->GetImage(pAd->pGl->GetImg("road"));
   Size sz = p->GetSize();
 
