@@ -14,7 +14,7 @@ struct LevelController;
 struct FireballBonus : virtual public Entity {
   std::string get_class_name() override { return "FireballBonus"; }
   std::map<std::string, float> fMap;
-  std::map<std::string, unsigned> uMap;
+  std::map<std::string, int> uMap;
   std::map<std::string, bool> bMap;
 
   int nNum;
@@ -22,7 +22,7 @@ struct FireballBonus : virtual public Entity {
   FireballBonus(int nNum_, bool bDef);
 
   void Add(std::string str, float f) { fMap[str] += f; }
-  void Add(std::string str, unsigned u) { uMap[str] += u; }
+  void Add(std::string str, int u) { uMap[str] += u; }
   void Add(std::string str, bool b) { bMap[str] |= b; }
 
   template <class T>
@@ -39,10 +39,10 @@ std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
  * IsLast when there are no more. */
 struct Chain {
   bool bInfinite;
-  unsigned nGeneration;
+  int nGeneration;
 
   Chain(bool bInfinite_ = false) : bInfinite(bInfinite_), nGeneration(0) {}
-  Chain(unsigned nGeneration_) : bInfinite(false), nGeneration(nGeneration_) {}
+  Chain(int nGeneration_) : bInfinite(false), nGeneration(nGeneration_) {}
 
   Chain Evolve();
 
@@ -65,7 +65,7 @@ struct ChainExplosion : virtual public AnimationOnce,
                  EntityListController *pBc_, Chain ch_ = Chain())
       : AnimationOnce(av), r_in(r_), r(r_), delta(delta_), ch(ch_), pBc(pBc_) {}
 
-  unsigned GetRadius() override { return unsigned(r); }
+  int GetRadius() override { return int(r); }
   /**
    * Each tick the blast may grow. Clear the fallen. For each soul inside
    * (save golems and great slimes): deal fire and maybe birth another blast
@@ -79,7 +79,7 @@ struct ChainExplosion : virtual public AnimationOnce,
 struct KnightOnFire : public Critter {
   std::string get_class_name() override { return "KnightOnFire"; }
   EntityListController *pBc;
-  unsigned nTimer, nTimer_i;
+  int nTimer, nTimer_i;
   Timer t;
   Chain c;
 
@@ -87,7 +87,7 @@ struct KnightOnFire : public Critter {
   void RandomizeVelocity();
 
   KnightOnFire(const Critter &cr, EntityListController *pBc_,
-                unsigned nTimer_, Chain c_);
+                int nTimer_, Chain c_);
 
   void Update() override;
 };
@@ -101,14 +101,14 @@ struct Fireball : public Critter {
   FireballBonus fb;
 
   Chain ch;
-  unsigned nChain;
+  int nChain;
 
   Fireball(const Fireball &f)
       : Critter(f), pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
         nChain(f.nChain) {}
 
   Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
-           Chain ch_ = Chain(), unsigned nChain_ = 1);
+           Chain ch_ = Chain(), int nChain_ = 1);
 
   void Update() override;
 };
@@ -118,7 +118,7 @@ struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
   std::string get_class_name() override { return "TimedFireballBonus"; }
   Timer t;
 
-  TimedFireballBonus(const FireballBonus &fb, unsigned nPeriod)
+  TimedFireballBonus(const FireballBonus &fb, int nPeriod)
       : FireballBonus(fb), t(nPeriod) {}
 
   void Update() override;
@@ -132,7 +132,7 @@ struct CircularFireball : virtual public Fireball,
   fPoint i_pos;
   Timer t;
 
-  CircularFireball(const Fireball &f, float fRadius_, unsigned nPeriod)
+  CircularFireball(const Fireball &f, float fRadius_, int nPeriod)
       : Fireball(f), TimedFireballBonus(FireballBonus(8, false), nPeriod),
         fRadius(fRadius_), i_pos(f.fPos), t(nPeriod) {}
 
@@ -144,16 +144,16 @@ struct CircularFireball : virtual public Fireball,
 struct FireballBonusAnimation : public Animation,
                                 virtual public PhysicalEntity {
   std::string get_class_name() override { return "FireballBonusAnimation"; }
-  unsigned n;
+  int n;
   Timer tm;
   bool bBlink;
   LevelController *pAd;
   std::string sUnderText;
   ImageSequence coronaSeq;
 
-  FireballBonusAnimation(Point p_, unsigned n_, LevelController *pAd_);
+  FireballBonusAnimation(Point p_, int n_, LevelController *pAd_);
 
-  unsigned GetRadius() override { return 20U; }
+  int GetRadius() override { return 20; }
 
   void Draw(ScalingDrawer *pDr) override;
 
@@ -164,6 +164,6 @@ int GetFireballRaduis(FireballBonus &fb);
 std::string GetSizeSuffix(FireballBonus &fb);
 float GetExplosionInitialRaduis(FireballBonus &fb);
 float GetExplosionExpansionRate(FireballBonus &fb);
-unsigned GetFireballChainNum(FireballBonus &fb);
+int GetFireballChainNum(FireballBonus &fb);
 
 #endif

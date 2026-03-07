@@ -50,7 +50,7 @@ void SimpleSoundInterface<SndHndl>::DeleteSound(Index /*snd*/) {}
 template <class SndHndl>
 Index SimpleSoundInterface<SndHndl>::LoadSound(std::string sFile) {
   SndHndl snd = pSn->LoadSound(sFile);
-  unsigned n = kp.GetNewIndex();
+  int n = kp.GetNewIndex();
   kp.GetElement(n) = snd;
   return Index(n, this);
 }

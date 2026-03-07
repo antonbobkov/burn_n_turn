@@ -70,43 +70,43 @@ Point ButtonSet::GetPoint(int nCode) {
   return p;
 }
 
-std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(unsigned n,
-                                                     unsigned nTime) {
+std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
+                                                     int nTime) {
   if (pAd->nLvl > 6)
-    nTime = unsigned(nTime * fBonusTimeMutiplierTwo);
+    nTime = int(nTime * fBonusTimeMutiplierTwo);
   else if (pAd->nLvl > 3)
-    nTime = unsigned(nTime * fBonusTimeMutiplierOne);
+    nTime = int(nTime * fBonusTimeMutiplierOne);
 
   std::unique_ptr<TimedFireballBonus> pBonus;
 
   if (n == 0)
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "regenerate", 2U), nTime * 2);
+        FireballBonus(n, "regenerate", 2), nTime * 2);
   else if (n == 1)
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "pershot", 1U), nTime);
+        FireballBonus(n, "pershot", 1), nTime);
   else if (n == 2) {
     pBonus =
         std::make_unique<TimedFireballBonus>(FireballBonus(n, false), nTime);
-    pBonus->Add("through", 1U);
+    pBonus->Add("through", 1);
     pBonus->Add("laser", true);
   } else if (n == 3)
-    pBonus = std::make_unique<TimedFireballBonus>(FireballBonus(n, "big", 1U),
+    pBonus = std::make_unique<TimedFireballBonus>(FireballBonus(n, "big", 1),
                                                   nTime);
   else if (n == 4) {
     pBonus = std::make_unique<TimedFireballBonus>(
         FireballBonus(n, "total", nFireballsPerBonus), nTime * 2);
   } else if (n == 5)
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "explode", 1U), nTime);
+        FireballBonus(n, "explode", 1), nTime);
   else if (n == 6) {
     pBonus =
         std::make_unique<TimedFireballBonus>(FireballBonus(n, false), nTime);
-    pBonus->Add("fireballchainnum", 1U);
+    pBonus->Add("fireballchainnum", 1);
     pBonus->Add("through_flag", true);
   } else if (n == 7)
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "setonfire", 1U), nTime);
+        FireballBonus(n, "setonfire", 1), nTime);
   else if (n == 8) {
     FireballBonus fb = GetAllBonuses();
 
@@ -244,7 +244,7 @@ void Dragon::Update() {
   if (bFly) {
     bool bHitCastle = false;
 
-    for (unsigned i = 0; i < pAd->vCs.size(); ++i)
+    for (int i = 0; i < (int)pAd->vCs.size(); ++i)
       if (this->HitDetection(pAd->vCs[i].get())) {
         if (pAd->vCs[i]->pDrag != nullptr)
           continue;
@@ -365,7 +365,7 @@ void Dragon::Fire(fPoint fDir) {
 
   nTimer = 4;
 
-  unsigned nNumber = fb.uMap["pershot"];
+  int nNumber = fb.uMap["pershot"];
 
   float fSpread = 1.F;
 
@@ -375,7 +375,7 @@ void Dragon::Fire(fPoint fDir) {
       fSpread = 1.F;
   }
 
-  for (unsigned i = 0; i < nNumber; ++i) {
+  for (int i = 0; i < nNumber; ++i) {
     Point pPos = GetPosition();
     if (!bFly)
       pPos += Point(-10, -25);
@@ -431,7 +431,7 @@ void Dragon::Toggle() {
     return;
   }
 
-  for (unsigned i = 0; i < pAd->vCs.size(); ++i)
+  for (int i = 0; i < (int)pAd->vCs.size(); ++i)
     if (this->HitDetection(pAd->vCs[i].get())) {
       if (pAd->vCs[i]->pDrag != nullptr || bTookOff || pAd->vCs[i]->bBroken)
         continue;
@@ -449,13 +449,13 @@ void Dragon::Toggle() {
         pAd->tutOne->PrincessCaptured();
         pAd->vCs[i]->nPrincesses += nPrCr;
 
-        unsigned j;
-        for (j = 0; j < pAd->vCs.size(); ++j) {
+        int j;
+        for (j = 0; j < (int)pAd->vCs.size(); ++j) {
           if (pAd->vCs[j]->nPrincesses < 4)
             break;
         }
 
-        if (j != pAd->vCs.size()) {
+        if (j != (int)pAd->vCs.size()) {
           pAd->pGl->PlaySound("princess_capture");
         } else {
           FlushBonuses();

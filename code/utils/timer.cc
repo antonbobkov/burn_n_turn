@@ -4,9 +4,9 @@
 
 #include "timer.h"
 
-Timer::Timer(unsigned nPeriod_) : nTimer(0), nPeriod(nPeriod_) {}
+Timer::Timer(int nPeriod_) : nTimer(0), nPeriod(nPeriod_) {}
 
-unsigned Timer::UntilTick() { return nPeriod - nTimer % nPeriod; }
+int Timer::UntilTick() { return nPeriod - nTimer % nPeriod; }
 
 bool Timer::Tick() {
   if (nPeriod == 0)

@@ -14,13 +14,13 @@
  * UntilTick() returns how many steps until the next period.
  * NextTick() sets the counter so the next Tick() returns true. */
 struct Timer {
-  unsigned nTimer, nPeriod;
+  int nTimer, nPeriod;
 
   /* Build a timer with the given period (default 1). Counter starts at 0. */
-  Timer(unsigned nPeriod_ = 1);
+  Timer(int nPeriod_ = 1);
 
   /* Steps remaining until the next period boundary. */
-  unsigned UntilTick();
+  int UntilTick();
 
   /* Advance by one step; return true when a period boundary is crossed. */
   bool Tick();

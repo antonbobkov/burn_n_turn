@@ -27,7 +27,7 @@ ImagePainter::ImagePainter(GraphicalInterface<Index> *pGr_,
 void ImagePainter::operator()(Index &img) {
   img = pGr->CopyImage(img);
   Image *pImg = pGr->GetImage(img);
-  for (unsigned i = 0; i < vTr.size(); ++i)
+  for (int i = 0; i < (int)vTr.size(); ++i)
     pImg->ChangeColor(vTr[i].first, vTr[i].second);
 }
 
@@ -77,7 +77,7 @@ Preloader::Preloader(GraphicalInterface<Index> *pGr_,
 
 void Preloader::AddTransparent(Color c) { vTr.push_back(c); }
 
-void Preloader::SetScale(unsigned nScale_) { nScale = nScale_; }
+void Preloader::SetScale(int nScale_) { nScale = nScale_; }
 
 void Preloader::ApplyTransparency(Index pImg) {
   Image *img = pGr->GetImage(pImg);
@@ -153,7 +153,7 @@ void Preloader::LoadT(std::string fName, std::string key, Color c) {
   }
 }
 
-void Preloader::LoadS(std::string fName, std::string key, unsigned nScale_) {
+void Preloader::LoadS(std::string fName, std::string key, int nScale_) {
   fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
@@ -173,7 +173,7 @@ void Preloader::LoadS(std::string fName, std::string key, unsigned nScale_) {
 }
 
 void Preloader::LoadTS(std::string fName, std::string key, Color c,
-                       unsigned nScale_) {
+                       int nScale_) {
   fName = fp_->GetRelativePath(fName);
   try {
     Index pImg = pGr->LoadImage(fName);
@@ -205,7 +205,7 @@ ImageSequence Preloader::LoadSeq(std::string fName) {
   Separate(fName, strFolder);
   bool bFancy = false;
   for (int i = 0;; ++i) {
-    unsigned n = 1;
+    int n = 1;
     std::string s;
     ifs >> s;
     if (bFancy)
@@ -241,7 +241,7 @@ void Preloader::LoadSeq(std::string fName, std::string key) {
 void Preloader::LoadSeqT(std::string fName, std::string key, Color c) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
-    for (unsigned i = 0, sz = imgSeq.vImage.size(); i < sz; ++i)
+    for (int i = 0, sz = (int)imgSeq.vImage.size(); i < sz; ++i)
       if (c == Color(0, 0, 0, 0))
         ApplyTransparency(imgSeq.vImage[i]);
       else
@@ -257,10 +257,10 @@ void Preloader::LoadSeqT(std::string fName, std::string key, Color c) {
   }
 }
 
-void Preloader::LoadSeqS(std::string fName, std::string key, unsigned nScale_) {
+void Preloader::LoadSeqS(std::string fName, std::string key, int nScale_) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
-    for (unsigned i = 0, sz = imgSeq.vImage.size(); i < sz; ++i)
+    for (int i = 0, sz = (int)imgSeq.vImage.size(); i < sz; ++i)
       if (nScale_ == 0)
         imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale);
       else
@@ -277,7 +277,7 @@ void Preloader::LoadSeqS(std::string fName, std::string key, unsigned nScale_) {
 }
 
 void Preloader::LoadSeqTS(std::string fName, std::string key, Color c,
-                          unsigned nScale_) {
+                          int nScale_) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
     for (size_t i = 0, sz = imgSeq.vImage.size(); i < sz; ++i) {
@@ -331,7 +331,7 @@ void Preloader::LoadSndSeq(std::string fName, std::string key) {
   Separate(fName, strFolder);
   bool bFancy = false;
   for (int i = 0;; ++i) {
-    unsigned n = 1;
+    int n = 1;
     std::string s;
     ifs >> s;
     if (bFancy)

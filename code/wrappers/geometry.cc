@@ -159,8 +159,8 @@ fPoint ComposeDirection(int dir1, int dir2) {
   return r;
 }
 
-fPoint GetWedgeAngle(fPoint fDir, float dWidth, unsigned nWhich,
-                    unsigned nHowMany) {
+fPoint GetWedgeAngle(fPoint fDir, float dWidth, int nWhich,
+                    int nHowMany) {
   if (nHowMany == 1)
     return fDir;
 

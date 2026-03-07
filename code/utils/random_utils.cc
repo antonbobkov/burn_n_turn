@@ -7,21 +7,21 @@
 
 #include "random_utils.h"
 
-unsigned GetRandNum(unsigned nRange) {
-  return unsigned(float(rand()) / (float(RAND_MAX) + 1) * nRange);
+int GetRandNum(int nRange) {
+  return int(float(rand()) / (float(RAND_MAX) + 1) * nRange);
 }
 
-unsigned GetRandFromDistribution(std::vector<float> vProb) {
+int GetRandFromDistribution(std::vector<float> vProb) {
   float fSum = 0;
 
-  for (unsigned i = 0; i < vProb.size(); ++i)
+  for (int i = 0; i < (int)vProb.size(); ++i)
     fSum += vProb[i];
 
   float fRand = float(rand()) / (float(RAND_MAX) + 1) * fSum;
 
   fSum = 0;
 
-  for (unsigned i = 0; i < vProb.size(); ++i) {
+  for (int i = 0; i < (int)vProb.size(); ++i) {
     fSum += vProb[i];
     if (fSum > fRand)
       return i;

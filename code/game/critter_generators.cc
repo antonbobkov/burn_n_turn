@@ -12,10 +12,10 @@
 #include "../wrappers/geometry.h"
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
-    : t(unsigned(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
+    : t(int(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
   pAdv_->AddOwnedBoth(std::make_unique<AnimationOnce>(
       2.F, pAdv->pGl->GetImgSeq("skelly_summon"),
-      unsigned(.1F * nFramesInSecond), p_, true));
+      int(.1F * nFramesInSecond), p_, true));
 }
 
 float KnightGenerator::GetRate() {
@@ -45,7 +45,7 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
 void KnightGenerator::Generate(bool bGolem) {
   Point p = bl.RandomByLength().ToPnt();
 
-  unsigned n = unsigned(rand() % pBc->vCs.size());
+  int n = rand() % (int)pBc->vCs.size();
 
   fPoint v = pBc->vCs[n]->GetPosition() - p;
   v.Normalize(fKnightSpeed);
@@ -227,7 +227,7 @@ void TraderGenerator::Update() {
   if (t.Tick()) {
     bExist = false;
 
-    unsigned n = unsigned(rand() % pAdv->vCs.size());
+    int n = rand() % (int)pAdv->vCs.size();
 
     fPoint v = pAdv->vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);

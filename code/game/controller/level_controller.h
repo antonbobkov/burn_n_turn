@@ -60,10 +60,10 @@ struct LevelController : public EntityListController {
   bool bCh;
 
   bool bLeftDown, bRightDown;
-  unsigned nLastDir;
+  int nLastDir;
   bool bWasDirectionalInput;
 
-  unsigned nLvl;
+  int nLvl;
 
   int nSlimeNum;
 

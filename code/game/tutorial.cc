@@ -45,7 +45,7 @@ void TutorialTextEntity::Draw(ScalingDrawer * /*pDr*/) {
   if (pGl && !pGl->IsTutorialOnSetting())
     return;
 
-  for (unsigned i = 0; i < sText.size(); ++i) {
+  for (int i = 0; i < (int)sText.size(); ++i) {
     Point p = pos;
     p.y -= nOffset;
     p.y += nTextVerticalSpacing * i + nTextVerticalSpacing / 3;

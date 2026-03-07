@@ -5,7 +5,7 @@
 
 extern int nSlimeMax;
 
-const unsigned nFramesInSecond = 30;
+const int nFramesInSecond = 30;
 
 const float fSpeedConstant = 1.5F / (float(nFramesInSecond) / 10);
 
@@ -24,11 +24,11 @@ const float fFireballSpeed = 1.F * fSpeedConstant;
 
 const float fDeathMultiplier = 2.F;
 
-const unsigned nBonusOnGroundTime = 60 * nFramesInSecond;
+const int nBonusOnGroundTime = 60 * nFramesInSecond;
 
-const unsigned nBonusCheatTime = 25 * nFramesInSecond;
-const unsigned nBonusPickUpTime = 35 * nFramesInSecond;
-const unsigned nBonusTraderTime = 55 * nFramesInSecond;
+const int nBonusCheatTime = 25 * nFramesInSecond;
+const int nBonusPickUpTime = 35 * nFramesInSecond;
+const int nBonusTraderTime = 55 * nFramesInSecond;
 
 const float fBonusTimeMutiplierOne = .85f;
 const float fBonusTimeMutiplierTwo = .7f;
@@ -60,10 +60,10 @@ const int nRegenDelay = 10;  /* deciseconds */
 
 #ifndef KEYBOARD_CONTROLS
 const int nInitialFireballs = 4;
-const unsigned nFireballsPerBonus = 2U;
+const int nFireballsPerBonus = 2;
 #else
 const int nInitialFireballs = 6;
-const unsigned nFireballsPerBonus = 3U;
+const int nFireballsPerBonus = 3;
 #endif
 
 #endif

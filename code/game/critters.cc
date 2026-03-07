@@ -42,7 +42,7 @@ void Princess::OnHit(char /*cWhat*/) {
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("princess_die_f")
                  : pAc->pGl->GetImgSeq("princess_die"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+      int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 }
 
 void Princess::Draw(ScalingDrawer *pDr) {
@@ -59,7 +59,7 @@ void Princess::Draw(ScalingDrawer *pDr) {
 Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
     : Critter(cr), pAc(pAc_), bAngry(bAngry_), bCasting(false),
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
-      tSpellAnimate(unsigned(.7F * nFramesInSecond)) {
+      tSpellAnimate(int(.7F * nFramesInSecond)) {
   fMvVel = Critter::fVel;
 
   bAngry = true;
@@ -73,7 +73,7 @@ void Mage::OnHit(char /*cWhat*/) {
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f")
                  : pAc->pGl->GetImgSeq("mage_die"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+      int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   pAc->pGl->SetAngry();
 
@@ -107,7 +107,7 @@ std::string GetBonusImage(int n) {
   return "void_bonus";
 }
 
-unsigned RandomBonus(bool bInTower) {
+int RandomBonus(bool bInTower) {
   std::vector<float> v;
 
   v.push_back(0.F);  // time
@@ -142,7 +142,7 @@ void Trader::OnHit(char /*cWhat*/) {
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die")
                  : pAc->pGl->GetImgSeq("trader_die_f"),
-      unsigned(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+      int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   auto pFb = std::make_unique<FireballBonusAnimation>(
       GetPosition(), RandomBonus(false), pAc);
@@ -181,7 +181,7 @@ void Knight::KnockBack() {
 }
 
 void Knight::Update() {
-  for (unsigned i = 0; i < pAc->vCs.size(); ++i)
+  for (int i = 0; i < (int)pAc->vCs.size(); ++i)
     if (this->HitDetection(pAc->vCs[i].get())) {
       pAc->vCs[i]->OnKnight(GetType());
 
@@ -267,7 +267,7 @@ void Knight::OnHit(char /*cWhat*/) {
     }
 
     pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
-        dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
+        dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
         GetPosition(), true));
   } else {
     smart_pointer<Ghostiness> pGhs =
@@ -332,7 +332,7 @@ void MegaSlime::OnHit(char /*cWhat*/) {
   pAc->pGl->PlaySound("megaslime_die");
 
   pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
-      dPriority, seqDead, unsigned(nFramesInSecond / 5 / fDeathMultiplier),
+      dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
       GetPosition(), true));
 }
 
@@ -343,7 +343,7 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
   if (nGhostHit == 0)
     seq = pAdv->pGl->GetImgSeq("ghost_burn");
 
-  unsigned n = unsigned(.2F * nFramesInSecond / fDeathMultiplier);
+  int n = int(.2F * nFramesInSecond / fDeathMultiplier);
 
   t = Timer(n * seq.GetTotalTime());
 
@@ -461,7 +461,7 @@ void Slime::OnHit(char cWhat) {
       throw SimpleException("No slimes found!");
 
     fPoint fAvg(0, 0);
-    for (unsigned i = 0; i < vDeadSlimes.size(); ++i) {
+    for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
       fAvg += vDeadSlimes[i];
     }
 
@@ -469,7 +469,7 @@ void Slime::OnHit(char cWhat) {
 
     pAc->MegaGeneration(fAvg.ToPnt());
 
-    for (unsigned i = 0; i < vDeadSlimes.size(); ++i) {
+    for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
       smart_pointer<FloatingSlime> pSlm = make_smart(
           new FloatingSlime(pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
                             fAvg.ToPnt(), nFramesInSecond * 1));
@@ -509,11 +509,11 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
   ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
                             : pAdv->pGl->GetImgSeq("slime_reproduce");
 
-  t = bFast ? Timer(unsigned(1.3F * nFramesInSecond))
-            : Timer(unsigned(2.3F * nFramesInSecond));
+  t = bFast ? Timer(int(1.3F * nFramesInSecond))
+            : Timer(int(2.3F * nFramesInSecond));
 
   smart_pointer<AnimationOnce> pSlmTmp = make_smart(
-      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true));
+      new AnimationOnce(2.F, seq, int(.1F * nFramesInSecond), p_, true));
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
@@ -544,7 +544,7 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
   ImageSequence seq = pAdv->pGl->GetImgSeq("megaslime_reproduce");
 
   smart_pointer<AnimationOnce> pSlmTmp = make_smart(
-      new AnimationOnce(2.F, seq, unsigned(.1F * nFramesInSecond), p_, true));
+      new AnimationOnce(2.F, seq, int(.1F * nFramesInSecond), p_, true));
   pSlm = pSlmTmp;
   pAdv_->AddBoth(pSlmTmp);
 
@@ -567,8 +567,8 @@ void MegaSliminess::Kill() {
 }
 
 FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
-                             unsigned nTime)
-    : SimpleVisualEntity(2.F, seq, true, unsigned(.1F * nFramesInSecond)) {
+                             int nTime)
+    : SimpleVisualEntity(2.F, seq, true, int(.1F * nFramesInSecond)) {
   fPos = pStart;
   tTermination = Timer(nTime);
   fVel = (fPoint(pEnd) - fPoint(pStart)) / float(nTime);
@@ -586,13 +586,13 @@ void FloatingSlime::Update() {
 void Mage::Update() {
   if (bAngry) {
     if (!bCasting) {
-      unsigned i = 0;
-      for (; i < pAc->vCs.size(); ++i) {
+      int i = 0;
+      for (; i < (int)pAc->vCs.size(); ++i) {
         fPoint p = pAc->vCs[i]->GetPosition() - fPos;
         if (p.Length() < nSummonRadius)
           break;
       }
-      if (i == pAc->vCs.size())
+      if (i == (int)pAc->vCs.size())
         if (rand() % nSummonChance == 0) {
           bCasting = true;
           Critter::seq = pAc->pGl->GetImgSeq("mage_spell");
@@ -695,7 +695,7 @@ void Castle::OnKnight(char cWhat) {
     if (cWhat == 'K') {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
-      for (unsigned i = 0; i < nPrincesses; ++i) {
+      for (int i = 0; i < nPrincesses; ++i) {
         fPoint v(sin(r + i * 2 * 3.1415F / nPrincesses),
                  cos(r + i * 2 * 3.1415F / nPrincesses));
         v.Normalize(fPrincessSpeed * 3.F);
@@ -723,8 +723,8 @@ void Castle::Draw(ScalingDrawer *pDr) {
 
   if (bBroken) {
     Critter::seq.nActive = pAv->tLoseTimer.nTimer / 2;
-    if (seq.nActive > seq.vImage.size() - 1)
-      seq.nActive = seq.vImage.size() - 1;
+    if (seq.nActive > (int)seq.vImage.size() - 1)
+      seq.nActive = (int)seq.vImage.size() - 1;
   }
 
   Critter::Draw(pDr);

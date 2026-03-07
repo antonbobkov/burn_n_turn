@@ -67,7 +67,7 @@ TEST_CASE("smart_pointer operator== and operator!=", "[smart_pointer]") {
 
 /* Helper: get ref count for a smart_pointer's pointee (TestObj inherits
  * SP_Info so the raw pointer is the SP_Info). */
-static unsigned ref_count(smart_pointer<TestObj> &p) {
+static int ref_count(smart_pointer<TestObj> &p) {
   if (p.is_null())
     return 0;
   return static_cast<SP_Info *>(p.get())->get_counter();

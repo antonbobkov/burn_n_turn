@@ -28,7 +28,7 @@ class SP_Info {
   friend void CHECK_DELETION(SP_Info *);
   friend void DELETE_REGULAR_POINTER(SP_Info *);
 
-  unsigned _SP_INFO_COUNTER;
+  int _SP_INFO_COUNTER;
 
 public:
   std::string _SP_INFO_STRING;
@@ -43,7 +43,7 @@ public:
 
   virtual std::string get_class_name() { return ""; }
 
-  unsigned get_counter() const { return _SP_INFO_COUNTER; }
+  int get_counter() const { return _SP_INFO_COUNTER; }
 
   virtual ~SP_Info() { --nGlobalSuperMegaCounter; }
 };

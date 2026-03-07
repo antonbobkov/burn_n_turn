@@ -25,7 +25,7 @@ std::string FullTextString() { return "full screen: "; }
 
 void MenuDisplay::Draw(ScalingDrawer * /*pDr*/) {
   Point p = pLeftTop;
-  for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
+  for (int i = 0; i < (int)pCurr->vEntries.size(); ++i) {
     if (!pCurr->vEntries[i].bDisabled)
       pNum->DrawWord(pCurr->vEntries[i].sText, p, false);
     else
@@ -44,7 +44,7 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   pMouse.y /= 4;
 
   Point p = pLeftTop;
-  for (unsigned i = 0; i < pCurr->vEntries.size(); ++i) {
+  for (int i = 0; i < (int)pCurr->vEntries.size(); ++i) {
     if (!pCurr->vEntries[i].bDisabled &&
         InsideRectangle(Rectangle(p, pCurr->vEntries[i].szSize), pMouse)) {
       pCurr->nMenuPosition = i;

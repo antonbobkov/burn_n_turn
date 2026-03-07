@@ -20,7 +20,7 @@
 #define FALSE 0
 
 void SdlMapKeys(std::map<int, GuiKeyType> &vSdlMapper) {
-  for (unsigned i = 0; i < 400; ++i)
+  for (int i = 0; i < 400; ++i)
     vSdlMapper[i] = GuiKeyType(i);
 
   vSdlMapper[SDLK_F1] = GUI_F1;

@@ -219,7 +219,7 @@ public:
   virtual ImageHndl CopyImage(ImageHndl pImg);
 
   virtual ImageHndl FlipImage(ImageHndl pImg, bool bHorizontal = true);
-  virtual ImageHndl ScaleImage(ImageHndl pImg, unsigned nScale);
+  virtual ImageHndl ScaleImage(ImageHndl pImg, int nScale);
 
   virtual ImageHndl
   GetBlankImage(Size sz) = 0; // create blank image of specified size
@@ -401,7 +401,7 @@ void GraphicalInterface<ImageHndl>::DrawImage(Point p, ImageHndl pImg,
             bRefresh); // draw all image
 }
 
-inline unsigned GetBmpPos(Point p, Size sz) // bmp coordinate recount function
+inline int GetBmpPos(Point p, Size sz) // bmp coordinate recount function
 {
   return (3 * sz.x + 3 - (3 * sz.x - 1) % 4) * (sz.y - p.y - 1) + p.x * 3;
 }
@@ -462,14 +462,14 @@ ImageHndl GraphicalInterface<ImageHndl>::FlipImage(ImageHndl pImg,
 
 template <class ImageHndl>
 ImageHndl GraphicalInterface<ImageHndl>::ScaleImage(ImageHndl pImg,
-                                                    unsigned nScale) {
+                                                    int nScale) {
   Image *pOrig = GetImage(pImg);
   Size sz = pOrig->GetSize();
   ImageHndl pRet = GetBlankImage(Size(sz.x * nScale, sz.y * nScale));
   Image *pFin = GetImage(pRet);
 
   Point p;
-  unsigned x, y;
+  int x, y;
   for (p.y = 0; p.y < sz.y; ++p.y)
     for (p.x = 0; p.x < sz.x; ++p.x)
       for (y = 0; y < nScale; ++y)
@@ -691,7 +691,7 @@ ImageHndl SimpleGraphicalInterface<ImageHndl>::Get(const Index &n) const {
 
 template <class ImageHndl>
 Index SimpleGraphicalInterface<ImageHndl>::New(ImageHndl pImg) {
-  unsigned n = kp.GetNewIndex();
+  int n = kp.GetNewIndex();
   kp.GetElement(n) = pImg;
   return Index(n, this);
 }

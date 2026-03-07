@@ -104,7 +104,7 @@ public:
   SoundSequence &GetSndSeq(std::string key);
 
   void AddTransparent(Color c);
-  void SetScale(unsigned nScale_);
+  void SetScale(int nScale_);
 
   /** Replace all vTr colors with transparent on the given image. */
   void ApplyTransparency(Index pImg);
@@ -117,10 +117,10 @@ public:
   /** Load image and apply transparency (vTr or replace c with transparent). */
   void LoadT(std::string fName, std::string key, Color c = Color(0, 0, 0, 0));
   /** Load image and scale; nScale 0 uses current SetScale. */
-  void LoadS(std::string fName, std::string key, unsigned nScale = 0);
+  void LoadS(std::string fName, std::string key, int nScale = 0);
   /** Load image, apply transparency, then scale. */
   void LoadTS(std::string fName, std::string key, Color c = Color(0, 0, 0, 0),
-              unsigned nScale = 0);
+              int nScale = 0);
 
   /** Load image sequence from file and store under key. */
   void LoadSeq(std::string fName, std::string key);
@@ -128,10 +128,10 @@ public:
   void LoadSeqT(std::string fName, std::string key,
                 Color c = Color(0, 0, 0, 0));
   /** Load sequence and scale each frame; nScale 0 uses current SetScale. */
-  void LoadSeqS(std::string fName, std::string key, unsigned nScale = 0);
+  void LoadSeqS(std::string fName, std::string key, int nScale = 0);
   /** Load sequence, apply transparency to each frame, then scale. */
   void LoadSeqTS(std::string fName, std::string key,
-                 Color c = Color(0, 0, 0, 0), unsigned nScale_ = 0);
+                 Color c = Color(0, 0, 0, 0), int nScale_ = 0);
 
   /** Load sound from file and store under key. */
   void LoadSnd(std::string fName, std::string key);
@@ -156,7 +156,7 @@ private:
   SndSeqMapType mpSndSeq;
 
   std::vector<Color> vTr;
-  unsigned nScale;
+  int nScale;
 
   FilePath *fp_;
 
