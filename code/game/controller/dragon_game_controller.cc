@@ -72,15 +72,16 @@ DragonGameController::DragonGameController(
     ScalingDrawer *pDr_, NumberDrawer *pNum_, NumberDrawer *pBigNum_,
     FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
-    TowerDataWrap *pWrp_, FilePath *fp, ConfigurationFile *config,
-    ConfigurationFile *game_data)
+    Size szActualRez_, Event *pExitProgram_, FilePath *fp,
+    ConfigurationFile *config, ConfigurationFile *game_data)
     : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(),
       pGraph(pDr_ ? pDr_->pGr : 0), pDr(pDr_),
       pNum(pNum_), pBigNum(pBigNum_), pFancyNum(pFancyNum_),
       pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
       vLvl(vLvl_), nScore(0), nHighScore(0), bAngry(false),
       settings_(game_data), rBound(rBound_),
-      pWrp(pWrp_), p_config_(config), pSelf(nullptr),
+      szActualRez(szActualRez_), pExitProgram(pExitProgram_), fp_(fp),
+      p_config_(config), pSelf(nullptr),
       pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)) {
   nHighScore = settings_.snHighScore.Get();
 
@@ -737,16 +738,16 @@ bool DragonGameController::CheatsUnlocked() const {
 const Rectangle &DragonGameController::GetBounds() const { return rBound; }
 
 Size DragonGameController::GetActualResolution() const {
-  return pWrp ? pWrp->szActualRez : Size(0, 0);
+  return szActualRez;
 }
 
 FilePath *DragonGameController::GetFilePath() const {
-  return pWrp ? pWrp->GetFilePath() : nullptr;
+  return fp_;
 }
 
 void DragonGameController::ExitProgram() {
-  if (pWrp && pWrp->pExitProgram)
-    Trigger(pWrp->pExitProgram);
+  if (pExitProgram)
+    Trigger(pExitProgram);
 }
 
 void DragonGameController::ClearBonusesToCarryOver() {

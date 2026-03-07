@@ -19,8 +19,8 @@ class Preloader;
 struct ImageSequence;
 struct SoundSequence;
 struct TimedFireballBonus;
-class TowerDataWrap;
 class FilePath;
+class Event;
 class Index;
 struct ScalingDrawer;
 struct NumberDrawer;
@@ -52,7 +52,7 @@ struct DragonGameController {
                        NumberDrawer *pBigNum_, FontWriter *pFancyNum_,
                        SoundInterface<Index> *pSndRaw_,
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
-                       TowerDataWrap *pWrp_, FilePath *fp,
+                       Size szActualRez_, Event *pExitProgram_, FilePath *fp,
                        ConfigurationFile *config,
                        ConfigurationFile *game_data);
 
@@ -188,7 +188,9 @@ private:
 
   std::list<std::unique_ptr<TimedFireballBonus>> lsBonusesToCarryOver;
 
-  TowerDataWrap *pWrp;
+  Size szActualRez;
+  Event *pExitProgram;
+  FilePath *fp_;
 
   ConfigurationFile *p_config_;
 
