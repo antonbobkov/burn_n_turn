@@ -7,10 +7,10 @@ CMake + MinGW Makefiles, compiler: `clang++`. Presets defined in `CMakePresets.j
 cmake --preset debug
 
 # Build
-cmake --build --preset debug
+cmake --build --preset debug -j4
 
 # Run integration tests (unit + simulation, no SDL) — use this to validate changes
-ctest --preset integration
+ctest --preset integration -j4
 ```
 
 ## Conventions
