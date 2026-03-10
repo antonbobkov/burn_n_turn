@@ -164,29 +164,23 @@ Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
   if (bFlip)
     m = -1;
 
-  smart_pointer<FancyCritter> pCr1 = make_smart(
-      new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 10, 0),
-                       rBound, 3, seq1, nFramesInSecond / 5));
-  AddBoth(pCr1);
-
-  pCrRun = pCr1;
+  pCrRun = std::make_unique<FancyCritter>(
+      7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 10, 0), rBound, 3, seq1,
+      nFramesInSecond / 5);
 
   ImageSequence seq2 = pGl_->GetImgSeq(sChase);
 
-  smart_pointer<FancyCritter> pCr2 = make_smart(
-      new FancyCritter(7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 12, 0),
-                       rBound, 3, seq2, nFramesInSecond / 5));
-
-  pCrFollow = pCr2;
+  pCrFollow = std::make_unique<FancyCritter>(
+      7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 12, 0), rBound, 3, seq2,
+      nFramesInSecond / 5);
 }
+
+Cutscene::~Cutscene() = default;
 
 void Cutscene::Update() {
   if (!bRelease && pCrRun->GetPosition().x >= rBound.sz.x / 3 &&
       pCrRun->GetPosition().x <= rBound.sz.x * 2 / 3) {
     bRelease = true;
-
-    smart_pointer<FancyCritter> pCr2 = pCrFollow;
-    AddBoth(pCr2);
   }
 
   if (!pCrFollow->bExist) {
@@ -203,6 +197,24 @@ void Cutscene::Update() {
   }
 
   EntityListController::Update();
+}
+
+std::vector<EventEntity *> Cutscene::GetNonOwnedUpdateEntities() {
+  std::vector<EventEntity *> out;
+  if (pCrRun)
+    out.push_back(pCrRun.get());
+  if (bRelease && pCrFollow)
+    out.push_back(pCrFollow.get());
+  return out;
+}
+
+std::vector<VisualEntity *> Cutscene::GetNonOwnedDrawEntities() {
+  std::vector<VisualEntity *> out;
+  if (pCrRun)
+    out.push_back(pCrRun.get());
+  if (bRelease && pCrFollow)
+    out.push_back(pCrFollow.get());
+  return out;
 }
 
 void Cutscene::OnKey(GuiKeyType c, bool bUp) {

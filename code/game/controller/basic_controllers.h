@@ -95,8 +95,8 @@ struct StartScreenController : public EntityListController {
 
 struct Cutscene : public EntityListController {
   std::string get_class_name() override { return "Cutscene"; }
-  smart_pointer<FancyCritter> pCrRun;
-  smart_pointer<FancyCritter> pCrFollow;
+  std::unique_ptr<FancyCritter> pCrRun;
+  std::unique_ptr<FancyCritter> pCrFollow;
 
   Timer tm;
   bool Beepy;
@@ -110,11 +110,15 @@ struct Cutscene : public EntityListController {
    */
   Cutscene(DragonGameController *pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false);
+  ~Cutscene();
 
   void Update() override;
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouseDown(Point /*pPos*/) override {}
   std::string GetControllerName() const override { return "cutscene"; }
+
+  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
+  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
 };
 
 /** A screen that shows the dragon's tally and leaves on click or when time
