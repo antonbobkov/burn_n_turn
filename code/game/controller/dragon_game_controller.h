@@ -4,7 +4,6 @@
 #include "../level.h"
 #include "../../game_utils/sound_utils.h"
 #include "../../utils/file_utils.h"
-#include "../../utils/smart_pointer.h"
 #include "../../wrappers/geometry.h"
 #include <list>
 #include <memory>
@@ -157,13 +156,13 @@ struct DragonGameController {
   SoundSequence &GetSndSeq(std::string key);
 
 private:
-  std::vector<smart_pointer<GameController>> vCnt;
+  std::vector<std::unique_ptr<GameController>> vCnt;
   int nActive;
   int nResumePosition;
 
   std::vector<int> vLevelPointers;
 
-  smart_pointer<MenuController> pMenu;
+  MenuController *pMenu;
 
   GraphicalInterface<Index> *pGraph;
   ScalingDrawer *pDr;

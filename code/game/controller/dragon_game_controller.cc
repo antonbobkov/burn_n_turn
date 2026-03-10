@@ -14,7 +14,6 @@
 #include "game_utils/sound_utils.h"
 #include "game_utils/sound_sequence.h"
 #include "utils/file_utils.h"
-#include "utils/smart_pointer.h"
 #include "wrappers/color.h"
 #include "wrappers/geometry.h"
 #include "wrappers/font_writer.h"
@@ -74,7 +73,7 @@ DragonGameController::DragonGameController(
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     Size szActualRez_, Event *pExitProgram_, FilePath *fp,
     ConfigurationFile *config, ConfigurationFile *game_data)
-    : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(),
+    : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(nullptr),
       pGraph(pDr_ ? pDr_->pGr : 0), pDr(pDr_),
       pNum(pNum_), pBigNum(pBigNum_), pFancyNum(pFancyNum_),
       pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
@@ -351,39 +350,39 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   bAngry = false;
 
   // menu
-  smart_pointer<MenuController> pMenuHolder = make_smart(
-      new MenuController(pSelf, &settings_, rBound, Color(0, 0, 0)));
-  pMenu = pMenuHolder;
+  auto pMenuHolder = std::make_unique<MenuController>(
+      pSelf, &settings_, rBound, Color(0, 0, 0));
+  pMenu = pMenuHolder.get();
 
   // logo 1
-  smart_pointer<EntityListController> pCnt0_1 =
-      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
+  auto pCnt0_1 =
+      std::make_unique<AutoAdvanceController>(pSelf, rBound, Color(0, 0, 0));
   // logo 2
-  smart_pointer<EntityListController> pCnt0_2 =
-      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
+  auto pCnt0_2 =
+      std::make_unique<AutoAdvanceController>(pSelf, rBound, Color(0, 0, 0));
   // press start screen
-  smart_pointer<EntityListController> pCnt1 =
-      make_smart(new StartScreenController(pSelf, rBound, Color(0, 0, 0)));
+  auto pCnt1 =
+      std::make_unique<StartScreenController>(pSelf, rBound, Color(0, 0, 0));
   // game over
-  smart_pointer<EntityListController> pCnt2 =
-      make_smart(new AutoAdvanceController(pSelf, rBound, Color(0, 0, 0)));
+  auto pCnt2 =
+      std::make_unique<AutoAdvanceController>(pSelf, rBound, Color(0, 0, 0));
   // you win!
-  smart_pointer<EntityListController> pCnt3 =
-      make_smart(new EntityListController(pSelf, rBound, Color(0, 0, 0)));
+  auto pCnt3 =
+      std::make_unique<EntityListController>(pSelf, rBound, Color(0, 0, 0));
   // score
-  smart_pointer<DragonScoreController> pScore = make_smart(
-      new DragonScoreController(pSelf, rBound, Color(0, 0, 0), true));
+  auto pScore =
+      std::make_unique<DragonScoreController>(pSelf, rBound, Color(0, 0, 0), true);
   // intro tutorial screen (non PC version)
-  smart_pointer<DragonScoreController> pIntro = make_smart(
-      new DragonScoreController(pSelf, rBound, Color(0, 0, 0), false));
+  auto pIntro =
+      std::make_unique<DragonScoreController>(pSelf, rBound, Color(0, 0, 0), false);
 
   // cutscenes
-  smart_pointer<EntityListController> pCut1 =
-      make_smart(new Cutscene(pSelf, rBound, "princess", "knight"));
-  smart_pointer<EntityListController> pCut2 =
-      make_smart(new Cutscene(pSelf, rBound, "knight", "dragon_walk_f", true));
-  smart_pointer<EntityListController> pCut3 =
-      make_smart(new Cutscene(pSelf, rBound, "dragon_walk", "mage"));
+  auto pCut1 =
+      std::make_unique<Cutscene>(pSelf, rBound, "princess", "knight");
+  auto pCut2 =
+      std::make_unique<Cutscene>(pSelf, rBound, "knight", "dragon_walk_f", true);
+  auto pCut3 =
+      std::make_unique<Cutscene>(pSelf, rBound, "dragon_walk", "mage");
 
   SoundControls bckgTemplate(plr, BG_BACKGROUND);
   SoundControls noMusicTemplate(plr, -1);
@@ -431,7 +430,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       2, (*pr)("arrow"), 3, Point(0, 0), true));
   pMenu->SetMenuDisplay(std::make_unique<MenuDisplay>(
       Point(rBound.sz.x / 2 - 8, rBound.sz.y / 2), pNum,
-      pMenu->GetMenuCaret(), pMenu.get(),
+      pMenu->GetMenuCaret(), pMenu,
       settings_.sbCheatsUnlocked.Get()));
 
   pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
@@ -484,23 +483,23 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   pCnt2->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
   pCnt3->AddOwnedEventEntity(std::make_unique<SoundControls>(noMusicTemplate));
 
-  vCnt.push_back(pMenuHolder); // menu
-  vCnt.push_back(pCnt0_1);     // logo 1
-  vCnt.push_back(pCnt0_2);     // logo 2
-  vCnt.push_back(pCnt1);       // press start screen
+  vCnt.emplace_back(std::move(pMenuHolder)); // menu
+  vCnt.emplace_back(std::move(pCnt0_1));     // logo 1
+  vCnt.emplace_back(std::move(pCnt0_2));     // logo 2
+  vCnt.emplace_back(std::move(pCnt1));       // press start screen
 #ifndef PC_VERSION
-  vCnt.push_back(pIntro); // tutorial screen
+  vCnt.emplace_back(std::move(pIntro)); // tutorial screen
 #endif
 
   for (int i = 0; i < (int)vLvl.size(); ++i) {
-    smart_pointer<LevelController> pAd =
-        make_smart(new LevelController(pSelf, rBound, Color(0, 0, 0), vLvl[i]));
+    auto pAd = std::make_unique<LevelController>(
+        pSelf, rBound, Color(0, 0, 0), vLvl[i]);
     pAd->Init(pAd.get(), vLvl[i]);
 
     pAd->pSc = std::make_unique<SoundControls>(bckgTemplate);
 
     // game level
-    vCnt.push_back(pAd);
+    vCnt.emplace_back(std::move(pAd));
 
     // chapters
     if (i == 0)
@@ -512,16 +511,16 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 
     // cutscene
     if (i == 2)
-      vCnt.push_back(pCut1);
+      vCnt.emplace_back(std::move(pCut1));
     if (i == 5)
-      vCnt.push_back(pCut2);
+      vCnt.emplace_back(std::move(pCut2));
     if (i == 8)
-      vCnt.push_back(pCut3);
+      vCnt.emplace_back(std::move(pCut3));
   }
 
 #ifdef TRIAL_VERSION
-  smart_pointer<BuyNowController> pBuy =
-      make_smart(new BuyNowController(pSelf, rBound, Color(0, 0, 0)));
+  auto pBuy = std::make_unique<BuyNowController>(
+      pSelf, rBound, Color(0, 0, 0));
 
   pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
   pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
@@ -554,12 +553,12 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 #endif
 
 #ifdef FULL_VERSION
-  vCnt.push_back(pCnt3);  // you win
-  vCnt.push_back(pCnt2);  // game over
-  vCnt.push_back(pScore); // score
+  vCnt.emplace_back(std::move(pCnt3));  // you win
+  vCnt.emplace_back(std::move(pCnt2));  // game over
+  vCnt.emplace_back(std::move(pScore)); // score
 #else
-  vCnt.push_back(pCnt2);
-  vCnt.push_back(pBuy);
+  vCnt.emplace_back(std::move(pCnt2));
+  vCnt.emplace_back(std::move(pBuy));
 #endif
 }
 
@@ -587,6 +586,7 @@ void DragonGameController::Restart(int nActive_ /* = -1*/) {
     nActive = nActive_;
 
   vCnt.clear();
+  pMenu = nullptr;
 
   StartUp(pSelf);
 }
