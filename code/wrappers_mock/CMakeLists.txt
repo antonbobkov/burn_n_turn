@@ -12,3 +12,4 @@ target_link_libraries(wrappers_mock_test PRIVATE
   Catch2::Catch2WithMain GuiMock SuiMock Utils
 )
 add_test(NAME wrappers_mock_test COMMAND $<TARGET_FILE:wrappers_mock_test>)
+set_tests_properties(wrappers_mock_test PROPERTIES LABELS "unit")

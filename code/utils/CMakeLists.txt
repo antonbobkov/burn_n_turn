@@ -25,11 +25,14 @@ add_library(Utils
 add_executable(configuration_file_test configuration_file_test.cc)
 target_link_libraries(configuration_file_test PRIVATE Utils Catch2::Catch2WithMain)
 add_test(NAME configuration_file_test COMMAND $<TARGET_FILE:configuration_file_test>)
+set_tests_properties(configuration_file_test PROPERTIES LABELS "unit")
 
 add_executable(file_utils_test file_utils_test.cc)
 target_link_libraries(file_utils_test PRIVATE Utils Catch2::Catch2WithMain)
 add_test(NAME file_utils_test COMMAND $<TARGET_FILE:file_utils_test>)
+set_tests_properties(file_utils_test PROPERTIES LABELS "unit")
 
 add_executable(smart_pointer_test smart_pointer_test.cc)
 target_link_libraries(smart_pointer_test PRIVATE Utils Catch2::Catch2WithMain)
 add_test(NAME smart_pointer_test COMMAND $<TARGET_FILE:smart_pointer_test>)
+set_tests_properties(smart_pointer_test PROPERTIES LABELS "unit")

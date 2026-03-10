@@ -32,6 +32,26 @@
       }
     }
   ],
+  "testPresets": [
+    {
+      "name": "unit",
+      "configurePreset": "debug",
+      "displayName": "Unit tests (no SDL, no simulation)",
+      "filter": { "include": { "label": "unit" } }
+    },
+    {
+      "name": "integration",
+      "configurePreset": "debug",
+      "displayName": "Integration tests (unit + simulation, no SDL)",
+      "filter": { "include": { "label": "unit|simulation" } }
+    },
+    {
+      "name": "sdl",
+      "configurePreset": "debug",
+      "displayName": "SDL tests",
+      "filter": { "include": { "label": "sdl" } }
+    }
+  ],
   "buildPresets": [
     {
       "name": "release",

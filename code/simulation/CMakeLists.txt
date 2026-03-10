@@ -16,5 +16,6 @@ target_link_libraries(simulation_test PRIVATE
 )
 add_test(NAME simulation_test COMMAND $<TARGET_FILE:simulation_test>)
 set_tests_properties(simulation_test PROPERTIES
-  WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  LABELS "simulation")
 add_dependencies(simulation_test copy_bin_files)
