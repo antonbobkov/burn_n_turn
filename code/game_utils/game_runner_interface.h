@@ -85,6 +85,6 @@ public:
   virtual void Fire() {}
 };
 
-smart_pointer<GameRunner> GetGameRunner(ProgramEngine const& pe);
+std::unique_ptr<GameRunner> GetGameRunner(ProgramEngine const& pe);
 
 #endif // GAME_RUNNER_INTERFACE_H

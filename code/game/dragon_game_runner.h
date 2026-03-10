@@ -6,6 +6,7 @@
 #include "../wrappers/geometry.h"
 #include "../utils/smart_pointer.h"
 #include <memory>
+#include <vector>
 
 struct DragonGameController;
 class FilePath;
@@ -15,41 +16,9 @@ struct FontWriter;
 struct ScalingDrawer;
 struct NumberDrawer;
 
-/** The tower's chest: exit signal and the realm's sight and sound, for when
- * the game is first raised. */
-class TowerDataWrap {
-public:
-  TowerDataWrap(ProgramEngine const& pe);
-
-  FilePath *GetFilePath() const { return fp_.get(); }
-
-  Event* pExitProgram;
-
-  GraphicalInterface<Index> *pGr;
-  SoundInterface<Index> *pSm;
-
-  std::unique_ptr<ScalingDrawer> pDr;
-  std::unique_ptr<ScalingDrawer> pBigDr;
-  std::unique_ptr<NumberDrawer> pNum;
-  std::unique_ptr<NumberDrawer> pBigNum;
-  std::unique_ptr<FontWriter> pFancyNum;
-
-  FileManager *p_fm_;
-  std::unique_ptr<ConfigurationFile> config_;
-  std::unique_ptr<ConfigurationFile> game_data_;
-  std::unique_ptr<FilePath> fp_;
-
-  std::vector<LevelLayout> vLvl;
-  std::unique_ptr<DragonGameController> pCnt;
-
-  Size szActualRez;
-};
-
 /** The top of the tower: holds the chest, builds the chapters and runs the
  * tale. */
 class DragonGameRunner : public GameRunner {
-  TowerDataWrap *pData;
-
 public:
   std::string get_class_name() override { return "DragonGameRunner"; }
   DragonGameRunner(ProgramEngine const& pe);
@@ -71,6 +40,28 @@ public:
   std::string GetActiveControllerName() const;
   /** True when the dragon has claimed the day (for the trial of simulation). */
   bool IsOnGameOverScreen() const;
+
+private:
+  Event *pExitProgram;
+
+  GraphicalInterface<Index> *pGr;
+  SoundInterface<Index> *pSm;
+
+  std::unique_ptr<ScalingDrawer> pDr;
+  std::unique_ptr<ScalingDrawer> pBigDr;
+  std::unique_ptr<NumberDrawer> pNum;
+  std::unique_ptr<NumberDrawer> pBigNum;
+  std::unique_ptr<FontWriter> pFancyNum;
+
+  FileManager *p_fm_;
+  std::unique_ptr<ConfigurationFile> config_;
+  std::unique_ptr<ConfigurationFile> game_data_;
+  std::unique_ptr<FilePath> fp_;
+
+  std::vector<LevelLayout> vLvl;
+  std::unique_ptr<DragonGameController> pCnt;
+
+  Size szActualRez;
 };
 
 #endif

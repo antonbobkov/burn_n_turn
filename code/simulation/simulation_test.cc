@@ -79,8 +79,7 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
 
       ProgramEngine pe(std::move(p_exit_ev), p_gr.get(), p_snd.get(),
                        std::move(p_msg), sz, fm.get());
-      smart_pointer<DragonGameRunner> p_gl =
-          make_smart(new DragonGameRunner(pe));
+      auto p_gl = std::make_unique<DragonGameRunner>(pe);
 
       bool reached_level = false;
       bool reached_menu = false;
@@ -239,8 +238,7 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
 
       ProgramEngine pe(std::move(p_exit_ev), p_gr.get(), p_snd.get(),
                        std::move(p_msg), sz, fm.get());
-      smart_pointer<DragonGameRunner> p_gl =
-          make_smart(new DragonGameRunner(pe));
+      auto p_gl = std::make_unique<DragonGameRunner>(pe);
       DragonGameController *ctrl = p_gl->GetTowerController();
       if (ctrl)
         ctrl->SetCheatsOnSetting(true);

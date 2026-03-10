@@ -90,6 +90,7 @@ struct LevelController : public EntityListController {
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
                   const LevelLayout &lvl);
+  ~LevelController();
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
 

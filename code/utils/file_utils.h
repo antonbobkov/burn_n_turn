@@ -142,7 +142,7 @@ private:
  * characters, and a FileManager for ReadFile/WriteFile. GetRelativePath and
  * GetParse return base path + relative part; Format/GetFormatted validate.
  * Not copyable; create via Create or CreateFromStream, store as unique_ptr
- * in owner (e.g. TowerDataWrap), pass raw pointer elsewhere. */
+ * in owner (e.g. DragonGameRunner), pass raw pointer elsewhere. */
 class FilePath {
 public:
   /* All arguments required; fm must outlive this FilePath. */
