@@ -1,0 +1,370 @@
+Running clang-tidy for 53 files out of 54 in compilation database ...
+[ 1/53][5.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\configuration_file_test.cc
+[ 2/53][5.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\game_runner_interface_impl.cc
+[ 3/53][6.3s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\controller\menu_controller.cc
+[ 4/53][6.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\tutorial.cc
+[ 5/53][14.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\MessageWriter.cc
+[ 6/53][7.5s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\mouse_utils.cc
+[ 7/53][15.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers\color.cc
+[ 8/53][16.8s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\sdl_examples\SDL_ex4_sound.cc
+[ 9/53][10.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\draw_utils.cc
+[10/53][1.6s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\index.cc
+[11/53][3.1s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\event.cc
+[12/53][17.5s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers\geometry.cc
+[13/53][0.1s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\timer.cc
+[14/53][0.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\exception.cc
+[15/53][1.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers\SuiGen.cc
+[16/53][14.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\sui_sdl_example.cc
+[17/53][10.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\file_utils_test.cc
+[18/53][10.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\sdl_examples\SDL_ex3_image.cc
+[19/53][4.5s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\test_sdl.cc
+[20/53][2.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\image_sequence.cc
+[21/53][12.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\entities.cc
+[22/53][13.6s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\simulation\simulation.cc
+[23/53][3.5s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\smart_pointer_test.cc
+[24/53][2.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\sound_utils.cc
+[25/53][19.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\dragon.cc
+[26/53][24.3s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\simulation\simulation_test.cc
+[27/53][7.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\controller\buy_now_controller.cc
+[28/53][14.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\sdl_examples\SDL_ex1_basic.cc
+[29/53][11.6s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers\GuiGen.cc
+[30/53][23.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\level.cc
+[31/53][22.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\file_utils.cc
+[32/53][11.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers\font_writer.cc
+[33/53][2.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\string_utils.cc
+[34/53][1.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_mock\SuiMock.cc
+[35/53][2.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_mock\wrappers_mock_test.cc
+[36/53][1.3s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\SuiSdl.cc
+[37/53][1.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\smart_pointer.cc
+[38/53][51.5s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\critters.cc
+[39/53][1.1s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\sound_sequence.cc
+[40/53][39.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\fireball.cc
+[41/53][1.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_mock\GuiMock.cc
+[42/53][26.7s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\controller\dragon_game_controller.cc
+[43/53][9.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\critter_generators.cc
+[44/53][1.6s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\random_utils.cc
+[45/53][9.3s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: warning: Call to virtual method 'SdlGraphicalInterface::DrawRectangle' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Call to virtual method 'SdlGraphicalInterface::DrawRectangle' during construction bypasses virtual dispatch
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:105:3: warning: Call to virtual method 'SdlGraphicalInterface::DeleteImage' during destruction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  105 |   DeleteImage(pScreenImage);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:105:3: note: Call to virtual method 'SdlGraphicalInterface::DeleteImage' during destruction bypasses virtual dispatch
+  105 |   DeleteImage(pScreenImage);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:260:5: warning: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  260 |     RectangleOnto(pScreenImage, p, c);
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:260:5: note: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch
+  260 |     RectangleOnto(pScreenImage, p, c);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: warning: Call to virtual method 'SdlGraphicalInterface::RefreshAll' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  262 |       RefreshAll();
+      |       ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:9: note: 'bRefresh' is true
+  261 |     if (bRefresh)
+      |         ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:5: note: Taking true branch
+  261 |     if (bRefresh)
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: note: Call to virtual method 'SdlGraphicalInterface::RefreshAll' during construction bypasses virtual dispatch
+  262 |       RefreshAll();
+      |       ^~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:300:5: warning: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  300 |     RectangleOnto(pScreenImage, Rectangle(Point(0, 0), Size(rOffSet.p.x, sz.y)),
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:9: note: 'bRefresh' is true
+  261 |     if (bRefresh)
+      |         ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:5: note: Taking true branch
+  261 |     if (bRefresh)
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: note: Calling 'SdlGraphicalInterface::RefreshAll'
+  262 |       RefreshAll();
+      |       ^~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:7: note: Assuming the condition is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |       ^~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:28: note: Left side of '||' is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |                            ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:3: note: Taking true branch
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:300:5: note: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch
+  300 |     RectangleOnto(pScreenImage, Rectangle(Point(0, 0), Size(rOffSet.p.x, sz.y)),
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  301 |                   Color(0, 0, 0));
+      |                   ~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:302:5: warning: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  302 |     RectangleOnto(pScreenImage, Rectangle(Point(0, 0), Size(sz.x, rOffSet.p.y)),
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:9: note: 'bRefresh' is true
+  261 |     if (bRefresh)
+      |         ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:5: note: Taking true branch
+  261 |     if (bRefresh)
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: note: Calling 'SdlGraphicalInterface::RefreshAll'
+  262 |       RefreshAll();
+      |       ^~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:7: note: Assuming the condition is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |       ^~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:28: note: Left side of '||' is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |                            ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:3: note: Taking true branch
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:302:5: note: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch
+  302 |     RectangleOnto(pScreenImage, Rectangle(Point(0, 0), Size(sz.x, rOffSet.p.y)),
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  303 |                   Color(0, 0, 0));
+      |                   ~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:305:5: warning: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  305 |     RectangleOnto(pScreenImage,
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:9: note: 'bRefresh' is true
+  261 |     if (bRefresh)
+      |         ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:5: note: Taking true branch
+  261 |     if (bRefresh)
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: note: Calling 'SdlGraphicalInterface::RefreshAll'
+  262 |       RefreshAll();
+      |       ^~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:7: note: Assuming the condition is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |       ^~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:28: note: Left side of '||' is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |                            ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:3: note: Taking true branch
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:305:5: note: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch
+  305 |     RectangleOnto(pScreenImage,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  306 |                   Rectangle(Point(rOffSet.Right(), 0),
+      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  307 |                             Size(sz.x - rOffSet.Right(), sz.y)),
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  308 |                   Color(0, 0, 0));
+      |                   ~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:310:5: warning: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch [clang-analyzer-optin.cplusplus.VirtualCall]
+  310 |     RectangleOnto(pScreenImage,
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:7: note: Assuming the condition is false
+   67 |   if (rOffSet == Rectangle())
+      |       ^~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:67:3: note: Taking false branch
+   67 |   if (rOffSet == Rectangle())
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:7: note: Assuming the condition is false
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:71:3: note: Taking false branch
+   71 |   if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: Assuming 'bFullScreen' is false
+   78 |                                    bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+      |                                    ^~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:78:36: note: '?' condition is false
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:7: note: Assuming 'pScrImg' is non-null
+   88 |   if (!pScrImg)
+      |       ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:88:3: note: Taking false branch
+   88 |   if (!pScrImg)
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:97:3: note: Calling 'SdlGraphicalInterface::DrawRectangle'
+   97 |   DrawRectangle(Rectangle(pScreenImage->GetSize()), Color(0, 0, 255));
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:9: note: 'bRefresh' is true
+  261 |     if (bRefresh)
+      |         ^~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:261:5: note: Taking true branch
+  261 |     if (bRefresh)
+      |     ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:262:7: note: Calling 'SdlGraphicalInterface::RefreshAll'
+  262 |       RefreshAll();
+      |       ^~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:7: note: Assuming the condition is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |       ^~~~~~~~~~~~~~~~~~~~
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:28: note: Left side of '||' is true
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |                            ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:299:3: note: Taking true branch
+  299 |   if (rOffSet.p != Point() || rOffSet.sz != sz) {
+      |   ^
+C:\code\dragongame\code\wrappers_sdl_impl\GuiSdl.cc:310:5: note: Call to virtual method 'SdlGraphicalInterface::RectangleOnto' during construction bypasses virtual dispatch
+  310 |     RectangleOnto(pScreenImage,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  311 |                   Rectangle(Point(0, rOffSet.Bottom()),
+      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  312 |                             Size(sz.x, sz.y - rOffSet.Bottom())),
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  313 |                   Color(0, 0, 0));
+      |                   ~~~~~~~~~~~~~~~
+8 warnings generated.
+
+[46/53][9.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\sdl_examples\SDL_ex2_interactive.cc
+[47/53][9.4s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\controller\basic_controllers.cc
+[48/53][10.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\sdl_game_runner_main.cc
+[49/53][13.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\dragon_game_runner.cc
+[50/53][5.1s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\wrappers_sdl_impl\gui_sdl_example.cc
+[51/53][12.2s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\utils\configuration_file.cc
+[52/53][17.0s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game_utils\Preloader.cc
+[53/53][16.9s] C:\code\installs\llvm-mingw-20251216-ucrt-x86_64\bin\clang-tidy.EXE -p=build/debug -quiet C:\code\dragongame\code\game\controller\level_controller.cc

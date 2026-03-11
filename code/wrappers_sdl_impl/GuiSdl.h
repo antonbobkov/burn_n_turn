@@ -90,7 +90,7 @@ public:
   }
 };
 
-class SdlGraphicalInterface : public GraphicalInterface<SdlImage *> {
+class SdlGraphicalInterface final : public GraphicalInterface<SdlImage *> {
   SdlImage *pScreenImage;
   SDL_Renderer *pScreenRenderer;
 

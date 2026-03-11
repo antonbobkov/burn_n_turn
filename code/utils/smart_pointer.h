@@ -115,7 +115,7 @@ public:
 
   ~smart_pointer() {
     if (pPointToSPInfo)
-      DELETE_REGULAR_POINTER(pPointToSPInfo);
+      DELETE_REGULAR_POINTER(pPointToSPInfo);  // NOLINT(clang-analyzer-cplusplus.NewDelete)
   }
 
   T *operator->() const { return pPointTo; }

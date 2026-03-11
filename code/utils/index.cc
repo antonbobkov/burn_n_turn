@@ -19,6 +19,9 @@ Index::~Index() {
 }
 
 Index &Index::operator=(const Index &i) {
+  if (this == &i)
+    return *this;
+
   if (pCounter && --*pCounter == 0) {
     pRm->DeleteIndex(*this);
     delete pCounter;

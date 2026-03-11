@@ -81,7 +81,7 @@ DragonGameController::DragonGameController(
       settings_(game_data), rBound(rBound_),
       szActualRez(szActualRez_), pExitProgram(pExitProgram_), fp_(fp),
       p_config_(config), pSelf(nullptr),
-      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)) {
+      pr(std::make_unique<Preloader>(pGraph, pSndRaw_, fp)) {
   nHighScore = settings_.snHighScore.Get();
 
   typedef ImagePainter::ColorMap ColorMap;
