@@ -7,19 +7,10 @@
 #include "../level.h"
 #include "../../game_utils/game_runner_interface.h"
 #include "../../game_utils/image_sequence.h"
-#include "../../utils/smart_pointer.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
 #include "../../wrappers/gui_key_type.h"
 #include <memory>
-
-void EntityListController::AddV(smart_pointer<VisualEntity> pVs) {
-  lsDraw.push_back(pVs);
-}
-
-void EntityListController::AddE(smart_pointer<EventEntity> pEv) {
-  lsUpdate.push_back(pEv);
-}
 
 std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
   std::vector<ConsumableEntity *> out;
@@ -57,20 +48,12 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 }
 
 void EntityListController::Update() {
-  /* Remove !bExist from lists. Clean raw-pointer lists (owned_visual_entities,
-   * owned_event_entities) before owned_entities so no raw ptr outlives its
-   * unique_ptr when we destroy in CleanUp(owned_entities). */
-  CleanUp(lsUpdate);
-  CleanUp(lsDraw);
-  CleanUp(lsPpl);
+  /* Clean raw-pointer views first so no raw ptr outlives its owning unique_ptr.
+   * lsPpl and owned_entities are cleaned after their raw-ptr views. */
   CleanUp(owned_visual_entities);
   CleanUp(owned_event_entities);
+  CleanUp(lsPpl);
   CleanUp(owned_entities);
-
-  for (auto &p : lsUpdate) {
-    if (p->bExist)
-      p->Move();
-  }
 
   for (EventEntity *pEx : owned_event_entities) {
     if (pEx->bExist)
@@ -80,11 +63,6 @@ void EntityListController::Update() {
   for (EventEntity *pEx : GetNonOwnedUpdateEntities()) {
     if (pEx->bExist)
       pEx->Move();
-  }
-
-  for (auto &p : lsUpdate) {
-    if (p->bExist)
-      p->Update();
   }
 
   for (EventEntity *pEx : owned_event_entities) {
@@ -100,12 +78,6 @@ void EntityListController::Update() {
   {
     typedef std::multimap<ScreenPos, VisualEntity *> DrawMap;
     DrawMap mmp;
-
-    for (auto &p : lsDraw) {
-      if (p->bExist)
-        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
-            ScreenPos(p->GetPriority(), p->GetPosition()), p.get()));
-    }
 
     for (VisualEntity *pOw : owned_visual_entities) {
       if (pOw->bExist)
@@ -256,10 +228,10 @@ void DragonScoreController::Update() {
 }
 
 void AutoAdvanceController::Update() {
-  CleanUp(lsUpdate);
-  CleanUp(lsDraw);
+  /* Clean raw-ptr views before checking size so dead entities don't count. */
+  CleanUp(owned_visual_entities);
 
-  if (lsDraw.size() == 1) {
+  if (owned_visual_entities.size() == 1) {
     pGl->Next();
     return;
   }

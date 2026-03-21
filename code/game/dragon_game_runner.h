@@ -21,7 +21,6 @@ struct NumberDrawer;
  * tale. */
 class DragonGameRunner : public GameRunner {
 public:
-  std::string get_class_name() override { return "DragonGameRunner"; }
   DragonGameRunner(ProgramEngine const& pe);
   ~DragonGameRunner();
 

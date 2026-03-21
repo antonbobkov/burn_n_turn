@@ -7,8 +7,8 @@
 #include "level.h"
 #include "tutorial.h"
 #include "../utils/random_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/geometry.h"
+#include <memory>
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
     : t(int(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
@@ -48,8 +48,8 @@ void KnightGenerator::Generate(bool bGolem) {
   v.Normalize(fKnightSpeed);
   p += rBound.p;
 
-  smart_pointer<Knight> pCr =
-      make_smart(new Knight(Critter(7, p, v, rBound, 3, seq, true), pBc, 'K'));
+  auto pCr = std::make_unique<Knight>(
+      Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
 
   if (bFirst) {
     pCr->sUnderText = "destroy";
@@ -57,20 +57,19 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   if (bGolem) {
-    pCr =
-        make_smart(new Knight(Critter(14, p, v * .5, rBound, 3,
-                                      v.x < 0 ? pBc->pGl->GetImgSeq("golem")
-                                              : pBc->pGl->GetImgSeq("golem_f"),
-                                      true),
-                              pBc, 'W'));
+    pCr = std::make_unique<Knight>(
+        Critter(14, p, v * .5, rBound, 3,
+                v.x < 0 ? pBc->pGl->GetImgSeq("golem")
+                        : pBc->pGl->GetImgSeq("golem_f"),
+                true),
+        pBc, 'W');
   } else if (pBc->bGhostTime) {
     pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
     pCr->cType = 'G';
     pCr->fVel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
   }
 
-  pBc->AddBoth(pCr);
-  pBc->lsPpl.push_back(pCr);
+  pBc->AddOwnedConsumable(std::move(pCr));
 }
 
 void KnightGenerator::Update() {
@@ -102,18 +101,17 @@ void PrincessGenerator::Update() {
 
     vel.Normalize(fPrincessSpeed);
 
-    smart_pointer<Princess> pCr = make_smart(
-        new Princess(Critter(7, p, vel, rBound, 3,
-                             vel.x < 0 ? pBc->pGl->GetImgSeq("princess_f")
-                                       : pBc->pGl->GetImgSeq("princess"),
-                             true),
-                     pBc));
+    auto pCr = std::make_unique<Princess>(
+        Critter(7, p, vel, rBound, 3,
+                vel.x < 0 ? pBc->pGl->GetImgSeq("princess_f")
+                           : pBc->pGl->GetImgSeq("princess"),
+                true),
+        pBc);
     if (bFirst) {
       pCr->sUnderText = "capture";
       bFirst = false;
     }
-    pBc->AddBoth(pCr);
-    pBc->lsPpl.push_back(pCr);
+    pBc->AddOwnedConsumable(std::move(pCr));
     pBc->pGl->PlaySound("princess_arrive");
 
     pBc->tutOne->PrincessGenerate();
@@ -151,14 +149,12 @@ void MageGenerator::MageGenerate() {
 
   vel.Normalize(fMageSpeed);
 
-  smart_pointer<Mage> pCr =
-      make_smart(new Mage(Critter(7, p, vel, rBound, 3,
-                                  vel.x < 0 ? pBc->pGl->GetImgSeq("mage_f")
-                                            : pBc->pGl->GetImgSeq("mage"),
-                                  true),
-                          pBc, pBc->pGl->IsAngry()));
-  pBc->AddBoth(pCr);
-  pBc->lsPpl.push_back(pCr);
+  pBc->AddOwnedConsumable(std::make_unique<Mage>(
+      Critter(7, p, vel, rBound, 3,
+              vel.x < 0 ? pBc->pGl->GetImgSeq("mage_f")
+                        : pBc->pGl->GetImgSeq("mage"),
+              true),
+      pBc, pBc->pGl->IsAngry()));
 }
 
 float TraderGenerator::GetRate() {
@@ -195,20 +191,19 @@ void TraderGenerator::Update() {
     fPoint vel(v);
     vel.Normalize(fTraderSpeed);
 
-    smart_pointer<Trader> pCr = make_smart(
-        new Trader(Critter(7, p, vel, rBound, 3,
-                           vel.x < 0 ? pBc->pGl->GetImgSeq("trader")
-                                     : pBc->pGl->GetImgSeq("trader_f"),
-                           true),
-                   pBc, bFirstBns));
+    auto pCr = std::make_unique<Trader>(
+        Critter(7, p, vel, rBound, 3,
+                vel.x < 0 ? pBc->pGl->GetImgSeq("trader")
+                           : pBc->pGl->GetImgSeq("trader_f"),
+                true),
+        pBc, bFirstBns);
 
     if (bFirst) {
       pCr->sUnderText = "kill";
       bFirst = false;
     }
 
-    pBc->AddBoth(pCr);
-    pBc->lsPpl.push_back(pCr);
+    pBc->AddOwnedConsumable(std::move(pCr));
 
     pBc->tutTwo->TraderGenerate();
   }
@@ -223,10 +218,8 @@ void TraderGenerator::Update() {
     fPoint v = pAdv->vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    smart_pointer<Knight> pCr = make_smart(new Knight(
+    pAdv->AddOwnedConsumable(std::make_unique<Knight>(
         Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->GetImgSeq("skelly"), true),
         pAdv, 'S'));
-    pAdv->AddBoth(pCr);
-    pAdv->lsPpl.push_back(pCr);
   }
 }

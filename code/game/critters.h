@@ -5,7 +5,7 @@
 #include "dragon_constants.h"
 #include "../game_utils/image_sequence.h"
 #include "entities.h"
-#include "../utils/smart_pointer.h"
+#include <memory>
 
 struct LevelController;
 struct Dragon;
@@ -199,7 +199,7 @@ struct Sliminess : public EventEntity {
   bool bFast;
   int nGeneration;
   LevelController *pAdv;
-  smart_pointer<AnimationOnce> pSlm;
+  std::unique_ptr<AnimationOnce> pSlm_;
 
   Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
@@ -218,7 +218,7 @@ struct MegaSliminess : public EventEntity {
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
   LevelController *pAdv;
-  smart_pointer<AnimationOnce> pSlm;
+  std::unique_ptr<AnimationOnce> pSlm_;
 
   MegaSliminess(Point p_, LevelController *pAdv_);
 
