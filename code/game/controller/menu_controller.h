@@ -11,7 +11,6 @@
 #include "../entities.h"
 #include "../../wrappers/gui_key_type.h"
 #include "../../game_utils/mouse_utils.h"
-#include "../../utils/smart_pointer.h"
 #include <memory>
 #include <vector>
 
@@ -115,7 +114,7 @@ struct MenuDisplay : virtual public EventEntity, public VisualEntity {
 
 /** The keeper of the pause hall: the display and options from the scrolls. */
 struct MenuController : public EntityListController {
-  std::string get_class_name() override { return "MenuController"; }
+  std::string get_class_name() { return "MenuController"; }
   std::unique_ptr<Animation> pMenuCaret;
   std::unique_ptr<MenuDisplay> pMenuDisplay;
 

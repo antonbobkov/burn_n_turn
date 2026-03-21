@@ -3,7 +3,6 @@
 #include "../game_utils/game_runner_interface.h"
 #include "../utils/configuration_file.h"
 #include "../utils/file_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/geometry.h"
 
 ProgramInfo GetProgramInfo() {

@@ -14,7 +14,6 @@
 #include "../../game_utils/image_sequence.h"
 #include "../../game_utils/sound_utils.h"
 #include "../../utils/random_utils.h"
-#include "../../utils/smart_pointer.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
 

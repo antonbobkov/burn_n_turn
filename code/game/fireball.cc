@@ -7,7 +7,6 @@
 #include "level.h"
 #include "../game_utils/draw_utils.h"
 #include "../game_utils/image_sequence.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/geometry.h"
 
 #include <map>

@@ -9,7 +9,6 @@
 #include "../game_utils/game_runner_interface.h"
 #include "../utils/exception.h"
 #include "../utils/file_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/gui_key_type.h"
 #include "../wrappers_mock/GuiMock.h"
 #include "../wrappers_mock/SuiMock.h"
@@ -37,19 +36,6 @@ const int kKeyPressCount = 3;
 const int kGameOverSimulationFrames = 5500;
 const int kCheatAdvancePastCutscene = 4; /* levels 0->1->2 then cutscene */
 const int kCheatAdvanceToLateLevel = 6;
-
-/* Build list of smart_pointer types with non-zero count, sorted by count desc.
- */
-std::vector<std::pair<std::string, int>> GetNonZeroSmartPointerCounts() {
-  std::vector<std::pair<std::string, int>> nonzero;
-  for (const auto &entry : g_smart_pointer_count) {
-    if (entry.second != 0)
-      nonzero.push_back({entry.first, entry.second});
-  }
-  std::sort(nonzero.begin(), nonzero.end(),
-            [](const auto &a, const auto &b) { return a.second > b.second; });
-  return nonzero;
-}
 
 } // namespace
 
@@ -178,17 +164,6 @@ TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
       CHECK(sound_file_flipped);
       CHECK(b_exit);
     }
-
-    std::vector<std::pair<std::string, int>> nonzero =
-        GetNonZeroSmartPointerCounts();
-    for (const auto &p : nonzero)
-      std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
-                << "\n";
-    std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter
-              << "\n";
-
-    CHECK(nGlobalSuperMegaCounter == 0);
-    CHECK(nonzero.empty());
 
   } catch (const SimpleException &e) {
     std::ostringstream msg;
@@ -349,17 +324,6 @@ TEST_CASE("Simulation cheats, load chapter, wait for game over",
       CHECK(reached_game_over);
       CHECK(b_exit);
     }
-
-    std::vector<std::pair<std::string, int>> nonzero =
-        GetNonZeroSmartPointerCounts();
-    for (const auto &p : nonzero)
-      std::cout << "smart_pointer_count[\"" << p.first << "\"] = " << p.second
-                << "\n";
-    std::cout << "nGlobalSuperMegaCounter = " << nGlobalSuperMegaCounter
-              << "\n";
-
-    CHECK(nGlobalSuperMegaCounter == 0);
-    CHECK(nonzero.empty());
 
   } catch (const SimpleException &e) {
     std::ostringstream msg;

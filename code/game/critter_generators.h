@@ -4,7 +4,6 @@
 #include "../game_utils/image_sequence.h"
 #include "entities.h"
 #include "level.h"
-#include "../utils/smart_pointer.h"
 
 struct LevelController;
 

@@ -4,7 +4,6 @@
 #include "../game_utils/draw_utils.h"
 #include "entities.h"
 #include "../utils/exception.h"
-#include "../utils/smart_pointer.h"
 
 class FilePath;
 

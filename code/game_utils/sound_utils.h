@@ -2,24 +2,19 @@
 #define TOWER_DEFENSE_SOUND_UTILS_H
 
 /* sound_utils.h - Sound helpers: SoundInterfaceProxy (gated playback),
- * BackgroundMusicPlayer for level music, and channel/theme enums.
- *
- * Dependencies (include required): SP_Info -> utils/smart_pointer.h;
- * Index -> utils/index.h; smart_pointer -> utils/smart_pointer.h. */
+ * BackgroundMusicPlayer for level music, and channel/theme enums. */
 
 #include "../utils/index.h"
-#include "../utils/smart_pointer.h"
 
 template <class T> class SoundInterface;
 
 /** Wraps SoundInterface<Index> and gates playback on bSoundOn
  * (Toggle/Get). */
-class SoundInterfaceProxy : virtual public SP_Info {
+class SoundInterfaceProxy {
   bool bSoundOn;
   SoundInterface<Index> *pSndRaw;
 
 public:
-  std::string get_class_name() override { return "SoundInterfaceProxy"; }
   SoundInterfaceProxy(SoundInterface<Index> *pSndRaw_)
       : bSoundOn(true), pSndRaw(pSndRaw_) {}
 

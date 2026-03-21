@@ -3,7 +3,6 @@
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
 #include "../game_utils/draw_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../utils/file_utils.h"
 #include "../wrappers/color.h"
 #include "../wrappers/geometry.h"
