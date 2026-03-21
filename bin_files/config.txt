@@ -1,0 +1,8 @@
+SYSTEM 0
+PATH ../../../assets/
+VERSION full
+PLATFORM pc
+CONTROLS mouse
+SCREEN_SIZE normal
+LOADING_SCREEN false
+DEBUG_UNIT_TEXT false

@@ -1,5 +1,4 @@
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "dragon_game_runner.h"
 #include "../game_utils/game_runner_interface.h"
 #include "../utils/configuration_file.h"
@@ -10,21 +9,16 @@
 ProgramInfo GetProgramInfo() {
   ProgramInfo inf;
 
-#ifdef SMALL_SCREEN_VERSION
-  inf.szScreenRez = Size(854, 480);
-#else
-  inf.szScreenRez = Size(960, 600);
-#endif
-
   inf.strTitle = "Tower Defense";
   inf.nFramerate = 1000 / nFramesInSecond;
   inf.bMouseCapture = false;
 
   StdFileManager fm;
   ConfigurationFile cfg(&fm, "config.txt");
-  bool bFullScreen = (cfg.GetEntry("FULLSCREEN") == "true");
+  inf.szScreenRez = (cfg.GetEntry("SCREEN_SIZE") == "small")
+                    ? Size(854, 480) : Size(960, 600);
 
-  if (bFullScreen) {
+  if (cfg.GetEntry("FULLSCREEN") == "true") {
     inf.bFullScreen = true;
     inf.bFlexibleResolution = true;
     inf.bBlackBox = true;

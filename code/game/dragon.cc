@@ -1,6 +1,5 @@
 #include "dragon.h"
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
 #include "critters.h"
@@ -14,6 +13,8 @@
 #include "../wrappers/geometry.h"
 
 int nSlimeMax = 100;
+int nInitialFireballs = 4;   /* default: mouse mode; set at startup from GameConfig */
+int nFireballsPerBonus = 2;  /* default: mouse mode; set at startup from GameConfig */
 
 void DragonLeash::ModifyTilt(Point trackball) {
   tilt -= tilt * naturalScaleFactor;
@@ -343,9 +344,7 @@ void Dragon::Fire(fPoint fDir) {
     return;
 
   FireballBonus fb(-1, true);
-#ifndef FLIGHT_POWER_MODE
-  if (!bFly)
-#endif
+  if (pAd->pGl->GetGameConfig().IsFlightPowerMode() || !bFly)
     fb = GetAllBonuses();
   fb.fMap["speed"] *= fFireballSpeed;
   if (bFly)

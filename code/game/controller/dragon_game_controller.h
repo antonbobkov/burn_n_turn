@@ -1,6 +1,7 @@
 #ifndef TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 #define TOWER_DEFENSE_DRAGON_GAME_CONTROLLER_H
 
+#include "../game_config.h"
 #include "../level.h"
 #include "../../game_utils/sound_utils.h"
 #include "../../utils/file_utils.h"
@@ -53,7 +54,8 @@ struct DragonGameController {
                        const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
                        Size szActualRez_, Event *pExitProgram_, FilePath *fp,
                        ConfigurationFile *config,
-                       ConfigurationFile *game_data);
+                       ConfigurationFile *game_data,
+                       GameConfig game_config);
 
   void StartUp(DragonGameController *pSelf);
   void Next();
@@ -127,6 +129,8 @@ struct DragonGameController {
   bool IsFullScreenSetting() const;
   /** Set fullscreen in config so next launch uses it. */
   void SetFullScreenSetting(bool value);
+  /** Runtime feature flags read from config.txt at startup. */
+  const GameConfig &GetGameConfig() const;
   /** Scroll of choice: are the hidden arts enabled? */
   bool AreCheatsOnSetting() const;
   /** Set cheats on/off (e.g. for tests). */
@@ -192,6 +196,7 @@ private:
   FilePath *fp_;
 
   ConfigurationFile *p_config_;
+  GameConfig game_config_;
 
   DragonGameController *pSelf;
 

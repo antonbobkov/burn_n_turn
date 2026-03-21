@@ -2,7 +2,7 @@
 #include "../game_utils/MessageWriter.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/game_controller_interface.h"
-#include "dragon_macros.h"
+#include "dragon_constants.h"
 #include "fireball.h"
 #include "level.h"
 #include "../game_utils/event.h"
@@ -13,15 +13,16 @@
 
 MessageWriter *pWr = 0;
 
-DragonGameRunner::DragonGameRunner(ProgramEngine const& pe) {
+DragonGameRunner::DragonGameRunner(ProgramEngine const& pe)
+    : p_fm_(pe.GetFileManager()),
+      config_(std::make_unique<ConfigurationFile>(p_fm_, "config.txt")),
+      game_config_(ReadGameConfig(*config_)) {
   szActualRez = pe.szActualRez;
 
   pExitProgram = pe.pExitProgram.get();
 
   pWr = pe.pMsg.get();
 
-  p_fm_ = pe.GetFileManager();
-  config_ = std::make_unique<ConfigurationFile>(p_fm_, "config.txt");
   {
     std::string systemVal = config_->GetEntry("SYSTEM");
     bool inLinux = (systemVal == "linux" || systemVal == "1");
@@ -31,6 +32,8 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe) {
     fp_ = FilePath::Create(inLinux, pathVal, p_fm_);
   }
   game_data_ = std::make_unique<ConfigurationFile>(p_fm_, "game_data.txt");
+  nInitialFireballs  = game_config_.IsKeyboardControls() ? 6 : 4;
+  nFireballsPerBonus = game_config_.IsKeyboardControls() ? 3 : 2;
 
   Rectangle sBound = Rectangle(pe.szScreenRez);
   int nScale = 2;
@@ -53,21 +56,18 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe) {
       fp_.get(), "dragonfont\\dragonfont2.txt", pGr, 2);
 
   std::string levelsFile;
-#ifdef FULL_VERSION
-#ifdef SMALL_SCREEN_VERSION
-  levelsFile = "levels_small.txt";
-#else
-  levelsFile = "levels.txt";
-#endif
-#else
-  levelsFile = "levels_trial.txt";
-#endif
+  if (game_config_.IsTrialVersion())
+    levelsFile = "levels_trial.txt";
+  else if (game_config_.IsSmallScreenVersion())
+    levelsFile = "levels_small.txt";
+  else
+    levelsFile = "levels.txt";
   ReadLevels(fp_.get(), levelsFile, rBound, vLvl);
 
   pCnt = std::make_unique<DragonGameController>(
       pDr.get(), pNum.get(), pBigNum.get(), pFancyNum.get(), pSm, vLvl,
       rBound, szActualRez, pExitProgram, fp_.get(), config_.get(),
-      game_data_.get());
+      game_data_.get(), game_config_);
   pCnt->StartUp(pCnt.get());
 }
 
@@ -98,10 +98,8 @@ void DragonGameRunner::KeyDown(GuiKeyType nCode) {
   if (p)
     p->OnKey(nCode, false);
 
-#ifndef PC_VERSION
-  if (nCode == GUI_ESCAPE)
+  if (!game_config_.IsPcVersion() && nCode == GUI_ESCAPE)
     Trigger(pExitProgram);
-#endif
 }
 
 void DragonGameRunner::KeyUp(GuiKeyType nCode) {
@@ -111,33 +109,27 @@ void DragonGameRunner::KeyUp(GuiKeyType nCode) {
 }
 
 void DragonGameRunner::MouseMove(Point pPos) {
-#ifdef PC_VERSION
-#ifndef KEYBOARD_CONTROLS
-  GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
-  if (p)
-    p->OnMouse(pPos);
-#endif
-#endif
+  if (game_config_.IsPcVersion() && !game_config_.IsKeyboardControls()) {
+    GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
+    if (p)
+      p->OnMouse(pPos);
+  }
 }
 
 void DragonGameRunner::MouseDown(Point pPos) {
-#ifdef PC_VERSION
-#ifndef KEYBOARD_CONTROLS
-  GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
-  if (p)
-    p->OnMouseDown(pPos);
-#endif
-#endif
+  if (game_config_.IsPcVersion() && !game_config_.IsKeyboardControls()) {
+    GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
+    if (p)
+      p->OnMouseDown(pPos);
+  }
 }
 
 void DragonGameRunner::MouseUp() {
-#ifdef PC_VERSION
-#ifndef KEYBOARD_CONTROLS
-  GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
-  if (p)
-    p->OnMouseUp();
-#endif
-#endif
+  if (game_config_.IsPcVersion() && !game_config_.IsKeyboardControls()) {
+    GameController *p = pCnt ? pCnt->GetActiveController() : nullptr;
+    if (p)
+      p->OnMouseUp();
+  }
 }
 
 void DragonGameRunner::DoubleClick() {

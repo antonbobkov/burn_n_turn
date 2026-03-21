@@ -3,7 +3,6 @@
 #include "level_controller.h"
 #include "menu_controller.h"
 #include "../dragon_constants.h"
-#include "../dragon_macros.h"
 #include "../dragon_game_runner.h"
 #include "../fireball.h"
 #include "../level.h"
@@ -18,11 +17,13 @@
 #include "../../wrappers/geometry.h"
 #include "../../wrappers/font_writer.h"
 
-static void DrawStuff([[maybe_unused]] Rectangle rBound,
-                      [[maybe_unused]] GraphicalInterface<Index> *pGraph,
-                      [[maybe_unused]] SoundInterface<Index> *pSnd, [[maybe_unused]] Preloader &pr,
-                      [[maybe_unused]] int n) {
-#ifdef LOADING_SCREEN
+static void DrawStuff(Rectangle rBound,
+                      GraphicalInterface<Index> *pGraph,
+                      SoundInterface<Index> *pSnd, Preloader &pr,
+                      int n, const GameConfig &cfg) {
+  if (!cfg.IsLoadingScreen())
+    return;
+
   rBound.sz.x *= 2;
   rBound.sz.y *= 2;
 
@@ -30,32 +31,25 @@ static void DrawStuff([[maybe_unused]] Rectangle rBound,
   Size sz2 = pGraph->GetImage(pr["loading"])->GetSize();
 
   Point p1(Crd(rBound.sz.x / 2), Crd(rBound.sz.y / 2));
-#ifdef SMALL_SCREEN_VERSION
-        Point p2(Crd(rBound.sz.x/2, Crd(rBound.sz.y*7.0f/10);
-#else
-  Point p2(Crd(rBound.sz.x / 2), Crd(rBound.sz.y * 6.5f / 10));
-#endif
+  Point p2 = cfg.IsSmallScreenVersion()
+      ? Point(Crd(rBound.sz.x / 2), Crd(rBound.sz.y * 7.0f / 10))
+      : Point(Crd(rBound.sz.x / 2), Crd(rBound.sz.y * 6.5f / 10));
 
-	p1.x -= sz1.x/2;
-	p1.y -= sz1.y/2;
-	p2.x -= sz2.x/2;
-	p2.y -= sz2.y/2;
+  p1.x -= sz1.x / 2;
+  p1.y -= sz1.y / 2;
+  p2.x -= sz2.x / 2;
+  p2.y -= sz2.y / 2;
 
-	pGraph->DrawImage(p1, pr["splash"], false);
+  pGraph->DrawImage(p1, pr["splash"], false);
+  pGraph->DrawImage(p2, pr["loading"], Rectangle(0, 0, 144 * n / 9, 32), false);
+  pGraph->RefreshAll();
 
-	pGraph->DrawImage(p2, pr["loading"], Rectangle(0,0,144*n/9,32), false);
-
-	pGraph->DrawImage(p2, pr["loading"], Rectangle(0,0,144*n/9,32), false);
-
-	pGraph->RefreshAll();
-
-#ifndef PC_VERSION
-	if(n%2)
-		pSnd->PlaySound(pr.GetSnd("beep"));
-	else pSnd->PlaySound(pr.GetSnd("boop"));
-#endif
-
-#endif // LOADING_SCREEN
+  if (!cfg.IsPcVersion()) {
+    if (n % 2)
+      pSnd->PlaySound(pr.GetSnd("beep"));
+    else
+      pSnd->PlaySound(pr.GetSnd("boop"));
+  }
 }
 
 DragonGameSettings::DragonGameSettings(ConfigurationFile *cfg)
@@ -72,7 +66,8 @@ DragonGameController::DragonGameController(
     FontWriter *pFancyNum_, SoundInterface<Index> *pSndRaw_,
     const std::vector<LevelLayout> &vLvl_, Rectangle rBound_,
     Size szActualRez_, Event *pExitProgram_, FilePath *fp,
-    ConfigurationFile *config, ConfigurationFile *game_data)
+    ConfigurationFile *config, ConfigurationFile *game_data,
+    GameConfig game_config)
     : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(nullptr),
       pGraph(pDr_ ? pDr_->pGr : 0), pDr(pDr_),
       pNum(pNum_), pBigNum(pBigNum_), pFancyNum(pFancyNum_),
@@ -80,8 +75,8 @@ DragonGameController::DragonGameController(
       vLvl(vLvl_), nScore(0), nHighScore(0), bAngry(false),
       settings_(game_data), rBound(rBound_),
       szActualRez(szActualRez_), pExitProgram(pExitProgram_), fp_(fp),
-      p_config_(config), pSelf(nullptr),
-      pr(std::make_unique<Preloader>(pGraph, pSndRaw_, fp)) {
+      p_config_(config), game_config_(game_config), pSelf(nullptr),
+      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)) {
   nHighScore = settings_.snHighScore.Get();
 
   typedef ImagePainter::ColorMap ColorMap;
@@ -101,21 +96,21 @@ DragonGameController::DragonGameController(
   pr->LoadTS("robotbear.bmp", "splash");
   pr->LoadSnd("beep.wav", "beep");
   pr->LoadSnd("boop.wav", "boop");
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 0);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 0, game_config_);
 
   pr->LoadTS("road.bmp", "road");
   pr->LoadTS("turnandvorn.bmp", "logo");
-#ifdef TRIAL_VERSION
-  pr->LoadTS("trial.bmp", "trial");
-  pr->LoadTS("buy_now.bmp", "buy");
-#endif
+  if (game_config_.IsTrialVersion()) {
+    pr->LoadTS("trial.bmp", "trial");
+    pr->LoadTS("buy_now.bmp", "buy");
+  }
   pr->LoadSeqTS("burn\\burn.txt", "burn");
   pr->LoadTS("empty.bmp", "empty");
 
   pr->LoadSeqTS("arrow\\sword.txt", "arrow");
   pr->LoadSeqTS("arrow\\claw.txt", "claw");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 1);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 1, game_config_);
 
   pr->LoadSeqTS("corona\\crosshair.txt", "corona"); // (not used icon)
   pr->LoadSeqTS("bonus\\void.txt", "void_bonus");
@@ -132,7 +127,7 @@ DragonGameController::DragonGameController(
   // pr.LoadSeqTS("bonus\\frequency.txt", "frequency");		// 11 -
   // frequency (not used)
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 2);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 2, game_config_);
   pr->LoadSeqTS("start.txt", "start");
   pr->LoadSeqTS("win\\win.txt", "win");
   pr->LoadSeqTS("win\\over.txt", "over");
@@ -146,7 +141,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("dragon\\stable.txt", "dragon_stable");
   pr->LoadSeqTS("dragon\\walk.txt", "dragon_walk");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 3);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 3, game_config_);
 
   pr->AddSequence((*pr)("dragon_fly"), "bdragon_fly");
   pr->AddSequence((*pr)("dragon_stable"), "bdragon_stable");
@@ -162,7 +157,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("explosion\\explosion_15.txt", "explosion_15");
   pr->LoadSeqTS("explosion\\laser_expl_15.txt", "laser_expl_15");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 4);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 4, game_config_);
 
   pr->LoadSeqTS("explosion\\explosion2.txt", "explosion_2", Color(0, 0, 0, 0),
                 nScale * 2);
@@ -181,7 +176,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("fireball\\fireball_15.txt", "fireball_3", Color(0, 0, 0, 0),
                 nScale * 2);
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 5);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 5, game_config_);
 
   pr->LoadSeqTS("fireball\\laser.txt", "laser");
   pr->LoadSeqTS("fireball\\laser_15.txt", "laser_15");
@@ -192,7 +187,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("fireball\\fireball_icon.txt", "fireball_icon",
                 Color(255, 255, 255));
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 6);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 6, game_config_);
 
   pr->LoadSeqTS("knight\\knight.txt", "knight");
   pr->LoadSeqTS("knight\\die.txt", "knight_die");
@@ -218,7 +213,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("trader\\trader.txt", "trader");
   pr->LoadSeqTS("trader\\die.txt", "trader_die");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 7);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 7, game_config_);
 
   pr->AddSequence((*pr)("trader"), "trader_f");
   pr->AddSequence((*pr)("trader_die"), "trader_die_f");
@@ -237,7 +232,7 @@ DragonGameController::DragonGameController(
   pr->LoadSeqTS("mage\\spell.txt", "mage_spell");
   pr->LoadSeqTS("mage\\die.txt", "mage_die");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 8);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 8, game_config_);
 
   pr->AddSequence((*pr)("mage"), "mage_f");
   pr->AddSequence((*pr)("mage_spell"), "mage_spell_f");
@@ -261,7 +256,7 @@ DragonGameController::DragonGameController(
   pr->LoadSndSeq("sound\\pluanbo.txt", "pluanbo");
   pr->LoadSndSeq("sound\\click.txt", "click");
 
-  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 9);
+  DrawStuff(rBound, pGraph, pSndRaw_, *pr, 9, game_config_);
 
   pr->LoadSnd("start_game.wav", "start_game");
   pr->LoadSnd("death01.wav", "death");
@@ -304,20 +299,18 @@ DragonGameController::DragonGameController(
   pr->LoadSnd("dddragon.wav", "background_music");
   pr->LoadSnd("_dddragon.wav", "background_music_slow");
 
-#ifdef FULL_VERSION
-  pr->LoadSnd("dddragon1.wav", "background_music2");
-  pr->LoadSnd("_dddragon1.wav", "background_music_slow2");
-
-  pr->LoadSnd("dddragon2.wav", "background_music3");
-  pr->LoadSnd("_dddragon2.wav", "background_music_slow3");
-#else // save memory on trial, though, *something* needs to be loaded otherwise
-      // crashes.
-  pr->LoadSnd("dddragon.wav", "background_music2");
-  pr->LoadSnd("_dddragon.wav", "background_music_slow2");
-
-  pr->LoadSnd("dddragon.wav", "background_music3");
-  pr->LoadSnd("_dddragon.wav", "background_music_slow3");
-#endif
+  if (game_config_.IsFullVersion()) {
+    pr->LoadSnd("dddragon1.wav", "background_music2");
+    pr->LoadSnd("_dddragon1.wav", "background_music_slow2");
+    pr->LoadSnd("dddragon2.wav", "background_music3");
+    pr->LoadSnd("_dddragon2.wav", "background_music_slow3");
+  } else {
+    // save memory on trial; something must be loaded or the game crashes
+    pr->LoadSnd("dddragon.wav", "background_music2");
+    pr->LoadSnd("_dddragon.wav", "background_music_slow2");
+    pr->LoadSnd("dddragon.wav", "background_music3");
+    pr->LoadSnd("_dddragon.wav", "background_music_slow3");
+  }
 
   plr.pSnd = pSndRaw_;
 
@@ -407,10 +400,9 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   vHints.push_back("spooky things happen when time runs out");
   vHints.push_back("more princesses you capture - more knights show up");
   vHints.push_back("you can capture multiple princesses in one flight");
-#ifndef KEYBOARD_CONTROLS
-  vHints.push_back("pick up traders by clicking when flying over them\nbring "
-                   "them to the tower to get longer bonuses");
-#endif
+  if (!game_config_.IsKeyboardControls())
+    vHints.push_back("pick up traders by clicking when flying over them\nbring "
+                     "them to the tower to get longer bonuses");
   vHints.push_back("this game was originally called tower defense");
 
   std::string sHint = vHintPref.at(rand() % vHintPref.size()) +
@@ -421,10 +413,9 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   auto pOptionText = std::make_unique<TextDrawEntity>(
       0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
 
-#ifdef TRIAL_VERSION
-  pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(
-      (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
-#endif
+  if (game_config_.IsTrialVersion())
+    pCnt1->AddOwnedVisualEntity(std::make_unique<StaticImage>(
+        (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
 
   pMenu->SetMenuCaret(std::make_unique<Animation>(
       2, (*pr)("arrow"), 3, Point(0, 0), true));
@@ -445,13 +436,13 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       0, (*pr)("start"), nFramesInSecond / 5,
       Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
-#ifdef PC_VERSION
-  pMenu->SetHintText(std::move(pHintText));
-  pMenu->SetOptionText(std::move(pOptionText));
-#else
-  pCnt1->AddOwnedVisualEntity(std::move(pHintText));
-  pMenu->SetOptionText(std::move(pOptionText));
-#endif
+  if (game_config_.IsPcVersion()) {
+    pMenu->SetHintText(std::move(pHintText));
+    pMenu->SetOptionText(std::move(pOptionText));
+  } else {
+    pCnt1->AddOwnedVisualEntity(std::move(pHintText));
+    pMenu->SetOptionText(std::move(pOptionText));
+  }
 
   pCnt3->AddOwnedBoth(std::make_unique<Animation>(
       0, (*pr)("win"), 3,
@@ -487,9 +478,8 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
   vCnt.emplace_back(std::move(pCnt0_1));     // logo 1
   vCnt.emplace_back(std::move(pCnt0_2));     // logo 2
   vCnt.emplace_back(std::move(pCnt1));       // press start screen
-#ifndef PC_VERSION
-  vCnt.emplace_back(std::move(pIntro)); // tutorial screen
-#endif
+  if (!game_config_.IsPcVersion())
+    vCnt.emplace_back(std::move(pIntro)); // tutorial screen
 
   for (int i = 0; i < (int)vLvl.size(); ++i) {
     auto pAd = std::make_unique<LevelController>(
@@ -518,48 +508,46 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       vCnt.emplace_back(std::move(pCut3));
   }
 
-#ifdef TRIAL_VERSION
-  auto pBuy = std::make_unique<BuyNowController>(
-      pSelf, rBound, Color(0, 0, 0));
+  if (game_config_.IsTrialVersion()) {
+    auto pBuy = std::make_unique<BuyNowController>(
+        pSelf, rBound, Color(0, 0, 0));
 
-  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(burnR));
-  pBuy->AddOwnedVisualEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
-  pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(
-      (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
+    pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(logo));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(burnL));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(burnR));
+    pBuy->AddOwnedVisualEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
+    pBuy->AddOwnedVisualEntity(std::make_unique<StaticImage>(
+        (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
 
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("golem_f"), nFramesInSecond / 10,
-      Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("skelly"), nFramesInSecond / 4,
-      Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
-      Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
-      Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("mage_spell"), nFramesInSecond / 2,
-      Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("ghost"), nFramesInSecond / 6,
-      Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
-  pBuy->AddOwnedBoth(std::make_unique<Animation>(
-      0, (*pr)("ghost_knight"), nFramesInSecond / 6,
-      Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
-#endif
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("golem_f"), nFramesInSecond / 10,
+        Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("skelly"), nFramesInSecond / 4,
+        Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
+        Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
+        Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("mage_spell"), nFramesInSecond / 2,
+        Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("ghost"), nFramesInSecond / 6,
+        Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
+    pBuy->AddOwnedBoth(std::make_unique<Animation>(
+        0, (*pr)("ghost_knight"), nFramesInSecond / 6,
+        Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
 
-#ifdef FULL_VERSION
-  vCnt.emplace_back(std::move(pCnt3));  // you win
-  vCnt.emplace_back(std::move(pCnt2));  // game over
-  vCnt.emplace_back(std::move(pScore)); // score
-#else
-  vCnt.emplace_back(std::move(pCnt2));
-  vCnt.emplace_back(std::move(pBuy));
-#endif
+    vCnt.emplace_back(std::move(pCnt2));
+    vCnt.emplace_back(std::move(pBuy));
+  } else {
+    vCnt.emplace_back(std::move(pCnt3));  // you win
+    vCnt.emplace_back(std::move(pCnt2));  // game over
+    vCnt.emplace_back(std::move(pScore)); // score
+  }
 }
 
 void DragonGameController::Next() {
@@ -776,4 +764,8 @@ Index &DragonGameController::GetSnd(std::string key) { return pr->GetSnd(key); }
 
 SoundSequence &DragonGameController::GetSndSeq(std::string key) {
   return pr->GetSndSeq(key);
+}
+
+const GameConfig &DragonGameController::GetGameConfig() const {
+  return game_config_;
 }
