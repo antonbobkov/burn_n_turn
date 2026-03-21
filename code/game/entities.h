@@ -6,7 +6,6 @@
 #include "../game_utils/sound_sequence.h"
 #include "../game_utils/sound_utils.h"
 #include "../utils/index.h"
-#include "../utils/smart_pointer.h"
 #include "../utils/timer.h"
 #include "../wrappers/color.h"
 #include "../wrappers/geometry.h"
@@ -25,15 +24,13 @@ struct Entity {
 };
 
 /** A thing that can step and update each tick. */
-struct EventEntity : virtual public Entity, virtual public SP_Info {
-  std::string get_class_name() override { return "EventEntity"; }
+struct EventEntity : virtual public Entity {
   virtual void Move() {}
   virtual void Update() {}
 };
 
 /** A thing that has a place on the vista (GetPosition). */
-struct ScreenEntity : virtual public Entity, virtual public SP_Info {
-  std::string get_class_name() override { return "ScreenEntity"; }
+struct ScreenEntity : virtual public Entity {
   virtual Point GetPosition() { return Point(0, 0); }
 };
 

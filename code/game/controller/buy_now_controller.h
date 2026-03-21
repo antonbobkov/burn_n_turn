@@ -4,12 +4,11 @@
 #include "basic_controllers.h"
 #include "../entities.h"
 #include "../../game_utils/draw_utils.h"
-#include "../../utils/smart_pointer.h"
 #include <memory>
 
 /** The keeper of the buy-now screen: slime dances and a countdown. */
 struct BuyNowController : public EntityListController {
-  std::string get_class_name() override { return "BuyNowController"; }
+  std::string get_class_name() { return "BuyNowController"; }
   int t;
   std::vector<std::unique_ptr<Animation>> mSlimes;
   std::vector<fPoint> mSlimeVel;

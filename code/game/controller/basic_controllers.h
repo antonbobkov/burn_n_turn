@@ -21,7 +21,7 @@ struct VisualEntity;
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
 struct EntityListController : public GameController {
-  std::string get_class_name() override { return "EntityListController"; }
+  std::string get_class_name() { return "EntityListController"; }
 
   /** Consumable entities (knight, princess, …) owned here. */
   std::list<std::unique_ptr<ConsumableEntity>> lsPpl;
@@ -80,7 +80,7 @@ struct EntityListController : public GameController {
 };
 
 struct StartScreenController : public EntityListController {
-  std::string get_class_name() override { return "StartScreenController"; }
+  std::string get_class_name() { return "StartScreenController"; }
   StartScreenController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 
@@ -94,7 +94,7 @@ struct StartScreenController : public EntityListController {
 };
 
 struct Cutscene : public EntityListController {
-  std::string get_class_name() override { return "Cutscene"; }
+  std::string get_class_name() { return "Cutscene"; }
   std::unique_ptr<FancyCritter> pCrRun;
   std::unique_ptr<FancyCritter> pCrFollow;
 
@@ -124,7 +124,7 @@ struct Cutscene : public EntityListController {
 /** A screen that shows the dragon's tally and leaves on click or when time
  * runs out. */
 struct DragonScoreController : public EntityListController {
-  std::string get_class_name() override { return "DragonScoreController"; }
+  std::string get_class_name() { return "DragonScoreController"; }
   Timer t;
   bool bClickToExit;
 
@@ -142,7 +142,7 @@ struct DragonScoreController : public EntityListController {
 /** A controller that steps to the next screen when only the veil remains, or
  * when the hero gives a sign. */
 struct AutoAdvanceController : public EntityListController {
-  std::string get_class_name() override { return "AutoAdvanceController"; }
+  std::string get_class_name() { return "AutoAdvanceController"; }
   AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
 

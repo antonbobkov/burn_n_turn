@@ -30,7 +30,6 @@
 #include "sound_sequence.h"
 #include "../utils/file_utils.h"
 #include "../utils/index.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/GuiGen.h"
 #include "../wrappers/SuiGen.h"
 #include "../wrappers/color.h"
@@ -89,9 +88,8 @@ public:
 };
 
 /** Loads and caches images, sequences, and sounds by string key. */
-class Preloader : virtual public SP_Info {
+class Preloader {
 public:
-  std::string get_class_name() override { return "Preloader"; }
   Preloader(GraphicalInterface<Index> *pGr_,
             SoundInterface<Index> *pSn_, FilePath *fp);
 

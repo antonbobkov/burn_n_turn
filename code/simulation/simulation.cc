@@ -143,5 +143,4 @@ void RunSimulation() {
   if (sound_toggle_verified)
     std::cout << "[sim] Verified: sound toggle wrote to game_data.txt.\n";
   std::cout << "[sim] Done\n";
-} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
-// TODO: delete this after removing smart pointers from the codebase.
+}

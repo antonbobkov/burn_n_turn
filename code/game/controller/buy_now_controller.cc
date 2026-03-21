@@ -4,7 +4,6 @@
 #include "../dragon_constants.h"
 #include "../entities.h"
 #include "../../utils/random_utils.h"
-#include "../../utils/smart_pointer.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
 

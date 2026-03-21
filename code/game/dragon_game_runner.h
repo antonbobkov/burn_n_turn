@@ -5,7 +5,6 @@
 #include "../game_utils/game_runner_interface.h"
 #include "../utils/configuration_file.h"
 #include "../wrappers/geometry.h"
-#include "../utils/smart_pointer.h"
 #include <memory>
 #include <vector>
 

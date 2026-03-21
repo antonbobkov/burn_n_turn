@@ -8,7 +8,6 @@
 #include "../game_utils/game_runner_interface.h"
 #include "../game_utils/MessageWriter.h"
 #include "../utils/file_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/color.h"
 #include "../wrappers/gui_key_type.h"
 
@@ -125,8 +124,6 @@ int main(int /*argc*/, char * /*argv*/[]) {
         else if (event.type == SDL_KEYDOWN) {
           pGl->KeyDown(vSdlMapper[event.key.keysym.sym]);
 
-          if (event.key.keysym.sym == SDLK_EQUALS)
-            std::cout << "Global: " << nGlobalSuperMegaCounter << "\n";
         } else if (event.type == SDL_MOUSEMOTION) {
           int x, y;
           SDL_GetRelativeMouseState(&x, &y);
@@ -160,9 +157,6 @@ int main(int /*argc*/, char * /*argv*/[]) {
   std::cout << "Unknown error!\n";
   }
   */
-
-  if (nGlobalSuperMegaCounter != 0)
-    std::cout << "Memory Leak: " << nGlobalSuperMegaCounter << "\n";
 
   return 0;
 }

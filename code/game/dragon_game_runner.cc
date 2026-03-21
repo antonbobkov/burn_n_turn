@@ -8,7 +8,6 @@
 #include "../game_utils/event.h"
 #include "../utils/configuration_file.h"
 #include "../utils/file_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/font_writer.h"
 
 MessageWriter *pWr = 0;

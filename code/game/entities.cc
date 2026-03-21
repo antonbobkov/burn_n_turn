@@ -4,7 +4,6 @@
 #include "controller/level_controller.h"
 #include "../game_utils/draw_utils.h"
 #include "../utils/string_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/font_writer.h"
 #include "../wrappers/geometry.h"
 

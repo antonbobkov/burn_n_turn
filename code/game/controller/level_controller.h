@@ -2,7 +2,6 @@
 #define TOWER_DEFENSE_LEVEL_CONTROLLER_H
 
 #include "../../game_utils/mouse_utils.h"
-#include "../../utils/smart_pointer.h"
 #include "../../utils/timer.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
@@ -31,7 +30,7 @@ struct TutorialTextEntity;
 /** The keeper of the chapter: castles, roads, dragon, spawners, treasures,
  * and the hero's input. */
 struct LevelController : public EntityListController {
-  std::string get_class_name() override { return "LevelController"; }
+  std::string get_class_name() { return "LevelController"; }
   std::vector<std::unique_ptr<Castle>> vCs;
   std::vector<std::unique_ptr<Road>> vRd;
   std::vector<std::unique_ptr<Dragon>> vDr;

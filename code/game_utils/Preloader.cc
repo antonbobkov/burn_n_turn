@@ -1,5 +1,4 @@
 #include "Preloader.h"
-#include "../utils/smart_pointer.h"
 
 #include "../utils/exception.h"
 #include "../utils/string_utils.h"

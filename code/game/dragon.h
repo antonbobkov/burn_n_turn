@@ -6,7 +6,6 @@
 #include "../game_utils/image_sequence.h"
 #include "critters.h"
 #include "fireball.h"
-#include "../utils/smart_pointer.h"
 #include <list>
 #include <memory>
 
