@@ -12,7 +12,7 @@ Website: http://robotbear.org/
 
 ![game](http://robotbear.org/images/BurnandTurn/bnt920x540_1.png)
 
-TOUCHPAD OR TRACKBALL REQUIRED FOR PLAYING
+TOUCHPAD OR TRACKBALL REQUIRED FOR PLAYING 
 
 ## Intro
 The princesses are loose!
