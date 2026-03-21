@@ -56,9 +56,19 @@ struct TutorialLevelOne {
 
   TutorialTextEntity *pTexter;
 
+  /* Control-scheme messages; set from GameConfig before the first Update(). */
+  std::string sSteerMessage;
+  std::string sShootingMessage;
+  std::string sTakeOffMessage;
+  bool bShowFlyingShootHint;
+
   TutorialLevelOne()
       : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
-        bPrincessCaptured(false), pTexter() {}
+        bPrincessCaptured(false), pTexter(),
+        sSteerMessage("click and hold to steer"),
+        sShootingMessage("click anywhere to shoot a fireball"),
+        sTakeOffMessage("press space or click the tower to take off"),
+        bShowFlyingShootHint(true) {}
 
   /** Choose which lines the wise one speaks for the first chapter. */
   std::vector<std::string> GetText();

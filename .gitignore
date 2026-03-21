@@ -4,7 +4,7 @@ cmake_*/
 *.sln
 *.vcproj
 Thumbs.db
-bin_*/
+
 *~
 build/
 *.exe

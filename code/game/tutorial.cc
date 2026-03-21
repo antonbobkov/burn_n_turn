@@ -1,28 +1,6 @@
 #include "tutorial.h"
 #include "controller/dragon_game_controller.h"
-#include "dragon_macros.h"
 #include "../game_utils/draw_utils.h"
-
-namespace {
-
-#ifdef KEYBOARD_CONTROLS
-#ifdef JOYSTICK_TUTORIAL
-const std::string sSteerMessage = "steer with joystick";
-const std::string sShootingMessage = "move joystick to shoot a fireball";
-const std::string sTakeOffMessage = "press button to take off";
-#else
-const std::string sSteerMessage = "steer with left and right keys";
-const std::string sShootingMessage = "shoot with arrow keys";
-const std::string sTakeOffMessage = "press space to take off";
-#endif
-#else
-const std::string sSteerMessage = "click and hold to steer";
-const std::string sShootingMessage = "click anywhere to shoot a fireball";
-const std::string sTakeOffMessage =
-    "press space or click the tower to take off";
-#endif
-
-} // namespace
 
 void TutorialTextEntity::SetText(std::vector<std::string> v) {
   if (sText == v && nDelta == 1)
@@ -82,9 +60,8 @@ std::vector<std::string> TutorialLevelOne::GetText() {
       sText.push_back(sSteerMessage);
       sText.push_back("fly over the princess to pick her up");
       sText.push_back("bring captured princess to the tower");
-#ifndef JOYSTICK_TUTORIAL
-      sText.push_back("(you can shoot while flying!)");
-#endif
+      if (bShowFlyingShootHint)
+        sText.push_back("(you can shoot while flying!)");
 
       return sText;
     }

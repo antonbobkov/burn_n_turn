@@ -2,7 +2,6 @@
 #include "critter_generators.h"
 #include "dragon.h"
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "fireball.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
@@ -50,10 +49,8 @@ void Princess::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-#ifdef UNDERLINE_UNIT_TEXT
-  if (sUnderText != "")
+  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
     pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
-#endif
 }
 
 Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
@@ -158,10 +155,8 @@ void Trader::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-#ifdef UNDERLINE_UNIT_TEXT
-  if (sUnderText != "")
+  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
     pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
-#endif
 }
 
 void Knight::Draw(ScalingDrawer *pDr) {
@@ -169,10 +164,8 @@ void Knight::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-#ifdef UNDERLINE_UNIT_TEXT
-  if (sUnderText != "")
+  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
     pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
-#endif
 }
 
 void Knight::KnockBack() {

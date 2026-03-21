@@ -1,6 +1,5 @@
 #include "entities.h"
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
 #include "../game_utils/draw_utils.h"
@@ -174,27 +173,24 @@ void SoundControls::Update() {
   vText.push_back("I must bring the royal princesses back to my tower");
   vText.push_back("and defend it from the knights!");
   vText.push_back("---");
-#ifdef PC_VERSION
-  vText.push_back("CLICK screen to shoot, CLICK tower to fly");
-  vText.push_back("CLICK + HOLD to steer");
-  vText.push_back("---");
-  vText.push_back("press SPACE to PLAY!");
-#else
-
-#ifndef SMALL_SCREEN_VERSION
-  vText.push_back("TAP screen to shoot, TAP tower to fly");
-  vText.push_back("TAP + HOLD to steer");
-  vText.push_back("---");
-  vText.push_back("double TAP to PLAY!");
-#else
-  vText.push_back("TAP screen to shoot, TAP tower to fly");
-  vText.push_back("TAP + HOLD to steer");
-  vText.push_back("OR use the GAMEPAD!");
-  vText.push_back("---");
-  vText.push_back("double TAP or press X to PLAY!");
-#endif
-
-#endif
+  const GameConfig &cfg = pGl->GetGameConfig();
+  if (cfg.IsPcVersion()) {
+    vText.push_back("CLICK screen to shoot, CLICK tower to fly");
+    vText.push_back("CLICK + HOLD to steer");
+    vText.push_back("---");
+    vText.push_back("press SPACE to PLAY!");
+  } else if (!cfg.IsSmallScreenVersion()) {
+    vText.push_back("TAP screen to shoot, TAP tower to fly");
+    vText.push_back("TAP + HOLD to steer");
+    vText.push_back("---");
+    vText.push_back("double TAP to PLAY!");
+  } else {
+    vText.push_back("TAP screen to shoot, TAP tower to fly");
+    vText.push_back("TAP + HOLD to steer");
+    vText.push_back("OR use the GAMEPAD!");
+    vText.push_back("---");
+    vText.push_back("double TAP or press X to PLAY!");
+  }
 
   int nHeight = pGl->GetFancyFont()->GetSize(" ").y + 2;
 

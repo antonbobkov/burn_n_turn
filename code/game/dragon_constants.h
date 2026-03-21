@@ -1,8 +1,6 @@
 #ifndef TOWER_DEFENSE_DRAGON_CONSTANTS_H
 #define TOWER_DEFENSE_DRAGON_CONSTANTS_H
 
-#include "dragon_macros.h"
-
 extern int nSlimeMax;
 
 const int nFramesInSecond = 30;
@@ -58,12 +56,10 @@ const float fInitialFrequency = 2.F;
 const int nInitialRegen = 0; /* deciseconds */
 const int nRegenDelay = 10;  /* deciseconds */
 
-#ifndef KEYBOARD_CONTROLS
-const int nInitialFireballs = 4;
-const int nFireballsPerBonus = 2;
-#else
-const int nInitialFireballs = 6;
-const int nFireballsPerBonus = 3;
-#endif
+/* Initial fireball counts; set at startup from GameConfig (CONTROLS setting).
+ * Defaults match mouse/touch mode. */
+// TODO: move those out, not constants
+extern int nInitialFireballs;
+extern int nFireballsPerBonus;
 
 #endif

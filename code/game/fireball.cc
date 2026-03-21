@@ -1,5 +1,4 @@
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "fireball.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
@@ -369,10 +368,8 @@ void FireballBonusAnimation::Draw(ScalingDrawer *pDr) {
   Point p = GetPosition();
   p.y += 13;
 
-#ifdef UNDERLINE_UNIT_TEXT
-  if (sUnderText != "")
+  if (pAd->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
     pAd->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
-#endif
 }
 
 void FireballBonusAnimation::Update() {

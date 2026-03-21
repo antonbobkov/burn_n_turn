@@ -1,7 +1,6 @@
 #include "critter_generators.h"
 #include "critters.h"
 #include "dragon_constants.h"
-#include "dragon_macros.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
 #include "entities.h"
@@ -36,10 +35,8 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
       seq(pBc_->pGl->GetImgSeq("knight")), tm(1), bl(bl_) {
   if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
-#ifdef TRIAL_VERSION
-  if (pBc->nLvl == 1)
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1)
     bFirst = true;
-#endif
 }
 
 void KnightGenerator::Generate(bool bGolem) {
@@ -89,11 +86,8 @@ PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
   if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
-
-#ifdef TRIAL_VERSION
-  if (pBc->nLvl == 1)
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1)
     bFirst = true;
-#endif
 }
 
 void PrincessGenerator::Update() {
@@ -184,13 +178,10 @@ TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
     bFirst = true;
     bFirstBns = true;
   }
-
-#ifdef TRIAL_VERSION
-  if (pBc->nLvl == 1) {
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1) {
     bFirst = true;
     bFirstBns = true;
   }
-#endif
 }
 
 void TraderGenerator::Update() {

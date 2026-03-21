@@ -5,7 +5,6 @@
 #include "../dragon.h"
 #include "../dragon_constants.h"
 #include "../dragon_game_runner.h"
-#include "../dragon_macros.h"
 #include "../entities.h"
 #include "../fireball.h"
 #include "../level.h"
@@ -27,46 +26,45 @@ struct AdNumberDrawer : public VisualEntity {
   explicit AdNumberDrawer(LevelController *ad) : pAd(ad) {}
 
   void Draw(ScalingDrawer * /*pDr*/) override {
+    if (pAd->pGl->GetGameConfig().IsFullVersion()) {
+      pAd->pGl->GetNumberDrawer()->DrawNumber(
+          pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
 
-#ifdef FULL_VERSION
-    pAd->pGl->GetNumberDrawer()->DrawNumber(
-        pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
+      if (pAd->bBlink) {
+        Color c(255, 255, 0);
 
-    if (pAd->bBlink) {
-      Color c(255, 255, 0);
+        if (pAd->bTimerFlash)
+          c = Color(255, 0, 0);
 
-      if (pAd->bTimerFlash)
-        c = Color(255, 0, 0);
+        pAd->pGl->GetNumberDrawer()->DrawColorNumber(
+            (pAd->t.nPeriod - pAd->t.nTimer) / nFramesInSecond,
+            Point(pAd->rBound.sz.x - 14 * 4, 4), c, 4);
+        pAd->pGl->GetNumberDrawer()->DrawColorWord(
+            "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
+      }
 
-      pAd->pGl->GetNumberDrawer()->DrawColorNumber(
-          (pAd->t.nPeriod - pAd->t.nTimer) / nFramesInSecond,
-          Point(pAd->rBound.sz.x - 14 * 4, 4), c, 4);
-      pAd->pGl->GetNumberDrawer()->DrawColorWord(
-          "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
+      pAd->pGl->GetNumberDrawer()->DrawNumber(
+          pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
+
+      pAd->pGl->GetNumberDrawer()->DrawWord("score:",
+                                            Point(pAd->rBound.sz.x - 33 * 4, 4));
+      pAd->pGl->GetNumberDrawer()->DrawWord("level:",
+                                            Point(pAd->rBound.sz.x - 9 * 4, 4));
+      if (pAd->bCh) {
+        pAd->pGl->GetNumberDrawer()->DrawColorWord(
+            "invincible", Point(pAd->rBound.sz.x - 44 * 4, 4), Color(0, 255, 0));
+      }
+    } else {
+      pAd->pGl->GetNumberDrawer()->DrawNumber(
+          pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
+      pAd->pGl->GetNumberDrawer()->DrawNumber(
+          pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
+
+      pAd->pGl->GetNumberDrawer()->DrawWord("score:",
+                                            Point(pAd->rBound.sz.x - 23 * 4, 4));
+      pAd->pGl->GetNumberDrawer()->DrawWord("level:",
+                                            Point(pAd->rBound.sz.x - 9 * 4, 4));
     }
-
-    pAd->pGl->GetNumberDrawer()->DrawNumber(
-        pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
-
-    pAd->pGl->GetNumberDrawer()->DrawWord("score:",
-                                          Point(pAd->rBound.sz.x - 33 * 4, 4));
-    pAd->pGl->GetNumberDrawer()->DrawWord("level:",
-                                          Point(pAd->rBound.sz.x - 9 * 4, 4));
-    if (pAd->bCh) {
-      pAd->pGl->GetNumberDrawer()->DrawColorWord(
-          "invincible", Point(pAd->rBound.sz.x - 44 * 4, 4), Color(0, 255, 0));
-    }
-#else
-    pAd->pGl->GetNumberDrawer()->DrawNumber(
-        pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
-    pAd->pGl->GetNumberDrawer()->DrawNumber(
-        pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
-
-    pAd->pGl->GetNumberDrawer()->DrawWord("score:",
-                                          Point(pAd->rBound.sz.x - 23 * 4, 4));
-    pAd->pGl->GetNumberDrawer()->DrawWord("level:",
-                                          Point(pAd->rBound.sz.x - 9 * 4, 4));
-#endif
   }
   Point GetPosition() override { return Point(); }
   float GetPriority() override { return 10; }
@@ -127,9 +125,7 @@ struct BonusDrawer : public VisualEntity {
   float GetPriority() override { return 10; }
 };
 
-#ifdef KEYBOARD_CONTROLS
 static const float fSpreadFactor = 2.0f;
-#endif
 
 LevelController::~LevelController() = default;
 
@@ -190,36 +186,51 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   pTutorialText =
       std::make_unique<TutorialTextEntity>(1, pos, pGl->GetNumberDrawer(), pGl);
 
-#ifdef PC_VERSION
+  if (pGl->GetGameConfig().IsPcVersion()) {
+    if (nLvl == 1) {
+      tutOne->pTexter = pTutorialText.get();
+      const GameConfig &cfg = pGl->GetGameConfig();
+      if (cfg.IsJoystickTutorial()) {
+        tutOne->sSteerMessage    = "steer with joystick";
+        tutOne->sShootingMessage = "move joystick to shoot a fireball";
+        tutOne->sTakeOffMessage  = "press button to take off";
+        tutOne->bShowFlyingShootHint = false;
+      } else if (cfg.IsKeyboardControls()) {
+        tutOne->sSteerMessage    = "steer with left and right keys";
+        tutOne->sShootingMessage = "shoot with arrow keys";
+        tutOne->sTakeOffMessage  = "press space to take off";
+        tutOne->bShowFlyingShootHint = true;
+      } else {
+        tutOne->sSteerMessage    = "click and hold to steer";
+        tutOne->sShootingMessage = "click anywhere to shoot a fireball";
+        tutOne->sTakeOffMessage  = "press space or click the tower to take off";
+        tutOne->bShowFlyingShootHint = true;
+      }
+      tutOne->Update();
+    }
 
-  if (nLvl == 1) {
-    tutOne->pTexter = pTutorialText.get();
-    tutOne->Update();
+    if (nLvl == 2) {
+      tutTwo->pTexter = pTutorialText.get();
+      tutTwo->Update();
+    }
   }
-
-  if (nLvl == 2) {
-    tutTwo->pTexter = pTutorialText.get();
-    tutTwo->Update();
-  }
-
-#endif
 }
 
 void LevelController::OnKey(GuiKeyType c, bool bUp) {
 
-#ifdef KEYBOARD_CONTROLS
-  if (!bUp) {
-    if (c == GUI_LEFT)
-      bLeftDown = true;
-    else if (c == GUI_RIGHT)
-      bRightDown = true;
-  } else {
-    if (c == GUI_LEFT)
-      bLeftDown = false;
-    else if (c == GUI_RIGHT)
-      bRightDown = false;
+  if (pGl->GetGameConfig().IsKeyboardControls()) {
+    if (!bUp) {
+      if (c == GUI_LEFT)
+        bLeftDown = true;
+      else if (c == GUI_RIGHT)
+        bRightDown = true;
+    } else {
+      if (c == GUI_LEFT)
+        bLeftDown = false;
+      else if (c == GUI_RIGHT)
+        bRightDown = false;
+    }
   }
-#endif
 
   if (bUp)
     return;
@@ -253,10 +264,8 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
         vDr[i]->AddBonus(vDr[i]->GetBonus(c - GUI_F1 + 1, nBonusCheatTime));
   }
 
-#ifdef PC_VERSION
-  if (c == GUI_ESCAPE)
+  if (pGl->GetGameConfig().IsPcVersion() && c == GUI_ESCAPE)
     pGl->EnterMenu();
-#endif
 
   for (int i = 0; i < (int)vDr.size(); ++i)
     if (vDr[i]->bt.IsSpace(c)) {
@@ -269,42 +278,42 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       }
     }
 
-#ifdef KEYBOARD_CONTROLS
-  if (nLastDir == 0) {
-    bool flag = true;
-    if (c == GUI_LEFT)
-      nLastDir = 1;
-    else if (c == GUI_RIGHT)
-      nLastDir = 2;
-    else if (c == GUI_DOWN)
-      nLastDir = 3;
-    else if (c == GUI_UP)
-      nLastDir = 4;
-    else
-      flag = false;
-    if (flag)
-      bWasDirectionalInput = true;
-  } else {
-    int dir = 0;
-    if (c == GUI_LEFT)
-      dir = 1;
-    else if (c == GUI_RIGHT)
-      dir = 2;
-    else if (c == GUI_DOWN)
-      dir = 3;
-    else if (c == GUI_UP)
-      dir = 4;
-    fPoint fp = ComposeDirection(nLastDir, dir);
-    fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
-    fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
+  if (pGl->GetGameConfig().IsKeyboardControls()) {
+    if (nLastDir == 0) {
+      bool flag = true;
+      if (c == GUI_LEFT)
+        nLastDir = 1;
+      else if (c == GUI_RIGHT)
+        nLastDir = 2;
+      else if (c == GUI_DOWN)
+        nLastDir = 3;
+      else if (c == GUI_UP)
+        nLastDir = 4;
+      else
+        flag = false;
+      if (flag)
+        bWasDirectionalInput = true;
+    } else {
+      int dir = 0;
+      if (c == GUI_LEFT)
+        dir = 1;
+      else if (c == GUI_RIGHT)
+        dir = 2;
+      else if (c == GUI_DOWN)
+        dir = 3;
+      else if (c == GUI_UP)
+        dir = 4;
+      fPoint fp = ComposeDirection(nLastDir, dir);
+      fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
+      fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-    if (!vDr[0]->bFly) {
-      vDr[0]->Fire(fp);
-      pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+      if (!vDr[0]->bFly) {
+        vDr[0]->Fire(fp);
+        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+      }
+      bWasDirectionalInput = false;
     }
-    bWasDirectionalInput = false;
   }
-#endif
 }
 
 void LevelController::OnMouse(Point pPos) {
@@ -542,12 +551,10 @@ void LevelController::Update() {
 
   EntityListController::Update();
 
-#ifdef PC_VERSION
-#ifndef KEYBOARD_CONTROLS
-  mc.bPressed = pt.bPressed;
-  mc.DrawCursor(pGl->GetGraphics());
-#endif
-#endif
+  if (pGl->GetGameConfig().IsPcVersion() && !pGl->GetGameConfig().IsKeyboardControls()) {
+    mc.bPressed = pt.bPressed;
+    mc.DrawCursor(pGl->GetGraphics());
+  }
   pGl->RefreshAll();
 
   if (tLoseTimer.nPeriod != 0 && tLoseTimer.Tick()) {
@@ -591,49 +598,48 @@ void LevelController::Update() {
     }
   }
 
-#ifdef FULL_VERSION
-  if (!bGhostTime) {
-    if (t.Tick()) {
-      bGhostTime = true;
+  if (pGl->GetGameConfig().IsFullVersion()) {
+    if (!bGhostTime) {
+      if (t.Tick()) {
+        bGhostTime = true;
 
-      if (!pGl->IsMusicOnSetting())
-        pGl->PlaySound("E");
+        if (!pGl->IsMusicOnSetting())
+          pGl->PlaySound("E");
 
-      if (nLvl > 6)
-        pGr->Generate(true);
+        if (nLvl > 6)
+          pGr->Generate(true);
+      }
+    }
+
+    if (!bTimerFlash) {
+      if (t.nPeriod - t.nTimer < 20 * nFramesInSecond) {
+        bTimerFlash = true;
+        tBlink = Timer(nFramesInSecond / 2);
+      }
+    } else {
+      if (tBlink.Tick()) {
+        if (!pGl->IsMusicOnSetting() && !bGhostTime && !bBlink)
+          pGl->PlaySound("D");
+
+        bBlink = !bBlink;
+      }
     }
   }
 
-  if (!bTimerFlash) {
-    if (t.nPeriod - t.nTimer < 20 * nFramesInSecond) {
-      bTimerFlash = true;
-      tBlink = Timer(nFramesInSecond / 2);
-    }
-  } else {
-    if (tBlink.Tick()) {
-      if (!pGl->IsMusicOnSetting() && !bGhostTime && !bBlink)
-        pGl->PlaySound("D");
+  if (pGl->GetGameConfig().IsKeyboardControls()) {
+    if (!bWasDirectionalInput)
+      nLastDir = 0;
+    else {
+      fPoint fp = ComposeDirection(nLastDir, nLastDir);
+      fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
+      fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-      bBlink = !bBlink;
+      if (!vDr[0]->bFly) {
+        vDr[0]->Fire(fp);
+        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+      }
     }
+
+    bWasDirectionalInput = false;
   }
-
-#endif
-
-#ifdef KEYBOARD_CONTROLS
-  if (!bWasDirectionalInput)
-    nLastDir = 0;
-  else {
-    fPoint fp = ComposeDirection(nLastDir, nLastDir);
-    fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
-    fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
-
-    if (!vDr[0]->bFly) {
-      vDr[0]->Fire(fp);
-      pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
-    }
-  }
-
-  bWasDirectionalInput = false;
-#endif
 }
