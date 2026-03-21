@@ -28,14 +28,13 @@ const std::string kGameDataFile("game_data.txt");
 const int kKeyPressFrames[] = {8, 18, 28};
 const int kKeyPressCount = 3;
 
-
 void LogState(DragonGameRunner *ctrl) {
   DragonGameController *twr = ctrl->GetTowerController();
   if (!twr)
     return;
   std::cout << "[sim] screen " << ctrl->GetActiveControllerName()
-            << " score=" << twr->GetScore()
-            << " high=" << twr->GetHighScore() << "\n";
+            << " score=" << twr->GetScore() << " high=" << twr->GetHighScore()
+            << "\n";
 }
 
 } // namespace
@@ -46,12 +45,12 @@ void RunSimulation() {
 
   std::cout << "[sim] Creating mocks and file manager\n";
   auto p_mock_gr = std::make_unique<MockGraphicalInterface>();
-  auto p_gr = std::make_unique<SimpleGraphicalInterface<std::string>>(
-      p_mock_gr.get());
+  auto p_gr =
+      std::make_unique<SimpleGraphicalInterface<std::string>>(p_mock_gr.get());
 
   auto p_mock_snd = std::make_unique<MockSoundInterface>();
-  auto p_snd = std::make_unique<SimpleSoundInterface<std::string>>(
-      p_mock_snd.get());
+  auto p_snd =
+      std::make_unique<SimpleSoundInterface<std::string>>(p_mock_snd.get());
 
   std::unique_ptr<StdFileManager> underlying(new StdFileManager());
   std::unique_ptr<CachingReadOnlyFileManager> fm(
@@ -59,8 +58,7 @@ void RunSimulation() {
 
   bool b_exit = false;
   bool b_true = true;
-  auto p_exit_ev =
-      std::make_unique<SwitchEvent<bool, bool>>(b_exit, b_true);
+  auto p_exit_ev = std::make_unique<SwitchEvent<bool, bool>>(b_exit, b_true);
   auto p_msg = std::make_unique<EmptyWriter>();
   Size sz(kScreenW, kScreenH);
 
@@ -146,4 +144,5 @@ void RunSimulation() {
   if (sound_toggle_verified)
     std::cout << "[sim] Verified: sound toggle wrote to game_data.txt.\n";
   std::cout << "[sim] Done\n";
-}  // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
+// TODO: delete this after removing smart pointers from the codebase.

@@ -86,14 +86,14 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
                      int nPeriod_)
-      : dPriority(dPriority_), nPeriod(nPeriod_),
-        t(nPeriod_ * seq_.GetTime()), bTimer(true),
-        bStep(false), bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
+      : dPriority(dPriority_), nPeriod(nPeriod_), t(nPeriod_ * seq_.GetTime()),
+        bTimer(true), bStep(false), bCenter(bCenter_), seq(seq_),
+        bImageToggle(false) {}
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
                      bool bStep_ = false)
-      : dPriority(dPriority_), nPeriod(1), bTimer(false),
-        bStep(bStep_), bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
+      : dPriority(dPriority_), nPeriod(1), bTimer(false), bStep(bStep_),
+        bCenter(bCenter_), seq(seq_), bImageToggle(false) {}
 
   void Draw(ScalingDrawer *pDr) override;
 
@@ -142,8 +142,8 @@ struct AnimationOnce : public SimpleVisualEntity {
   Point pos;
   bool bOnce;
 
-  AnimationOnce(float dPriority_, const ImageSequence &seq,
-                int nTimeMeasure_, Point p, bool bCenter = false)
+  AnimationOnce(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
+                Point p, bool bCenter = false)
       : SimpleVisualEntity(dPriority_, seq, bCenter, nTimeMeasure_), pos(p),
         bOnce(true) {}
 
@@ -189,7 +189,8 @@ struct StaticRectangle : public VisualEntity {
   float GetPriority() override { return dPriority; }
 };
 
-/** A thing on the vista with a radius—so we can tell when it touches another. */
+/** A thing on the vista with a radius—so we can tell when it touches another.
+ */
 struct PhysicalEntity : virtual public ScreenEntity {
   std::string get_class_name() override { return "PhysicalEntity"; }
   virtual int GetRadius() { return 0; }
