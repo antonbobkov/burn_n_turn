@@ -1,5 +1,4 @@
 #include "simulation.h"
-#include "../utils/smart_pointer.h"
 
 #include "../game/controller/dragon_game_controller.h"
 #include "../game/dragon_game_runner.h"
@@ -67,7 +66,7 @@ void RunSimulation() {
   std::cout << "[sim] Creating ProgramEngine and tower controller explicitly\n";
   ProgramEngine pe(std::move(p_exit_ev), p_gr.get(), p_snd.get(),
                    std::move(p_msg), sz, fm.get());
-  smart_pointer<DragonGameRunner> p_gl = make_smart(new DragonGameRunner(pe));
+  std::unique_ptr<DragonGameRunner> p_gl = std::make_unique<DragonGameRunner>(pe);
 
   std::string sound_content_before;
   bool sound_toggle_verified = false;

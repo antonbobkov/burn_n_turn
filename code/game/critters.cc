@@ -12,8 +12,8 @@
 #include "../game_utils/draw_utils.h"
 #include "../game_utils/image_sequence.h"
 #include "../utils/random_utils.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/geometry.h"
+#include <memory>
 
 void SummonSkeletons(LevelController *pAc, Point p) {
   int nNum = 4;
@@ -190,19 +190,14 @@ void Knight::Update() {
     }
 
   if (cType == 'S') {
-    CleanUp(pAc->lsPpl);
-
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-             pAc->lsPpl.begin();
-         itr != pAc->lsPpl.end(); ++itr) {
-      if (!(*itr)->bExist)
+    for (auto &entity : pAc->lsPpl) {
+      if (!entity->bExist)
         continue;
 
-      if (this->HitDetection(itr->get())) {
-
-        if ((*itr)->GetType() == 'P' || (*itr)->GetType() == 'T') {
+      if (this->HitDetection(entity.get())) {
+        if (entity->GetType() == 'P' || entity->GetType() == 'T') {
           pAc->pGl->PlaySound("death");
-          (*itr)->OnHit('S');
+          entity->OnHit('S');
         }
       }
     }
@@ -270,9 +265,8 @@ void Knight::OnHit(char /*cWhat*/) {
         dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
         GetPosition(), true));
   } else {
-    smart_pointer<Ghostiness> pGhs =
-        make_smart(new Ghostiness(GetPosition(), pAc, *this, nGhostHit));
-    pAc->AddE(pGhs);
+    pAc->AddOwnedEventEntity(
+        std::make_unique<Ghostiness>(GetPosition(), pAc, *this, nGhostHit));
   }
 }
 
@@ -357,15 +351,13 @@ void Ghostiness::Update() {
     if (nGhostHit == 0)
       return;
 
-    smart_pointer<Knight> pCr = make_smart(new Knight(knCp, pAdv, 'G'));
+    auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G');
     if (nGhostHit == 1)
       pCr->seq = pAdv->pGl->GetImgSeq("ghost");
     else
       pCr->seq = pAdv->pGl->GetImgSeq("ghost_knight");
     pCr->nGhostHit = nGhostHit - 1;
-
-    pAdv->AddBoth(pCr);
-    pAdv->lsPpl.push_back(pCr);
+    pAdv->AddOwnedConsumable(std::move(pCr));
   }
 }
 
@@ -397,14 +389,12 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (std::list<smart_pointer<ConsumableEntity>>::iterator itr =
-           pAc->lsPpl.begin();
-       itr != pAc->lsPpl.end(); ++itr) {
-    if (!(*itr)->bExist)
+  for (auto &entity : pAc->lsPpl) {
+    if (!entity->bExist)
       continue;
 
-    if (this->HitDetection(itr->get())) {
-      if ((*itr)->GetType() == 'K') {
+    if (this->HitDetection(entity.get())) {
+      if (entity->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 
         bExist = false;
@@ -470,10 +460,9 @@ void Slime::OnHit(char cWhat) {
     pAc->MegaGeneration(fAvg.ToPnt());
 
     for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
-      smart_pointer<FloatingSlime> pSlm = make_smart(
-          new FloatingSlime(pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
-                            fAvg.ToPnt(), nFramesInSecond * 1));
-      pAc->AddBoth(pSlm);
+      pAc->AddOwnedBoth(std::make_unique<FloatingSlime>(
+          pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
+          fAvg.ToPnt(), nFramesInSecond * 1));
     }
 
     return;
@@ -505,17 +494,14 @@ void Slime::OnHit(char cWhat) {
 
 Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
-    : p(p_), bFast(bFast_), nGeneration(nGeneration_), pAdv(pAdv_), pSlm() {
+    : p(p_), bFast(bFast_), nGeneration(nGeneration_), pAdv(pAdv_), pSlm_() {
   ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
                             : pAdv->pGl->GetImgSeq("slime_reproduce");
 
   t = bFast ? Timer(int(1.3F * nFramesInSecond))
             : Timer(int(2.3F * nFramesInSecond));
 
-  smart_pointer<AnimationOnce> pSlmTmp = make_smart(
-      new AnimationOnce(2.F, seq, int(.1F * nFramesInSecond), p_, true));
-  pSlm = pSlmTmp;
-  pAdv_->AddBoth(pSlmTmp);
+  pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
 
   ++pAdv_->nSlimeNum;
 }
@@ -531,7 +517,7 @@ void Sliminess::Update() {
 
 void Sliminess::Kill() {
   bExist = false;
-  pSlm->bExist = false;
+  pSlm_->bExist = false;
 }
 
 Sliminess::~Sliminess() {
@@ -540,19 +526,16 @@ Sliminess::~Sliminess() {
 }
 
 MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
-    : p(p_), pAdv(pAdv_), pSlm() {
+    : p(p_), pAdv(pAdv_), pSlm_() {
   ImageSequence seq = pAdv->pGl->GetImgSeq("megaslime_reproduce");
 
-  smart_pointer<AnimationOnce> pSlmTmp = make_smart(
-      new AnimationOnce(2.F, seq, int(.1F * nFramesInSecond), p_, true));
-  pSlm = pSlmTmp;
-  pAdv_->AddBoth(pSlmTmp);
+  pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
 
   pAdv->pGl->PlaySound("slime_spawn");
 }
 
 void MegaSliminess::Update() {
-  if (pSlm->bExist == false) {
+  if (!pSlm_->bExist) {
     bExist = false;
 
     pAdv->AddMegaSlime(
@@ -562,8 +545,8 @@ void MegaSliminess::Update() {
 
 void MegaSliminess::Kill() {
   bExist = false;
-  if (pSlm.get())
-    pSlm->bExist = false;
+  if (pSlm_)
+    pSlm_->bExist = false;
 }
 
 FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
@@ -680,14 +663,12 @@ void Castle::OnKnight(char cWhat) {
       fPoint v = RandomAngle();
       v.Normalize(fPrincessSpeed * 3.F);
 
-      smart_pointer<Princess> pCr = make_smart(
-          new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                               v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                                       : pAv->pGl->GetImgSeq("princess"),
-                               true),
-                       pAv));
-      pAv->AddBoth(pCr);
-      pAv->lsPpl.push_back(pCr);
+      pAv->AddOwnedConsumable(std::make_unique<Princess>(
+          Critter(7, GetPosition(), v, rBound, 0,
+                  v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                           : pAv->pGl->GetImgSeq("princess"),
+                  true),
+          pAv));
     }
   } else {
     pAv->pGl->PlaySound("all_princess_escape");
@@ -700,14 +681,12 @@ void Castle::OnKnight(char cWhat) {
                  cos(r + i * 2 * 3.1415F / nPrincesses));
         v.Normalize(fPrincessSpeed * 3.F);
 
-        smart_pointer<Princess> pCr = make_smart(
-            new Princess(Critter(7, GetPosition(), v, rBound, 0,
-                                 v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                                         : pAv->pGl->GetImgSeq("princess"),
-                                 true),
-                         pAv));
-        pAv->AddBoth(pCr);
-        pAv->lsPpl.push_back(pCr);
+        pAv->AddOwnedConsumable(std::make_unique<Princess>(
+            Critter(7, GetPosition(), v, rBound, 0,
+                    v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
+                             : pAv->pGl->GetImgSeq("princess"),
+                    true),
+            pAv));
       }
     }
 

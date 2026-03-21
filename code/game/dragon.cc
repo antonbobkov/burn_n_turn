@@ -10,7 +10,6 @@
 #include "tutorial.h"
 #include "../game_utils/draw_utils.h"
 #include "../game_utils/image_sequence.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/geometry.h"
 
 int nSlimeMax = 100;
@@ -129,27 +128,26 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     pBonus = std::make_unique<TimedFireballBonus>(FireballBonus(n, false),
                                                   nTime * 2);
   } else if (n == 9) {
-    CleanUp(pAd->lsPpl);
-
     nSlimeMax *= 2;
 
-    for (std::list<smart_pointer<ConsumableEntity>>::iterator
-             itr = pAd->lsPpl.begin(),
-             etr = pAd->lsPpl.end();
-         itr != etr; ++itr)
-      if ((*itr)->GetType() == 'K' || (*itr)->GetType() == 'S' ||
-          (*itr)->GetType() == 'L') {
-        if ((*itr)->GetType() == 'K' &&
+    for (auto &entity : pAd->lsPpl) {
+      if (!entity->bExist)
+        continue;
+
+      if (entity->GetType() == 'K' || entity->GetType() == 'S' ||
+          entity->GetType() == 'L') {
+        if (entity->GetType() == 'K' &&
             GetAllBonuses().uMap["setonfire"] != 0) {
-          (*itr)->bExist = false;
+          entity->bExist = false;
           pAd->AddOwnedBoth(std::make_unique<KnightOnFire>(
-              Critter((*itr)->GetRadius(), (*itr)->GetPosition(), fPoint(),
+              Critter(entity->GetRadius(), entity->GetPosition(), fPoint(),
                       rBound, 1.F, ImageSequence(), true),
               pAd, 15 * nFramesInSecond,
               Chain(GetAllBonuses().uMap["setonfire"])));
         } else
-          (*itr)->OnHit('F');
+          entity->OnHit('F');
       }
+    }
 
     nSlimeMax /= 2;
   } else if (n == 10) {
@@ -262,7 +260,7 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (smart_pointer<ConsumableEntity> entity : pAd->lsPpl) {
+    for (auto &entity : pAd->lsPpl) {
       if (!entity->bExist)
         continue;
 
@@ -481,12 +479,10 @@ void Dragon::Toggle() {
       return;
     }
 
-  CleanUp(pAd->lsPpl);
-
   if (bCarry)
     return;
 
-  for (smart_pointer<ConsumableEntity> entity : pAd->lsPpl) {
+  for (auto &entity : pAd->lsPpl) {
     if (!entity->bExist)
       continue;
 

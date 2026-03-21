@@ -450,10 +450,16 @@ std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
     out.push_back(u.get());
   for (auto &u : lsMegaSlimes)
     out.push_back(u.get());
-  for (auto &u : lsSliminess)
+  for (auto &u : lsSliminess) {
     out.push_back(u.get());
-  for (auto &u : lsMegaSliminess)
+    if (u->pSlm_)
+      out.push_back(u->pSlm_.get());
+  }
+  for (auto &u : lsMegaSliminess) {
     out.push_back(u.get());
+    if (u->pSlm_)
+      out.push_back(u->pSlm_.get());
+  }
   for (size_t i = 0; i < vDr.size(); ++i)
     out.push_back(vDr[i].get());
   for (size_t i = 0; i < vDr.size(); ++i)
@@ -488,7 +494,12 @@ std::vector<VisualEntity *> LevelController::GetNonOwnedDrawEntities() {
     out.push_back(u.get());
   for (size_t i = 0; i < vDr.size(); ++i)
     out.push_back(vDr[i].get());
-  /* Sliminess / MegaSliminess are EventEntity only, not VisualEntity */
+  for (auto &u : lsSliminess)
+    if (u->pSlm_)
+      out.push_back(u->pSlm_.get());
+  for (auto &u : lsMegaSliminess)
+    if (u->pSlm_)
+      out.push_back(u->pSlm_.get());
   return out;
 }
 

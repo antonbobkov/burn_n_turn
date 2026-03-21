@@ -2,7 +2,6 @@
 #define GAME_RUNNER_INTERFACE_H
 
 #include "event.h"
-#include "../utils/smart_pointer.h"
 #include "../wrappers/gui_key_type.h"
 
 #include <memory>
@@ -70,9 +69,9 @@ struct ProgramEngine {
   FileManager *GetFileManager() const { return p_fm; }
 };
 
-class GameRunner : virtual public SP_Info {
+class GameRunner {
 public:
-  std::string get_class_name() override { return "GameRunner"; }
+  virtual ~GameRunner() = default;
   virtual void Update() = 0;
 
   virtual void KeyDown(GuiKeyType /*nCode*/) {}

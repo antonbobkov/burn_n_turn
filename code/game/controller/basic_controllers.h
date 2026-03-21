@@ -3,7 +3,6 @@
 
 #include "game_controller_interface.h"
 #include "../../utils/index.h"
-#include "../../utils/smart_pointer.h"
 #include "../../utils/timer.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
@@ -23,23 +22,21 @@ struct VisualEntity;
  * tick it moves, updates, then paints from back to front. */
 struct EntityListController : public GameController {
   std::string get_class_name() override { return "EntityListController"; }
-  std::list<smart_pointer<VisualEntity>> lsDraw;
-  std::list<smart_pointer<EventEntity>> lsUpdate;
-  std::list<smart_pointer<ConsumableEntity>> lsPpl;
 
-  /** Creatures and sights this controller brought into the world (it owns
-   * them). Empty for now. */
+  /** Consumable entities (knight, princess, …) owned here. */
+  std::list<std::unique_ptr<ConsumableEntity>> lsPpl;
+
+  /** Non-consumable entities owned here (animations, effects, …). */
   std::list<std::unique_ptr<Entity>> owned_entities;
+
+  /** Raw-pointer views for iteration — point into lsPpl or owned_entities. */
   std::list<VisualEntity *> owned_visual_entities;
   std::list<EventEntity *> owned_event_entities;
 
-  /** Add a sight to the list of things drawn. */
-  void AddV(smart_pointer<VisualEntity> pVs);
-  /** Add a creature that ticks each frame to the update list. */
-  void AddE(smart_pointer<EventEntity> pEv);
-
   void AddOwnedVisualEntity(std::unique_ptr<VisualEntity> p);
   void AddOwnedEventEntity(std::unique_ptr<EventEntity> p);
+
+  /** Own a visual+event entity (e.g. AnimationOnce, FancyCritter). */
   template <class T> void AddOwnedBoth(std::unique_ptr<T> p) {
     T *raw = p.get();
     owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
@@ -47,9 +44,12 @@ struct EntityListController : public GameController {
     owned_event_entities.push_back(raw);
   }
 
-  template <class T> void AddBoth(T &t) {
-    lsDraw.push_back(t);
-    lsUpdate.push_back(t);
+  /** Own a consumable entity (knight, princess, …) that is also visual+event. */
+  template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
+    T *raw = p.get();
+    lsPpl.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
+    owned_visual_entities.push_back(raw);
+    owned_event_entities.push_back(raw);
   }
 
   /** Add a fullscreen colored veil to the draw list. */
