@@ -5,7 +5,6 @@
 #include "../game_utils/image_sequence.h"
 #include "entities.h"
 
-struct EntityListController;
 struct LevelController;
 
 /** The dragon's fire strength: named numbers and flags; += combines, Add
@@ -57,10 +56,10 @@ struct ChainExplosion : public AnimationOnce {
 
   Chain ch;
 
-  EntityListController *pBc;
+  LevelController *pBc;
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
-                 EntityListController *pBc_, Chain ch_ = Chain())
+                 LevelController *pBc_, Chain ch_ = Chain())
       : AnimationOnce(av), r_in(r_), r(r_), delta(delta_), ch(ch_), pBc(pBc_) {}
 
   int GetRadius() override { return int(r); }
@@ -76,7 +75,7 @@ struct ChainExplosion : public AnimationOnce {
 
 struct KnightOnFire : public Critter {
   std::string get_class_name() override { return "KnightOnFire"; }
-  EntityListController *pBc;
+  LevelController *pBc;
   int nTimer, nTimer_i;
   Timer t;
   Chain c;
@@ -84,7 +83,7 @@ struct KnightOnFire : public Critter {
   /** Send the burning knight in a random direction at fire speed. */
   void RandomizeVelocity();
 
-  KnightOnFire(const Critter &cr, EntityListController *pBc_,
+  KnightOnFire(const Critter &cr, LevelController *pBc_,
                 int nTimer_, Chain c_);
 
   void Update() override;

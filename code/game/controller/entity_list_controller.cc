@@ -7,9 +7,7 @@
 #include <memory>
 
 void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
-  Entity *raw = p.get();
   owned_entities.push_back(std::move(p));
-  owned_entity_list.push_back(raw);
 }
 
 void EntityListController::AddBackground(Color c) {
@@ -27,15 +25,11 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 }
 
 void EntityListController::Update() {
-  /* Clean raw-pointer view first so no raw ptr outlives its owning unique_ptr.
-   * owned_entities is cleaned after the raw-ptr view. */
-  CleanUpConsumables();
-  CleanUp(owned_entity_list);
   CleanUp(owned_entities);
 
   auto nonOwned = GetNonOwnedEntities();
 
-  for (Entity *pEx : owned_entity_list) {
+  for (auto &pEx : owned_entities) {
     if (pEx->bExist)
       pEx->Move();
   }
@@ -45,7 +39,7 @@ void EntityListController::Update() {
       pEx->Move();
   }
 
-  for (Entity *pEx : owned_entity_list) {
+  for (auto &pEx : owned_entities) {
     if (pEx->bExist)
       pEx->Update();
   }
@@ -59,10 +53,10 @@ void EntityListController::Update() {
     typedef std::multimap<ScreenPos, Entity *> DrawMap;
     DrawMap mmp;
 
-    for (Entity *pOw : owned_entity_list) {
+    for (auto &pOw : owned_entities) {
       if (pOw->bExist && pOw->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
-            ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw));
+            ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw.get()));
     }
 
     for (Entity *pEx : nonOwned) {
@@ -89,9 +83,9 @@ void EntityListController::OnKey(GuiKeyType /*c*/, bool bUp) {
 void EntityListController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }
 
 int EntityListController::CountDrawable() {
-  CleanUp(owned_entity_list);
+  CleanUp(owned_entities);
   int n = 0;
-  for (Entity *p : owned_entity_list)
+  for (auto &p : owned_entities)
     if (p->ShouldDraw())
       ++n;
   return n;

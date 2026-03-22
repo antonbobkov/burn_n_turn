@@ -88,17 +88,13 @@ struct LevelController : public EntityListController {
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
-    T *raw = p.get();
     lsPpl_.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
-    owned_entity_list.push_back(raw);
   }
 
   /** Pointers to people (non-slime consumables) for targeted iteration. */
   std::vector<ConsumableEntity *> GetPeoplePointers();
 
-  std::vector<ConsumableEntity *> GetConsumablePointers() override;
-
-  void CleanUpConsumables() override;
+  std::vector<ConsumableEntity *> GetConsumablePointers();
 
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,

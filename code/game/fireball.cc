@@ -79,7 +79,6 @@ void ChainExplosion::Update() {
     r += delta;
   }
 
-  pBc->CleanUpConsumables();
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
     if (!ptr->bExist)
@@ -111,7 +110,7 @@ void KnightOnFire::RandomizeVelocity() {
   fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
 }
 
-KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
+KnightOnFire::KnightOnFire(const Critter &cr, LevelController *pBc_,
                            int nTimer_, Chain c_)
     : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_),
       t(nFramesInSecond / 5), c(c_) {
@@ -241,7 +240,6 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
 }
 
 void Fireball::Update() {
-  pBc->CleanUpConsumables();
 
   bool bMultiHit = false;
 
