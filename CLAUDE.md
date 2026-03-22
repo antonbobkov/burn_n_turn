@@ -22,3 +22,4 @@ ctest --preset integration -j4
 - Member variables: trailing underscore (e.g. `config_`, `fp_`), parameters: no underscore.
 - Test framework: Catch2 v2 (`TEST_CASE` / `REQUIRE`).
 - Integer types: use `int` (not bare `unsigned`) throughout.
+- Avoid `auto`, prefer specifying types explicitly, unless inside a for loop or clear from context

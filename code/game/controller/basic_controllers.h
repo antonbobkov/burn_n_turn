@@ -22,6 +22,7 @@ struct FancyCritter;
 struct EntityListController : public GameController {
   std::string get_class_name() { return "EntityListController"; }
 
+  // TODO: restrict access and move to level controller
   /** Consumable entities (knight, princess, …) owned here. */
   std::list<std::unique_ptr<ConsumableEntity>> lsPpl;
 
