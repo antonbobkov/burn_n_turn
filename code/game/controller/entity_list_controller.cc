@@ -83,10 +83,9 @@ void EntityListController::OnKey(GuiKeyType /*c*/, bool bUp) {
 void EntityListController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }
 
 int EntityListController::CountDrawable() {
-  CleanUp(owned_entities);
   int n = 0;
   for (auto &p : owned_entities)
-    if (p->ShouldDraw())
+    if (p->bExist && p->ShouldDraw())
       ++n;
   return n;
 }

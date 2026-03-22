@@ -38,7 +38,7 @@ struct EntityListController : public GameController {
   /** Entities that tick and draw here but are owned elsewhere. */
   virtual std::vector<Entity *> GetNonOwnedEntities() { return {}; }
 
-  /** Count of owned entities that will be drawn this tick (dead ones excluded). */
+  /** Count of owned entities that exist and would be drawn this tick. */
   int CountDrawable();
 
   void OnKey(GuiKeyType c, bool bUp) override;
