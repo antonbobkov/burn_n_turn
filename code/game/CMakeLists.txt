@@ -8,6 +8,7 @@ add_library(GameCore STATIC
   entities.cc
   level.cc
   tutorial.cc
+  controller/entity_list_controller.cc
   controller/basic_controllers.cc
   controller/buy_now_controller.cc
   controller/dragon_game_controller.cc
