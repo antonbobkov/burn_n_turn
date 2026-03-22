@@ -18,7 +18,8 @@ struct LevelController;
 /** The root of all things in the realm; a flag says if it still exists.
  * Combines movement (Move/Update), screen presence (GetPosition), visuals
  * (Draw/GetPriority), and collision (GetRadius/HitDetection). */
-struct Entity {
+class Entity {
+public:
   Entity() : bExist(true) {}
   Entity(const Entity &) = default;
   Entity &operator=(const Entity &) = default;
@@ -42,7 +43,8 @@ private:
 };
 
 /** A sight that paints lines of text at a point on the vista. */
-struct TextDrawEntity : public Entity {
+class TextDrawEntity : public Entity {
+public:
   std::string get_class_name() override { return "TextDrawEntity"; }
   bool ShouldDraw() override { return true; }
 
@@ -68,7 +70,8 @@ private:
 
 /** A sight with a sequence of images: draws the current frame; Update steps
  * by timer or when position changes. */
-struct SimpleVisualEntity : virtual public Entity {
+class SimpleVisualEntity : virtual public Entity {
+public:
   std::string get_class_name() override { return "SimpleVisualEntity"; }
   bool ShouldDraw() override { return true; }
 
@@ -109,7 +112,8 @@ protected:
 
 /** A thing that plays a sound sequence on a timer; it vanishes when the tune
  * ends. */
-struct SimpleSoundEntity : public Entity {
+class SimpleSoundEntity : public Entity {
+public:
   std::string get_class_name() override { return "SimpleSoundEntity"; }
 
   SimpleSoundEntity(const SoundSequence &seq_, int nPeriod_,
@@ -128,7 +132,8 @@ private:
 };
 
 /** A sight that stays in one place and cycles through frames. */
-struct Animation : public SimpleVisualEntity {
+class Animation : public SimpleVisualEntity {
+public:
   std::string get_class_name() override { return "Animation"; }
 
   Animation(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
@@ -146,7 +151,8 @@ private:
 };
 
 /** An animation that plays once to the end, then vanishes. */
-struct AnimationOnce : public SimpleVisualEntity {
+class AnimationOnce : public SimpleVisualEntity {
+public:
   std::string get_class_name() override { return "AnimationOnce"; }
 
   AnimationOnce(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
@@ -163,7 +169,8 @@ private:
 };
 
 /** A sight that shows one image at a fixed point. */
-struct StaticImage : public Entity {
+class StaticImage : public Entity {
+public:
   std::string get_class_name() override { return "StaticImage"; }
   bool ShouldDraw() override { return true; }
 
@@ -187,7 +194,8 @@ private:
 };
 
 /** A sight that draws a filled rectangle (covers the vista, no single spot). */
-struct StaticRectangle : public Entity {
+class StaticRectangle : public Entity {
+public:
   std::string get_class_name() override { return "StaticRectangle"; }
   bool ShouldDraw() override { return true; }
 
@@ -208,7 +216,8 @@ private:
 
 /** A thing that can be struck (OnHit), has a kind (GetType) and an image
  * (GetImage). */
-struct ConsumableEntity : virtual public Entity {
+class ConsumableEntity : virtual public Entity {
+public:
   std::string get_class_name() override { return "ConsumableEntity"; }
   virtual char GetType() = 0;
   virtual void OnHit(char cWhat) = 0;
@@ -217,7 +226,8 @@ struct ConsumableEntity : virtual public Entity {
 
 /** A creature that moves: place, speed, bounds, and radius; Move() steps it
  * and clamps or removes it when it leaves the realm. */
-struct Critter : public SimpleVisualEntity {
+class Critter : public SimpleVisualEntity {
+public:
   std::string get_class_name() override { return "Critter"; }
 
   int GetRadius() override { return nRadius; }
@@ -253,7 +263,8 @@ protected:
 };
 
 /** A creature that steps and flips frames by a timer. */
-struct FancyCritter : public SimpleVisualEntity {
+class FancyCritter : public SimpleVisualEntity {
+public:
   std::string get_class_name() override { return "FancyCritter"; }
 
   int GetRadius() override { return nRadius; }
@@ -292,7 +303,8 @@ struct ScreenPos {
 };
 
 /** A floating "+N" tally at a point; it lingers a moment then fades. */
-struct BonusScore : public Entity {
+class BonusScore : public Entity {
+public:
   std::string get_class_name() override { return "BonusScore"; }
   bool ShouldDraw() override { return true; }
 
@@ -317,7 +329,8 @@ private:
   Color c;
 };
 
-struct SoundControls : public Entity {
+class SoundControls : public Entity {
+public:
   std::string get_class_name() override { return "SoundControls"; }
 
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
@@ -335,7 +348,8 @@ private:
 };
 
 /** Paints the finest tally yet within a rectangle on the vista. */
-struct HighScoreShower : public Entity {
+class HighScoreShower : public Entity {
+public:
   std::string get_class_name() override { return "HighScoreShower"; }
   bool ShouldDraw() override { return true; }
 
@@ -349,7 +363,8 @@ private:
   Rectangle rBound;
 };
 
-struct IntroTextShower : public Entity {
+class IntroTextShower : public Entity {
+public:
   std::string get_class_name() override { return "IntroTextShower"; }
   bool ShouldDraw() override { return true; }
 

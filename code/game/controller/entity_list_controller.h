@@ -9,11 +9,12 @@
 #include <memory>
 #include <vector>
 
-struct Entity;
+class Entity;
 
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
-struct EntityListController : public GameController {
+class EntityListController : public GameController {
+public:
   std::string get_class_name() { return "EntityListController"; }
 
   void AddOwnedEntity(std::unique_ptr<Entity> p);

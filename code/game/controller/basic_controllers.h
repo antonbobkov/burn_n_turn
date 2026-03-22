@@ -5,10 +5,11 @@
 #include "../../utils/timer.h"
 #include <memory>
 
-struct Animation;
-struct FancyCritter;
+class Animation;
+class FancyCritter;
 
-struct StartScreenController : public EntityListController {
+class StartScreenController : public EntityListController {
+public:
   std::string get_class_name() { return "StartScreenController"; }
   StartScreenController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
@@ -22,7 +23,8 @@ struct StartScreenController : public EntityListController {
   std::string GetControllerName() const override { return "start"; }
 };
 
-struct Cutscene : public EntityListController {
+class Cutscene : public EntityListController {
+public:
   std::string get_class_name() { return "Cutscene"; }
 
   /**
@@ -53,7 +55,8 @@ private:
 
 /** A screen that shows the dragon's tally and leaves on click or when time
  * runs out. */
-struct DragonScoreController : public EntityListController {
+class DragonScoreController : public EntityListController {
+public:
   std::string get_class_name() { return "DragonScoreController"; }
 
   DragonScoreController(DragonGameController *pGl_, Rectangle rBound, Color c,
@@ -73,7 +76,8 @@ private:
 
 /** A controller that steps to the next screen when only the veil remains, or
  * when the hero gives a sign. */
-struct AutoAdvanceController : public EntityListController {
+class AutoAdvanceController : public EntityListController {
+public:
   std::string get_class_name() { return "AutoAdvanceController"; }
   AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
