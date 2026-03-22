@@ -48,6 +48,10 @@ struct EntityListController : public GameController {
   /** Clean up dead consumable entities. Override in subclasses that own them. */
   virtual void CleanUpConsumables() {}
 
+  /** Clean dead entries from owned_entity_list and return the number of
+   * entities that would be drawn this tick. */
+  int CountDrawable();
+
   void OnKey(GuiKeyType c, bool bUp) override;
 
   void OnMouseDown(Point pPos) override;

@@ -114,16 +114,7 @@ void DragonScoreController::Update() {
 }
 
 void AutoAdvanceController::Update() {
-  // TODO: avoid accessing owned_entity_list directly, have a helper function in EntityListController
-  /* Clean raw-ptr view before counting so dead entities don't count. */
-  CleanUp(owned_entity_list);
-
-  int nDrawable = 0;
-  for (Entity *p : owned_entity_list)
-    if (p->ShouldDraw())
-      ++nDrawable;
-
-  if (nDrawable == 1) {
+  if (CountDrawable() == 1) {
     pGl->Next();
     return;
   }
