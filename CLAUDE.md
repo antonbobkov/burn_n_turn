@@ -1,3 +1,6 @@
+- All relevant code is under code/. Ignore unused_old_ignore/
+- Don't commit/push/merge unless instructed.
+
 ## Build system
 
 CMake + MinGW Makefiles, compiler: `clang++`. Presets defined in `CMakePresets.json`.
