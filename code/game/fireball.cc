@@ -45,7 +45,7 @@ FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
     fMap["speed"] = 5;
     fMap["frequency"] = fInitialFrequency;
     uMap["pershot"] = 1;
-    uMap["total"] = nInitialFireballs;
+    uMap["total"] = 0;
   }
 }
 
@@ -79,7 +79,6 @@ void ChainExplosion::Update() {
     r += delta;
   }
 
-  CleanUp(pBc->lsPpl);
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
     if (!ptr->bExist)
@@ -111,7 +110,7 @@ void KnightOnFire::RandomizeVelocity() {
   fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
 }
 
-KnightOnFire::KnightOnFire(const Critter &cr, EntityListController *pBc_,
+KnightOnFire::KnightOnFire(const Critter &cr, LevelController *pBc_,
                            int nTimer_, Chain c_)
     : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_),
       t(nFramesInSecond / 5), c(c_) {
@@ -241,7 +240,6 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
 }
 
 void Fireball::Update() {
-  CleanUp(pBc->lsPpl);
 
   bool bMultiHit = false;
 

@@ -183,11 +183,11 @@ void Knight::Update() {
     }
 
   if (cType == 'S') {
-    for (auto &entity : pAc->lsPpl) {
+    for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
       if (!entity->bExist)
         continue;
 
-      if (this->HitDetection(entity.get())) {
+      if (this->HitDetection(entity)) {
         if (entity->GetType() == 'P' || entity->GetType() == 'T') {
           pAc->pGl->PlaySound("death");
           entity->OnHit('S');
@@ -382,11 +382,11 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (auto &entity : pAc->lsPpl) {
+  for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
     if (!entity->bExist)
       continue;
 
-    if (this->HitDetection(entity.get())) {
+    if (this->HitDetection(entity)) {
       if (entity->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 

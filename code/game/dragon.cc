@@ -12,8 +12,6 @@
 #include "../wrappers/geometry.h"
 
 int nSlimeMax = 100;
-int nInitialFireballs = 4;   /* default: mouse mode; set at startup from GameConfig */
-int nFireballsPerBonus = 2;  /* default: mouse mode; set at startup from GameConfig */
 
 void DragonLeash::ModifyTilt(Point trackball) {
   tilt -= tilt * naturalScaleFactor;
@@ -95,7 +93,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
                                                   nTime);
   else if (n == 4) {
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "total", nFireballsPerBonus), nTime * 2);
+        FireballBonus(n, "total", pAd->pGl->GetGameConfig().FireballsPerBonus()), nTime * 2);
   } else if (n == 5)
     pBonus = std::make_unique<TimedFireballBonus>(
         FireballBonus(n, "explode", 1), nTime);
@@ -131,7 +129,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
   } else if (n == 9) {
     nSlimeMax *= 2;
 
-    for (auto &entity : pAd->lsPpl) {
+    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
       if (!entity->bExist)
         continue;
 
@@ -177,6 +175,7 @@ void Dragon::RecoverBonuses() {
 FireballBonus Dragon::GetAllBonuses() {
   CleanUp(lsBonuses);
   FireballBonus fbRet(-1, true);
+  fbRet.uMap["total"] = pAd->pGl->GetGameConfig().InitialFireballs();
 
   for (auto itr = lsBonuses.begin(), etr = lsBonuses.end(); itr != etr; ++itr)
     fbRet += **itr;
@@ -261,11 +260,11 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (auto &entity : pAd->lsPpl) {
+    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
       if (!entity->bExist)
         continue;
 
-      if (entity->GetType() == 'P' && this->HitDetection(entity.get())) {
+      if (entity->GetType() == 'P' && this->HitDetection(entity)) {
         bCarry = true;
         imgCarry = entity->GetImage();
         cCarry = 'P';
@@ -481,14 +480,14 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (auto &entity : pAd->lsPpl) {
+  for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
     if (!entity->bExist)
       continue;
 
     if (entity->GetType() != 'T')
       continue;
 
-    if (this->HitDetection(entity.get())) {
+    if (this->HitDetection(entity)) {
       if (!bCarry) {
         bCarry = true;
         imgCarry = entity->GetImage();

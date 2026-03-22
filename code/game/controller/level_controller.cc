@@ -436,9 +436,15 @@ void LevelController::AddSpawnedGenerator(std::unique_ptr<Entity> p) {
   lsSpawnedGenerators.push_back(std::move(p));
 }
 
+std::vector<ConsumableEntity *> LevelController::GetPeoplePointers() {
+  std::vector<ConsumableEntity *> out;
+  for (auto &p : lsPpl_)
+    out.push_back(p.get());
+  return out;
+}
+
 std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
-  std::vector<ConsumableEntity *> out =
-      EntityListController::GetConsumablePointers();
+  std::vector<ConsumableEntity *> out = GetPeoplePointers();
   for (auto &u : lsSlimes)
     out.push_back(u.get());
   for (auto &u : lsMegaSlimes)
@@ -448,6 +454,8 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
 
 std::vector<Entity *> LevelController::GetNonOwnedEntities() {
   std::vector<Entity *> out;
+  for (auto &u : lsPpl_)
+    out.push_back(u.get());
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
   for (size_t i = 0; i < vRd.size(); ++i)
@@ -502,6 +510,7 @@ void LevelController::MegaGeneration(Point p) {
 }
 
 void LevelController::Update() {
+  CleanUp(lsPpl_);
   CleanUp(lsBonus);
   CleanUp(lsSlimes);
   CleanUp(lsMegaSlimes);

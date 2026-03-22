@@ -2,7 +2,6 @@
 #include "../game_utils/MessageWriter.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/game_controller_interface.h"
-#include "dragon_constants.h"
 #include "fireball.h"
 #include "level.h"
 #include "../game_utils/event.h"
@@ -31,9 +30,6 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe)
     fp_ = FilePath::Create(inLinux, pathVal, p_fm_);
   }
   game_data_ = std::make_unique<ConfigurationFile>(p_fm_, "game_data.txt");
-  nInitialFireballs  = game_config_.IsKeyboardControls() ? 6 : 4;
-  nFireballsPerBonus = game_config_.IsKeyboardControls() ? 3 : 2;
-
   Rectangle sBound = Rectangle(pe.szScreenRez);
   int nScale = 2;
   Rectangle rBound =
