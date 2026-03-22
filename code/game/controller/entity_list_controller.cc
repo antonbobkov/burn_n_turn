@@ -6,13 +6,6 @@
 #include <map>
 #include <memory>
 
-std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
-  std::vector<ConsumableEntity *> out;
-  for (auto &p : lsPpl)
-    out.push_back(p.get());
-  return out;
-}
-
 void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
   Entity *raw = p.get();
   owned_entities.push_back(std::move(p));
@@ -35,9 +28,9 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 
 void EntityListController::Update() {
   /* Clean raw-pointer view first so no raw ptr outlives its owning unique_ptr.
-   * lsPpl and owned_entities are cleaned after their raw-ptr view. */
+   * owned_entities is cleaned after the raw-ptr view. */
+  CleanUpConsumables();
   CleanUp(owned_entity_list);
-  CleanUp(lsPpl);
   CleanUp(owned_entities);
 
   auto nonOwned = GetNonOwnedEntities();

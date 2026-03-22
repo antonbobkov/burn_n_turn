@@ -79,7 +79,7 @@ void ChainExplosion::Update() {
     r += delta;
   }
 
-  CleanUp(pBc->lsPpl);
+  pBc->CleanUpConsumables();
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
     if (!ptr->bExist)
@@ -241,7 +241,7 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
 }
 
 void Fireball::Update() {
-  CleanUp(pBc->lsPpl);
+  pBc->CleanUpConsumables();
 
   bool bMultiHit = false;
 

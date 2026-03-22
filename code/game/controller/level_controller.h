@@ -86,6 +86,20 @@ struct LevelController : public EntityListController {
   std::unique_ptr<TutorialLevelTwo> tutTwo;
   std::unique_ptr<TutorialTextEntity> pTutorialText;
 
+  /** Own a consumable entity (knight, princess, …). */
+  template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
+    T *raw = p.get();
+    lsPpl_.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
+    owned_entity_list.push_back(raw);
+  }
+
+  /** Pointers to people (non-slime consumables) for targeted iteration. */
+  std::vector<ConsumableEntity *> GetPeoplePointers();
+
+  std::vector<ConsumableEntity *> GetConsumablePointers() override;
+
+  void CleanUpConsumables() override;
+
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
                   const LevelLayout &lvl);
@@ -100,8 +114,6 @@ struct LevelController : public EntityListController {
   void AddSliminess(std::unique_ptr<Sliminess> p);
   void AddMegaSliminess(std::unique_ptr<MegaSliminess> p);
   void AddSpawnedGenerator(std::unique_ptr<Entity> p);
-
-  std::vector<ConsumableEntity *> GetConsumablePointers() override;
 
   /** Find the dragon in our list that matches p, or nullptr. */
   Dragon *FindDragon(Dragon *p);
@@ -125,6 +137,9 @@ struct LevelController : public EntityListController {
 
   void MegaGeneration();
   void MegaGeneration(Point p);
+
+ private:
+  std::list<std::unique_ptr<ConsumableEntity>> lsPpl_;
 };
 
 #endif

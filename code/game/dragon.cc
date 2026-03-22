@@ -131,7 +131,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
   } else if (n == 9) {
     nSlimeMax *= 2;
 
-    for (auto &entity : pAd->lsPpl) {
+    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
       if (!entity->bExist)
         continue;
 
@@ -261,11 +261,11 @@ void Dragon::Update() {
   }
 
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (auto &entity : pAd->lsPpl) {
+    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
       if (!entity->bExist)
         continue;
 
-      if (entity->GetType() == 'P' && this->HitDetection(entity.get())) {
+      if (entity->GetType() == 'P' && this->HitDetection(entity)) {
         bCarry = true;
         imgCarry = entity->GetImage();
         cCarry = 'P';
@@ -481,14 +481,14 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (auto &entity : pAd->lsPpl) {
+  for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
     if (!entity->bExist)
       continue;
 
     if (entity->GetType() != 'T')
       continue;
 
-    if (this->HitDetection(entity.get())) {
+    if (this->HitDetection(entity)) {
       if (!bCarry) {
         bCarry = true;
         imgCarry = entity->GetImage();

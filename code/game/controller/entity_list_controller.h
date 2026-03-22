@@ -17,9 +17,6 @@ struct Entity;
 struct EntityListController : public GameController {
   std::string get_class_name() { return "EntityListController"; }
 
-  /** Consumable entities (knight, princess, …) owned here. */
-  std::list<std::unique_ptr<ConsumableEntity>> lsPpl;
-
   /** Non-consumable entities owned here (animations, effects, …). */
   std::list<std::unique_ptr<Entity>> owned_entities;
 
@@ -27,13 +24,6 @@ struct EntityListController : public GameController {
   std::list<Entity *> owned_entity_list;
 
   void AddOwnedEntity(std::unique_ptr<Entity> p);
-
-  /** Own a consumable entity (knight, princess, …). */
-  template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
-    T *raw = p.get();
-    lsPpl.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
-    owned_entity_list.push_back(raw);
-  }
 
   /** Add a fullscreen colored veil to the draw list. */
   void AddBackground(Color c);
@@ -53,7 +43,10 @@ struct EntityListController : public GameController {
   virtual std::vector<Entity *> GetNonOwnedEntities() { return {}; }
 
   /** Pointers to consumable entities for hit detection (e.g. fireball). */
-  virtual std::vector<ConsumableEntity *> GetConsumablePointers();
+  virtual std::vector<ConsumableEntity *> GetConsumablePointers() { return {}; }
+
+  /** Clean up dead consumable entities. Override in subclasses that own them. */
+  virtual void CleanUpConsumables() {}
 
   void OnKey(GuiKeyType c, bool bUp) override;
 
