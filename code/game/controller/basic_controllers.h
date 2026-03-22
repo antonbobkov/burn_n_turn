@@ -16,7 +16,7 @@ struct ConsumableEntity;
 struct Entity;
 struct FancyCritter;
 
-// TODO: move to a separate file.
+// TODO: move EntityListController to a separate file.
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
 struct EntityListController : public GameController {

@@ -210,6 +210,7 @@ void DragonScoreController::Update() {
 }
 
 void AutoAdvanceController::Update() {
+  // TODO: avoid accessing owned_entity_list directly, have a helper function in EntityListController
   /* Clean raw-ptr view before counting so dead entities don't count. */
   CleanUp(owned_entity_list);
 
