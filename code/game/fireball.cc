@@ -81,7 +81,7 @@ void ChainExplosion::Update() {
 
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
-    if (!ptr->bExist)
+    if (!ptr->IsAlive())
       continue;
 
     if (this->HitDetection(ptr)) {
@@ -122,7 +122,7 @@ void KnightOnFire::Update() {
   Critter::Update();
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
-    if (!ptr->bExist)
+    if (!ptr->IsAlive())
       continue;
 
     if (this->HitDetection(ptr)) {
@@ -134,7 +134,7 @@ void KnightOnFire::Update() {
       if (c.IsLast() || cType != 'K')
         ptr->OnHit('F');
       else {
-        ptr->bExist = false;
+        ptr->Kill();
         pBc->AddOwnedEntity(std::make_unique<KnightOnFire>(
             Critter(GetRadius(), ptr->GetPosition(), fPoint(), rBound,
                     GetPriority(), ImageSequence(), true),
@@ -144,7 +144,7 @@ void KnightOnFire::Update() {
   }
 
   if (nTimer != 0 && --nTimer == 0) {
-    bExist = false;
+    Kill();
 
     pBc->AddOwnedEntity(std::make_unique<AnimationOnce>(
         dPriority, pBc->pGl->GetImgSeq("knight_die"),
@@ -244,7 +244,7 @@ void Fireball::Update() {
   bool bMultiHit = false;
 
   for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
-    if (!ptr->bExist)
+    if (!ptr->IsAlive())
       continue;
 
     if (this->HitDetection(ptr)) {
@@ -253,7 +253,7 @@ void Fireball::Update() {
       if (cType == 'W' || cType == 'E') {
         ptr->OnHit('F');
 
-        bExist = false;
+        Kill();
         return;
       } else
         pBc->pGl->PlaySound("death");
@@ -261,7 +261,7 @@ void Fireball::Update() {
       if (ptr->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
         ptr->OnHit('F');
       else {
-        ptr->bExist = false;
+        ptr->Kill();
         pBc->AddOwnedEntity(std::make_unique<KnightOnFire>(
             Critter(ptr->GetRadius(), ptr->GetPosition(), fPoint(),
                     rBound, 1.F, ImageSequence(), true),
@@ -272,7 +272,7 @@ void Fireball::Update() {
         bool bKeepGoing = (fb.uMap["through"] != 0) || fb.bMap["through_flag"];
 
         if (nChain != 0 || !bKeepGoing)
-          bExist = false;
+          Kill();
 
         if (bKeepGoing) {
           if (fb.bMap["through_flag"])
@@ -323,14 +323,14 @@ void Fireball::Update() {
 
 void TimedFireballBonus::Update() {
   if (t.Tick())
-    bExist = false;
+    Kill();
 }
 
 void CircularFireball::Update() {
   Fireball::Update();
 
   if (t.Tick())
-    bExist = false;
+    Kill();
 
   fPoint p = fPoint(GetPosition()) - i_pos;
   if (p.Length() < fRadius)
@@ -374,7 +374,7 @@ void FireballBonusAnimation::Update() {
   Animation::Update();
 
   if (tm.Tick())
-    bExist = false;
+    Kill();
 
   if (!bBlink && tm.nPeriod && (tm.nPeriod - tm.nTimer) < 7 * nFramesInSecond) {
     bBlink = true;

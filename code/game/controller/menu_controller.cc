@@ -32,7 +32,7 @@ void MenuDisplay::Draw(ScalingDrawer * /*pDr*/) {
                           false);
 
     if (pCurr->nMenuPosition == static_cast<int>(i) && pMenuCaret)
-      pMenuCaret->pos = p + Point(-11, pCurr->vEntries[i].szSize.y / 4);
+      pMenuCaret->SetPos(p + Point(-11, pCurr->vEntries[i].szSize.y / 4));
 
     p.y += pCurr->vEntries[i].szSize.y;
   }

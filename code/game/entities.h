@@ -19,7 +19,6 @@ struct LevelController;
  * Combines movement (Move/Update), screen presence (GetPosition), visuals
  * (Draw/GetPriority), and collision (GetRadius/HitDetection). */
 struct Entity {
-  bool bExist;
   Entity() : bExist(true) {}
   Entity(const Entity &) = default;
   Entity &operator=(const Entity &) = default;
@@ -34,17 +33,18 @@ struct Entity {
   virtual int GetRadius() { return 0; }
   virtual bool ShouldDraw() { return false; }
   bool HitDetection(Entity *pPh);
+
+  bool IsAlive() const { return bExist; }
+  void Kill() { bExist = false; }
+
+private:
+  bool bExist;
 };
 
 /** A sight that paints lines of text at a point on the vista. */
 struct TextDrawEntity : public Entity {
   std::string get_class_name() override { return "TextDrawEntity"; }
   bool ShouldDraw() override { return true; }
-  float dPriority;
-  Point pos;
-  bool bCenter;
-  std::vector<std::string> vText;
-  NumberDrawer *pNum;
 
   TextDrawEntity(float dPriority_, Point pos_, bool bCenter_, std::string sText,
                  NumberDrawer *pNum_)
@@ -57,6 +57,13 @@ struct TextDrawEntity : public Entity {
   void Draw(ScalingDrawer *pDr) override;
 
   float GetPriority() override { return dPriority; }
+
+private:
+  float dPriority;
+  Point pos;
+  bool bCenter;
+  std::vector<std::string> vText;
+  NumberDrawer *pNum;
 };
 
 /** A sight with a sequence of images: draws the current frame; Update steps
@@ -64,16 +71,6 @@ struct TextDrawEntity : public Entity {
 struct SimpleVisualEntity : virtual public Entity {
   std::string get_class_name() override { return "SimpleVisualEntity"; }
   bool ShouldDraw() override { return true; }
-  float dPriority;
-
-  int nPeriod;
-  Timer t;
-
-  bool bTimer, bStep, bCenter;
-
-  Point pPrev;
-
-  ImageSequence seq;
 
   SimpleVisualEntity(float dPriority_, const ImageSequence &seq_, bool bCenter_,
                      int nPeriod_)
@@ -90,20 +87,30 @@ struct SimpleVisualEntity : virtual public Entity {
 
   float GetPriority() override { return dPriority; }
 
-  bool bImageToggle;
+  void SetPriority(float d) { dPriority = d; }
+  void SetSeq(const ImageSequence &s) { seq = s; }
 
   void Update() override;
+
+protected:
+  float dPriority;
+
+  int nPeriod;
+  Timer t;
+
+  bool bTimer, bStep, bCenter;
+
+  Point pPrev;
+
+  ImageSequence seq;
+
+  bool bImageToggle;
 };
 
 /** A thing that plays a sound sequence on a timer; it vanishes when the tune
  * ends. */
 struct SimpleSoundEntity : public Entity {
   std::string get_class_name() override { return "SimpleSoundEntity"; }
-  int nPeriod;
-  Timer t;
-
-  SoundSequence seq;
-  SoundInterfaceProxy *pSnd;
 
   SimpleSoundEntity(const SoundSequence &seq_, int nPeriod_,
                     SoundInterfaceProxy *pSnd_)
@@ -111,12 +118,18 @@ struct SimpleSoundEntity : public Entity {
   }
 
   void Update() override;
+
+private:
+  int nPeriod;
+  Timer t;
+
+  SoundSequence seq;
+  SoundInterfaceProxy *pSnd;
 };
 
 /** A sight that stays in one place and cycles through frames. */
 struct Animation : public SimpleVisualEntity {
   std::string get_class_name() override { return "Animation"; }
-  Point pos;
 
   Animation(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
             Point p, bool bCenter = false)
@@ -125,13 +138,16 @@ struct Animation : public SimpleVisualEntity {
   Animation &operator=(const Animation &) = default;
 
   Point GetPosition() override { return pos; }
+
+  void SetPos(Point p_) { pos = p_; }
+
+private:
+  Point pos;
 };
 
 /** An animation that plays once to the end, then vanishes. */
 struct AnimationOnce : public SimpleVisualEntity {
   std::string get_class_name() override { return "AnimationOnce"; }
-  Point pos;
-  bool bOnce;
 
   AnimationOnce(float dPriority_, const ImageSequence &seq, int nTimeMeasure_,
                 Point p, bool bCenter = false)
@@ -140,16 +156,16 @@ struct AnimationOnce : public SimpleVisualEntity {
 
   Point GetPosition() override { return pos; }
   void Update() override;
+
+private:
+  Point pos;
+  bool bOnce;
 };
 
 /** A sight that shows one image at a fixed point. */
 struct StaticImage : public Entity {
   std::string get_class_name() override { return "StaticImage"; }
   bool ShouldDraw() override { return true; }
-  Index img;
-  float dPriority;
-  Point p;
-  bool bCentered;
 
   StaticImage(Index img_, Point p_ = Point(0, 0), bool bCentered_ = false,
               float dPriority_ = 0)
@@ -162,15 +178,18 @@ struct StaticImage : public Entity {
   Point GetPosition() override { return p; }
 
   float GetPriority() override { return dPriority; }
+
+private:
+  Index img;
+  float dPriority;
+  Point p;
+  bool bCentered;
 };
 
 /** A sight that draws a filled rectangle (covers the vista, no single spot). */
 struct StaticRectangle : public Entity {
   std::string get_class_name() override { return "StaticRectangle"; }
   bool ShouldDraw() override { return true; }
-  float dPriority;
-  Rectangle r;
-  Color c;
 
   StaticRectangle(Rectangle r_, Color c_, float dPriority_ = 0)
       : dPriority(dPriority_), r(r_), c(c_) {}
@@ -180,6 +199,11 @@ struct StaticRectangle : public Entity {
   Point GetPosition() override { return Point(0, 0); }
 
   float GetPriority() override { return dPriority; }
+
+private:
+  float dPriority;
+  Rectangle r;
+  Color c;
 };
 
 /** A thing that can be struck (OnHit), has a kind (GetType) and an image
@@ -195,18 +219,15 @@ struct ConsumableEntity : virtual public Entity {
  * and clamps or removes it when it leaves the realm. */
 struct Critter : public SimpleVisualEntity {
   std::string get_class_name() override { return "Critter"; }
-  int nRadius;
-  fPoint fPos;
-  fPoint fVel;
-
-  Rectangle rBound;
-  bool bDieOnExit;
-
-  std::string sUnderText;
 
   int GetRadius() override { return nRadius; }
   Point GetPosition() override { return fPos.ToPnt(); }
   void Move() override;
+
+  fPoint GetFPos() const { return fPos; }
+  fPoint GetVel() const { return fVel; }
+  void SetVel(fPoint v) { fVel = v; }
+  void SetUnderText(std::string s) { sUnderText = s; }
 
   Critter(int nRadius_, fPoint fPos_, fPoint fVel_, Rectangle rBound_,
           float dPriority, const ImageSequence &seq, int nPeriod)
@@ -219,11 +240,8 @@ struct Critter : public SimpleVisualEntity {
       : SimpleVisualEntity(dPriority, seq, true, true), nRadius(nRadius_),
         fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         sUnderText("") {}
-};
 
-/** A creature that steps and flips frames by a timer. */
-struct FancyCritter : public SimpleVisualEntity {
-  std::string get_class_name() override { return "FancyCritter"; }
+protected:
   int nRadius;
   fPoint fPos;
   fPoint fVel;
@@ -231,7 +249,12 @@ struct FancyCritter : public SimpleVisualEntity {
   Rectangle rBound;
   bool bDieOnExit;
 
-  Timer tm;
+  std::string sUnderText;
+};
+
+/** A creature that steps and flips frames by a timer. */
+struct FancyCritter : public SimpleVisualEntity {
+  std::string get_class_name() override { return "FancyCritter"; }
 
   int GetRadius() override { return nRadius; }
   Point GetPosition() override { return fPos.ToPnt(); }
@@ -242,6 +265,16 @@ struct FancyCritter : public SimpleVisualEntity {
       : SimpleVisualEntity(dPriority, seq, true, false), nRadius(nRadius_),
         fPos(fPos_), fVel(fVel_), rBound(rBound_), bDieOnExit(true),
         tm(nPeriod) {}
+
+private:
+  int nRadius;
+  fPoint fPos;
+  fPoint fVel;
+
+  Rectangle rBound;
+  bool bDieOnExit;
+
+  Timer tm;
 };
 
 /** How we order what is drawn: by priority and height (operator<). */
@@ -262,14 +295,6 @@ struct ScreenPos {
 struct BonusScore : public Entity {
   std::string get_class_name() override { return "BonusScore"; }
   bool ShouldDraw() override { return true; }
-  LevelController *pAc;
-  std::string sText;
-  int nScore;
-  int nScoreSoFar;
-  Point p;
-  Timer t;
-  int nC;
-  Color c;
 
   BonusScore(LevelController *pAc_, Point p_, int nScore_);
 
@@ -280,51 +305,69 @@ struct BonusScore : public Entity {
   float GetPriority() override { return 5; }
 
   Point GetPosition() override { return p; }
+
+private:
+  LevelController *pAc;
+  std::string sText;
+  int nScore;
+  int nScoreSoFar;
+  Point p;
+  Timer t;
+  int nC;
+  Color c;
 };
 
 struct SoundControls : public Entity {
   std::string get_class_name() override { return "SoundControls"; }
-  BackgroundMusicPlayer &plr;
-  int nTheme;
 
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
       : plr(plr_), nTheme(nTheme_) {}
   SoundControls(const SoundControls &) = default;
   SoundControls &operator=(const SoundControls &) = delete;
 
+  void SetTheme(int n) { nTheme = n; }
+
   void Update() override;
+
+private:
+  BackgroundMusicPlayer &plr;
+  int nTheme;
 };
 
 /** Paints the finest tally yet within a rectangle on the vista. */
 struct HighScoreShower : public Entity {
   std::string get_class_name() override { return "HighScoreShower"; }
   bool ShouldDraw() override { return true; }
-  DragonGameController *pGl;
-  Rectangle rBound;
 
   HighScoreShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   void Draw(ScalingDrawer *pDr) override;
+
+private:
+  DragonGameController *pGl;
+  Rectangle rBound;
 };
 
 struct IntroTextShower : public Entity {
   std::string get_class_name() override { return "IntroTextShower"; }
   bool ShouldDraw() override { return true; }
-  DragonGameController *pGl;
-  Rectangle rBound;
 
   IntroTextShower(DragonGameController *pGl_, Rectangle rBound_)
       : pGl(pGl_), rBound(rBound_) {}
 
   void Draw(ScalingDrawer *pDr) override;
+
+private:
+  DragonGameController *pGl;
+  Rectangle rBound;
 };
 
 /** Clear from the list all that have left the realm (bExist is false). */
 template <class T> void CleanUp(std::list<T> &ar) {
   for (typename std::list<T>::iterator itr = ar.begin(), etr = ar.end();
        itr != etr;) {
-    if (!(*itr)->bExist)
+    if (!(*itr)->IsAlive())
       ar.erase(itr++);
     else
       ++itr;

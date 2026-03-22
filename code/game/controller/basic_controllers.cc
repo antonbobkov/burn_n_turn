@@ -52,7 +52,7 @@ void Cutscene::Update() {
     bRelease = true;
   }
 
-  if (!pCrFollow->bExist) {
+  if (!pCrFollow->IsAlive()) {
     pGl->Next();
   }
 

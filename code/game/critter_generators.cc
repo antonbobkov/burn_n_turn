@@ -52,7 +52,7 @@ void KnightGenerator::Generate(bool bGolem) {
       Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
 
   if (bFirst) {
-    pCr->sUnderText = "destroy";
+    pCr->SetUnderText("destroy");
     bFirst = false;
   }
 
@@ -64,9 +64,11 @@ void KnightGenerator::Generate(bool bGolem) {
                 true),
         pBc, 'W');
   } else if (pBc->bGhostTime) {
-    pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
+    pCr->SetSeq(pBc->pGl->GetImgSeq("ghost_knight"));
     pCr->cType = 'G';
-    pCr->fVel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
+    fPoint vel = pCr->GetVel();
+    vel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
+    pCr->SetVel(vel);
   }
 
   pBc->AddOwnedConsumable(std::move(pCr));
@@ -108,7 +110,7 @@ void PrincessGenerator::Update() {
                 true),
         pBc);
     if (bFirst) {
-      pCr->sUnderText = "capture";
+      pCr->SetUnderText("capture");
       bFirst = false;
     }
     pBc->AddOwnedConsumable(std::move(pCr));
@@ -199,7 +201,7 @@ void TraderGenerator::Update() {
         pBc, bFirstBns);
 
     if (bFirst) {
-      pCr->sUnderText = "kill";
+      pCr->SetUnderText("kill");
       bFirst = false;
     }
 
@@ -211,7 +213,7 @@ void TraderGenerator::Update() {
 
 /*virutal*/ void SkellyGenerator::Update() {
   if (t.Tick()) {
-    bExist = false;
+    Kill();
 
     int n = rand() % (int)pAdv->vCs.size();
 
