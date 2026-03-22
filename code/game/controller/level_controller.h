@@ -119,8 +119,7 @@ struct LevelController : public EntityListController {
 
   float GetCompletionRate();
 
-  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
-  std::vector<Entity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedEntities() override;
 
   MouseCursor mc;
 

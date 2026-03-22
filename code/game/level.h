@@ -54,6 +54,7 @@ std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
  * and bounds; Draw paints the gray bar. */
 struct Road : public Entity {
   std::string get_class_name() override { return "Road"; }
+  bool ShouldDraw() override { return true; }
   bool bVertical;
   int nCoord;
   Rectangle rBound;

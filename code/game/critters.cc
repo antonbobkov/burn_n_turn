@@ -33,11 +33,11 @@ void SummonSkeletons(LevelController *pAc, Point p) {
 }
 
 void Princess::OnHit(char /*cWhat*/) {
-  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
+  pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
   bExist = false;
 
-  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+  pAc->AddEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("princess_die_f")
                  : pAc->pGl->GetImgSeq("princess_die"),
@@ -66,7 +66,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
 void Mage::OnHit(char /*cWhat*/) {
   bExist = false;
 
-  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+  pAc->AddEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f")
                  : pAc->pGl->GetImgSeq("mage_die"),
@@ -129,13 +129,13 @@ int RandomBonus(bool bInTower) {
 }
 
 void Trader::OnHit(char /*cWhat*/) {
-  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
+  pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
 
   bExist = false;
 
   pAc->tutTwo->TraderKilled();
 
-  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+  pAc->AddEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
       fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die")
                  : pAc->pGl->GetImgSeq("trader_die_f"),
@@ -233,7 +233,7 @@ void Knight::OnHit(char /*cWhat*/) {
 
     pAc->pGl->PlaySound("golem_death");
 
-    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
+    pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
   }
 
   bExist = false;
@@ -241,7 +241,7 @@ void Knight::OnHit(char /*cWhat*/) {
   pAc->tutOne->KnightKilled();
 
   if (cType != 'G') {
-    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
+    pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
 
     ImageSequence seqDead = pAc->pGl->GetImgSeq("knight_die");
 
@@ -254,11 +254,11 @@ void Knight::OnHit(char /*cWhat*/) {
         seqDead = pAc->pGl->GetImgSeq("golem_die_f");
     }
 
-    pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+    pAc->AddEntity(std::make_unique<AnimationOnce>(
         dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
         GetPosition(), true));
   } else {
-    pAc->AddOwnedEventEntity(
+    pAc->AddEntity(
         std::make_unique<Ghostiness>(GetPosition(), pAc, *this, nGhostHit));
   }
 }
@@ -313,12 +313,12 @@ void MegaSlime::OnHit(char /*cWhat*/) {
 
   bExist = false;
 
-  pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
+  pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
 
   ImageSequence seqDead = pAc->pGl->GetImgSeq("megaslime_die");
   pAc->pGl->PlaySound("megaslime_die");
 
-  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+  pAc->AddEntity(std::make_unique<AnimationOnce>(
       dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
       GetPosition(), true));
 }
@@ -334,7 +334,7 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
 
   t = Timer(n * seq.GetTotalTime());
 
-  pAdv_->AddOwnedBoth(std::make_unique<AnimationOnce>(2.F, seq, n, p_, true));
+  pAdv_->AddEntity(std::make_unique<AnimationOnce>(2.F, seq, n, p_, true));
 }
 
 void Ghostiness::Update() {
@@ -392,7 +392,7 @@ void Slime::Update() {
 
         bExist = false;
 
-        pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+        pAc->AddEntity(std::make_unique<AnimationOnce>(
             dPriority, pAc->pGl->GetImgSeq("slime_poke"), nFramesInSecond / 5,
             GetPosition(), true));
 
@@ -453,7 +453,7 @@ void Slime::OnHit(char cWhat) {
     pAc->MegaGeneration(fAvg.ToPnt());
 
     for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
-      pAc->AddOwnedBoth(std::make_unique<FloatingSlime>(
+      pAc->AddEntity(std::make_unique<FloatingSlime>(
           pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
           fAvg.ToPnt(), nFramesInSecond * 1));
     }
@@ -466,10 +466,10 @@ void Slime::OnHit(char cWhat) {
   bool bRevive = (cWhat != 'M');
 
   if (cWhat != 'M') {
-    pAc->AddOwnedBoth(std::make_unique<BonusScore>(pAc, GetPosition(), 1));
+    pAc->AddEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 1));
   }
 
-  pAc->AddOwnedBoth(std::make_unique<AnimationOnce>(
+  pAc->AddEntity(std::make_unique<AnimationOnce>(
       dPriority, pAc->pGl->GetImgSeq(bRevive ? "slime_die" : "slime_poke"),
       nFramesInSecond / 5, GetPosition(), true));
 

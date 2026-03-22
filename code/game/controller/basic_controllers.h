@@ -27,27 +27,16 @@ struct EntityListController : public GameController {
   /** Non-consumable entities owned here (animations, effects, …). */
   std::list<std::unique_ptr<Entity>> owned_entities;
 
-  /** Raw-pointer views for iteration — point into lsPpl or owned_entities. */
-  std::list<Entity *> owned_visual_entities;
-  std::list<Entity *> owned_event_entities;
+  /** Raw-pointer view for iteration — points into lsPpl or owned_entities. */
+  std::list<Entity *> owned_entity_list;
 
-  void AddOwnedVisualEntity(std::unique_ptr<Entity> p);
-  void AddOwnedEventEntity(std::unique_ptr<Entity> p);
+  void AddEntity(std::unique_ptr<Entity> p);
 
-  /** Own a visual+event entity (e.g. AnimationOnce, FancyCritter). */
-  template <class T> void AddOwnedBoth(std::unique_ptr<T> p) {
-    T *raw = p.get();
-    owned_entities.push_back(std::move(p));
-    owned_visual_entities.push_back(raw);
-    owned_event_entities.push_back(raw);
-  }
-
-  /** Own a consumable entity (knight, princess, …) that is also visual+event. */
+  /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
     T *raw = p.get();
     lsPpl.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
-    owned_visual_entities.push_back(raw);
-    owned_event_entities.push_back(raw);
+    owned_entity_list.push_back(raw);
   }
 
   /** Add a fullscreen colored veil to the draw list. */
@@ -64,9 +53,8 @@ struct EntityListController : public GameController {
    */
   void Update() override;
 
-  /** Creatures and sights that tick and draw here but are owned elsewhere. */
-  virtual std::vector<Entity *> GetNonOwnedUpdateEntities() { return {}; }
-  virtual std::vector<Entity *> GetNonOwnedDrawEntities() { return {}; }
+  /** Entities that tick and draw here but are owned elsewhere. */
+  virtual std::vector<Entity *> GetNonOwnedEntities() { return {}; }
 
   /** Pointers to consumable entities for hit detection (e.g. fireball). */
   virtual std::vector<ConsumableEntity *> GetConsumablePointers();
@@ -115,8 +103,7 @@ struct Cutscene : public EntityListController {
   void OnMouseDown(Point /*pPos*/) override {}
   std::string GetControllerName() const override { return "cutscene"; }
 
-  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
-  std::vector<Entity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedEntities() override;
 };
 
 /** A screen that shows the dragon's tally and leaves on click or when time

@@ -32,12 +32,14 @@ struct Entity {
   virtual void Draw(ScalingDrawer * /*pDr*/) {}
   virtual float GetPriority() { return 0; }
   virtual int GetRadius() { return 0; }
+  virtual bool ShouldDraw() { return false; }
   bool HitDetection(Entity *pPh);
 };
 
 /** A sight that paints lines of text at a point on the vista. */
 struct TextDrawEntity : public Entity {
   std::string get_class_name() override { return "TextDrawEntity"; }
+  bool ShouldDraw() override { return true; }
   float dPriority;
   Point pos;
   bool bCenter;
@@ -61,6 +63,7 @@ struct TextDrawEntity : public Entity {
  * by timer or when position changes. */
 struct SimpleVisualEntity : virtual public Entity {
   std::string get_class_name() override { return "SimpleVisualEntity"; }
+  bool ShouldDraw() override { return true; }
   float dPriority;
 
   int nPeriod;
@@ -142,6 +145,7 @@ struct AnimationOnce : public SimpleVisualEntity {
 /** A sight that shows one image at a fixed point. */
 struct StaticImage : public Entity {
   std::string get_class_name() override { return "StaticImage"; }
+  bool ShouldDraw() override { return true; }
   Index img;
   float dPriority;
   Point p;
@@ -163,6 +167,7 @@ struct StaticImage : public Entity {
 /** A sight that draws a filled rectangle (covers the vista, no single spot). */
 struct StaticRectangle : public Entity {
   std::string get_class_name() override { return "StaticRectangle"; }
+  bool ShouldDraw() override { return true; }
   float dPriority;
   Rectangle r;
   Color c;
@@ -256,6 +261,7 @@ struct ScreenPos {
 /** A floating "+N" tally at a point; it lingers a moment then fades. */
 struct BonusScore : public Entity {
   std::string get_class_name() override { return "BonusScore"; }
+  bool ShouldDraw() override { return true; }
   LevelController *pAc;
   std::string sText;
   int nScore;
@@ -292,6 +298,7 @@ struct SoundControls : public Entity {
 /** Paints the finest tally yet within a rectangle on the vista. */
 struct HighScoreShower : public Entity {
   std::string get_class_name() override { return "HighScoreShower"; }
+  bool ShouldDraw() override { return true; }
   DragonGameController *pGl;
   Rectangle rBound;
 
@@ -303,6 +310,7 @@ struct HighScoreShower : public Entity {
 
 struct IntroTextShower : public Entity {
   std::string get_class_name() override { return "IntroTextShower"; }
+  bool ShouldDraw() override { return true; }
   DragonGameController *pGl;
   Rectangle rBound;
 
