@@ -59,7 +59,7 @@ MenuController::MenuController(DragonGameController *pGl_,
     : EntityListController(pGl_, rBound, c), pMenuCaret(), pMenuDisplay(),
       mc(pGl_->GetImgSeq("claw"), Point()), pHintText(), pOptionText(),
       settings(settings_) {
-  bNoRefresh = true;
+  SuppressRefresh();
 }
 
 void MenuController::SetMenuCaret(std::unique_ptr<Animation> p) {

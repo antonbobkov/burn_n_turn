@@ -16,17 +16,16 @@ struct Entity;
 struct EntityListController : public GameController {
   std::string get_class_name() { return "EntityListController"; }
 
-  /** Non-consumable entities owned here (animations, effects, …). */
-  std::list<std::unique_ptr<Entity>> owned_entities;
-
   void AddOwnedEntity(std::unique_ptr<Entity> p);
 
   /** Add a fullscreen colored veil to the draw list. */
   void AddBackground(Color c);
 
   EntityListController(const EntityListController &) = delete;
-  bool bNoRefresh;
   EntityListController(DragonGameController *pGl_, Rectangle rBound, Color c);
+
+  /** Prevent the automatic screen refresh at the end of each tick. */
+  void SuppressRefresh() { bNoRefresh = true; }
 
   /**
    * Each tick: clear the fallen from the list, move all that can move, then
@@ -44,6 +43,11 @@ struct EntityListController : public GameController {
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouseDown(Point pPos) override;
   std::string GetControllerName() const override { return "basic"; }
+
+private:
+  /** Non-consumable entities owned here (animations, effects, …). */
+  std::list<std::unique_ptr<Entity>> owned_entities;
+  bool bNoRefresh;
 };
 
 #endif

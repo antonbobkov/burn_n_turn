@@ -19,7 +19,7 @@ BuyNowController::BuyNowController(DragonGameController *pGl_, Rectangle rBound,
     mSlimePos.push_back(mSlimes.back()->pos);
   }
 
-  bNoRefresh = true;
+  SuppressRefresh();
 }
 
 void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {

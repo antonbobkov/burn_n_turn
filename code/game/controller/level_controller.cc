@@ -150,7 +150,7 @@ Dragon *LevelController::FindDragon(Dragon *p) {
 
 void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   pSelf = pSelf_;
-  bNoRefresh = true;
+  SuppressRefresh();
 
   tLoseTimer.nPeriod = 0;
 
