@@ -1,3 +1,4 @@
+- Don't use structs.
 - Class shouldn't have any public member variables
 - All access to member variables needs to be done via functions:
   - Those can be getters/setters
