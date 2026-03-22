@@ -24,13 +24,6 @@ struct StartScreenController : public EntityListController {
 
 struct Cutscene : public EntityListController {
   std::string get_class_name() { return "Cutscene"; }
-  std::unique_ptr<FancyCritter> pCrRun;
-  std::unique_ptr<FancyCritter> pCrFollow;
-
-  Timer tm;
-  bool Beepy;
-
-  bool bRelease;
 
   /**
    * Set the stage: dark veil, one soul running and one waiting. Runner starts
@@ -40,6 +33,15 @@ struct Cutscene : public EntityListController {
   Cutscene(DragonGameController *pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false);
   ~Cutscene();
+
+private:
+  std::unique_ptr<FancyCritter> pCrRun;
+  std::unique_ptr<FancyCritter> pCrFollow;
+
+  Timer tm;
+  bool Beepy;
+
+  bool bRelease;
 
   void Update() override;
   void OnKey(GuiKeyType c, bool bUp) override;
@@ -53,11 +55,13 @@ struct Cutscene : public EntityListController {
  * runs out. */
 struct DragonScoreController : public EntityListController {
   std::string get_class_name() { return "DragonScoreController"; }
-  Timer t;
-  bool bClickToExit;
 
   DragonScoreController(DragonGameController *pGl_, Rectangle rBound, Color c,
                         bool bScoreShow);
+
+private:
+  Timer t;
+  bool bClickToExit;
 
   void OnKey(GuiKeyType c, bool bUp) override;
   void Update() override;
