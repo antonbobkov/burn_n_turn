@@ -94,7 +94,7 @@ void ChainExplosion::Update() {
       ptr->OnHit('F');
 
       if (!ch.IsLast()) {
-        pBc->AddEntity(std::make_unique<ChainExplosion>(
+        pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
             AnimationOnce(GetPriority(), Reset(seq),
                          SimpleVisualEntity::t.nPeriod,
                          ptr->GetPosition(), true),
@@ -136,7 +136,7 @@ void KnightOnFire::Update() {
         ptr->OnHit('F');
       else {
         ptr->bExist = false;
-        pBc->AddEntity(std::make_unique<KnightOnFire>(
+        pBc->AddOwnedEntity(std::make_unique<KnightOnFire>(
             Critter(GetRadius(), ptr->GetPosition(), fPoint(), rBound,
                     GetPriority(), ImageSequence(), true),
             pBc, nTimer_i, c.Evolve()));
@@ -147,7 +147,7 @@ void KnightOnFire::Update() {
   if (nTimer != 0 && --nTimer == 0) {
     bExist = false;
 
-    pBc->AddEntity(std::make_unique<AnimationOnce>(
+    pBc->AddOwnedEntity(std::make_unique<AnimationOnce>(
         dPriority, pBc->pGl->GetImgSeq("knight_die"),
         int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
   }
@@ -264,7 +264,7 @@ void Fireball::Update() {
         ptr->OnHit('F');
       else {
         ptr->bExist = false;
-        pBc->AddEntity(std::make_unique<KnightOnFire>(
+        pBc->AddOwnedEntity(std::make_unique<KnightOnFire>(
             Critter(ptr->GetRadius(), ptr->GetPosition(), fPoint(),
                     rBound, 1.F, ImageSequence(), true),
             pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"])));
@@ -287,7 +287,7 @@ void Fireball::Update() {
           fPoint v = fVel;
 
           for (int i = 0; i < nChain; ++i) {
-            pBc->AddEntity(std::make_unique<Fireball>(
+            pBc->AddOwnedEntity(std::make_unique<Fireball>(
                 ptr->GetPosition(), GetWedgeAngle(v, 1.F / 6, i, nChain),
                 pBc, fb, Chain(), nChain));
           }
@@ -295,7 +295,7 @@ void Fireball::Update() {
 
         if (fb.uMap["explode"] > 0) {
           if (!fb.bMap["laser"]) {
-            pBc->AddEntity(std::make_unique<ChainExplosion>(
+            pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
                     pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
@@ -303,7 +303,7 @@ void Fireball::Update() {
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.uMap["explode"] - 1)));
           } else {
-            pBc->AddEntity(std::make_unique<ChainExplosion>(
+            pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
                     pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),

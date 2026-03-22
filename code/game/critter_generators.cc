@@ -12,7 +12,7 @@
 
 SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
     : t(int(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
-  pAdv_->AddEntity(std::make_unique<AnimationOnce>(
+  pAdv_->AddOwnedEntity(std::make_unique<AnimationOnce>(
       2.F, pAdv->pGl->GetImgSeq("skelly_summon"),
       int(.1F * nFramesInSecond), p_, true));
 }

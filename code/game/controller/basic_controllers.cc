@@ -19,7 +19,7 @@ std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
   return out;
 }
 
-void EntityListController::AddEntity(std::unique_ptr<Entity> p) {
+void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
   Entity *raw = p.get();
   owned_entities.push_back(std::move(p));
   owned_entity_list.push_back(raw);
@@ -30,7 +30,7 @@ void EntityListController::AddBackground(Color c) {
   r.sz.x *= pGl->GetDrawScaleFactor();
   r.sz.y *= pGl->GetDrawScaleFactor();
 
-  AddEntity(std::make_unique<StaticRectangle>(r, c, -1.F));
+  AddOwnedEntity(std::make_unique<StaticRectangle>(r, c, -1.F));
 }
 
 EntityListController::EntityListController(DragonGameController *pGl_,
@@ -189,9 +189,9 @@ DragonScoreController::DragonScoreController(DragonGameController *pGl_,
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {
-    AddEntity(std::make_unique<HighScoreShower>(pGl, rBound));
+    AddOwnedEntity(std::make_unique<HighScoreShower>(pGl, rBound));
   } else
-    AddEntity(std::make_unique<IntroTextShower>(pGl, rBound));
+    AddOwnedEntity(std::make_unique<IntroTextShower>(pGl, rBound));
 }
 
 void DragonScoreController::OnKey(GuiKeyType /*c*/, bool bUp) {

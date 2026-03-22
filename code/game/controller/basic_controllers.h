@@ -16,6 +16,7 @@ struct ConsumableEntity;
 struct Entity;
 struct FancyCritter;
 
+// TODO: move to a separate file.
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
 struct EntityListController : public GameController {
@@ -30,7 +31,7 @@ struct EntityListController : public GameController {
   /** Raw-pointer view for iteration — points into lsPpl or owned_entities. */
   std::list<Entity *> owned_entity_list;
 
-  void AddEntity(std::unique_ptr<Entity> p);
+  void AddOwnedEntity(std::unique_ptr<Entity> p);
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {

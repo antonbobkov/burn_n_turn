@@ -120,7 +120,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     fPoint fVel = RandomAngle();
 
     for (int i = 0; i < nNumCirc; ++i) {
-      pAd->AddEntity(std::make_unique<CircularFireball>(
+      pAd->AddOwnedEntity(std::make_unique<CircularFireball>(
           Fireball(p, GetWedgeAngle(fVel, 1.F, i, nNumCirc + 1), pAd, fb,
                    Chain(), GetFireballChainNum(fb)),
           35, nTime * 2));
@@ -140,7 +140,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
         if (entity->GetType() == 'K' &&
             GetAllBonuses().uMap["setonfire"] != 0) {
           entity->bExist = false;
-          pAd->AddEntity(std::make_unique<KnightOnFire>(
+          pAd->AddOwnedEntity(std::make_unique<KnightOnFire>(
               Critter(entity->GetRadius(), entity->GetPosition(), fPoint(),
                       rBound, 1.F, ImageSequence(), true),
               pAd, 15 * nFramesInSecond,
@@ -394,7 +394,7 @@ void Dragon::Fire(fPoint fDir) {
                      Crd(pPos.y + fNormalized.x * 6));
     }
 
-    pAd->AddEntity(std::make_unique<Fireball>(pPos, fShoot, pAd, fb, Chain(),
+    pAd->AddOwnedEntity(std::make_unique<Fireball>(pPos, fShoot, pAd, fb, Chain(),
                                                  GetFireballChainNum(fb)));
   }
 

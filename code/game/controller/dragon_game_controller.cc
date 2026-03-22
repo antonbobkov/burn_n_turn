@@ -414,7 +414,7 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       0, Point(rBound.sz.x / 2, rBound.sz.y * 7 / 8), true, "sup", pNum);
 
   if (game_config_.IsTrialVersion())
-    pCnt1->AddEntity(std::make_unique<StaticImage>(
+    pCnt1->AddOwnedEntity(std::make_unique<StaticImage>(
         (*pr)["trial"], Point(rBound.sz.x / 2 - 73, rBound.sz.y / 3 + 28), true));
 
   pMenu->SetMenuCaret(std::make_unique<Animation>(
@@ -424,15 +424,15 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
       pMenu->GetMenuCaret(), pMenu,
       settings_.sbCheatsUnlocked.Get()));
 
-  pCnt1->AddEntity(std::make_unique<StaticImage>(logo));
-  pCnt1->AddEntity(std::make_unique<Animation>(burnL));
-  pCnt1->AddEntity(std::make_unique<Animation>(burnR));
+  pCnt1->AddOwnedEntity(std::make_unique<StaticImage>(logo));
+  pCnt1->AddOwnedEntity(std::make_unique<Animation>(burnL));
+  pCnt1->AddOwnedEntity(std::make_unique<Animation>(burnR));
 
-  pMenu->AddEntity(std::make_unique<StaticImage>(logo));
-  pMenu->AddEntity(std::make_unique<Animation>(burnL));
-  pMenu->AddEntity(std::make_unique<Animation>(burnR));
+  pMenu->AddOwnedEntity(std::make_unique<StaticImage>(logo));
+  pMenu->AddOwnedEntity(std::make_unique<Animation>(burnL));
+  pMenu->AddOwnedEntity(std::make_unique<Animation>(burnR));
 
-  pCnt1->AddEntity(std::make_unique<Animation>(
+  pCnt1->AddOwnedEntity(std::make_unique<Animation>(
       0, (*pr)("start"), nFramesInSecond / 5,
       Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
 
@@ -440,39 +440,39 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
     pMenu->SetHintText(std::move(pHintText));
     pMenu->SetOptionText(std::move(pOptionText));
   } else {
-    pCnt1->AddEntity(std::move(pHintText));
+    pCnt1->AddOwnedEntity(std::move(pHintText));
     pMenu->SetOptionText(std::move(pOptionText));
   }
 
-  pCnt3->AddEntity(std::make_unique<Animation>(
+  pCnt3->AddOwnedEntity(std::make_unique<Animation>(
       0, (*pr)("win"), 3,
       Point(rBound.sz.x / 2, rBound.sz.y / 2 - 20), true));
-  pCnt2->AddEntity(std::make_unique<AnimationOnce>(
+  pCnt2->AddOwnedEntity(std::make_unique<AnimationOnce>(
       0, (*pr)("over"), nFramesInSecond / 2,
       Point(rBound.sz.x / 2, Crd(rBound.sz.y / 2.5f)), true));
-  pCnt2->AddEntity(std::make_unique<SimpleSoundEntity>(
+  pCnt2->AddOwnedEntity(std::make_unique<SimpleSoundEntity>(
       pr->GetSndSeq("over"), nFramesInSecond / 2, pSnd.get()));
 
-  pCnt0_1->AddEntity(std::make_unique<AnimationOnce>(
+  pCnt0_1->AddOwnedEntity(std::make_unique<AnimationOnce>(
       0, (*pr)("pluanbo"), nFramesInSecond / 10,
       Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-  pCnt0_1->AddEntity(std::make_unique<SimpleSoundEntity>(
+  pCnt0_1->AddOwnedEntity(std::make_unique<SimpleSoundEntity>(
       pr->GetSndSeq("pluanbo"), nFramesInSecond / 10, pSnd.get()));
 
-  pCnt0_2->AddEntity(std::make_unique<AnimationOnce>(
+  pCnt0_2->AddOwnedEntity(std::make_unique<AnimationOnce>(
       0, (*pr)("gengui"), nFramesInSecond / 5,
       Point(rBound.sz.x / 2, rBound.sz.y / 2), true));
-  pCnt0_2->AddEntity(std::make_unique<SimpleSoundEntity>(
+  pCnt0_2->AddOwnedEntity(std::make_unique<SimpleSoundEntity>(
       pr->GetSndSeq("click"), nFramesInSecond / 5, pSnd.get()));
 
-  pCnt1->AddEntity(std::make_unique<SoundControls>(bckgTemplate));
+  pCnt1->AddOwnedEntity(std::make_unique<SoundControls>(bckgTemplate));
 
-  pMenu->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
-  pCut1->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
-  pCut2->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
-  pCut3->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
-  pCnt2->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
-  pCnt3->AddEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pMenu->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut1->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut2->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCut3->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt2->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
+  pCnt3->AddOwnedEntity(std::make_unique<SoundControls>(noMusicTemplate));
 
   vCnt.emplace_back(std::move(pMenuHolder)); // menu
   vCnt.emplace_back(std::move(pCnt0_1));     // logo 1
@@ -512,32 +512,32 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
     auto pBuy = std::make_unique<BuyNowController>(
         pSelf, rBound, Color(0, 0, 0));
 
-    pBuy->AddEntity(std::make_unique<StaticImage>(logo));
-    pBuy->AddEntity(std::make_unique<Animation>(burnL));
-    pBuy->AddEntity(std::make_unique<Animation>(burnR));
-    pBuy->AddEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
-    pBuy->AddEntity(std::make_unique<StaticImage>(
+    pBuy->AddOwnedEntity(std::make_unique<StaticImage>(logo));
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(burnL));
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(burnR));
+    pBuy->AddOwnedEntity(std::make_unique<SlimeUpdater>(pBuy.get()));
+    pBuy->AddOwnedEntity(std::make_unique<StaticImage>(
         (*pr)["buy"], Point(rBound.sz.x / 2, rBound.sz.y / 3 + 33), true));
 
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("golem_f"), nFramesInSecond / 10,
         Point(rBound.sz.x / 4, rBound.sz.y * 3 / 4 - 10), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("skelly"), nFramesInSecond / 4,
         Point(rBound.sz.x * 3 / 4, rBound.sz.y * 3 / 4 - 5), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("skelly"), nFramesInSecond / 4 + 1,
         Point(rBound.sz.x * 3 / 4 - 10, rBound.sz.y * 3 / 4 - 15), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("skelly"), nFramesInSecond / 4 - 1,
         Point(rBound.sz.x * 3 / 4 + 10, rBound.sz.y * 3 / 4 - 15), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("mage_spell"), nFramesInSecond / 2,
         Point(rBound.sz.x / 2, rBound.sz.y * 3 / 4), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("ghost"), nFramesInSecond / 6,
         Point(rBound.sz.x * 5 / 8, rBound.sz.y * 3 / 4 - 30), true));
-    pBuy->AddEntity(std::make_unique<Animation>(
+    pBuy->AddOwnedEntity(std::make_unique<Animation>(
         0, (*pr)("ghost_knight"), nFramesInSecond / 6,
         Point(rBound.sz.x * 3 / 8, rBound.sz.y * 3 / 4 - 30), true));
 

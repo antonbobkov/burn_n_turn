@@ -154,8 +154,8 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   tLoseTimer.nPeriod = 0;
 
-  AddEntity(std::make_unique<AdNumberDrawer>(pSelf));
-  AddEntity(std::make_unique<BonusDrawer>(pSelf));
+  AddOwnedEntity(std::make_unique<AdNumberDrawer>(pSelf));
+  AddOwnedEntity(std::make_unique<BonusDrawer>(pSelf));
 
   pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
                                                  lvl.blKnightGen);
