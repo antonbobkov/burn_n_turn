@@ -56,10 +56,5 @@ const float fInitialFrequency = 2.F;
 const int nInitialRegen = 0; /* deciseconds */
 const int nRegenDelay = 10;  /* deciseconds */
 
-/* Initial fireball counts; set at startup from GameConfig (CONTROLS setting).
- * Defaults match mouse/touch mode. */
-// TODO: move those out, not constants
-extern int nInitialFireballs;
-extern int nFireballsPerBonus;
 
 #endif

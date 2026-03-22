@@ -45,7 +45,7 @@ FireballBonus::FireballBonus(int nNum_, bool bDef) : nNum(nNum_) {
     fMap["speed"] = 5;
     fMap["frequency"] = fInitialFrequency;
     uMap["pershot"] = 1;
-    uMap["total"] = nInitialFireballs;
+    uMap["total"] = 0;
   }
 }
 

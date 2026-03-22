@@ -30,6 +30,9 @@ class GameConfig {
   bool IsTrialVersion()    const { return !is_full_version_; }
   bool IsFlightPowerMode() const { return is_small_screen_version_; }
 
+  int InitialFireballs()  const { return is_keyboard_controls_ ? 6 : 4; }
+  int FireballsPerBonus() const { return is_keyboard_controls_ ? 3 : 2; }
+
  private:
   bool is_full_version_;
   bool is_pc_version_;
