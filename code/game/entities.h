@@ -15,37 +15,28 @@
 struct DragonGameController;
 struct LevelController;
 
-/** The root of all things in the realm; a flag says if it still exists. */
+/** The root of all things in the realm; a flag says if it still exists.
+ * Combines movement (Move/Update), screen presence (GetPosition), visuals
+ * (Draw/GetPriority), and collision (GetRadius/HitDetection). */
 struct Entity {
   bool bExist;
   Entity() : bExist(true) {}
+  Entity(const Entity &) = default;
+  Entity &operator=(const Entity &) = default;
+  Entity &operator=(Entity &&) = delete;
   virtual ~Entity() {}
   virtual std::string get_class_name() { return "Entity"; }
-};
-
-/** A thing that can step and update each tick. */
-struct EventEntity : virtual public Entity {
   virtual void Move() {}
   virtual void Update() {}
-};
-
-/** A thing that has a place on the vista (GetPosition). */
-struct ScreenEntity : virtual public Entity {
   virtual Point GetPosition() { return Point(0, 0); }
-};
-
-struct VisualEntity : virtual public ScreenEntity {
-  std::string get_class_name() override { return "VisualEntity"; }
   virtual void Draw(ScalingDrawer * /*pDr*/) {}
   virtual float GetPriority() { return 0; }
-  VisualEntity() = default;
-  VisualEntity(const VisualEntity &) = default;
-  VisualEntity &operator=(const VisualEntity &) = default;
-  VisualEntity &operator=(VisualEntity &&) = delete;
+  virtual int GetRadius() { return 0; }
+  bool HitDetection(Entity *pPh);
 };
 
 /** A sight that paints lines of text at a point on the vista. */
-struct TextDrawEntity : virtual public VisualEntity {
+struct TextDrawEntity : public Entity {
   std::string get_class_name() override { return "TextDrawEntity"; }
   float dPriority;
   Point pos;
@@ -68,7 +59,7 @@ struct TextDrawEntity : virtual public VisualEntity {
 
 /** A sight with a sequence of images: draws the current frame; Update steps
  * by timer or when position changes. */
-struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
+struct SimpleVisualEntity : virtual public Entity {
   std::string get_class_name() override { return "SimpleVisualEntity"; }
   float dPriority;
 
@@ -103,7 +94,7 @@ struct SimpleVisualEntity : virtual public EventEntity, public VisualEntity {
 
 /** A thing that plays a sound sequence on a timer; it vanishes when the tune
  * ends. */
-struct SimpleSoundEntity : virtual public EventEntity {
+struct SimpleSoundEntity : public Entity {
   std::string get_class_name() override { return "SimpleSoundEntity"; }
   int nPeriod;
   Timer t;
@@ -149,7 +140,7 @@ struct AnimationOnce : public SimpleVisualEntity {
 };
 
 /** A sight that shows one image at a fixed point. */
-struct StaticImage : public VisualEntity {
+struct StaticImage : public Entity {
   std::string get_class_name() override { return "StaticImage"; }
   Index img;
   float dPriority;
@@ -170,7 +161,7 @@ struct StaticImage : public VisualEntity {
 };
 
 /** A sight that draws a filled rectangle (covers the vista, no single spot). */
-struct StaticRectangle : public VisualEntity {
+struct StaticRectangle : public Entity {
   std::string get_class_name() override { return "StaticRectangle"; }
   float dPriority;
   Rectangle r;
@@ -186,18 +177,9 @@ struct StaticRectangle : public VisualEntity {
   float GetPriority() override { return dPriority; }
 };
 
-/** A thing on the vista with a radius—so we can tell when it touches another.
- */
-struct PhysicalEntity : virtual public ScreenEntity {
-  std::string get_class_name() override { return "PhysicalEntity"; }
-  virtual int GetRadius() { return 0; }
-
-  bool HitDetection(PhysicalEntity *pPh);
-};
-
 /** A thing that can be struck (OnHit), has a kind (GetType) and an image
  * (GetImage). */
-struct ConsumableEntity : virtual public PhysicalEntity {
+struct ConsumableEntity : virtual public Entity {
   std::string get_class_name() override { return "ConsumableEntity"; }
   virtual char GetType() = 0;
   virtual void OnHit(char cWhat) = 0;
@@ -206,7 +188,7 @@ struct ConsumableEntity : virtual public PhysicalEntity {
 
 /** A creature that moves: place, speed, bounds, and radius; Move() steps it
  * and clamps or removes it when it leaves the realm. */
-struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
+struct Critter : public SimpleVisualEntity {
   std::string get_class_name() override { return "Critter"; }
   int nRadius;
   fPoint fPos;
@@ -235,7 +217,7 @@ struct Critter : virtual public PhysicalEntity, public SimpleVisualEntity {
 };
 
 /** A creature that steps and flips frames by a timer. */
-struct FancyCritter : virtual public PhysicalEntity, public SimpleVisualEntity {
+struct FancyCritter : public SimpleVisualEntity {
   std::string get_class_name() override { return "FancyCritter"; }
   int nRadius;
   fPoint fPos;
@@ -272,7 +254,7 @@ struct ScreenPos {
 };
 
 /** A floating "+N" tally at a point; it lingers a moment then fades. */
-struct BonusScore : public EventEntity, public VisualEntity {
+struct BonusScore : public Entity {
   std::string get_class_name() override { return "BonusScore"; }
   LevelController *pAc;
   std::string sText;
@@ -294,7 +276,7 @@ struct BonusScore : public EventEntity, public VisualEntity {
   Point GetPosition() override { return p; }
 };
 
-struct SoundControls : public EventEntity {
+struct SoundControls : public Entity {
   std::string get_class_name() override { return "SoundControls"; }
   BackgroundMusicPlayer &plr;
   int nTheme;
@@ -308,7 +290,7 @@ struct SoundControls : public EventEntity {
 };
 
 /** Paints the finest tally yet within a rectangle on the vista. */
-struct HighScoreShower : public VisualEntity {
+struct HighScoreShower : public Entity {
   std::string get_class_name() override { return "HighScoreShower"; }
   DragonGameController *pGl;
   Rectangle rBound;
@@ -319,7 +301,7 @@ struct HighScoreShower : public VisualEntity {
   void Draw(ScalingDrawer *pDr) override;
 };
 
-struct IntroTextShower : public VisualEntity {
+struct IntroTextShower : public Entity {
   std::string get_class_name() override { return "IntroTextShower"; }
   DragonGameController *pGl;
   Rectangle rBound;

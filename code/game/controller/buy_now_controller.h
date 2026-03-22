@@ -39,7 +39,7 @@ struct BuyNowController : public EntityListController {
 };
 
 /** A sight that paints the slime dances on the buy-now screen. */
-struct SlimeUpdater : public VisualEntity {
+struct SlimeUpdater : public Entity {
   BuyNowController *pBuy;
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}

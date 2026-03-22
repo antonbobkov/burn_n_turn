@@ -151,7 +151,7 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 };
 
 /** The ghost's echo: a brief shimmer where the knight fell. */
-struct Ghostiness : public EventEntity {
+struct Ghostiness : public Entity {
   std::string get_class_name() override { return "Ghostiness"; }
   Timer t;
   Point p;
@@ -191,7 +191,7 @@ struct Slime : public Critter, public ConsumableEntity {
 };
 
 /** Summons slimes on a timer at a spot in the realm. */
-struct Sliminess : public EventEntity {
+struct Sliminess : public Entity {
   std::string get_class_name() override { return "Sliminess"; }
   Timer t;
   Point p;
@@ -208,13 +208,13 @@ struct Sliminess : public EventEntity {
   /** End the summoning; the spawn and its shimmer are gone. */
   void Kill();
 
-  Point GetPosition() { return p; }
+  Point GetPosition() override { return p; }
 
   ~Sliminess();
 };
 
 /** Summons the great slimes; keeps the spot and the realm's keeper. */
-struct MegaSliminess : public EventEntity {
+struct MegaSliminess : public Entity {
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
   LevelController *pAdv;
@@ -224,7 +224,7 @@ struct MegaSliminess : public EventEntity {
 
   void Update() override;
 
-  Point GetPosition() { return p; }
+  Point GetPosition() override { return p; }
   void Kill();
 };
 

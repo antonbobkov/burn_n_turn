@@ -8,7 +8,7 @@
 struct LevelController;
 
 /** Summons skeleton knights on a timer at a spot. */
-struct SkellyGenerator : public EventEntity {
+struct SkellyGenerator : public Entity {
   std::string get_class_name() override { return "SkellyGenerator"; }
   Timer t;
   Point p;
@@ -21,7 +21,7 @@ struct SkellyGenerator : public EventEntity {
 };
 
 /** Summons knights along the path on a timer. */
-struct KnightGenerator : virtual public EventEntity {
+struct KnightGenerator : public Entity {
   std::string get_class_name() override { return "KnightGenerator"; }
   bool bFirst;
 
@@ -47,7 +47,7 @@ struct KnightGenerator : virtual public EventEntity {
 };
 
 /** Summons princesses at a rate within the chapter bounds. */
-struct PrincessGenerator : virtual public EventEntity {
+struct PrincessGenerator : public Entity {
   std::string get_class_name() override { return "PrincessGenerator"; }
   float dRate;
   Rectangle rBound;
@@ -65,7 +65,7 @@ struct PrincessGenerator : virtual public EventEntity {
   void Update() override;
 };
 
-struct MageGenerator : virtual public EventEntity {
+struct MageGenerator : public Entity {
   std::string get_class_name() override { return "MageGenerator"; }
   float dRate;
   Rectangle rBound;
@@ -82,7 +82,7 @@ struct MageGenerator : virtual public EventEntity {
 };
 
 /** Summons traders at a rate within the chapter bounds. */
-struct TraderGenerator : virtual public EventEntity {
+struct TraderGenerator : public Entity {
   std::string get_class_name() override { return "TraderGenerator"; }
   float dRate;
   Rectangle rBound;

@@ -19,16 +19,15 @@ std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
   return out;
 }
 
-void EntityListController::AddOwnedVisualEntity(
-    std::unique_ptr<VisualEntity> p) {
-  VisualEntity *raw = p.get();
-  owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+void EntityListController::AddOwnedVisualEntity(std::unique_ptr<Entity> p) {
+  Entity *raw = p.get();
+  owned_entities.push_back(std::move(p));
   owned_visual_entities.push_back(raw);
 }
 
-void EntityListController::AddOwnedEventEntity(std::unique_ptr<EventEntity> p) {
-  EventEntity *raw = p.get();
-  owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+void EntityListController::AddOwnedEventEntity(std::unique_ptr<Entity> p) {
+  Entity *raw = p.get();
+  owned_entities.push_back(std::move(p));
   owned_event_entities.push_back(raw);
 }
 
@@ -55,39 +54,39 @@ void EntityListController::Update() {
   CleanUp(lsPpl);
   CleanUp(owned_entities);
 
-  for (EventEntity *pEx : owned_event_entities) {
+  for (Entity *pEx : owned_event_entities) {
     if (pEx->bExist)
       pEx->Move();
   }
 
-  for (EventEntity *pEx : GetNonOwnedUpdateEntities()) {
+  for (Entity *pEx : GetNonOwnedUpdateEntities()) {
     if (pEx->bExist)
       pEx->Move();
   }
 
-  for (EventEntity *pEx : owned_event_entities) {
+  for (Entity *pEx : owned_event_entities) {
     if (pEx->bExist)
       pEx->Update();
   }
 
-  for (EventEntity *pEx : GetNonOwnedUpdateEntities()) {
+  for (Entity *pEx : GetNonOwnedUpdateEntities()) {
     if (pEx->bExist)
       pEx->Update();
   }
 
   {
-    typedef std::multimap<ScreenPos, VisualEntity *> DrawMap;
+    typedef std::multimap<ScreenPos, Entity *> DrawMap;
     DrawMap mmp;
 
-    for (VisualEntity *pOw : owned_visual_entities) {
+    for (Entity *pOw : owned_visual_entities) {
       if (pOw->bExist)
-        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
+        mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw));
     }
 
-    for (VisualEntity *pEx : GetNonOwnedDrawEntities()) {
+    for (Entity *pEx : GetNonOwnedDrawEntities()) {
       if (pEx && pEx->bExist)
-        mmp.insert(std::pair<ScreenPos, VisualEntity *>(
+        mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
     }
 
@@ -171,8 +170,8 @@ void Cutscene::Update() {
   EntityListController::Update();
 }
 
-std::vector<EventEntity *> Cutscene::GetNonOwnedUpdateEntities() {
-  std::vector<EventEntity *> out;
+std::vector<Entity *> Cutscene::GetNonOwnedUpdateEntities() {
+  std::vector<Entity *> out;
   if (pCrRun)
     out.push_back(pCrRun.get());
   if (bRelease && pCrFollow)
@@ -180,8 +179,8 @@ std::vector<EventEntity *> Cutscene::GetNonOwnedUpdateEntities() {
   return out;
 }
 
-std::vector<VisualEntity *> Cutscene::GetNonOwnedDrawEntities() {
-  std::vector<VisualEntity *> out;
+std::vector<Entity *> Cutscene::GetNonOwnedDrawEntities() {
+  std::vector<Entity *> out;
   if (pCrRun)
     out.push_back(pCrRun.get());
   if (bRelease && pCrFollow)

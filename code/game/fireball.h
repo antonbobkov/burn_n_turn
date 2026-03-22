@@ -50,8 +50,7 @@ struct Chain {
 
 /** A growing blast; it strikes all it touches and may birth more blasts
  * through the chain. */
-struct ChainExplosion : virtual public AnimationOnce,
-                        virtual public PhysicalEntity {
+struct ChainExplosion : public AnimationOnce {
   std::string get_class_name() override { return "ChainExplosion"; }
   float r_in, r;
   float delta;
@@ -113,7 +112,7 @@ struct Fireball : public Critter {
 };
 
 /** A fire strength that fades with time (e.g. a temporary boon). */
-struct TimedFireballBonus : public FireballBonus, virtual public EventEntity {
+struct TimedFireballBonus : public FireballBonus {
   std::string get_class_name() override { return "TimedFireballBonus"; }
   Timer t;
 
@@ -140,8 +139,7 @@ struct CircularFireball : virtual public Fireball,
 
 /** A treasure shimmer with a radius; when the dragon touches it, the treasure
  * is gathered. */
-struct FireballBonusAnimation : public Animation,
-                                virtual public PhysicalEntity {
+struct FireballBonusAnimation : public Animation {
   std::string get_class_name() override { return "FireballBonusAnimation"; }
   int n;
   Timer tm;

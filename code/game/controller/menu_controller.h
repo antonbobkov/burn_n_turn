@@ -54,7 +54,7 @@ struct MenuEntryManager {
 
 /** The pause hall's face: draws choices and caret, answers mouse and key;
  * side chambers and option toggles. */
-struct MenuDisplay : virtual public EventEntity, public VisualEntity {
+struct MenuDisplay : public Entity {
   std::string get_class_name() override { return "MenuDisplay"; }
   MenuEntryManager *pCurr;
 
@@ -136,8 +136,8 @@ struct MenuController : public EntityListController {
     return pMenuCaret ? pMenuCaret.get() : nullptr;
   }
 
-  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
-  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
+  std::vector<Entity *> GetNonOwnedDrawEntities() override;
 
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouse(Point pPos) override;

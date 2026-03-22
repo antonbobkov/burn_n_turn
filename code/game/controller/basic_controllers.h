@@ -14,9 +14,7 @@
 struct Animation;
 struct ConsumableEntity;
 struct Entity;
-struct EventEntity;
 struct FancyCritter;
-struct VisualEntity;
 
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
@@ -30,16 +28,16 @@ struct EntityListController : public GameController {
   std::list<std::unique_ptr<Entity>> owned_entities;
 
   /** Raw-pointer views for iteration — point into lsPpl or owned_entities. */
-  std::list<VisualEntity *> owned_visual_entities;
-  std::list<EventEntity *> owned_event_entities;
+  std::list<Entity *> owned_visual_entities;
+  std::list<Entity *> owned_event_entities;
 
-  void AddOwnedVisualEntity(std::unique_ptr<VisualEntity> p);
-  void AddOwnedEventEntity(std::unique_ptr<EventEntity> p);
+  void AddOwnedVisualEntity(std::unique_ptr<Entity> p);
+  void AddOwnedEventEntity(std::unique_ptr<Entity> p);
 
   /** Own a visual+event entity (e.g. AnimationOnce, FancyCritter). */
   template <class T> void AddOwnedBoth(std::unique_ptr<T> p) {
     T *raw = p.get();
-    owned_entities.push_back(std::unique_ptr<Entity>(p.release()));
+    owned_entities.push_back(std::move(p));
     owned_visual_entities.push_back(raw);
     owned_event_entities.push_back(raw);
   }
@@ -67,8 +65,8 @@ struct EntityListController : public GameController {
   void Update() override;
 
   /** Creatures and sights that tick and draw here but are owned elsewhere. */
-  virtual std::vector<EventEntity *> GetNonOwnedUpdateEntities() { return {}; }
-  virtual std::vector<VisualEntity *> GetNonOwnedDrawEntities() { return {}; }
+  virtual std::vector<Entity *> GetNonOwnedUpdateEntities() { return {}; }
+  virtual std::vector<Entity *> GetNonOwnedDrawEntities() { return {}; }
 
   /** Pointers to consumable entities for hit detection (e.g. fireball). */
   virtual std::vector<ConsumableEntity *> GetConsumablePointers();
@@ -117,8 +115,8 @@ struct Cutscene : public EntityListController {
   void OnMouseDown(Point /*pPos*/) override {}
   std::string GetControllerName() const override { return "cutscene"; }
 
-  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
-  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
+  std::vector<Entity *> GetNonOwnedDrawEntities() override;
 };
 
 /** A screen that shows the dragon's tally and leaves on click or when time
