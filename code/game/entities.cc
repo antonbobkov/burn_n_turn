@@ -76,7 +76,7 @@ void AnimationOnce::Update() {
   }
 }
 
-bool PhysicalEntity::HitDetection(PhysicalEntity *pPh) {
+bool Entity::HitDetection(Entity *pPh) {
   if (pPh == nullptr)
     return false;
   Point d = GetPosition() - pPh->GetPosition();

@@ -74,7 +74,7 @@ struct LevelController : public EntityListController {
   std::unique_ptr<MageGenerator> pMGen;
   KnightGenerator *pGr;
   MageGenerator *pMgGen;
-  std::list<std::unique_ptr<EventEntity>> lsSpawnedGenerators;
+  std::list<std::unique_ptr<Entity>> lsSpawnedGenerators;
   std::unique_ptr<SoundControls> pSc;
 
   LevelController *pSelf;
@@ -99,7 +99,7 @@ struct LevelController : public EntityListController {
   void AddMegaSlime(std::unique_ptr<MegaSlime> p);
   void AddSliminess(std::unique_ptr<Sliminess> p);
   void AddMegaSliminess(std::unique_ptr<MegaSliminess> p);
-  void AddSpawnedGenerator(std::unique_ptr<EventEntity> p);
+  void AddSpawnedGenerator(std::unique_ptr<Entity> p);
 
   std::vector<ConsumableEntity *> GetConsumablePointers() override;
 
@@ -119,8 +119,8 @@ struct LevelController : public EntityListController {
 
   float GetCompletionRate();
 
-  std::vector<EventEntity *> GetNonOwnedUpdateEntities() override;
-  std::vector<VisualEntity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
+  std::vector<Entity *> GetNonOwnedDrawEntities() override;
 
   MouseCursor mc;
 

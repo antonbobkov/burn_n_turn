@@ -52,7 +52,7 @@ std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
 
 /** A stretch of road in the chapter: vertical or horizontal, with coordinate
  * and bounds; Draw paints the gray bar. */
-struct Road : virtual public VisualEntity {
+struct Road : public Entity {
   std::string get_class_name() override { return "Road"; }
   bool bVertical;
   int nCoord;
@@ -62,7 +62,6 @@ struct Road : virtual public VisualEntity {
       : bVertical(bVertical_), nCoord(nCoord_), rBound(rBound_) {}
   Road(const Road &) = default;
   Road &operator=(const Road &) = default;
-  Road &operator=(Road &&) = delete;
 
   float GetPriority() override { return 0; }
   Point GetPosition() override { return Point(); }

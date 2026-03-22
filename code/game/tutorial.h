@@ -8,7 +8,7 @@ struct DragonGameController;
 
 /** The wise one's scrolling words. SetText queues new lines; Update scrolls
  * between the old and the new. */
-struct TutorialTextEntity : virtual public EventEntity, public VisualEntity {
+struct TutorialTextEntity : public Entity {
   std::string get_class_name() override { return "TutorialTextEntity"; }
   float dPriority;
   Point pos;

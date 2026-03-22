@@ -18,7 +18,7 @@
 #include "../../wrappers/geometry.h"
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
-struct AdNumberDrawer : public VisualEntity {
+struct AdNumberDrawer : public Entity {
   LevelController *pAd;
 
   AdNumberDrawer() : pAd(0) {}
@@ -69,7 +69,7 @@ struct AdNumberDrawer : public VisualEntity {
   float GetPriority() override { return 10; }
 };
 
-struct BonusDrawer : public VisualEntity {
+struct BonusDrawer : public Entity {
   LevelController *pAd;
 
   Timer t;
@@ -430,7 +430,7 @@ void LevelController::AddMegaSliminess(std::unique_ptr<MegaSliminess> p) {
   lsMegaSliminess.push_back(std::move(p));
 }
 
-void LevelController::AddSpawnedGenerator(std::unique_ptr<EventEntity> p) {
+void LevelController::AddSpawnedGenerator(std::unique_ptr<Entity> p) {
   lsSpawnedGenerators.push_back(std::move(p));
 }
 
@@ -444,8 +444,8 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
   return out;
 }
 
-std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
-  std::vector<EventEntity *> out;
+std::vector<Entity *> LevelController::GetNonOwnedUpdateEntities() {
+  std::vector<Entity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
   if (pTutorialText)
@@ -486,8 +486,8 @@ std::vector<EventEntity *> LevelController::GetNonOwnedUpdateEntities() {
   return out;
 }
 
-std::vector<VisualEntity *> LevelController::GetNonOwnedDrawEntities() {
-  std::vector<VisualEntity *> out;
+std::vector<Entity *> LevelController::GetNonOwnedDrawEntities() {
+  std::vector<Entity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
   for (size_t i = 0; i < vRd.size(); ++i)
