@@ -40,6 +40,7 @@ struct BuyNowController : public EntityListController {
 
 /** A sight that paints the slime dances on the buy-now screen. */
 struct SlimeUpdater : public Entity {
+  bool ShouldDraw() override { return true; }
   BuyNowController *pBuy;
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}

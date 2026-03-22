@@ -56,6 +56,7 @@ struct MenuEntryManager {
  * side chambers and option toggles. */
 struct MenuDisplay : public Entity {
   std::string get_class_name() override { return "MenuDisplay"; }
+  bool ShouldDraw() override { return true; }
   MenuEntryManager *pCurr;
 
   MenuEntryManager memMain;
@@ -136,8 +137,7 @@ struct MenuController : public EntityListController {
     return pMenuCaret ? pMenuCaret.get() : nullptr;
   }
 
-  std::vector<Entity *> GetNonOwnedUpdateEntities() override;
-  std::vector<Entity *> GetNonOwnedDrawEntities() override;
+  std::vector<Entity *> GetNonOwnedEntities() override;
 
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouse(Point pPos) override;

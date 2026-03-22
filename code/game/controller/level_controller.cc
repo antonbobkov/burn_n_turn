@@ -19,6 +19,7 @@
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
 struct AdNumberDrawer : public Entity {
+  bool ShouldDraw() override { return true; }
   LevelController *pAd;
 
   AdNumberDrawer() : pAd(0) {}
@@ -70,6 +71,7 @@ struct AdNumberDrawer : public Entity {
 };
 
 struct BonusDrawer : public Entity {
+  bool ShouldDraw() override { return true; }
   LevelController *pAd;
 
   Timer t;
@@ -152,8 +154,8 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
 
   tLoseTimer.nPeriod = 0;
 
-  AddOwnedVisualEntity(std::make_unique<AdNumberDrawer>(pSelf));
-  AddOwnedVisualEntity(std::make_unique<BonusDrawer>(pSelf));
+  AddOwnedEntity(std::make_unique<AdNumberDrawer>(pSelf));
+  AddOwnedEntity(std::make_unique<BonusDrawer>(pSelf));
 
   pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
                                                  lvl.blKnightGen);
@@ -444,10 +446,12 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
   return out;
 }
 
-std::vector<Entity *> LevelController::GetNonOwnedUpdateEntities() {
+std::vector<Entity *> LevelController::GetNonOwnedEntities() {
   std::vector<Entity *> out;
   for (size_t i = 0; i < vCs.size(); ++i)
     out.push_back(vCs[i].get());
+  for (size_t i = 0; i < vRd.size(); ++i)
+    out.push_back(vRd[i].get());
   if (pTutorialText)
     out.push_back(pTutorialText.get());
   if (pSc)
@@ -483,31 +487,6 @@ std::vector<Entity *> LevelController::GetNonOwnedUpdateEntities() {
     out.push_back(pMGen.get());
   for (auto &u : lsSpawnedGenerators)
     out.push_back(u.get());
-  return out;
-}
-
-std::vector<Entity *> LevelController::GetNonOwnedDrawEntities() {
-  std::vector<Entity *> out;
-  for (size_t i = 0; i < vCs.size(); ++i)
-    out.push_back(vCs[i].get());
-  for (size_t i = 0; i < vRd.size(); ++i)
-    out.push_back(vRd[i].get());
-  if (pTutorialText)
-    out.push_back(pTutorialText.get());
-  for (auto &u : lsBonus)
-    out.push_back(u.get());
-  for (auto &u : lsSlimes)
-    out.push_back(u.get());
-  for (auto &u : lsMegaSlimes)
-    out.push_back(u.get());
-  for (size_t i = 0; i < vDr.size(); ++i)
-    out.push_back(vDr[i].get());
-  for (auto &u : lsSliminess)
-    if (u->pSlm_)
-      out.push_back(u->pSlm_.get());
-  for (auto &u : lsMegaSliminess)
-    if (u->pSlm_)
-      out.push_back(u->pSlm_.get());
   return out;
 }
 

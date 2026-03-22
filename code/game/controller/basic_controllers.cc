@@ -19,16 +19,10 @@ std::vector<ConsumableEntity *> EntityListController::GetConsumablePointers() {
   return out;
 }
 
-void EntityListController::AddOwnedVisualEntity(std::unique_ptr<Entity> p) {
+void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
   Entity *raw = p.get();
   owned_entities.push_back(std::move(p));
-  owned_visual_entities.push_back(raw);
-}
-
-void EntityListController::AddOwnedEventEntity(std::unique_ptr<Entity> p) {
-  Entity *raw = p.get();
-  owned_entities.push_back(std::move(p));
-  owned_event_entities.push_back(raw);
+  owned_entity_list.push_back(raw);
 }
 
 void EntityListController::AddBackground(Color c) {
@@ -36,8 +30,7 @@ void EntityListController::AddBackground(Color c) {
   r.sz.x *= pGl->GetDrawScaleFactor();
   r.sz.y *= pGl->GetDrawScaleFactor();
 
-  AddOwnedVisualEntity(
-      std::make_unique<StaticRectangle>(r, c, -1.F));
+  AddOwnedEntity(std::make_unique<StaticRectangle>(r, c, -1.F));
 }
 
 EntityListController::EntityListController(DragonGameController *pGl_,
@@ -47,29 +40,30 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 }
 
 void EntityListController::Update() {
-  /* Clean raw-pointer views first so no raw ptr outlives its owning unique_ptr.
-   * lsPpl and owned_entities are cleaned after their raw-ptr views. */
-  CleanUp(owned_visual_entities);
-  CleanUp(owned_event_entities);
+  /* Clean raw-pointer view first so no raw ptr outlives its owning unique_ptr.
+   * lsPpl and owned_entities are cleaned after their raw-ptr view. */
+  CleanUp(owned_entity_list);
   CleanUp(lsPpl);
   CleanUp(owned_entities);
 
-  for (Entity *pEx : owned_event_entities) {
+  auto nonOwned = GetNonOwnedEntities();
+
+  for (Entity *pEx : owned_entity_list) {
     if (pEx->bExist)
       pEx->Move();
   }
 
-  for (Entity *pEx : GetNonOwnedUpdateEntities()) {
+  for (Entity *pEx : nonOwned) {
     if (pEx->bExist)
       pEx->Move();
   }
 
-  for (Entity *pEx : owned_event_entities) {
+  for (Entity *pEx : owned_entity_list) {
     if (pEx->bExist)
       pEx->Update();
   }
 
-  for (Entity *pEx : GetNonOwnedUpdateEntities()) {
+  for (Entity *pEx : nonOwned) {
     if (pEx->bExist)
       pEx->Update();
   }
@@ -78,14 +72,14 @@ void EntityListController::Update() {
     typedef std::multimap<ScreenPos, Entity *> DrawMap;
     DrawMap mmp;
 
-    for (Entity *pOw : owned_visual_entities) {
-      if (pOw->bExist)
+    for (Entity *pOw : owned_entity_list) {
+      if (pOw->bExist && pOw->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw));
     }
 
-    for (Entity *pEx : GetNonOwnedDrawEntities()) {
-      if (pEx && pEx->bExist)
+    for (Entity *pEx : nonOwned) {
+      if (pEx && pEx->bExist && pEx->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
     }
@@ -170,16 +164,7 @@ void Cutscene::Update() {
   EntityListController::Update();
 }
 
-std::vector<Entity *> Cutscene::GetNonOwnedUpdateEntities() {
-  std::vector<Entity *> out;
-  if (pCrRun)
-    out.push_back(pCrRun.get());
-  if (bRelease && pCrFollow)
-    out.push_back(pCrFollow.get());
-  return out;
-}
-
-std::vector<Entity *> Cutscene::GetNonOwnedDrawEntities() {
+std::vector<Entity *> Cutscene::GetNonOwnedEntities() {
   std::vector<Entity *> out;
   if (pCrRun)
     out.push_back(pCrRun.get());
@@ -204,11 +189,9 @@ DragonScoreController::DragonScoreController(DragonGameController *pGl_,
     : EntityListController(pGl_, rBound, c), t(5 * nFramesInSecond),
       bClickToExit(false) {
   if (bScoreShow) {
-    AddOwnedVisualEntity(
-        std::make_unique<HighScoreShower>(pGl, rBound));
+    AddOwnedEntity(std::make_unique<HighScoreShower>(pGl, rBound));
   } else
-    AddOwnedVisualEntity(
-        std::make_unique<IntroTextShower>(pGl, rBound));
+    AddOwnedEntity(std::make_unique<IntroTextShower>(pGl, rBound));
 }
 
 void DragonScoreController::OnKey(GuiKeyType /*c*/, bool bUp) {
@@ -227,10 +210,16 @@ void DragonScoreController::Update() {
 }
 
 void AutoAdvanceController::Update() {
-  /* Clean raw-ptr views before checking size so dead entities don't count. */
-  CleanUp(owned_visual_entities);
+  // TODO: avoid accessing owned_entity_list directly, have a helper function in EntityListController
+  /* Clean raw-ptr view before counting so dead entities don't count. */
+  CleanUp(owned_entity_list);
 
-  if (owned_visual_entities.size() == 1) {
+  int nDrawable = 0;
+  for (Entity *p : owned_entity_list)
+    if (p->ShouldDraw())
+      ++nDrawable;
+
+  if (nDrawable == 1) {
     pGl->Next();
     return;
   }

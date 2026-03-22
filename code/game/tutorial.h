@@ -10,6 +10,7 @@ struct DragonGameController;
  * between the old and the new. */
 struct TutorialTextEntity : public Entity {
   std::string get_class_name() override { return "TutorialTextEntity"; }
+  bool ShouldDraw() override { return true; }
   float dPriority;
   Point pos;
 

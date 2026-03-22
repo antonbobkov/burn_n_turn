@@ -78,16 +78,7 @@ void MenuController::SetMenuDisplay(std::unique_ptr<MenuDisplay> p) {
   pMenuDisplay = std::move(p);
 }
 
-std::vector<Entity *> MenuController::GetNonOwnedUpdateEntities() {
-  std::vector<Entity *> out;
-  if (pMenuCaret)
-    out.push_back(pMenuCaret.get());
-  if (pMenuDisplay)
-    out.push_back(pMenuDisplay.get());
-  return out;
-}
-
-std::vector<Entity *> MenuController::GetNonOwnedDrawEntities() {
+std::vector<Entity *> MenuController::GetNonOwnedEntities() {
   std::vector<Entity *> out;
   if (pMenuCaret)
     out.push_back(pMenuCaret.get());
