@@ -228,8 +228,8 @@ void Dragon::Update() {
 
     tFireballRegen.Tick();
 
-    if (int(tFireballRegen.nTimer) >= nPeriod) {
-      tFireballRegen.nTimer = 0;
+    if (tFireballRegen.GetTimer() >= nPeriod) {
+      tFireballRegen.Reset();
 
       if (nFireballCount < int(fb.uMap["total"])) {
         if (nInitialRegen == 0)
@@ -350,9 +350,9 @@ void Dragon::Fire(fPoint fDir) {
   if (!bFly)
     pAd->TutorialNotify(TutorialEvent::ShotFired);
 
-  tFireballRegen.nTimer = 0;
+  tFireballRegen.Reset();
   bRegenLocked = true;
-  tRegenUnlock.nTimer = 0;
+  tRegenUnlock.Reset();
 
   --nFireballCount;
 

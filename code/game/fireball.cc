@@ -95,7 +95,7 @@ void ChainExplosion::Update() {
       if (!ch.IsLast()) {
         pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
             AnimationOnce(GetPriority(), Reset(seq),
-                         SimpleVisualEntity::t.nPeriod,
+                         SimpleVisualEntity::t.GetPeriod(),
                          ptr->GetPosition(), true),
             r_in, delta, pBc, ch.Evolve()));
       }
@@ -376,7 +376,7 @@ void FireballBonusAnimation::Update() {
   if (tm.Tick())
     this->Destroy();
 
-  if (!bBlink && tm.nPeriod && (tm.nPeriod - tm.nTimer) < 7 * nFramesInSecond) {
+  if (!bBlink && tm.IsActive() && tm.UntilTick() < 7 * nFramesInSecond) {
     bBlink = true;
 
     ImageSequence img;

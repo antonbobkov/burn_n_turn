@@ -8,15 +8,14 @@
  * period.
  */
 
-/* Period-based timer: internal counter (nTimer) and period (nPeriod).
+/* Period-based timer: internal counter and period.
  * Tick() advances the counter and returns true once per period.
  * Check() returns true when the counter is on a period boundary.
  * UntilTick() returns how many steps until the next period.
- * NextTick() sets the counter so the next Tick() returns true. */
+ * NextTick() sets the counter so the next Tick() returns true.
+ * A timer with period 0 is considered inactive and never ticks. */
 class Timer {
 public:
-  int nTimer, nPeriod;
-
   /* Build a timer with the given period (default 1). Counter starts at 0. */
   Timer(int nPeriod_ = 1);
 
@@ -31,6 +30,21 @@ public:
 
   /* Set counter so the next Tick() returns true. */
   void NextTick();
+
+  /* Reset the counter to 0. */
+  void Reset();
+
+  /* Return true if the period is non-zero (timer is active). */
+  bool IsActive() const;
+
+  /* Return the period length. */
+  int GetPeriod() const;
+
+  /* Return the current counter value. */
+  int GetTimer() const;
+
+private:
+  int nTimer, nPeriod;
 };
 
 #endif // GUI_TIMER_HEADER_ALREADY_DEFINED
