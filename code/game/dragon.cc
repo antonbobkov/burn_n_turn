@@ -281,18 +281,16 @@ void Dragon::Update() {
 
   if (bFly) {
     for (FireballBonusAnimation *pBns : pAd->GetBonusAnimations()) {
-      if (!pBns->bExist)
+      if (!pBns->Exists())
         continue;
 
       if (this->HitDetection(pBns)) {
         AddBonus(GetBonus(pBns->n, nBonusPickUpTime));
-        pBns->bExist = false;
+        pBns->Destroy();
 
         pAd->GetTutorial()->Notify(TutorialEvent::BonusPickUp);
       }
     }
-
-    pAd->GetTutorial()->Notify(TutorialEvent::BonusPickUp);
   }
 
   Critter::Update();

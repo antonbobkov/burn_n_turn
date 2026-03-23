@@ -65,7 +65,7 @@ void KnightGenerator::Generate(bool bGolem) {
                 true),
         pBc, 'W');
   } else if (pBc->IsGhostTime()) {
-    pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
+    pCr->SetSeq(pBc->pGl->GetImgSeq("ghost_knight"));
     pCr->cType = 'G';
     pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
   }

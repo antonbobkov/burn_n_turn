@@ -277,7 +277,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       if (!vDr_[i]->bFly)
         vDr_[i]->Toggle();
       else {
-        fPoint fFb = vDr_[0]->fVel;
+        fPoint fFb = vDr_[0]->GetVel();
         fFb.Normalize(100);
         vDr_[0]->Fire(fFb);
       }
@@ -379,8 +379,8 @@ void LevelController::OnMouseUp() {
   fTime = fTime / nFramesInSecond;
 
   if (vDr_[0]->bFly && fTime <= .2 && !bTakeOffToggle_ &&
-      pt_.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->nRadius) {
-    fPoint fFb = vDr_[0]->fVel;
+      pt_.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->GetRadius()) {
+    fPoint fFb = vDr_[0]->GetVel();
 
     fFb.Normalize(100);
     vDr_[0]->Fire(fFb);
@@ -392,7 +392,7 @@ void LevelController::OnMouseUp() {
 
 void LevelController::Fire() {
   if (vDr_[0]->bFly) {
-    fPoint fFb = vDr_[0]->fVel;
+    fPoint fFb = vDr_[0]->GetVel();
 
     fFb.Normalize(100);
     vDr_[0]->Fire(fFb);
@@ -525,7 +525,7 @@ int LevelController::GetLoseTimerFrame() const {
 
 void LevelController::StopMusic() {
   if (pSc_)
-    pSc_->nTheme = -1;
+    pSc_->SetTheme(-1);
 }
 
 Castle *LevelController::GetFirstCastle() {
@@ -547,31 +547,31 @@ void LevelController::DoSlimeMassKill() {
   std::vector<Point> vDeadSlimes;
 
   for (auto &u : lsSlimes_) {
-    if (!u->bExist)
+    if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
     u->OnHit('M');
   }
 
   for (auto &u : lsMegaSlimes_) {
-    if (!u->bExist)
+    if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
     u->OnHit('M');
   }
 
   for (auto &u : lsSliminess_) {
-    if (!u->bExist)
+    if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
-    u->Kill();
+    u->Destroy();
   }
 
   for (auto &u : lsMegaSliminess_) {
-    if (!u->bExist)
+    if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
-    u->Kill();
+    u->Destroy();
   }
 
   if (vDeadSlimes.empty())
@@ -614,18 +614,18 @@ void LevelController::Update() {
   if (tLoseTimer_.nPeriod == 0) {
     if (!bGhostTime_) {
       if (nLvl_ <= 3)
-        pSc_->nTheme = BG_BACKGROUND;
+        pSc_->SetTheme(BG_BACKGROUND);
       else if (nLvl_ <= 6)
-        pSc_->nTheme = BG_BACKGROUND2;
+        pSc_->SetTheme(BG_BACKGROUND2);
       else
-        pSc_->nTheme = BG_BACKGROUND3;
+        pSc_->SetTheme(BG_BACKGROUND3);
     } else {
       if (nLvl_ <= 3)
-        pSc_->nTheme = BG_SLOW_BACKGROUND;
+        pSc_->SetTheme(BG_SLOW_BACKGROUND);
       else if (nLvl_ <= 6)
-        pSc_->nTheme = BG_SLOW_BACKGROUND2;
+        pSc_->SetTheme(BG_SLOW_BACKGROUND2);
       else
-        pSc_->nTheme = BG_SLOW_BACKGROUND3;
+        pSc_->SetTheme(BG_SLOW_BACKGROUND3);
     }
   }
 
@@ -656,7 +656,7 @@ void LevelController::Update() {
     }
   } else {
     if (pt_.bPressed) {
-      fPoint v = vDr_[0]->fVel;
+      fPoint v = vDr_[0]->GetVel();
       fPoint d = pt_.GetDirection(vDr_[0]->GetPosition());
 
       if (d.Length() == 0)
@@ -664,17 +664,19 @@ void LevelController::Update() {
 
       d.Normalize(v.Length());
 
-      vDr_[0]->fVel = v * fFlightCoefficient + d;
-      vDr_[0]->fVel.Normalize(vDr_[0]->leash.speed);
+      fPoint newVel = v * fFlightCoefficient + d;
+      newVel.Normalize(vDr_[0]->leash.speed);
+      vDr_[0]->SetVel(newVel);
     } else if (bLeftDown_ || bRightDown_) {
-      fPoint v = vDr_[0]->fVel;
+      fPoint v = vDr_[0]->GetVel();
       fPoint d(v.y, v.x);
       if (bLeftDown_)
         d.y *= -1;
       else
         d.x *= -1;
-      vDr_[0]->fVel = v * fFlightCoefficient * 1.2f + d;
-      vDr_[0]->fVel.Normalize(vDr_[0]->leash.speed);
+      fPoint newVel = v * fFlightCoefficient * 1.2f + d;
+      newVel.Normalize(vDr_[0]->leash.speed);
+      vDr_[0]->SetVel(newVel);
     }
   }
 
