@@ -67,17 +67,18 @@ enum class TutorialEvent {
  * pushes it to the text entity. */
 class Tutorial {
  public:
-  explicit Tutorial(TutorialTextEntity *pTexter) : pTexter_(pTexter) {}
+  explicit Tutorial(TutorialTextEntity *tutorial_text)
+      : tutorial_text_(tutorial_text) {}
   virtual ~Tutorial() = default;
   virtual void Notify(TutorialEvent event) = 0;
 
  protected:
   /** Push GetText() result to the text entity. */
-  void Update();
+  void UpdateTutorialText();
 
  private:
   virtual std::vector<std::string> GetText() { return {}; }
-  TutorialTextEntity *pTexter_;
+  TutorialTextEntity *tutorial_text_;
 };
 
 /** Tutorial that does nothing; used for levels without tutorial guidance. */
@@ -90,7 +91,7 @@ class NoopTutorial : public Tutorial {
 /** First chapter tutorial: tracks knight, flight, and princess milestones. */
 class TutorialLevelOne : public Tutorial {
  public:
-  TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick,
+  TutorialLevelOne(TutorialTextEntity *tutorial_text, bool is_joystick,
                    bool is_keyboard);
   void Notify(TutorialEvent event) override;
 
@@ -110,7 +111,7 @@ class TutorialLevelOne : public Tutorial {
 /** Second chapter tutorial: tracks trader appearance and bonus milestones. */
 class TutorialLevelTwo : public Tutorial {
  public:
-  explicit TutorialLevelTwo(TutorialTextEntity *pTexter);
+  explicit TutorialLevelTwo(TutorialTextEntity *tutorial_text);
   void Notify(TutorialEvent event) override;
 
  private:

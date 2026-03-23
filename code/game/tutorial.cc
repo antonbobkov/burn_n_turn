@@ -47,14 +47,14 @@ void TutorialTextEntity::Update() {
   }
 }
 
-void Tutorial::Update() {
-  if (pTexter_ != nullptr)
-    pTexter_->SetText(GetText());
+void Tutorial::UpdateTutorialText() {
+  if (tutorial_text_ != nullptr)
+    tutorial_text_->SetText(GetText());
 }
 
-TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick,
-                                   bool is_keyboard)
-    : Tutorial(pTexter), killed_knight_(false), flying_(false),
+TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *tutorial_text,
+                                   bool is_joystick, bool is_keyboard)
+    : Tutorial(tutorial_text), killed_knight_(false), flying_(false),
       princess_generated_(false), princess_captured_(false),
       show_flying_shoot_hint_(!is_joystick) {
   if (is_joystick) {
@@ -70,7 +70,7 @@ TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick
     shooting_message_ = "click anywhere to shoot a fireball";
     take_off_message_ = "press space or click the tower to take off";
   }
-  Update();
+  UpdateTutorialText();
 }
 
 std::vector<std::string> TutorialLevelOne::GetText() {
@@ -114,34 +114,34 @@ void TutorialLevelOne::Notify(TutorialEvent event) {
     case TutorialEvent::KnightKilled:
       if (!killed_knight_) {
         killed_knight_ = true;
-        Update();
+        UpdateTutorialText();
       }
       break;
     case TutorialEvent::FlyOn:
       flying_ = true;
-      Update();
+      UpdateTutorialText();
       break;
     case TutorialEvent::FlyOff:
       flying_ = false;
-      Update();
+      UpdateTutorialText();
       break;
     case TutorialEvent::PrincessGenerate:
       princess_generated_ = true;
-      Update();
+      UpdateTutorialText();
       break;
     case TutorialEvent::PrincessCaptured:
       princess_captured_ = true;
-      Update();
+      UpdateTutorialText();
       break;
     default:
       break;
   }
 }
 
-TutorialLevelTwo::TutorialLevelTwo(TutorialTextEntity *pTexter)
-    : Tutorial(pTexter), trader_generated_(false), trader_killed_(false),
+TutorialLevelTwo::TutorialLevelTwo(TutorialTextEntity *tutorial_text)
+    : Tutorial(tutorial_text), trader_generated_(false), trader_killed_(false),
       bonus_picked_up_(false) {
-  Update();
+  UpdateTutorialText();
 }
 
 std::vector<std::string> TutorialLevelTwo::GetText() {
@@ -162,17 +162,17 @@ void TutorialLevelTwo::Notify(TutorialEvent event) {
   switch (event) {
     case TutorialEvent::TraderGenerate:
       trader_generated_ = true;
-      Update();
+      UpdateTutorialText();
       break;
     case TutorialEvent::TraderKilled:
       if (!trader_killed_) {
         trader_killed_ = true;
-        Update();
+        UpdateTutorialText();
       }
       break;
     case TutorialEvent::BonusPickUp:
       bonus_picked_up_ = true;
-      Update();
+      UpdateTutorialText();
       break;
     default:
       break;
