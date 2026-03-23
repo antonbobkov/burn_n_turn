@@ -384,7 +384,7 @@ void DragonGameController::StartUp() {
   Animation burnL(0, (*pr)("burn"), 3,
                   Point(rBound.sz.x / 2 - 45, rBound.sz.y / 2 - 64), true);
   ImageSequence burnRSeq = (*pr)("burn");
-  burnRSeq.nActive += 4;
+  burnRSeq.SetActive(burnRSeq.GetActive() + 4);
   Animation burnR(0, burnRSeq, 4,
                   Point(rBound.sz.x / 2 - 54, rBound.sz.y / 2 - 64), true);
 

@@ -34,7 +34,7 @@ public:
 
   Princess(const Critter &cr, LevelController *pAc_) : Critter(cr), pAc(pAc_) {}
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return 'P'; }
 
@@ -59,7 +59,7 @@ public:
 
   Mage(const Critter &cr, LevelController *pAc_, bool bAngry_);
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   void SummonSlimes();
 
@@ -84,7 +84,7 @@ public:
   Trader(const Critter &cr, LevelController *pAc_, bool &bFirstBns_)
       : Critter(cr), pAc(pAc_), bFirstBns(bFirstBns_) {}
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return 'T'; }
 
@@ -123,7 +123,7 @@ public:
 
   void OnHit(char cWhat) override;
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return cType; }
 };
@@ -151,7 +151,7 @@ public:
 
   void OnHit(char cWhat) override;
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return 'E'; }
 };
@@ -191,7 +191,7 @@ public:
 
   void OnHit(char cWhat) override;
 
-  Index GetImage() override { return seq.vImage[0]; }
+  Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return 'L'; }
 

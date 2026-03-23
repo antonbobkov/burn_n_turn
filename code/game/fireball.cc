@@ -235,7 +235,7 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
     Polar pol(Critter::fVel);
     int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
-        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
+        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
   }
 }
 
@@ -346,7 +346,7 @@ void CircularFireball::Update() {
     Polar pol(Critter::fVel);
     int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
-        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).vImage[n]);
+        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
   }
 }
 
@@ -381,16 +381,16 @@ void FireballBonusAnimation::Update() {
 
     ImageSequence img;
 
-    int nSz = (int)seq.vImage.size();
+    int nSz = seq.GetImageCount();
 
     for (int i = 0; i < nSz; ++i) {
       int nLm = 1;
-      if ((int)seq.vIntervals.size() > i)
-        nLm = seq.vIntervals[i];
+      if (seq.GetIntervalCount() > i)
+        nLm = seq.GetIntervalAt(i);
       if (nLm == 0)
         nLm = 1;
       for (int j = 0; j < nLm; ++j) {
-        img.Add(seq.vImage[i]);
+        img.Add(seq.GetImageAt(i));
         img.Add(pAd->pGl->GetImg("empty"));
       }
     }

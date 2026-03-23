@@ -58,6 +58,22 @@ bool ImageSequence::Toggle() {
   return false;
 }
 
+int ImageSequence::GetImageCount() const { return (int)vImage.size(); }
+
+bool ImageSequence::IsEmpty() const { return vImage.empty(); }
+
+Index ImageSequence::GetImageAt(int i) const { return vImage[i]; }
+
+void ImageSequence::SetImageAt(int i, Index img) { vImage[i] = img; }
+
+int ImageSequence::GetActive() const { return nActive; }
+
+void ImageSequence::SetActive(int n) { nActive = n; }
+
+int ImageSequence::GetIntervalCount() const { return (int)vIntervals.size(); }
+
+int ImageSequence::GetIntervalAt(int i) const { return vIntervals[i]; }
+
 bool ImageSequence::ToggleTimed() {
   if (!t.IsActive())
     t = Timer(vIntervals.at(nActive));
