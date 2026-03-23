@@ -21,3 +21,11 @@ bool Timer::Check() {
 }
 
 void Timer::NextTick() { nTimer = nPeriod - 1; }
+
+void Timer::Reset() { nTimer = 0; }
+
+bool Timer::IsActive() const { return nPeriod != 0; }
+
+int Timer::GetPeriod() const { return nPeriod; }
+
+int Timer::GetTimer() const { return nTimer; }

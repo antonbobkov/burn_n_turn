@@ -59,7 +59,7 @@ bool ImageSequence::Toggle() {
 }
 
 bool ImageSequence::ToggleTimed() {
-  if (t.nPeriod == 0)
+  if (!t.IsActive())
     t = Timer(vIntervals.at(nActive));
   if (t.Tick()) {
     bool b = Toggle();

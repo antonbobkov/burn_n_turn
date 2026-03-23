@@ -38,7 +38,7 @@ public:
           c = Color(255, 0, 0);
 
         pAd->pGl->GetNumberDrawer()->DrawColorNumber(
-            (pAd->t_.nPeriod - pAd->t_.nTimer) / nFramesInSecond,
+            pAd->t_.UntilTick() / nFramesInSecond,
             Point(pAd->rBound.sz.x - 14 * 4, 4), c, 4);
         pAd->pGl->GetNumberDrawer()->DrawColorWord(
             "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
@@ -96,8 +96,8 @@ public:
       for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
         TimedFireballBonus *pBns = itr->get();
 
-        if (pBns->t.nPeriod &&
-            (pBns->t.nPeriod - pBns->t.nTimer) < 4 * nFramesInSecond)
+        if (pBns->t.IsActive() &&
+            pBns->t.UntilTick() < 4 * nFramesInSecond)
           if (nAnimationCounter % 2 == 1) {
             p.x += 10;
             continue;
@@ -158,7 +158,7 @@ Dragon *LevelController::FindDragon(Dragon *p) {
 void LevelController::Init(const LevelLayout &lvl) {
   SuppressRefresh();
 
-  tLoseTimer_.nPeriod = 0;
+  tLoseTimer_ = Timer(0);
 
   AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
   AddOwnedEntity(std::make_unique<BonusDrawer>(this));
@@ -248,7 +248,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       std::cout << "Slimes: " << nSlimeNum_ << "\n";
 
     if (c == 't')
-      t_.nTimer = t_.nPeriod - 1;
+      t_.NextTick();
 
     if (c >= GUI_F1 && c <= GUI_F10)
       for (int i = 0; i < (int)vDr_.size(); ++i)
@@ -501,12 +501,12 @@ void LevelController::MegaGeneration(Point p) {
 }
 
 void LevelController::StartLoseTimer() {
-  if (tLoseTimer_.nPeriod == 0)
+  if (!tLoseTimer_.IsActive())
     tLoseTimer_ = Timer(nFramesInSecond * 3);
 }
 
 int LevelController::GetLoseTimerFrame() const {
-  return tLoseTimer_.nTimer / 2;
+  return tLoseTimer_.GetTimer() / 2;
 }
 
 void LevelController::StopMusic() {
@@ -597,7 +597,7 @@ void LevelController::Update() {
     pGl->ClearBonusesToCarryOver();
   }
 
-  if (tLoseTimer_.nPeriod == 0) {
+  if (!tLoseTimer_.IsActive()) {
     if (!bGhostTime_) {
       if (nLvl_ <= 3)
         pSc_->SetTheme(BG_BACKGROUND);
@@ -623,7 +623,7 @@ void LevelController::Update() {
   }
   pGl->RefreshAll();
 
-  if (tLoseTimer_.nPeriod != 0 && tLoseTimer_.Tick()) {
+  if (tLoseTimer_.IsActive() && tLoseTimer_.Tick()) {
     pGl->ShowGameOverScreen();
     return;
   }
@@ -680,7 +680,7 @@ void LevelController::Update() {
     }
 
     if (!bTimerFlash_) {
-      if (t_.nPeriod - t_.nTimer < 20 * nFramesInSecond) {
+      if (t_.UntilTick() < 20 * nFramesInSecond) {
         bTimerFlash_ = true;
         tBlink_ = Timer(nFramesInSecond / 2);
       }
