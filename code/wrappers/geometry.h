@@ -106,8 +106,7 @@ std::istream &operator>>(std::istream &ifs, Size &s);
 
 /* Axis-aligned rectangle (Point p, Size sz); normalizes to non-negative size.
  */
-class Rectangle {
-public:
+struct Rectangle {
   Point p;
   Size sz;
 
