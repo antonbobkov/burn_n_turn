@@ -105,7 +105,7 @@ public:
 
         ImageSequence img = pAd->pGl->GetImgSeq(GetBonusImage(pBns->nNum));
 
-        pDr->Draw(img.vImage[nAnimationCounter % img.vImage.size()], p, false);
+        pDr->Draw(img.GetImageAt(nAnimationCounter % img.GetImageCount()), p, false);
 
         p.x += 10;
       }

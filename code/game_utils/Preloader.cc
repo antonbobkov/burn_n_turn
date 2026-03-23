@@ -218,7 +218,7 @@ ImageSequence Preloader::LoadSeq(std::string fName) {
     s = fp_->Format(s);
     imgSeq.Add(pGr->LoadImage(strFolder + s), n);
   }
-  if (imgSeq.vImage.empty())
+  if (imgSeq.IsEmpty())
     throw PreloaderExceptionLoad("LoadSeq", fName);
   return imgSeq;
 }
@@ -240,11 +240,11 @@ void Preloader::LoadSeq(std::string fName, std::string key) {
 void Preloader::LoadSeqT(std::string fName, std::string key, Color c) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
-    for (int i = 0, sz = (int)imgSeq.vImage.size(); i < sz; ++i)
+    for (int i = 0, sz = imgSeq.GetImageCount(); i < sz; ++i)
       if (c == Color(0, 0, 0, 0))
-        ApplyTransparency(imgSeq.vImage[i]);
+        ApplyTransparency(imgSeq.GetImageAt(i));
       else
-        pGr->GetImage(imgSeq.vImage[i])->ChangeColor(c, Color(0, 0, 0, 0));
+        pGr->GetImage(imgSeq.GetImageAt(i))->ChangeColor(c, Color(0, 0, 0, 0));
     mpSeq[key] = imgSeq;
   } catch (GraphicalInterfaceException &exGr) {
     PreloaderExceptionLoad ex("LoadSeqT", fName);
@@ -259,11 +259,11 @@ void Preloader::LoadSeqT(std::string fName, std::string key, Color c) {
 void Preloader::LoadSeqS(std::string fName, std::string key, int nScale_) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
-    for (int i = 0, sz = (int)imgSeq.vImage.size(); i < sz; ++i)
+    for (int i = 0, sz = imgSeq.GetImageCount(); i < sz; ++i)
       if (nScale_ == 0)
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale);
+        imgSeq.SetImageAt(i, pGr->ScaleImage(imgSeq.GetImageAt(i), nScale));
       else
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale_);
+        imgSeq.SetImageAt(i, pGr->ScaleImage(imgSeq.GetImageAt(i), nScale_));
     mpSeq[key] = imgSeq;
   } catch (GraphicalInterfaceException &exGr) {
     PreloaderExceptionLoad ex("LoadSeqS", fName);
@@ -279,15 +279,15 @@ void Preloader::LoadSeqTS(std::string fName, std::string key, Color c,
                           int nScale_) {
   try {
     ImageSequence imgSeq = LoadSeq(fName);
-    for (size_t i = 0, sz = imgSeq.vImage.size(); i < sz; ++i) {
+    for (int i = 0, sz = imgSeq.GetImageCount(); i < sz; ++i) {
       if (c == Color(0, 0, 0, 0))
-        ApplyTransparency(imgSeq.vImage[i]);
+        ApplyTransparency(imgSeq.GetImageAt(i));
       else
-        pGr->GetImage(imgSeq.vImage[i])->ChangeColor(c, Color(0, 0, 0, 0));
+        pGr->GetImage(imgSeq.GetImageAt(i))->ChangeColor(c, Color(0, 0, 0, 0));
       if (nScale_ == 0)
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale);
+        imgSeq.SetImageAt(i, pGr->ScaleImage(imgSeq.GetImageAt(i), nScale));
       else
-        imgSeq.vImage[i] = pGr->ScaleImage(imgSeq.vImage[i], nScale_);
+        imgSeq.SetImageAt(i, pGr->ScaleImage(imgSeq.GetImageAt(i), nScale_));
     }
     mpSeq[key] = imgSeq;
   } catch (GraphicalInterfaceException &exGr) {

@@ -16,12 +16,6 @@
  */
 class ImageSequence {
 public:
-  std::vector<Index> vImage;
-  std::vector<int> vIntervals;
-  int nActive;
-
-  Timer t;
-
   /** Advance to next frame; wraps to 0 at end. Returns true on wrap. */
   bool Toggle();
   /** Advance frame when timer expires; restarts timer for current interval. */
@@ -39,18 +33,47 @@ public:
   ImageSequence(Index img1);
   ImageSequence(Index img1, Index img2);
   ImageSequence(Index img1, Index img2, Index img3);
+
+  /** Number of frames in the sequence. */
+  int GetImageCount() const;
+  /** True if the sequence has no frames. */
+  bool IsEmpty() const;
+  /** Image index at position i. */
+  Index GetImageAt(int i) const;
+  /** Replace the image index at position i. */
+  void SetImageAt(int i, Index img);
+
+  /** Current active frame index. */
+  int GetActive() const;
+  /** Set the current active frame index. */
+  void SetActive(int n);
+
+  /** Number of frame intervals stored. */
+  int GetIntervalCount() const;
+  /** Interval value at position i. */
+  int GetIntervalAt(int i) const;
+
+private:
+  std::vector<Index> vImage;
+  std::vector<int> vIntervals;
+  int nActive;
+  Timer t;
 };
 
 /** Reset sequence to first frame. */
 inline ImageSequence Reset(ImageSequence imgSeq) {
-  imgSeq.nActive = 0;
+  imgSeq.SetActive(0);
   return imgSeq;
 }
 
-/** Applies a functor to each image index in an ImageSequence. */
+/** Applies a functor to each image index in an ImageSequence.
+ *  The functor receives Index& and may modify it in place. */
 template <class T> void ForEachImage(ImageSequence &img, T t) {
-  for (int i = 0; i < (int)img.vImage.size(); ++i)
-    t(img.vImage[i]);
+  for (int i = 0; i < img.GetImageCount(); ++i) {
+    Index idx = img.GetImageAt(i);
+    t(idx);
+    img.SetImageAt(i, idx);
+  }
 }
 
 #endif // IMAGE_SEQUENCE_HEADER

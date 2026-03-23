@@ -308,14 +308,14 @@ void Dragon::Draw(ScalingDrawer *pDr) {
 
   if (!bFly) {
     if (!nTimer)
-      pDr->Draw(SimpleVisualEntity::seq.vImage[0],
+      pDr->Draw(SimpleVisualEntity::seq.GetImageAt(0),
                 pCs->GetPosition() - Point(0, 22));
     else
-      pDr->Draw(SimpleVisualEntity::seq.vImage[1],
+      pDr->Draw(SimpleVisualEntity::seq.GetImageAt(1),
                 pCs->GetPosition() - Point(0, 22));
   } else {
     Polar p(Critter::fVel);
-    pDr->Draw(imgFly.vImage[DiscreetAngle(p.a, 16)], GetPosition());
+    pDr->Draw(imgFly.GetImageAt(DiscreetAngle(p.a, 16)), GetPosition());
   }
 
   if (nTimer > 0)

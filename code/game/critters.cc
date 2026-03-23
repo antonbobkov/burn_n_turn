@@ -212,9 +212,9 @@ void Knight::Update() {
     if (bImageToggle) {
       seq.Toggle();
 
-      if (seq.nActive == 3)
+      if (seq.GetActive() == 3)
         pAc->pGl->PlaySound("step_left");
-      else if (seq.nActive == 6)
+      else if (seq.GetActive() == 6)
         pAc->pGl->PlaySound("step_right");
     }
   }
@@ -293,10 +293,10 @@ void MegaSlime::Update() {
     seq.Toggle();
     t = Timer(nPeriod * seq.GetTime() + rand() % 2);
 
-    if (seq.nActive == 11) {
+    if (seq.GetActive() == 11) {
       pAc->pGl->PlaySound("megaslime_jump");
       RandomizeVelocity();
-    } else if (seq.nActive == 16) {
+    } else if (seq.GetActive() == 16) {
       fVel = fPoint(0, 0);
       pAc->pGl->PlaySound("megaslime_land");
     }
@@ -621,15 +621,15 @@ void Castle::OnKnight(char cWhat) {
 }
 
 void Castle::Draw(ScalingDrawer *pDr) {
-  Critter::seq.nActive = nPrincesses;
+  Critter::seq.SetActive(nPrincesses);
 
   if (nPrincesses > 4)
-    Critter::seq.nActive = 4;
+    Critter::seq.SetActive(4);
 
   if (bBroken) {
-    Critter::seq.nActive = pAv->GetLoseTimerFrame();
-    if (seq.nActive > (int)seq.vImage.size() - 1)
-      seq.nActive = (int)seq.vImage.size() - 1;
+    Critter::seq.SetActive(pAv->GetLoseTimerFrame());
+    if (seq.GetActive() > seq.GetImageCount() - 1)
+      seq.SetActive(seq.GetImageCount() - 1);
   }
 
   Critter::Draw(pDr);

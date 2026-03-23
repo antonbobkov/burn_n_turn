@@ -68,7 +68,7 @@ void SimpleSoundEntity::Update() {
 void AnimationOnce::Update() {
   SimpleVisualEntity::Update();
 
-  if (SimpleVisualEntity::seq.nActive == 0) {
+  if (SimpleVisualEntity::seq.GetActive() == 0) {
     if (!bOnce)
       this->Destroy();
   } else {
