@@ -195,26 +195,9 @@ void LevelController::Init(LevelController *pSelf, const LevelLayout &lvl) {
   if (pGl->GetGameConfig().IsPcVersion()) {
     if (nLvl_ == 1) {
       const GameConfig &cfg = pGl->GetGameConfig();
-      std::string steer, shoot, take_off;
-      bool fly_hint;
-      if (cfg.IsJoystickTutorial()) {
-        steer    = "steer with joystick";
-        shoot    = "move joystick to shoot a fireball";
-        take_off = "press button to take off";
-        fly_hint = false;
-      } else if (cfg.IsKeyboardControls()) {
-        steer    = "steer with left and right keys";
-        shoot    = "shoot with arrow keys";
-        take_off = "press space to take off";
-        fly_hint = true;
-      } else {
-        steer    = "click and hold to steer";
-        shoot    = "click anywhere to shoot a fireball";
-        take_off = "press space or click the tower to take off";
-        fly_hint = true;
-      }
       pTutorial_ = std::make_unique<TutorialLevelOne>(
-          pTutorialText_.get(), steer, shoot, take_off, fly_hint);
+          pTutorialText_.get(), cfg.IsJoystickTutorial(),
+          cfg.IsKeyboardControls());
     }
 
     if (nLvl_ == 2) {

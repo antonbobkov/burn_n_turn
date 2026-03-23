@@ -47,17 +47,24 @@ void TutorialTextEntity::Update() {
   }
 }
 
-TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter,
-                                   std::string steer_message,
-                                   std::string shooting_message,
-                                   std::string take_off_message,
-                                   bool show_flying_shoot_hint)
+TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick,
+                                   bool is_keyboard)
     : killed_knight_(false), flying_(false), princess_generated_(false),
       princess_captured_(false), pTexter_(pTexter),
-      steer_message_(std::move(steer_message)),
-      shooting_message_(std::move(shooting_message)),
-      take_off_message_(std::move(take_off_message)),
-      show_flying_shoot_hint_(show_flying_shoot_hint) {
+      show_flying_shoot_hint_(!is_joystick) {
+  if (is_joystick) {
+    steer_message_    = "steer with joystick";
+    shooting_message_ = "move joystick to shoot a fireball";
+    take_off_message_ = "press button to take off";
+  } else if (is_keyboard) {
+    steer_message_    = "steer with left and right keys";
+    shooting_message_ = "shoot with arrow keys";
+    take_off_message_ = "press space to take off";
+  } else {
+    steer_message_    = "click and hold to steer";
+    shooting_message_ = "click anywhere to shoot a fireball";
+    take_off_message_ = "press space or click the tower to take off";
+  }
   Update();
 }
 

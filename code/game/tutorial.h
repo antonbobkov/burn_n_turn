@@ -79,11 +79,8 @@ class NoopTutorial : public Tutorial {
 /** First chapter tutorial: tracks knight, flight, and princess milestones. */
 class TutorialLevelOne : public Tutorial {
  public:
-  TutorialLevelOne(TutorialTextEntity *pTexter,
-                   std::string steer_message,
-                   std::string shooting_message,
-                   std::string take_off_message,
-                   bool show_flying_shoot_hint);
+  TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick,
+                   bool is_keyboard);
   void Notify(TutorialEvent event) override;
 
  private:
