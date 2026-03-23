@@ -30,22 +30,22 @@ void EntityListController::Update() {
   auto nonOwned = GetNonOwnedEntities();
 
   for (auto &pEx : owned_entities) {
-    if (pEx->bExist)
+    if (pEx->Exists())
       pEx->Move();
   }
 
   for (Entity *pEx : nonOwned) {
-    if (pEx->bExist)
+    if (pEx->Exists())
       pEx->Move();
   }
 
   for (auto &pEx : owned_entities) {
-    if (pEx->bExist)
+    if (pEx->Exists())
       pEx->Update();
   }
 
   for (Entity *pEx : nonOwned) {
-    if (pEx->bExist)
+    if (pEx->Exists())
       pEx->Update();
   }
 
@@ -54,13 +54,13 @@ void EntityListController::Update() {
     DrawMap mmp;
 
     for (auto &pOw : owned_entities) {
-      if (pOw->bExist && pOw->ShouldDraw())
+      if (pOw->Exists() && pOw->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw.get()));
     }
 
     for (Entity *pEx : nonOwned) {
-      if (pEx && pEx->bExist && pEx->ShouldDraw())
+      if (pEx && pEx->Exists() && pEx->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
     }
@@ -85,7 +85,7 @@ void EntityListController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }
 int EntityListController::CountDrawable() {
   int n = 0;
   for (auto &p : owned_entities)
-    if (p->bExist && p->ShouldDraw())
+    if (p->Exists() && p->ShouldDraw())
       ++n;
   return n;
 }

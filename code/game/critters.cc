@@ -23,8 +23,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
     nNum = 8;
 
   for (int i = 0; i < nNum; ++i) {
-    fPoint f = GetWedgeAngle(Point(1, 1), 1, i, nNum + 1);
-    f.Normalize(15);
+    fPoint f = fPoint::Normalized(GetWedgeAngle(Point(1, 1), 1, i, nNum + 1), 15);
 
     pAc->pGl->PlaySound("slime_summon");
     pAc->AddSpawnedGenerator(
@@ -35,7 +34,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
 void Princess::OnHit(char /*cWhat*/) {
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
-  bExist = false;
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
@@ -64,7 +63,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
 }
 
 void Mage::OnHit(char /*cWhat*/) {
-  bExist = false;
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
@@ -131,7 +130,7 @@ int RandomBonus(bool bInTower) {
 void Trader::OnHit(char /*cWhat*/) {
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
 
-  bExist = false;
+  this->Destroy();
 
   pAc->tutTwo->TraderKilled();
 
@@ -178,13 +177,13 @@ void Knight::Update() {
     if (this->HitDetection(pAc->vCs[i].get())) {
       pAc->vCs[i]->OnKnight(GetType());
 
-      bExist = false;
+      this->Destroy();
       break;
     }
 
   if (cType == 'S') {
     for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
-      if (!entity->bExist)
+      if (!entity->Exists())
         continue;
 
       if (this->HitDetection(entity)) {
@@ -196,12 +195,12 @@ void Knight::Update() {
     }
 
     for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
-      if (!ptr->bExist)
+      if (!ptr->Exists())
         continue;
 
       if (this->HitDetection(ptr)) {
         pAc->pGl->PlaySound("skeleton_bonus");
-        ptr->bExist = false;
+        ptr->Destroy();
       }
     }
   }
@@ -236,7 +235,7 @@ void Knight::OnHit(char /*cWhat*/) {
     pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
   }
 
-  bExist = false;
+  this->Destroy();
 
   pAc->tutOne->KnightKilled();
 
@@ -281,11 +280,11 @@ void MegaSlime::RandomizeVelocity() {
 
 void MegaSlime::Update() {
   for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
-    if (!ptr->bExist)
+    if (!ptr->Exists())
       continue;
 
     if (this->HitDetection(ptr)) {
-      ptr->bExist = false;
+      ptr->Destroy();
       pAc->pGl->PlaySound("megaslime_bonus");
     }
   }
@@ -311,7 +310,7 @@ void MegaSlime::OnHit(char /*cWhat*/) {
     return;
   }
 
-  bExist = false;
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
 
@@ -339,16 +338,16 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
 
 void Ghostiness::Update() {
   if (t.Tick()) {
-    bExist = false;
+    this->Destroy();
 
     if (nGhostHit == 0)
       return;
 
     auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G');
     if (nGhostHit == 1)
-      pCr->seq = pAdv->pGl->GetImgSeq("ghost");
+      pCr->SetSeq(pAdv->pGl->GetImgSeq("ghost"));
     else
-      pCr->seq = pAdv->pGl->GetImgSeq("ghost_knight");
+      pCr->SetSeq(pAdv->pGl->GetImgSeq("ghost_knight"));
     pCr->nGhostHit = nGhostHit - 1;
     pAdv->AddOwnedConsumable(std::move(pCr));
   }
@@ -383,14 +382,14 @@ void Slime::Update() {
     RandomizeVelocity();
 
   for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
-    if (!entity->bExist)
+    if (!entity->Exists())
       continue;
 
     if (this->HitDetection(entity)) {
       if (entity->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 
-        bExist = false;
+        this->Destroy();
 
         pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
             dPriority, pAc->pGl->GetImgSeq("slime_poke"), nFramesInSecond / 5,
@@ -409,7 +408,7 @@ void Slime::OnHit(char cWhat) {
     std::vector<Point> vDeadSlimes;
 
     for (auto &u : pAc->lsSlimes) {
-      if (!u->bExist)
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
@@ -417,7 +416,7 @@ void Slime::OnHit(char cWhat) {
     }
 
     for (auto &u : pAc->lsMegaSlimes) {
-      if (!u->bExist)
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
@@ -425,19 +424,19 @@ void Slime::OnHit(char cWhat) {
     }
 
     for (auto &u : pAc->lsSliminess) {
-      if (!u->bExist)
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
-      u->Kill();
+      u->Destroy();
     }
 
     for (auto &u : pAc->lsMegaSliminess) {
-      if (!u->bExist)
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
-      u->Kill();
+      u->Destroy();
     }
 
     if (vDeadSlimes.empty())
@@ -461,7 +460,7 @@ void Slime::OnHit(char cWhat) {
     return;
   }
 
-  bExist = false;
+  this->Destroy();
 
   bool bRevive = (cWhat != 'M');
 
@@ -477,8 +476,7 @@ void Slime::OnHit(char cWhat) {
     return;
 
   for (int i = 0; i < 2; ++i) {
-    fPoint f = RandomAngle();
-    f.Normalize(4);
+    fPoint f = fPoint::Normalized(RandomAngle(), 4);
 
     pAc->AddSliminess(std::make_unique<Sliminess>(
         GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
@@ -501,16 +499,16 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
 
 void Sliminess::Update() {
   if (t.Tick()) {
-    bExist = false;
+    this->Destroy();
 
     pAdv->AddSlime(
         std::make_unique<Slime>(p, pAdv->rBound, pAdv, nGeneration));
   }
 }
 
-void Sliminess::Kill() {
-  bExist = false;
-  pSlm_->bExist = false;
+void Sliminess::Destroy() {
+  Entity::Destroy();
+  pSlm_->Destroy();
 }
 
 Sliminess::~Sliminess() {
@@ -528,18 +526,18 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
 }
 
 void MegaSliminess::Update() {
-  if (!pSlm_->bExist) {
-    bExist = false;
+  if (!pSlm_->Exists()) {
+    this->Destroy();
 
     pAdv->AddMegaSlime(
         std::make_unique<MegaSlime>(p, pAdv->rBound, pAdv));
   }
 }
 
-void MegaSliminess::Kill() {
-  bExist = false;
+void MegaSliminess::Destroy() {
+  Entity::Destroy();
   if (pSlm_)
-    pSlm_->bExist = false;
+    pSlm_->Destroy();
 }
 
 FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
@@ -556,7 +554,7 @@ void FloatingSlime::Update() {
   fPos += fVel;
 
   if (tTermination.Tick())
-    bExist = false;
+    this->Destroy();
 }
 
 void Mage::Update() {
@@ -597,8 +595,7 @@ void Mage::Update() {
 
 void Mage::SummonSlimes() {
   for (int i = 0; i < 2; ++i) {
-    fPoint f = RandomAngle();
-    f.Normalize(10);
+    fPoint f = fPoint::Normalized(RandomAngle(), 10);
 
     pAc->AddSliminess(std::make_unique<Sliminess>(
         GetPosition() + f.ToPnt(), pAc, true, 0));
@@ -616,7 +613,7 @@ void Castle::OnKnight(char cWhat) {
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
       pAv->pGl->PlaySound("destroy_castle_sound");
-      pAv->pSc->nTheme = -1;
+      pAv->pSc->SetTheme(-1);
       Critter::seq = pAv->pGl->GetImgSeq("destroy_castle");
     }
 
@@ -631,15 +628,15 @@ void Castle::OnKnight(char cWhat) {
       pDrag->bFly = true;
       pDrag->bTookOff = true;
 
-      pDrag->SimpleVisualEntity::seq = pDrag->imgFly;
-      pDrag->SimpleVisualEntity::dPriority = 5;
+      pDrag->SetSeq(pDrag->imgFly);
+      pDrag->SetPriority(5);
 
       pDrag->pCs = nullptr;
 
-      pDrag->fVel = pAv->pt.GetDirection(GetPosition());
-      if (pDrag->fVel.Length() == 0)
-        pDrag->fVel = fPoint(0, -1);
-      pDrag->fVel.Normalize(pDrag->leash.speed);
+      fPoint dragVel = pAv->pt.GetDirection(GetPosition());
+      if (dragVel.Length() == 0)
+        dragVel = fPoint(0, -1);
+      pDrag->SetVel(fPoint::Normalized(dragVel, pDrag->leash.speed));
 
       pDrag = nullptr;
     }
@@ -653,8 +650,7 @@ void Castle::OnKnight(char cWhat) {
     --nPrincesses;
 
     if (cWhat == 'K') {
-      fPoint v = RandomAngle();
-      v.Normalize(fPrincessSpeed * 3.F);
+      fPoint v = fPoint::Normalized(RandomAngle(), fPrincessSpeed * 3.F);
 
       pAv->AddOwnedConsumable(std::make_unique<Princess>(
           Critter(7, GetPosition(), v, rBound, 0,

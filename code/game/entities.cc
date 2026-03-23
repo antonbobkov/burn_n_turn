@@ -56,7 +56,7 @@ void SimpleSoundEntity::Update() {
     pSnd->PlaySound(seq.GetSound());
 
     if (seq.nActive == (int)seq.vSounds.size() - 1) {
-      bExist = false;
+      this->Destroy();
       return;
     }
 
@@ -70,7 +70,7 @@ void AnimationOnce::Update() {
 
   if (SimpleVisualEntity::seq.nActive == 0) {
     if (!bOnce)
-      bExist = false;
+      this->Destroy();
   } else {
     bOnce = false;
   }
@@ -88,7 +88,7 @@ void Critter::Move() {
   fPos += fVel;
   if (!InsideRectangle(rBound, fPos.ToPnt())) {
     if (bDieOnExit)
-      bExist = false;
+      this->Destroy();
     else {
       if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
         fPos.y -= fVel.y;
@@ -108,7 +108,7 @@ void FancyCritter::Move() {
 
   if (!InsideRectangle(rBound, fPos.ToPnt())) {
     if (bDieOnExit)
-      bExist = false;
+      this->Destroy();
     else {
       if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
         fPos.y -= fVel.y;
@@ -130,9 +130,9 @@ BonusScore::BonusScore(LevelController *pAc_, Point p_, int nScore_)
 
 void SoundControls::Update() {
   if (nTheme != -1)
-    plr.SwitchTheme(nTheme);
+    plr->SwitchTheme(nTheme);
   else
-    plr.StopMusic();
+    plr->StopMusic();
 }
 
 /*virtual*/ void HighScoreShower::Draw(ScalingDrawer * /*pDr*/) {
@@ -210,7 +210,7 @@ void SoundControls::Update() {
 
 void BonusScore::Update() {
   if (pAc->bGhostTime)
-    bExist = false;
+    this->Destroy();
 
   if (t.Tick()) {
     ++nC;
@@ -228,7 +228,7 @@ void BonusScore::Update() {
     }
 
     if (nC >= 15) {
-      bExist = false;
+      this->Destroy();
     }
   }
 }

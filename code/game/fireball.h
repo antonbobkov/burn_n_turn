@@ -131,7 +131,7 @@ struct CircularFireball : virtual public Fireball,
 
   CircularFireball(const Fireball &f, float fRadius_, int nPeriod)
       : Fireball(f), TimedFireballBonus(FireballBonus(8, false), nPeriod),
-        fRadius(fRadius_), i_pos(f.fPos), t(nPeriod) {}
+        fRadius(fRadius_), i_pos(f.GetFPos()), t(nPeriod) {}
 
   void Update() override;
 };

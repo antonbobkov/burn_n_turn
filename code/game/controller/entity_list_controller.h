@@ -9,15 +9,13 @@
 #include <memory>
 #include <vector>
 
-struct Entity;
+class Entity;
 
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
-struct EntityListController : public GameController {
+class EntityListController : public GameController {
+public:
   std::string get_class_name() { return "EntityListController"; }
-
-  /** Non-consumable entities owned here (animations, effects, …). */
-  std::list<std::unique_ptr<Entity>> owned_entities;
 
   void AddOwnedEntity(std::unique_ptr<Entity> p);
 
@@ -25,8 +23,10 @@ struct EntityListController : public GameController {
   void AddBackground(Color c);
 
   EntityListController(const EntityListController &) = delete;
-  bool bNoRefresh;
   EntityListController(DragonGameController *pGl_, Rectangle rBound, Color c);
+
+  /** Prevent the automatic screen refresh at the end of each tick. */
+  void SuppressRefresh() { bNoRefresh = true; }
 
   /**
    * Each tick: clear the fallen from the list, move all that can move, then
@@ -44,6 +44,11 @@ struct EntityListController : public GameController {
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouseDown(Point pPos) override;
   std::string GetControllerName() const override { return "basic"; }
+
+private:
+  /** Non-consumable entities owned here (animations, effects, …). */
+  std::list<std::unique_ptr<Entity>> owned_entities;
+  bool bNoRefresh;
 };
 
 #endif

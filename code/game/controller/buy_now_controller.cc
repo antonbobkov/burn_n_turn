@@ -16,10 +16,10 @@ BuyNowController::BuyNowController(DragonGameController *pGl_, Rectangle rBound,
         0, pGl->GetImgSeq("slime"), nFramesInSecond / 10,
         Point(rBound.sz.x / 2, rBound.sz.y / 2 + 25), true));
     mSlimeVel.push_back(fPoint());
-    mSlimePos.push_back(mSlimes.back()->pos);
+    mSlimePos.push_back(mSlimes.back()->GetPosition());
   }
 
-  bNoRefresh = true;
+  SuppressRefresh();
 }
 
 void BuyNowController::RandomizeVelocity(fPoint &fVel, fPoint pPos) {
@@ -48,7 +48,7 @@ void BuyNowController::Update() {
   for (int i = 0; i < (int)mSlimes.size(); i++) {
     mSlimes[i]->Update();
     mSlimePos[i] += mSlimeVel[i];
-    mSlimes[i]->pos = mSlimePos[i].ToPnt();
+    mSlimes[i]->SetPos(mSlimePos[i].ToPnt());
   }
 
   if (t >= 0)

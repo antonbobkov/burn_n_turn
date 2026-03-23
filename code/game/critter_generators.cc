@@ -44,15 +44,14 @@ void KnightGenerator::Generate(bool bGolem) {
 
   int n = rand() % (int)pBc->vCs.size();
 
-  fPoint v = pBc->vCs[n]->GetPosition() - p;
-  v.Normalize(fKnightSpeed);
+  fPoint v = fPoint::Normalized(pBc->vCs[n]->GetPosition() - p, fKnightSpeed);
   p += rBound.p;
 
   auto pCr = std::make_unique<Knight>(
       Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
 
   if (bFirst) {
-    pCr->sUnderText = "destroy";
+    pCr->SetUnderText("destroy");
     bFirst = false;
   }
 
@@ -64,9 +63,9 @@ void KnightGenerator::Generate(bool bGolem) {
                 true),
         pBc, 'W');
   } else if (pBc->bGhostTime) {
-    pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
+    pCr->SetSeq(pBc->pGl->GetImgSeq("ghost_knight"));
     pCr->cType = 'G';
-    pCr->fVel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
+    pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
   }
 
   pBc->AddOwnedConsumable(std::move(pCr));
@@ -97,9 +96,7 @@ void PrincessGenerator::Update() {
 
     pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
 
-    fPoint vel(v);
-
-    vel.Normalize(fPrincessSpeed);
+    fPoint vel = fPoint::Normalized(fPoint(v), fPrincessSpeed);
 
     auto pCr = std::make_unique<Princess>(
         Critter(7, p, vel, rBound, 3,
@@ -108,7 +105,7 @@ void PrincessGenerator::Update() {
                 true),
         pBc);
     if (bFirst) {
-      pCr->sUnderText = "capture";
+      pCr->SetUnderText("capture");
       bFirst = false;
     }
     pBc->AddOwnedConsumable(std::move(pCr));
@@ -145,9 +142,7 @@ void MageGenerator::MageGenerate() {
 
   pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
 
-  fPoint vel(v);
-
-  vel.Normalize(fMageSpeed);
+  fPoint vel = fPoint::Normalized(fPoint(v), fMageSpeed);
 
   pBc->AddOwnedConsumable(std::make_unique<Mage>(
       Critter(7, p, vel, rBound, 3,
@@ -188,8 +183,7 @@ void TraderGenerator::Update() {
 
     pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
 
-    fPoint vel(v);
-    vel.Normalize(fTraderSpeed);
+    fPoint vel = fPoint::Normalized(fPoint(v), fTraderSpeed);
 
     auto pCr = std::make_unique<Trader>(
         Critter(7, p, vel, rBound, 3,
@@ -199,7 +193,7 @@ void TraderGenerator::Update() {
         pBc, bFirstBns);
 
     if (bFirst) {
-      pCr->sUnderText = "kill";
+      pCr->SetUnderText("kill");
       bFirst = false;
     }
 
@@ -211,12 +205,11 @@ void TraderGenerator::Update() {
 
 /*virutal*/ void SkellyGenerator::Update() {
   if (t.Tick()) {
-    bExist = false;
+    this->Destroy();
 
     int n = rand() % (int)pAdv->vCs.size();
 
-    fPoint v = pAdv->vCs[n]->GetPosition() - p;
-    v.Normalize(fSkeletonSpeed);
+    fPoint v = fPoint::Normalized(pAdv->vCs[n]->GetPosition() - p, fSkeletonSpeed);
 
     pAdv->AddOwnedConsumable(std::make_unique<Knight>(
         Critter(7, p, v, pAdv->rBound, 3, pAdv->pGl->GetImgSeq("skelly"), true),

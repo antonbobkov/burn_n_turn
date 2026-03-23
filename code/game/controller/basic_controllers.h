@@ -5,10 +5,11 @@
 #include "../../utils/timer.h"
 #include <memory>
 
-struct Animation;
-struct FancyCritter;
+class Animation;
+class FancyCritter;
 
-struct StartScreenController : public EntityListController {
+class StartScreenController : public EntityListController {
+public:
   std::string get_class_name() { return "StartScreenController"; }
   StartScreenController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}
@@ -22,15 +23,9 @@ struct StartScreenController : public EntityListController {
   std::string GetControllerName() const override { return "start"; }
 };
 
-struct Cutscene : public EntityListController {
+class Cutscene : public EntityListController {
+public:
   std::string get_class_name() { return "Cutscene"; }
-  std::unique_ptr<FancyCritter> pCrRun;
-  std::unique_ptr<FancyCritter> pCrFollow;
-
-  Timer tm;
-  bool Beepy;
-
-  bool bRelease;
 
   /**
    * Set the stage: dark veil, one soul running and one waiting. Runner starts
@@ -40,6 +35,15 @@ struct Cutscene : public EntityListController {
   Cutscene(DragonGameController *pGl_, Rectangle rBound_, std::string sRun,
            std::string sChase, bool bFlip = false);
   ~Cutscene();
+
+private:
+  std::unique_ptr<FancyCritter> pCrRun;
+  std::unique_ptr<FancyCritter> pCrFollow;
+
+  Timer tm;
+  bool Beepy;
+
+  bool bRelease;
 
   void Update() override;
   void OnKey(GuiKeyType c, bool bUp) override;
@@ -51,13 +55,16 @@ struct Cutscene : public EntityListController {
 
 /** A screen that shows the dragon's tally and leaves on click or when time
  * runs out. */
-struct DragonScoreController : public EntityListController {
+class DragonScoreController : public EntityListController {
+public:
   std::string get_class_name() { return "DragonScoreController"; }
-  Timer t;
-  bool bClickToExit;
 
   DragonScoreController(DragonGameController *pGl_, Rectangle rBound, Color c,
                         bool bScoreShow);
+
+private:
+  Timer t;
+  bool bClickToExit;
 
   void OnKey(GuiKeyType c, bool bUp) override;
   void Update() override;
@@ -69,7 +76,8 @@ struct DragonScoreController : public EntityListController {
 
 /** A controller that steps to the next screen when only the veil remains, or
  * when the hero gives a sign. */
-struct AutoAdvanceController : public EntityListController {
+class AutoAdvanceController : public EntityListController {
+public:
   std::string get_class_name() { return "AutoAdvanceController"; }
   AutoAdvanceController(DragonGameController *pGl_, Rectangle rBound, Color c)
       : EntityListController(pGl_, rBound, c) {}

@@ -149,7 +149,7 @@ Dragon *LevelController::FindDragon(Dragon *p) {
 }
 
 void LevelController::Init(const LevelLayout &lvl) {
-  bNoRefresh = true;
+  SuppressRefresh();
 
   tLoseTimer.nPeriod = 0;
 
@@ -272,9 +272,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       if (!vDr[i]->bFly)
         vDr[i]->Toggle();
       else {
-        fPoint fFb = vDr[0]->fVel;
-        fFb.Normalize(100);
-        vDr[0]->Fire(fFb);
+        vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
       }
     }
 
@@ -361,7 +359,6 @@ void LevelController::OnMouseDown(Point pPos) {
   } else {
     if (!vDr[0]->bFly) {
       fPoint fFb = pt.GetDirection(vDr[0]->GetPosition() + Point(-10, -25));
-
       fFb.Normalize(100);
       vDr[0]->Fire(fFb);
     }
@@ -373,11 +370,8 @@ void LevelController::OnMouseUp() {
   fTime = fTime / nFramesInSecond;
 
   if (vDr[0]->bFly && fTime <= .2 && !bTakeOffToggle &&
-      pt.GetDirection(vDr[0]->GetPosition()).Length() > vDr[0]->nRadius) {
-    fPoint fFb = vDr[0]->fVel;
-
-    fFb.Normalize(100);
-    vDr[0]->Fire(fFb);
+      pt.GetDirection(vDr[0]->GetPosition()).Length() > vDr[0]->GetRadius()) {
+    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
   }
 
   if (bTakeOffToggle)
@@ -386,10 +380,7 @@ void LevelController::OnMouseUp() {
 
 void LevelController::Fire() {
   if (vDr[0]->bFly) {
-    fPoint fFb = vDr[0]->fVel;
-
-    fFb.Normalize(100);
-    vDr[0]->Fire(fFb);
+    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
   }
 }
 
@@ -531,18 +522,18 @@ void LevelController::Update() {
   if (tLoseTimer.nPeriod == 0) {
     if (!bGhostTime) {
       if (nLvl <= 3)
-        pSc->nTheme = BG_BACKGROUND;
+        pSc->SetTheme(BG_BACKGROUND);
       else if (nLvl <= 6)
-        pSc->nTheme = BG_BACKGROUND2;
+        pSc->SetTheme(BG_BACKGROUND2);
       else
-        pSc->nTheme = BG_BACKGROUND3;
+        pSc->SetTheme(BG_BACKGROUND3);
     } else {
       if (nLvl <= 3)
-        pSc->nTheme = BG_SLOW_BACKGROUND;
+        pSc->SetTheme(BG_SLOW_BACKGROUND);
       else if (nLvl <= 6)
-        pSc->nTheme = BG_SLOW_BACKGROUND2;
+        pSc->SetTheme(BG_SLOW_BACKGROUND2);
       else
-        pSc->nTheme = BG_SLOW_BACKGROUND3;
+        pSc->SetTheme(BG_SLOW_BACKGROUND3);
     }
   }
 
@@ -573,25 +564,26 @@ void LevelController::Update() {
     }
   } else {
     if (pt.bPressed) {
-      fPoint v = vDr[0]->fVel;
+      fPoint v = vDr[0]->GetVel();
       fPoint d = pt.GetDirection(vDr[0]->GetPosition());
 
       if (d.Length() == 0)
         d = v;
 
       d.Normalize(v.Length());
-
-      vDr[0]->fVel = v * fFlightCoefficient + d;
-      vDr[0]->fVel.Normalize(vDr[0]->leash.speed);
+      fPoint newVel = v * fFlightCoefficient + d;
+      newVel.Normalize(vDr[0]->leash.speed);
+      vDr[0]->SetVel(newVel);
     } else if (bLeftDown || bRightDown) {
-      fPoint v = vDr[0]->fVel;
+      fPoint v = vDr[0]->GetVel();
       fPoint d(v.y, v.x);
       if (bLeftDown)
         d.y *= -1;
       else
         d.x *= -1;
-      vDr[0]->fVel = v * fFlightCoefficient * 1.2f + d;
-      vDr[0]->fVel.Normalize(vDr[0]->leash.speed);
+      fPoint newVel2 = v * fFlightCoefficient * 1.2f + d;
+      newVel2.Normalize(vDr[0]->leash.speed);
+      vDr[0]->SetVel(newVel2);
     }
   }
 
