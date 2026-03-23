@@ -34,7 +34,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
 void Princess::OnHit(char /*cWhat*/) {
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
-  Kill();
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
@@ -63,7 +63,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
 }
 
 void Mage::OnHit(char /*cWhat*/) {
-  Kill();
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
@@ -130,7 +130,7 @@ int RandomBonus(bool bInTower) {
 void Trader::OnHit(char /*cWhat*/) {
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 60));
 
-  Kill();
+  this->Destroy();
 
   pAc->tutTwo->TraderKilled();
 
@@ -177,13 +177,13 @@ void Knight::Update() {
     if (this->HitDetection(pAc->vCs[i].get())) {
       pAc->vCs[i]->OnKnight(GetType());
 
-      Kill();
+      this->Destroy();
       break;
     }
 
   if (cType == 'S') {
     for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
-      if (!entity->IsAlive())
+      if (!entity->Exists())
         continue;
 
       if (this->HitDetection(entity)) {
@@ -195,12 +195,12 @@ void Knight::Update() {
     }
 
     for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
-      if (!ptr->IsAlive())
+      if (!ptr->Exists())
         continue;
 
       if (this->HitDetection(ptr)) {
         pAc->pGl->PlaySound("skeleton_bonus");
-        ptr->Kill();
+        ptr->Destroy();
       }
     }
   }
@@ -235,7 +235,7 @@ void Knight::OnHit(char /*cWhat*/) {
     pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
   }
 
-  Kill();
+  this->Destroy();
 
   pAc->tutOne->KnightKilled();
 
@@ -280,11 +280,11 @@ void MegaSlime::RandomizeVelocity() {
 
 void MegaSlime::Update() {
   for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
-    if (!ptr->IsAlive())
+    if (!ptr->Exists())
       continue;
 
     if (this->HitDetection(ptr)) {
-      ptr->Kill();
+      ptr->Destroy();
       pAc->pGl->PlaySound("megaslime_bonus");
     }
   }
@@ -310,7 +310,7 @@ void MegaSlime::OnHit(char /*cWhat*/) {
     return;
   }
 
-  Kill();
+  this->Destroy();
 
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
 
@@ -338,7 +338,7 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
 
 void Ghostiness::Update() {
   if (t.Tick()) {
-    Kill();
+    this->Destroy();
 
     if (nGhostHit == 0)
       return;
@@ -382,14 +382,14 @@ void Slime::Update() {
     RandomizeVelocity();
 
   for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
-    if (!entity->IsAlive())
+    if (!entity->Exists())
       continue;
 
     if (this->HitDetection(entity)) {
       if (entity->GetType() == 'K') {
         pAc->pGl->PlaySound("slime_poke");
 
-        Kill();
+        this->Destroy();
 
         pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
             dPriority, pAc->pGl->GetImgSeq("slime_poke"), nFramesInSecond / 5,
@@ -408,7 +408,7 @@ void Slime::OnHit(char cWhat) {
     std::vector<Point> vDeadSlimes;
 
     for (auto &u : pAc->lsSlimes) {
-      if (!u->IsAlive())
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
@@ -416,7 +416,7 @@ void Slime::OnHit(char cWhat) {
     }
 
     for (auto &u : pAc->lsMegaSlimes) {
-      if (!u->IsAlive())
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
@@ -424,19 +424,19 @@ void Slime::OnHit(char cWhat) {
     }
 
     for (auto &u : pAc->lsSliminess) {
-      if (!u->IsAlive())
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
-      u->Kill();
+      u->Destroy();
     }
 
     for (auto &u : pAc->lsMegaSliminess) {
-      if (!u->IsAlive())
+      if (!u->Exists())
         continue;
 
       vDeadSlimes.push_back(u->GetPosition());
-      u->Kill();
+      u->Destroy();
     }
 
     if (vDeadSlimes.empty())
@@ -460,7 +460,7 @@ void Slime::OnHit(char cWhat) {
     return;
   }
 
-  Kill();
+  this->Destroy();
 
   bool bRevive = (cWhat != 'M');
 
@@ -499,16 +499,16 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
 
 void Sliminess::Update() {
   if (t.Tick()) {
-    Kill();
+    this->Destroy();
 
     pAdv->AddSlime(
         std::make_unique<Slime>(p, pAdv->rBound, pAdv, nGeneration));
   }
 }
 
-void Sliminess::Kill() {
-  Kill();
-  pSlm_->Kill();
+void Sliminess::Destroy() {
+  Entity::Destroy();
+  pSlm_->Destroy();
 }
 
 Sliminess::~Sliminess() {
@@ -526,18 +526,18 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
 }
 
 void MegaSliminess::Update() {
-  if (!pSlm_->IsAlive()) {
-    Kill();
+  if (!pSlm_->Exists()) {
+    this->Destroy();
 
     pAdv->AddMegaSlime(
         std::make_unique<MegaSlime>(p, pAdv->rBound, pAdv));
   }
 }
 
-void MegaSliminess::Kill() {
-  Kill();
+void MegaSliminess::Destroy() {
+  Entity::Destroy();
   if (pSlm_)
-    pSlm_->Kill();
+    pSlm_->Destroy();
 }
 
 FloatingSlime::FloatingSlime(ImageSequence seq, Point pStart, Point pEnd,
@@ -554,7 +554,7 @@ void FloatingSlime::Update() {
   fPos += fVel;
 
   if (tTermination.Tick())
-    Kill();
+    this->Destroy();
 }
 
 void Mage::Update() {

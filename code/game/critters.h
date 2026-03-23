@@ -206,7 +206,7 @@ struct Sliminess : public Entity {
   void Update() override;
 
   /** End the summoning; the spawn and its shimmer are gone. */
-  void Kill();
+  void Destroy();
 
   Point GetPosition() override { return p; }
 
@@ -225,7 +225,7 @@ struct MegaSliminess : public Entity {
   void Update() override;
 
   Point GetPosition() override { return p; }
-  void Kill();
+  void Destroy();
 };
 
 /** A drifting slime that moves with position and velocity (e.g. in the menu). */

@@ -35,8 +35,8 @@ public:
   virtual bool ShouldDraw() { return false; }
   bool HitDetection(Entity *pPh);
 
-  bool IsAlive() const { return bExist; }
-  void Kill() { bExist = false; }
+  bool Exists() const { return bExist; }
+  void Destroy() { bExist = false; }
 
 private:
   bool bExist;
@@ -382,7 +382,7 @@ private:
 template <class T> void CleanUp(std::list<T> &ar) {
   for (typename std::list<T>::iterator itr = ar.begin(), etr = ar.end();
        itr != etr;) {
-    if (!(*itr)->IsAlive())
+    if (!(*itr)->Exists())
       ar.erase(itr++);
     else
       ++itr;

@@ -205,7 +205,7 @@ void TraderGenerator::Update() {
 
 /*virutal*/ void SkellyGenerator::Update() {
   if (t.Tick()) {
-    Kill();
+    this->Destroy();
 
     int n = rand() % (int)pAdv->vCs.size();
 

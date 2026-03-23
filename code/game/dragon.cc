@@ -130,14 +130,14 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     nSlimeMax *= 2;
 
     for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
-      if (!entity->IsAlive())
+      if (!entity->Exists())
         continue;
 
       if (entity->GetType() == 'K' || entity->GetType() == 'S' ||
           entity->GetType() == 'L') {
         if (entity->GetType() == 'K' &&
             GetAllBonuses().uMap["setonfire"] != 0) {
-          entity->Kill();
+          entity->Destroy();
           pAd->AddOwnedEntity(std::make_unique<KnightOnFire>(
               Critter(entity->GetRadius(), entity->GetPosition(), fPoint(),
                       rBound, 1.F, ImageSequence(), true),
@@ -261,7 +261,7 @@ void Dragon::Update() {
 
   if (bFly && (!bCarry || cCarry == 'P')) {
     for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
-      if (!entity->IsAlive())
+      if (!entity->Exists())
         continue;
 
       if (entity->GetType() == 'P' && this->HitDetection(entity)) {
@@ -270,7 +270,7 @@ void Dragon::Update() {
         cCarry = 'P';
         ++nPrCr;
 
-        entity->Kill();
+        entity->Destroy();
 
         pAd->pGl->PlaySound("pickup");
         break;
@@ -282,12 +282,12 @@ void Dragon::Update() {
     CleanUp(pAd->lsBonus);
 
     for (auto &bonus : pAd->lsBonus) {
-      if (!bonus->IsAlive())
+      if (!bonus->Exists())
         continue;
 
       if (this->HitDetection(bonus.get())) {
         AddBonus(GetBonus(bonus->n, nBonusPickUpTime));
-        bonus->Kill();
+        bonus->Destroy();
 
         pAd->tutTwo->BonusPickUp();
       }
@@ -481,7 +481,7 @@ void Dragon::Toggle() {
     return;
 
   for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
-    if (!entity->IsAlive())
+    if (!entity->Exists())
       continue;
 
     if (entity->GetType() != 'T')
@@ -498,7 +498,7 @@ void Dragon::Toggle() {
         throw SimpleException("not supposed to drop things");
       }
 
-      entity->Kill();
+      entity->Destroy();
 
       return;
     }
