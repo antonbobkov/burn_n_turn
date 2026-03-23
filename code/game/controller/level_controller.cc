@@ -130,7 +130,9 @@ static const float fSpreadFactor = 2.0f;
 
 LevelController::~LevelController() = default;
 
-Tutorial *LevelController::GetTutorial() const { return pTutorial_.get(); }
+void LevelController::TutorialNotify(TutorialEvent event) {
+  pTutorial_->Notify(event);
+}
 
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  Color c, const LevelLayout &lvl,

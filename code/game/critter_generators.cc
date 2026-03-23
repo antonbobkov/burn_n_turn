@@ -113,7 +113,7 @@ void PrincessGenerator::Update() {
     pBc->AddOwnedConsumable(std::move(pCr));
     pBc->pGl->PlaySound("princess_arrive");
 
-    pBc->GetTutorial()->Notify(TutorialEvent::PrincessGenerate);
+    pBc->TutorialNotify(TutorialEvent::PrincessGenerate);
   }
 }
 
@@ -201,7 +201,7 @@ void TraderGenerator::Update() {
 
     pBc->AddOwnedConsumable(std::move(pCr));
 
-    pBc->GetTutorial()->Notify(TutorialEvent::TraderGenerate);
+    pBc->TutorialNotify(TutorialEvent::TraderGenerate);
   }
 }
 

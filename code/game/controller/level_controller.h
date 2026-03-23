@@ -25,6 +25,7 @@ struct MegaSliminess;
 struct SoundControls;
 class Tutorial;
 struct TutorialTextEntity;
+enum class TutorialEvent;
 
 /** The keeper of the chapter: castles, roads, dragon, spawners, treasures,
  * and the hero's input. */
@@ -33,8 +34,8 @@ struct LevelController : public EntityListController {
 
   LevelController *pSelf;
 
-  /** Return the active tutorial handler for this level. */
-  Tutorial *GetTutorial() const;
+  /** Deliver a game event to the active tutorial handler. */
+  void TutorialNotify(TutorialEvent event);
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {

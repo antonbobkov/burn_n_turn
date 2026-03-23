@@ -132,7 +132,7 @@ void Trader::OnHit(char /*cWhat*/) {
 
   this->Destroy();
 
-  pAc->GetTutorial()->Notify(TutorialEvent::TraderKilled);
+  pAc->TutorialNotify(TutorialEvent::TraderKilled);
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
@@ -237,7 +237,7 @@ void Knight::OnHit(char /*cWhat*/) {
 
   this->Destroy();
 
-  pAc->GetTutorial()->Notify(TutorialEvent::KnightKilled);
+  pAc->TutorialNotify(TutorialEvent::KnightKilled);
 
   if (cType != 'G') {
     pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
