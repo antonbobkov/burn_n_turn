@@ -403,8 +403,6 @@ void Dragon::Fire(fPoint fDir) {
 }
 
 void Dragon::TakeOff() {
-  pAd->pGl->PlaySound("leave_tower");
-
   bFly = true;
   bTookOff = true;
 
@@ -425,6 +423,7 @@ void Dragon::TakeOff() {
 
 void Dragon::Toggle() {
   if (!bFly) {
+    pAd->pGl->PlaySound("leave_tower");
     TakeOff();
     return;
   }
