@@ -1,5 +1,5 @@
 - All relevant code is under code/. Ignore unused_old_ignore/
-- Don't commit/push/merge unless instructed.
+- When commiting changes, push them, and show github link to commit.
 
 ## Build system
 
