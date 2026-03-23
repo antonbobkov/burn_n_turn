@@ -32,8 +32,6 @@ struct TutorialTextEntity;
 struct LevelController : public EntityListController {
   std::string get_class_name() { return "LevelController"; }
 
-  PositionTracker pt;
-
   std::unique_ptr<TutorialLevelOne> tutOne;
   std::unique_ptr<TutorialLevelTwo> tutTwo;
 
@@ -140,6 +138,7 @@ struct LevelController : public EntityListController {
   int nLvl_;
   int nSlimeNum_;
   Timer tLoseTimer_;
+  PositionTracker pt_;
   bool bTakeOffToggle_;
   TrackballTracker tr_;
 

@@ -179,7 +179,7 @@ void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
   t_ = Timer(lvl.nTimer);
 
   vDr_.push_back(std::make_unique<Dragon>(
-      vCs_[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"),
+      vCs_[0].get(), pSelf, &pt_, pGl->GetImgSeq("dragon_stable"),
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr_.back()->pCs != nullptr)
@@ -312,7 +312,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
 
       if (!vDr_[0]->bFly) {
         vDr_[0]->Fire(fp);
-        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+        pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
       bWasDirectionalInput_ = false;
     }
@@ -329,7 +329,7 @@ void LevelController::OnMouse(Point pPos) {
   pPos.x *= Crd(fX);
   pPos.y *= Crd(fY);
 
-  pt.UpdateMouse(pPos);
+  pt_.UpdateMouse(pPos);
   mc_.SetCursorPos(pPos);
 }
 
@@ -343,18 +343,18 @@ void LevelController::OnMouseDown(Point pPos) {
   pPos.x *= Crd(fX);
   pPos.y *= Crd(fY);
 
-  pt.UpdateMouse(pPos);
-  pt.UpdateLastDownPosition(pPos);
-  pt.On();
+  pt_.UpdateMouse(pPos);
+  pt_.UpdateLastDownPosition(pPos);
+  pt_.On();
 
   bool bHit = false;
 
   if (!vDr_[0]->bFly)
-    bHit = (pt.GetDirection(vDr_[0]->pCs->GetPosition()).Length() <
+    bHit = (pt_.GetDirection(vDr_[0]->pCs->GetPosition()).Length() <
             fTowerClickRadius);
   else
     bHit =
-        (pt.GetDirection(vDr_[0]->GetPosition()).Length() < fDragonClickRadius);
+        (pt_.GetDirection(vDr_[0]->GetPosition()).Length() < fDragonClickRadius);
 
   if (bHit) {
     if (!vDr_[0]->bFly)
@@ -363,7 +363,7 @@ void LevelController::OnMouseDown(Point pPos) {
     vDr_[0]->Toggle();
   } else {
     if (!vDr_[0]->bFly) {
-      fPoint fFb = pt.GetDirection(vDr_[0]->GetPosition() + Point(-10, -25));
+      fPoint fFb = pt_.GetDirection(vDr_[0]->GetPosition() + Point(-10, -25));
 
       fFb.Normalize(100);
       vDr_[0]->Fire(fFb);
@@ -372,11 +372,11 @@ void LevelController::OnMouseDown(Point pPos) {
 }
 
 void LevelController::OnMouseUp() {
-  float fTime = float(pt.Off());
+  float fTime = float(pt_.Off());
   fTime = fTime / nFramesInSecond;
 
   if (vDr_[0]->bFly && fTime <= .2 && !bTakeOffToggle_ &&
-      pt.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->nRadius) {
+      pt_.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->nRadius) {
     fPoint fFb = vDr_[0]->fVel;
 
     fFb.Normalize(100);
@@ -597,7 +597,7 @@ void LevelController::Update() {
   CleanUp(lsMegaSliminess_);
   CleanUp(lsSpawnedGenerators_);
 
-  pt.Update();
+  pt_.Update();
 
   if (bFirstUpdate_) {
     bFirstUpdate_ = false;
@@ -629,7 +629,7 @@ void LevelController::Update() {
   EntityListController::Update();
 
   if (pGl->GetGameConfig().IsPcVersion() && !pGl->GetGameConfig().IsKeyboardControls()) {
-    mc_.bPressed = pt.bPressed;
+    mc_.bPressed = pt_.bPressed;
     mc_.DrawCursor(pGl->GetGraphics());
   }
   pGl->RefreshAll();
@@ -652,9 +652,9 @@ void LevelController::Update() {
       }
     }
   } else {
-    if (pt.bPressed) {
+    if (pt_.bPressed) {
       fPoint v = vDr_[0]->fVel;
-      fPoint d = pt.GetDirection(vDr_[0]->GetPosition());
+      fPoint d = pt_.GetDirection(vDr_[0]->GetPosition());
 
       if (d.Length() == 0)
         d = v;
@@ -713,7 +713,7 @@ void LevelController::Update() {
 
       if (!vDr_[0]->bFly) {
         vDr_[0]->Fire(fp);
-        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+        pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
     }
 

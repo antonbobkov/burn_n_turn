@@ -185,8 +185,8 @@ FireballBonus Dragon::GetAllBonuses() {
   return fbRet;
 }
 
-Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
-               ImageSequence imgFly_, ButtonSet bt_)
+Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
+               ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_)
     : Critter(13,
               pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
@@ -194,7 +194,8 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
       bFly(), bCarry(false), cCarry(' '), nPrCr(0), nExtraFireballs(0),
       nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
-      pAd(pAd_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_), bt(bt_) {
+      pAd(pAd_), pPt(pPt_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_),
+      bt(bt_) {
   nFireballCount = GetAllBonuses().uMap["total"];
 
   if (pCs != nullptr && pCs->pDrag == nullptr) {
@@ -401,27 +402,30 @@ void Dragon::Fire(fPoint fDir) {
     pAd->pGl->PlaySound("shoot");
 }
 
+void Dragon::TakeOff() {
+  pAd->pGl->PlaySound("leave_tower");
+
+  bFly = true;
+  bTookOff = true;
+
+  pAd->tutOne->FlyOn();
+
+  SimpleVisualEntity::seq = imgFly;
+  SimpleVisualEntity::dPriority = 5;
+
+  pCs->pDrag = nullptr;
+  pCs = nullptr;
+
+  fVel = pPt->GetFlightDirection(GetPosition());
+
+  if (fVel.Length() == 0)
+    fVel = fPoint(0, -1);
+  fVel.Normalize(leash.speed);
+}
+
 void Dragon::Toggle() {
   if (!bFly) {
-    pAd->pGl->PlaySound("leave_tower");
-
-    bFly = true;
-    bTookOff = true;
-
-    pAd->tutOne->FlyOn();
-
-    SimpleVisualEntity::seq = imgFly;
-    SimpleVisualEntity::dPriority = 5;
-
-    pCs->pDrag = nullptr;
-    pCs = nullptr;
-
-    fVel = pAd->pt.GetFlightDirection(GetPosition());
-
-    if (fVel.Length() == 0)
-      fVel = fPoint(0, -1);
-    fVel.Normalize(leash.speed);
-
+    TakeOff();
     return;
   }
 
@@ -431,7 +435,7 @@ void Dragon::Toggle() {
     if (pC->pDrag != nullptr || bTookOff || pC->bBroken)
       continue;
 
-    pAd->pt.Off();
+    pPt->Off();
 
     bFly = false;
 

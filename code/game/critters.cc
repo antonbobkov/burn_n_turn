@@ -577,20 +577,7 @@ void Castle::OnKnight(char cWhat) {
     nPrincesses = 0;
 
     if (pDrag != nullptr) {
-
-      pDrag->bFly = true;
-      pDrag->bTookOff = true;
-
-      pDrag->SimpleVisualEntity::seq = pDrag->imgFly;
-      pDrag->SimpleVisualEntity::dPriority = 5;
-
-      pDrag->pCs = nullptr;
-
-      pDrag->fVel = pAv->pt.GetDirection(GetPosition());
-      if (pDrag->fVel.Length() == 0)
-        pDrag->fVel = fPoint(0, -1);
-      pDrag->fVel.Normalize(pDrag->leash.speed);
-
+      pDrag->TakeOff();
       pDrag = nullptr;
     }
 
