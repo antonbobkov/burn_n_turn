@@ -483,10 +483,9 @@ void DragonGameController::StartUp(DragonGameController *pSelf_) {
 
   for (int i = 0; i < (int)vLvl.size(); ++i) {
     auto pAd = std::make_unique<LevelController>(
-        pSelf, rBound, Color(0, 0, 0), vLvl[i]);
+        pSelf, rBound, Color(0, 0, 0), vLvl[i],
+        std::make_unique<SoundControls>(bckgTemplate));
     pAd->Init(pAd.get(), vLvl[i]);
-
-    pAd->SetSoundControls(std::make_unique<SoundControls>(bckgTemplate));
 
     // game level
     vCnt.emplace_back(std::move(pAd));

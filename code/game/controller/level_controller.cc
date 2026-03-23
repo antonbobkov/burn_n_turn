@@ -131,7 +131,8 @@ static const float fSpreadFactor = 2.0f;
 LevelController::~LevelController() = default;
 
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
-                                 Color c, const LevelLayout &lvl)
+                                 Color c, const LevelLayout &lvl,
+                                 std::unique_ptr<SoundControls> pSc)
     : EntityListController(pGl_, rBound, c),
       bFirstUpdate_(true), bGhostTime_(false), bTimerFlash_(false), bBlink_(true),
       bLeft_(false), bCh_(false), bLeftDown_(false), bRightDown_(false),
@@ -139,6 +140,7 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
       pGr_(0), bTakeOffToggle_(false),
       tutOne(std::make_unique<TutorialLevelOne>()),
       tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText_(),
+      pSc_(std::move(pSc)),
       mc_(pGl->GetImgSeq("claw"), Point()) {}
 
 Dragon *LevelController::FindDragon(Dragon *p) {
@@ -521,10 +523,6 @@ int LevelController::GetLoseTimerFrame() const {
 void LevelController::StopMusic() {
   if (pSc_)
     pSc_->nTheme = -1;
-}
-
-void LevelController::SetSoundControls(std::unique_ptr<SoundControls> p) {
-  pSc_ = std::move(p);
 }
 
 Castle *LevelController::GetFirstCastle() {

@@ -51,7 +51,7 @@ struct LevelController : public EntityListController {
 
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
-                  const LevelLayout &lvl);
+                  const LevelLayout &lvl, std::unique_ptr<SoundControls> pSc);
   ~LevelController();
 
   void Init(LevelController *pSelf, const LevelLayout &lvl);
@@ -103,8 +103,6 @@ struct LevelController : public EntityListController {
   int GetSlimeCount() const { return nSlimeNum_; }
   /** Kill all active slimes/sliminess and trigger mega-generation at centroid. */
   void DoSlimeMassKill();
-
-  void SetSoundControls(std::unique_ptr<SoundControls> p);
 
   Castle *GetFirstCastle();
   std::vector<Castle *> GetCastlePointers();
