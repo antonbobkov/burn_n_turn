@@ -538,11 +538,8 @@ std::vector<Castle *> LevelController::GetCastlePointers() {
   return out;
 }
 
-std::vector<Road *> LevelController::GetRoadPointers() {
-  std::vector<Road *> out;
-  for (auto &u : vRd_)
-    out.push_back(u.get());
-  return out;
+void LevelController::GetRandomRoadLocation(Point &p, Point &v) {
+  vRd_[rand() % vRd_.size()]->RoadMap(p, v);
 }
 
 void LevelController::DoSlimeMassKill() {

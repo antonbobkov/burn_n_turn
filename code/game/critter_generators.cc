@@ -96,8 +96,7 @@ void PrincessGenerator::Update() {
 
     Point p, v;
 
-    std::vector<Road *> vRd = pBc->GetRoadPointers();
-    vRd[rand() % vRd.size()]->RoadMap(p, v);
+    pBc->GetRandomRoadLocation(p, v);
 
     fPoint vel(v);
 
@@ -145,8 +144,7 @@ void MageGenerator::Update() {
 void MageGenerator::MageGenerate() {
   Point p, v;
 
-  std::vector<Road *> vRd = pBc->GetRoadPointers();
-  vRd[rand() % vRd.size()]->RoadMap(p, v);
+  pBc->GetRandomRoadLocation(p, v);
 
   fPoint vel(v);
 
@@ -189,8 +187,7 @@ void TraderGenerator::Update() {
 
     Point p, v;
 
-    std::vector<Road *> vRd = pBc->GetRoadPointers();
-    vRd[rand() % vRd.size()]->RoadMap(p, v);
+    pBc->GetRandomRoadLocation(p, v);
 
     fPoint vel(v);
     vel.Normalize(fTraderSpeed);

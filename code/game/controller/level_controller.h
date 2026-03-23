@@ -108,7 +108,8 @@ struct LevelController : public EntityListController {
 
   Castle *GetFirstCastle();
   std::vector<Castle *> GetCastlePointers();
-  std::vector<Road *> GetRoadPointers();
+  /** Pick a random road and return its spawn point and direction. */
+  void GetRandomRoadLocation(Point &p, Point &v);
 
  private:
   friend struct AdNumberDrawer;
