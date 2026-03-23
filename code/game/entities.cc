@@ -209,8 +209,8 @@ void SoundControls::Update() {
 }
 
 void BonusScore::Update() {
-  if (pAc->bGhostTime)
-    this->Destroy();
+  if (pAc->IsGhostTime())
+    bExist = false;
 
   if (t.Tick()) {
     ++nC;

@@ -10,6 +10,7 @@
 #include <memory>
 
 struct LevelController;
+struct PositionTracker;
 
 struct DragonLeash {
   fPoint lastVel;
@@ -78,6 +79,7 @@ struct Dragon : public Critter {
   Timer tRegenUnlock;
 
   LevelController *pAd;
+  PositionTracker *pPt;
 
   Castle *pCs;
 
@@ -86,7 +88,7 @@ struct Dragon : public Critter {
 
   ButtonSet bt;
 
-  Dragon(Castle *pCs_, LevelController *pAd_,
+  Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
          ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
 
   void Update() override;
@@ -98,6 +100,9 @@ struct Dragon : public Critter {
   void AddBonus(std::unique_ptr<TimedFireballBonus> pBonus, bool bSilent = false);
 
   void Fire(fPoint fDir);
+
+  /** Leave the tower: set flying state, initial velocity from cursor direction. */
+  void TakeOff();
 
   void Toggle();
 };

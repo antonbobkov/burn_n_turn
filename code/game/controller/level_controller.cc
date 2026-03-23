@@ -30,27 +30,27 @@ struct AdNumberDrawer : public Entity {
       pAd->pGl->GetNumberDrawer()->DrawNumber(
           pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 27 * 4, 4), 7);
 
-      if (pAd->bBlink) {
+      if (pAd->bBlink_) {
         Color c(255, 255, 0);
 
-        if (pAd->bTimerFlash)
+        if (pAd->bTimerFlash_)
           c = Color(255, 0, 0);
 
         pAd->pGl->GetNumberDrawer()->DrawColorNumber(
-            (pAd->t.nPeriod - pAd->t.nTimer) / nFramesInSecond,
+            (pAd->t_.nPeriod - pAd->t_.nTimer) / nFramesInSecond,
             Point(pAd->rBound.sz.x - 14 * 4, 4), c, 4);
         pAd->pGl->GetNumberDrawer()->DrawColorWord(
             "time:", Point(pAd->rBound.sz.x - 19 * 4, 4), c);
       }
 
       pAd->pGl->GetNumberDrawer()->DrawNumber(
-          pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
+          pAd->nLvl_, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
 
       pAd->pGl->GetNumberDrawer()->DrawWord("score:",
                                             Point(pAd->rBound.sz.x - 33 * 4, 4));
       pAd->pGl->GetNumberDrawer()->DrawWord("level:",
                                             Point(pAd->rBound.sz.x - 9 * 4, 4));
-      if (pAd->bCh) {
+      if (pAd->bCh_) {
         pAd->pGl->GetNumberDrawer()->DrawColorWord(
             "invincible", Point(pAd->rBound.sz.x - 44 * 4, 4), Color(0, 255, 0));
       }
@@ -58,7 +58,7 @@ struct AdNumberDrawer : public Entity {
       pAd->pGl->GetNumberDrawer()->DrawNumber(
           pAd->pGl->GetScore(), Point(pAd->rBound.sz.x - 17 * 4, 4), 7);
       pAd->pGl->GetNumberDrawer()->DrawNumber(
-          pAd->nLvl, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
+          pAd->nLvl_, Point(pAd->rBound.sz.x - 3 * 4, 4), 2);
 
       pAd->pGl->GetNumberDrawer()->DrawWord("score:",
                                             Point(pAd->rBound.sz.x - 23 * 4, 4));
@@ -88,8 +88,8 @@ struct BonusDrawer : public Entity {
 
     Point p(1, 3);
 
-    for (int nDr = 0; nDr < (int)pAd->vDr.size(); ++nDr) {
-      auto &lst = pAd->vDr[nDr]->lsBonuses;
+    for (int nDr = 0; nDr < (int)pAd->vDr_.size(); ++nDr) {
+      auto &lst = pAd->vDr_[nDr]->lsBonuses;
 
       for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
         TimedFireballBonus *pBns = itr->get();
@@ -112,7 +112,7 @@ struct BonusDrawer : public Entity {
 
       p.x = 3;
 
-      for (int i = 0; i < pAd->vDr[nDr]->nFireballCount; ++i) {
+      for (int i = 0; i < pAd->vDr_[nDr]->nFireballCount; ++i) {
         pDr->Draw(pAd->pGl->GetImgSeq("fireball_icon").GetImage(), p, false);
 
         p.x += 7;
@@ -131,64 +131,67 @@ static const float fSpreadFactor = 2.0f;
 LevelController::~LevelController() = default;
 
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
-                                 Color c, const LevelLayout &lvl)
+                                 Color c, const LevelLayout &lvl,
+                                 std::unique_ptr<SoundControls> pSc)
     : EntityListController(pGl_, rBound, c),
-      bFirstUpdate(true), bGhostTime(false), bTimerFlash(false), bBlink(true),
-      bLeft(false), bCh(false), bLeftDown(false), bRightDown(false),
-      nLastDir(0), bWasDirectionalInput(0), nLvl(lvl.nLvl), nSlimeNum(0),
-      pGr(0), bTakeOffToggle(false),
+      bFirstUpdate_(true), bGhostTime_(false), bTimerFlash_(false), bBlink_(true),
+      bLeft_(false), bCh_(false), bLeftDown_(false), bRightDown_(false),
+      nLastDir_(0), bWasDirectionalInput_(0), nLvl_(lvl.nLvl), nSlimeNum_(0),
+      pGr_(0), bTakeOffToggle_(false),
       tutOne(std::make_unique<TutorialLevelOne>()),
-      tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText(),
-      mc(pGl->GetImgSeq("claw"), Point()) {}
+      tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText_(),
+      pSc_(std::move(pSc)),
+      mc_(pGl->GetImgSeq("claw"), Point()) {}
 
 Dragon *LevelController::FindDragon(Dragon *p) {
-  for (size_t i = 0; i < vDr.size(); ++i)
-    if (vDr[i].get() == p)
-      return vDr[i].get();
+  for (size_t i = 0; i < vDr_.size(); ++i)
+    if (vDr_[i].get() == p)
+      return vDr_[i].get();
   return nullptr;
 }
 
-void LevelController::Init(const LevelLayout &lvl) {
+void LevelController::Init(LevelController *pSelf, const LevelLayout &lvl) {
+  this->pSelf = pSelf;
   SuppressRefresh();
 
-  tLoseTimer.nPeriod = 0;
+  tLoseTimer_.nPeriod = 0;
 
   AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
   AddOwnedEntity(std::make_unique<BonusDrawer>(this));
 
-  pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, this,
-                                                 lvl.blKnightGen);
-  pPGen = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, this);
-  pTGen = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, this);
-  pMGen = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
-                                          rBound, this);
+  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
+                                                  lvl.blKnightGen);
+  pPGen_ = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, pSelf);
+  pTGen_ = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, pSelf);
+  pMGen_ = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
+                                           rBound, pSelf);
 
-  pGr = pKnightGen.get();
-  pMgGen = pMGen.get();
+  pGr_ = pKnightGen_.get();
+  pMgGen_ = pMGen_.get();
 
   int i;
   for (i = 0; i < (int)lvl.vRoadGen.size(); ++i)
-    vRd.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], this));
+    vRd_.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], pSelf));
 
   for (i = 0; i < (int)lvl.vCastleLoc.size(); ++i)
-    vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, this));
+    vCs_.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
 
-  t = Timer(lvl.nTimer);
+  t_ = Timer(lvl.nTimer);
 
-  vDr.push_back(std::make_unique<Dragon>(
-      vCs[0].get(), this, pGl->GetImgSeq("dragon_stable"),
+  vDr_.push_back(std::make_unique<Dragon>(
+      vCs_[0].get(), pSelf, &pt_, pGl->GetImgSeq("dragon_stable"),
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
-  if (vDr.back()->pCs != nullptr)
-    vDr.back()->pCs->pDrag = vDr.back().get();
+  if (vDr_.back()->pCs != nullptr)
+    vDr_.back()->pCs->pDrag = vDr_.back().get();
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
-  pTutorialText =
+  pTutorialText_ =
       std::make_unique<TutorialTextEntity>(1, pos, pGl->GetNumberDrawer(), pGl);
 
   if (pGl->GetGameConfig().IsPcVersion()) {
-    if (nLvl == 1) {
-      tutOne->pTexter = pTutorialText.get();
+    if (nLvl_ == 1) {
+      tutOne->pTexter = pTutorialText_.get();
       const GameConfig &cfg = pGl->GetGameConfig();
       if (cfg.IsJoystickTutorial()) {
         tutOne->sSteerMessage    = "steer with joystick";
@@ -209,8 +212,8 @@ void LevelController::Init(const LevelLayout &lvl) {
       tutOne->Update();
     }
 
-    if (nLvl == 2) {
-      tutTwo->pTexter = pTutorialText.get();
+    if (nLvl_ == 2) {
+      tutTwo->pTexter = pTutorialText_.get();
       tutTwo->Update();
     }
   }
@@ -221,14 +224,14 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
   if (pGl->GetGameConfig().IsKeyboardControls()) {
     if (!bUp) {
       if (c == GUI_LEFT)
-        bLeftDown = true;
+        bLeftDown_ = true;
       else if (c == GUI_RIGHT)
-        bRightDown = true;
+        bRightDown_ = true;
     } else {
       if (c == GUI_LEFT)
-        bLeftDown = false;
+        bLeftDown_ = false;
       else if (c == GUI_RIGHT)
-        bRightDown = false;
+        bRightDown_ = false;
     }
   }
 
@@ -242,55 +245,57 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
     }
 
     if (c == 'i')
-      bCh = !bCh;
+      bCh_ = !bCh_;
 
     if (c == 'g')
-      pGr->Generate(true);
+      pGr_->Generate(true);
 
     if (c == 'l')
       MegaGeneration();
 
     if (c == 'm')
-      pMgGen->MageGenerate();
+      pMgGen_->MageGenerate();
 
     if (c == '6')
-      std::cout << "Slimes: " << nSlimeNum << "\n";
+      std::cout << "Slimes: " << nSlimeNum_ << "\n";
 
     if (c == 't')
-      t.nTimer = t.nPeriod - 1;
+      t_.nTimer = t_.nPeriod - 1;
 
     if (c >= GUI_F1 && c <= GUI_F10)
-      for (int i = 0; i < (int)vDr.size(); ++i)
-        vDr[i]->AddBonus(vDr[i]->GetBonus(c - GUI_F1 + 1, nBonusCheatTime));
+      for (int i = 0; i < (int)vDr_.size(); ++i)
+        vDr_[i]->AddBonus(vDr_[i]->GetBonus(c - GUI_F1 + 1, nBonusCheatTime));
   }
 
   if (pGl->GetGameConfig().IsPcVersion() && c == GUI_ESCAPE)
     pGl->EnterMenu();
 
-  for (int i = 0; i < (int)vDr.size(); ++i)
-    if (vDr[i]->bt.IsSpace(c)) {
-      if (!vDr[i]->bFly)
-        vDr[i]->Toggle();
+  for (int i = 0; i < (int)vDr_.size(); ++i)
+    if (vDr_[i]->bt.IsSpace(c)) {
+      if (!vDr_[i]->bFly)
+        vDr_[i]->Toggle();
       else {
-        vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
+        fPoint fFb = vDr_[0]->fVel;
+        fFb.Normalize(100);
+        vDr_[0]->Fire(fFb);
       }
     }
 
   if (pGl->GetGameConfig().IsKeyboardControls()) {
-    if (nLastDir == 0) {
+    if (nLastDir_ == 0) {
       bool flag = true;
       if (c == GUI_LEFT)
-        nLastDir = 1;
+        nLastDir_ = 1;
       else if (c == GUI_RIGHT)
-        nLastDir = 2;
+        nLastDir_ = 2;
       else if (c == GUI_DOWN)
-        nLastDir = 3;
+        nLastDir_ = 3;
       else if (c == GUI_UP)
-        nLastDir = 4;
+        nLastDir_ = 4;
       else
         flag = false;
       if (flag)
-        bWasDirectionalInput = true;
+        bWasDirectionalInput_ = true;
     } else {
       int dir = 0;
       if (c == GUI_LEFT)
@@ -301,15 +306,15 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
         dir = 3;
       else if (c == GUI_UP)
         dir = 4;
-      fPoint fp = ComposeDirection(nLastDir, dir);
+      fPoint fp = ComposeDirection(nLastDir_, dir);
       fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
       fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-      if (!vDr[0]->bFly) {
-        vDr[0]->Fire(fp);
-        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+      if (!vDr_[0]->bFly) {
+        vDr_[0]->Fire(fp);
+        pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
-      bWasDirectionalInput = false;
+      bWasDirectionalInput_ = false;
     }
   }
 }
@@ -324,8 +329,8 @@ void LevelController::OnMouse(Point pPos) {
   pPos.x *= Crd(fX);
   pPos.y *= Crd(fY);
 
-  pt.UpdateMouse(pPos);
-  mc.SetCursorPos(pPos);
+  pt_.UpdateMouse(pPos);
+  mc_.SetCursorPos(pPos);
 }
 
 void LevelController::OnMouseDown(Point pPos) {
@@ -338,92 +343,100 @@ void LevelController::OnMouseDown(Point pPos) {
   pPos.x *= Crd(fX);
   pPos.y *= Crd(fY);
 
-  pt.UpdateMouse(pPos);
-  pt.UpdateLastDownPosition(pPos);
-  pt.On();
+  pt_.UpdateMouse(pPos);
+  pt_.UpdateLastDownPosition(pPos);
+  pt_.On();
 
   bool bHit = false;
 
-  if (!vDr[0]->bFly)
-    bHit = (pt.GetDirection(vDr[0]->pCs->GetPosition()).Length() <
+  if (!vDr_[0]->bFly)
+    bHit = (pt_.GetDirection(vDr_[0]->pCs->GetPosition()).Length() <
             fTowerClickRadius);
   else
     bHit =
-        (pt.GetDirection(vDr[0]->GetPosition()).Length() < fDragonClickRadius);
+        (pt_.GetDirection(vDr_[0]->GetPosition()).Length() < fDragonClickRadius);
 
   if (bHit) {
-    if (!vDr[0]->bFly)
-      bTakeOffToggle = true;
+    if (!vDr_[0]->bFly)
+      bTakeOffToggle_ = true;
 
-    vDr[0]->Toggle();
+    vDr_[0]->Toggle();
   } else {
-    if (!vDr[0]->bFly) {
-      fPoint fFb = pt.GetDirection(vDr[0]->GetPosition() + Point(-10, -25));
+    if (!vDr_[0]->bFly) {
+      fPoint fFb = pt_.GetDirection(vDr_[0]->GetPosition() + Point(-10, -25));
+
+
       fFb.Normalize(100);
-      vDr[0]->Fire(fFb);
+      vDr_[0]->Fire(fFb);
     }
   }
 }
 
 void LevelController::OnMouseUp() {
-  float fTime = float(pt.Off());
+  float fTime = float(pt_.Off());
   fTime = fTime / nFramesInSecond;
 
-  if (vDr[0]->bFly && fTime <= .2 && !bTakeOffToggle &&
-      pt.GetDirection(vDr[0]->GetPosition()).Length() > vDr[0]->GetRadius()) {
-    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
+  if (vDr_[0]->bFly && fTime <= .2 && !bTakeOffToggle_ &&
+      pt_.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->nRadius) {
+    fPoint fFb = vDr_[0]->fVel;
+
+    fFb.Normalize(100);
+    vDr_[0]->Fire(fFb);
   }
 
-  if (bTakeOffToggle)
-    bTakeOffToggle = false;
+  if (bTakeOffToggle_)
+    bTakeOffToggle_ = false;
 }
 
 void LevelController::Fire() {
-  if (vDr[0]->bFly) {
-    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
+  if (vDr_[0]->bFly) {
+    fPoint fFb = vDr_[0]->fVel;
+
+    fFb.Normalize(100);
+    vDr_[0]->Fire(fFb);
   }
 }
 
 float LevelController::GetCompletionRate() {
   float fCap = 0;
-  for (int i = 0; i < (int)vCs.size(); ++i)
-    fCap += vCs[i]->nPrincesses;
+  for (int i = 0; i < (int)vCs_.size(); ++i)
+    fCap += vCs_[i]->nPrincesses;
 
-  fCap /= (4 * vCs.size());
+  fCap /= (4 * vCs_.size());
 
   return fCap;
 }
 
 void LevelController::AddBonusAnimation(
     std::unique_ptr<FireballBonusAnimation> p) {
-  lsBonus.push_back(std::move(p));
+  lsBonus_.push_back(std::move(p));
 }
 
 std::vector<FireballBonusAnimation *> LevelController::GetBonusAnimations() {
   std::vector<FireballBonusAnimation *> out;
-  for (auto &u : lsBonus)
+  for (auto &u : lsBonus_)
     out.push_back(u.get());
   return out;
 }
 
 void LevelController::AddSlime(std::unique_ptr<Slime> p) {
-  lsSlimes.push_back(std::move(p));
+  lsSlimes_.push_back(std::move(p));
 }
 
 void LevelController::AddSliminess(std::unique_ptr<Sliminess> p) {
-  lsSliminess.push_back(std::move(p));
+  lsSliminess_.push_back(std::move(p));
 }
 
 void LevelController::AddMegaSlime(std::unique_ptr<MegaSlime> p) {
-  lsMegaSlimes.push_back(std::move(p));
+  lsMegaSlimes_.push_back(std::move(p));
 }
 
 void LevelController::AddMegaSliminess(std::unique_ptr<MegaSliminess> p) {
-  lsMegaSliminess.push_back(std::move(p));
+  lsMegaSliminess_.push_back(std::move(p));
 }
 
 void LevelController::AddSpawnedGenerator(std::unique_ptr<Entity> p) {
-  lsSpawnedGenerators.push_back(std::move(p));
+  lsSpawnedGenerators_.push_back(std::move(p));
 }
 
 std::vector<ConsumableEntity *> LevelController::GetPeoplePointers() {
@@ -435,9 +448,9 @@ std::vector<ConsumableEntity *> LevelController::GetPeoplePointers() {
 
 std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
   std::vector<ConsumableEntity *> out = GetPeoplePointers();
-  for (auto &u : lsSlimes)
+  for (auto &u : lsSlimes_)
     out.push_back(u.get());
-  for (auto &u : lsMegaSlimes)
+  for (auto &u : lsMegaSlimes_)
     out.push_back(u.get());
   return out;
 }
@@ -446,44 +459,44 @@ std::vector<Entity *> LevelController::GetNonOwnedEntities() {
   std::vector<Entity *> out;
   for (auto &u : lsPpl_)
     out.push_back(u.get());
-  for (size_t i = 0; i < vCs.size(); ++i)
-    out.push_back(vCs[i].get());
-  for (size_t i = 0; i < vRd.size(); ++i)
-    out.push_back(vRd[i].get());
-  if (pTutorialText)
-    out.push_back(pTutorialText.get());
-  if (pSc)
-    out.push_back(pSc.get());
-  for (auto &u : lsBonus)
+  for (size_t i = 0; i < vCs_.size(); ++i)
+    out.push_back(vCs_[i].get());
+  for (size_t i = 0; i < vRd_.size(); ++i)
+    out.push_back(vRd_[i].get());
+  if (pTutorialText_)
+    out.push_back(pTutorialText_.get());
+  if (pSc_)
+    out.push_back(pSc_.get());
+  for (auto &u : lsBonus_)
     out.push_back(u.get());
-  for (auto &u : lsSlimes)
+  for (auto &u : lsSlimes_)
     out.push_back(u.get());
-  for (auto &u : lsMegaSlimes)
+  for (auto &u : lsMegaSlimes_)
     out.push_back(u.get());
-  for (auto &u : lsSliminess) {
-    out.push_back(u.get());
-    if (u->pSlm_)
-      out.push_back(u->pSlm_.get());
-  }
-  for (auto &u : lsMegaSliminess) {
+  for (auto &u : lsSliminess_) {
     out.push_back(u.get());
     if (u->pSlm_)
       out.push_back(u->pSlm_.get());
   }
-  for (size_t i = 0; i < vDr.size(); ++i)
-    out.push_back(vDr[i].get());
-  for (size_t i = 0; i < vDr.size(); ++i)
-    for (auto &u : vDr[i]->lsBonuses)
+  for (auto &u : lsMegaSliminess_) {
+    out.push_back(u.get());
+    if (u->pSlm_)
+      out.push_back(u->pSlm_.get());
+  }
+  for (size_t i = 0; i < vDr_.size(); ++i)
+    out.push_back(vDr_[i].get());
+  for (size_t i = 0; i < vDr_.size(); ++i)
+    for (auto &u : vDr_[i]->lsBonuses)
       out.push_back(u.get());
-  if (pKnightGen)
-    out.push_back(pKnightGen.get());
-  if (pPGen)
-    out.push_back(pPGen.get());
-  if (pTGen)
-    out.push_back(pTGen.get());
-  if (pMGen)
-    out.push_back(pMGen.get());
-  for (auto &u : lsSpawnedGenerators)
+  if (pKnightGen_)
+    out.push_back(pKnightGen_.get());
+  if (pPGen_)
+    out.push_back(pPGen_.get());
+  if (pTGen_)
+    out.push_back(pTGen_.get());
+  if (pMGen_)
+    out.push_back(pMGen_.get());
+  for (auto &u : lsSpawnedGenerators_)
     out.push_back(u.get());
   return out;
 }
@@ -499,136 +512,212 @@ void LevelController::MegaGeneration(Point p) {
   AddMegaSliminess(std::make_unique<MegaSliminess>(p, this));
 }
 
+void LevelController::StartLoseTimer() {
+  if (tLoseTimer_.nPeriod == 0)
+    tLoseTimer_ = Timer(nFramesInSecond * 3);
+}
+
+int LevelController::GetLoseTimerFrame() const {
+  return tLoseTimer_.nTimer / 2;
+}
+
+void LevelController::StopMusic() {
+  if (pSc_)
+    pSc_->nTheme = -1;
+}
+
+Castle *LevelController::GetFirstCastle() {
+  return vCs_[0].get();
+}
+
+std::vector<Castle *> LevelController::GetCastlePointers() {
+  std::vector<Castle *> out;
+  for (auto &u : vCs_)
+    out.push_back(u.get());
+  return out;
+}
+
+void LevelController::GetRandomRoadLocation(Point &p, Point &v) {
+  vRd_[rand() % vRd_.size()]->RoadMap(p, v);
+}
+
+void LevelController::DoSlimeMassKill() {
+  std::vector<Point> vDeadSlimes;
+
+  for (auto &u : lsSlimes_) {
+    if (!u->bExist)
+      continue;
+    vDeadSlimes.push_back(u->GetPosition());
+    u->OnHit('M');
+  }
+
+  for (auto &u : lsMegaSlimes_) {
+    if (!u->bExist)
+      continue;
+    vDeadSlimes.push_back(u->GetPosition());
+    u->OnHit('M');
+  }
+
+  for (auto &u : lsSliminess_) {
+    if (!u->bExist)
+      continue;
+    vDeadSlimes.push_back(u->GetPosition());
+    u->Kill();
+  }
+
+  for (auto &u : lsMegaSliminess_) {
+    if (!u->bExist)
+      continue;
+    vDeadSlimes.push_back(u->GetPosition());
+    u->Kill();
+  }
+
+  if (vDeadSlimes.empty())
+    throw SimpleException("No slimes found!");
+
+  fPoint fAvg(0, 0);
+  for (int i = 0; i < (int)vDeadSlimes.size(); ++i)
+    fAvg += vDeadSlimes[i];
+  fAvg /= float(vDeadSlimes.size());
+
+  MegaGeneration(fAvg.ToPnt());
+
+  for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
+    AddOwnedEntity(std::make_unique<FloatingSlime>(
+        pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
+        fAvg.ToPnt(), nFramesInSecond * 1));
+  }
+}
+
 void LevelController::Update() {
   CleanUp(lsPpl_);
-  CleanUp(lsBonus);
-  CleanUp(lsSlimes);
-  CleanUp(lsMegaSlimes);
-  CleanUp(lsSliminess);
-  CleanUp(lsMegaSliminess);
-  CleanUp(lsSpawnedGenerators);
+  CleanUp(lsBonus_);
+  CleanUp(lsSlimes_);
+  CleanUp(lsMegaSlimes_);
+  CleanUp(lsSliminess_);
+  CleanUp(lsMegaSliminess_);
+  CleanUp(lsSpawnedGenerators_);
 
-  pt.Update();
+  pt_.Update();
 
-  if (bFirstUpdate) {
-    bFirstUpdate = false;
+  if (bFirstUpdate_) {
+    bFirstUpdate_ = false;
 
-    if (nLvl != 1 && nLvl != 4 && nLvl != 7 && nLvl != 10) {
-      vDr[0]->RecoverBonuses();
+    if (nLvl_ != 1 && nLvl_ != 4 && nLvl_ != 7 && nLvl_ != 10) {
+      vDr_[0]->RecoverBonuses();
     }
     pGl->ClearBonusesToCarryOver();
   }
 
-  if (tLoseTimer.nPeriod == 0) {
-    if (!bGhostTime) {
-      if (nLvl <= 3)
-        pSc->SetTheme(BG_BACKGROUND);
-      else if (nLvl <= 6)
-        pSc->SetTheme(BG_BACKGROUND2);
+  if (tLoseTimer_.nPeriod == 0) {
+    if (!bGhostTime_) {
+      if (nLvl_ <= 3)
+        pSc_->nTheme = BG_BACKGROUND;
+      else if (nLvl_ <= 6)
+        pSc_->nTheme = BG_BACKGROUND2;
       else
-        pSc->SetTheme(BG_BACKGROUND3);
+        pSc_->nTheme = BG_BACKGROUND3;
     } else {
-      if (nLvl <= 3)
-        pSc->SetTheme(BG_SLOW_BACKGROUND);
-      else if (nLvl <= 6)
-        pSc->SetTheme(BG_SLOW_BACKGROUND2);
+      if (nLvl_ <= 3)
+        pSc_->nTheme = BG_SLOW_BACKGROUND;
+      else if (nLvl_ <= 6)
+        pSc_->nTheme = BG_SLOW_BACKGROUND2;
       else
-        pSc->SetTheme(BG_SLOW_BACKGROUND3);
+        pSc_->nTheme = BG_SLOW_BACKGROUND3;
     }
   }
 
   EntityListController::Update();
 
   if (pGl->GetGameConfig().IsPcVersion() && !pGl->GetGameConfig().IsKeyboardControls()) {
-    mc.bPressed = pt.bPressed;
-    mc.DrawCursor(pGl->GetGraphics());
+    mc_.bPressed = pt_.bPressed;
+    mc_.DrawCursor(pGl->GetGraphics());
   }
   pGl->RefreshAll();
 
-  if (tLoseTimer.nPeriod != 0 && tLoseTimer.Tick()) {
+  if (tLoseTimer_.nPeriod != 0 && tLoseTimer_.Tick()) {
     pGl->ShowGameOverScreen();
     return;
   }
 
-  tr.Update();
-  if (!vDr[0]->bFly) {
-    if (tr.IsTrigger()) {
-      fPoint p = tr.GetMovement();
+  tr_.Update();
+  if (!vDr_[0]->bFly) {
+    if (tr_.IsTrigger()) {
+      fPoint p = tr_.GetMovement();
 
       if (p.Length() > 50) {
         if (p.Length() > 250)
           p.Normalize(250);
 
-        vDr[0]->Fire(p);
+        vDr_[0]->Fire(p);
       }
     }
   } else {
-    if (pt.bPressed) {
-      fPoint v = vDr[0]->GetVel();
-      fPoint d = pt.GetDirection(vDr[0]->GetPosition());
+    if (pt_.bPressed) {
+      fPoint v = vDr_[0]->fVel;
+      fPoint d = pt_.GetDirection(vDr_[0]->GetPosition());
 
       if (d.Length() == 0)
         d = v;
 
       d.Normalize(v.Length());
-      fPoint newVel = v * fFlightCoefficient + d;
-      newVel.Normalize(vDr[0]->leash.speed);
-      vDr[0]->SetVel(newVel);
-    } else if (bLeftDown || bRightDown) {
-      fPoint v = vDr[0]->GetVel();
+
+      vDr_[0]->fVel = v * fFlightCoefficient + d;
+      vDr_[0]->fVel.Normalize(vDr_[0]->leash.speed);
+    } else if (bLeftDown_ || bRightDown_) {
+      fPoint v = vDr_[0]->fVel;
       fPoint d(v.y, v.x);
-      if (bLeftDown)
+      if (bLeftDown_)
         d.y *= -1;
       else
         d.x *= -1;
-      fPoint newVel2 = v * fFlightCoefficient * 1.2f + d;
-      newVel2.Normalize(vDr[0]->leash.speed);
-      vDr[0]->SetVel(newVel2);
+      vDr_[0]->fVel = v * fFlightCoefficient * 1.2f + d;
+      vDr_[0]->fVel.Normalize(vDr_[0]->leash.speed);
     }
   }
 
   if (pGl->GetGameConfig().IsFullVersion()) {
-    if (!bGhostTime) {
-      if (t.Tick()) {
-        bGhostTime = true;
+    if (!bGhostTime_) {
+      if (t_.Tick()) {
+        bGhostTime_ = true;
 
         if (!pGl->IsMusicOnSetting())
           pGl->PlaySound("E");
 
-        if (nLvl > 6)
-          pGr->Generate(true);
+        if (nLvl_ > 6)
+          pGr_->Generate(true);
       }
     }
 
-    if (!bTimerFlash) {
-      if (t.nPeriod - t.nTimer < 20 * nFramesInSecond) {
-        bTimerFlash = true;
-        tBlink = Timer(nFramesInSecond / 2);
+    if (!bTimerFlash_) {
+      if (t_.nPeriod - t_.nTimer < 20 * nFramesInSecond) {
+        bTimerFlash_ = true;
+        tBlink_ = Timer(nFramesInSecond / 2);
       }
     } else {
-      if (tBlink.Tick()) {
-        if (!pGl->IsMusicOnSetting() && !bGhostTime && !bBlink)
+      if (tBlink_.Tick()) {
+        if (!pGl->IsMusicOnSetting() && !bGhostTime_ && !bBlink_)
           pGl->PlaySound("D");
 
-        bBlink = !bBlink;
+        bBlink_ = !bBlink_;
       }
     }
   }
 
   if (pGl->GetGameConfig().IsKeyboardControls()) {
-    if (!bWasDirectionalInput)
-      nLastDir = 0;
+    if (!bWasDirectionalInput_)
+      nLastDir_ = 0;
     else {
-      fPoint fp = ComposeDirection(nLastDir, nLastDir);
+      fPoint fp = ComposeDirection(nLastDir_, nLastDir_);
       fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
       fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-      if (!vDr[0]->bFly) {
-        vDr[0]->Fire(fp);
-        pt.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
+      if (!vDr_[0]->bFly) {
+        vDr_[0]->Fire(fp);
+        pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
     }
 
-    bWasDirectionalInput = false;
+    bWasDirectionalInput_ = false;
   }
 }

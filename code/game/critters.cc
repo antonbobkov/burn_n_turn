@@ -17,9 +17,9 @@
 void SummonSkeletons(LevelController *pAc, Point p) {
   int nNum = 4;
 
-  if (pAc->nLvl > 6)
+  if (pAc->GetLevel() > 6)
     nNum = 6;
-  if (pAc->nLvl >= 10)
+  if (pAc->GetLevel() >= 10)
     nNum = 8;
 
   for (int i = 0; i < nNum; ++i) {
@@ -73,7 +73,7 @@ void Mage::OnHit(char /*cWhat*/) {
 
   pAc->pGl->SetAngry();
 
-  if (pAc->nLvl > 6)
+  if (pAc->GetLevel() > 6)
     SummonSlimes();
 }
 
@@ -173,9 +173,9 @@ void Knight::KnockBack() {
 }
 
 void Knight::Update() {
-  for (int i = 0; i < (int)pAc->vCs.size(); ++i)
-    if (this->HitDetection(pAc->vCs[i].get())) {
-      pAc->vCs[i]->OnKnight(GetType());
+  for (Castle *pC : pAc->GetCastlePointers())
+    if (this->HitDetection(pC)) {
+      pC->OnKnight(GetType());
 
       this->Destroy();
       break;
@@ -359,7 +359,7 @@ Slime::Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
               true),
       pAc(pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
-  ++pAc->nSlimeNum;
+  pAc->IncrementSlimeCount();
 }
 
 void Slime::RandomizeVelocity() {
@@ -373,7 +373,7 @@ void Slime::RandomizeVelocity() {
 
 Slime::~Slime() {
   if (pAc) {
-    --pAc->nSlimeNum;
+    pAc->DecrementSlimeCount();
   }
 }
 
@@ -404,59 +404,8 @@ void Slime::Update() {
 }
 
 void Slime::OnHit(char cWhat) {
-  if (pAc->nSlimeNum >= nSlimeMax && cWhat != 'M') {
-    std::vector<Point> vDeadSlimes;
-
-    for (auto &u : pAc->lsSlimes) {
-      if (!u->Exists())
-        continue;
-
-      vDeadSlimes.push_back(u->GetPosition());
-      u->OnHit('M');
-    }
-
-    for (auto &u : pAc->lsMegaSlimes) {
-      if (!u->Exists())
-        continue;
-
-      vDeadSlimes.push_back(u->GetPosition());
-      u->OnHit('M');
-    }
-
-    for (auto &u : pAc->lsSliminess) {
-      if (!u->Exists())
-        continue;
-
-      vDeadSlimes.push_back(u->GetPosition());
-      u->Destroy();
-    }
-
-    for (auto &u : pAc->lsMegaSliminess) {
-      if (!u->Exists())
-        continue;
-
-      vDeadSlimes.push_back(u->GetPosition());
-      u->Destroy();
-    }
-
-    if (vDeadSlimes.empty())
-      throw SimpleException("No slimes found!");
-
-    fPoint fAvg(0, 0);
-    for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
-      fAvg += vDeadSlimes[i];
-    }
-
-    fAvg /= float(vDeadSlimes.size());
-
-    pAc->MegaGeneration(fAvg.ToPnt());
-
-    for (int i = 0; i < (int)vDeadSlimes.size(); ++i) {
-      pAc->AddOwnedEntity(std::make_unique<FloatingSlime>(
-          pAc->pGl->GetImgSeq("slime_cloud"), vDeadSlimes[i],
-          fAvg.ToPnt(), nFramesInSecond * 1));
-    }
-
+  if (pAc->GetSlimeCount() >= nSlimeMax && cWhat != 'M') {
+    pAc->DoSlimeMassKill();
     return;
   }
 
@@ -494,7 +443,7 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
 
   pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
 
-  ++pAdv_->nSlimeNum;
+  pAdv_->IncrementSlimeCount();
 }
 
 void Sliminess::Update() {
@@ -513,7 +462,7 @@ void Sliminess::Destroy() {
 
 Sliminess::~Sliminess() {
   if (pAdv)
-    --pAdv->nSlimeNum;
+    pAdv->DecrementSlimeCount();
 }
 
 MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
@@ -560,13 +509,15 @@ void FloatingSlime::Update() {
 void Mage::Update() {
   if (bAngry) {
     if (!bCasting) {
-      int i = 0;
-      for (; i < (int)pAc->vCs.size(); ++i) {
-        fPoint p = pAc->vCs[i]->GetPosition() - fPos;
-        if (p.Length() < nSummonRadius)
+      bool bNearCastle = false;
+      for (Castle *pC : pAc->GetCastlePointers()) {
+        fPoint p = pC->GetPosition() - fPos;
+        if (p.Length() < nSummonRadius) {
+          bNearCastle = true;
           break;
+        }
       }
-      if (i == (int)pAc->vCs.size())
+      if (!bNearCastle)
         if (rand() % nSummonChance == 0) {
           bCasting = true;
           Critter::seq = pAc->pGl->GetImgSeq("mage_spell");
@@ -607,37 +558,23 @@ Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
       nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
 void Castle::OnKnight(char cWhat) {
-  if (pAv->bCh)
+  if (pAv->IsCheating())
     return;
 
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
       pAv->pGl->PlaySound("destroy_castle_sound");
-      pAv->pSc->SetTheme(-1);
+      pAv->StopMusic();
       Critter::seq = pAv->pGl->GetImgSeq("destroy_castle");
     }
 
-    if (pAv->tLoseTimer.nPeriod == 0)
-      pAv->tLoseTimer = Timer(nFramesInSecond * 3);
+    pAv->StartLoseTimer();
 
     bBroken = true;
     nPrincesses = 0;
 
     if (pDrag != nullptr) {
-
-      pDrag->bFly = true;
-      pDrag->bTookOff = true;
-
-      pDrag->SetSeq(pDrag->imgFly);
-      pDrag->SetPriority(5);
-
-      pDrag->pCs = nullptr;
-
-      fPoint dragVel = pAv->pt.GetDirection(GetPosition());
-      if (dragVel.Length() == 0)
-        dragVel = fPoint(0, -1);
-      pDrag->SetVel(fPoint::Normalized(dragVel, pDrag->leash.speed));
-
+      pDrag->TakeOff();
       pDrag = nullptr;
     }
 
@@ -690,7 +627,7 @@ void Castle::Draw(ScalingDrawer *pDr) {
     Critter::seq.nActive = 4;
 
   if (bBroken) {
-    Critter::seq.nActive = pAv->tLoseTimer.nTimer / 2;
+    Critter::seq.nActive = pAv->GetLoseTimerFrame();
     if (seq.nActive > (int)seq.vImage.size() - 1)
       seq.nActive = (int)seq.vImage.size() - 1;
   }
