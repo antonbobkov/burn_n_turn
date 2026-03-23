@@ -153,8 +153,7 @@ Dragon *LevelController::FindDragon(Dragon *p) {
   return nullptr;
 }
 
-void LevelController::Init(LevelController *pSelf, const LevelLayout &lvl) {
-  this->pSelf = pSelf;
+void LevelController::Init(const LevelLayout &lvl) {
   SuppressRefresh();
 
   tLoseTimer_.nPeriod = 0;
@@ -162,27 +161,27 @@ void LevelController::Init(LevelController *pSelf, const LevelLayout &lvl) {
   AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
   AddOwnedEntity(std::make_unique<BonusDrawer>(this));
 
-  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
+  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, this,
                                                   lvl.blKnightGen);
-  pPGen_ = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, pSelf);
-  pTGen_ = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, pSelf);
+  pPGen_ = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, this);
+  pTGen_ = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, this);
   pMGen_ = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
-                                           rBound, pSelf);
+                                           rBound, this);
 
   pGr_ = pKnightGen_.get();
   pMgGen_ = pMGen_.get();
 
   int i;
   for (i = 0; i < (int)lvl.vRoadGen.size(); ++i)
-    vRd_.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], pSelf));
+    vRd_.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], this));
 
   for (i = 0; i < (int)lvl.vCastleLoc.size(); ++i)
-    vCs_.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
+    vCs_.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, this));
 
   t_ = Timer(lvl.nTimer);
 
   vDr_.push_back(std::make_unique<Dragon>(
-      vCs_[0].get(), pSelf, &pt_, pGl->GetImgSeq("dragon_stable"),
+      vCs_[0].get(), this, &pt_, pGl->GetImgSeq("dragon_stable"),
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr_.back()->pCs != nullptr)

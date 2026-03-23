@@ -32,8 +32,6 @@ enum class TutorialEvent;
 struct LevelController : public EntityListController {
   std::string get_class_name() { return "LevelController"; }
 
-  LevelController *pSelf;
-
   /** Deliver a game event to the active tutorial handler. */
   void TutorialNotify(TutorialEvent event);
 
@@ -52,7 +50,7 @@ struct LevelController : public EntityListController {
                   const LevelLayout &lvl, std::unique_ptr<SoundControls> pSc);
   ~LevelController();
 
-  void Init(LevelController *pSelf, const LevelLayout &lvl);
+  void Init(const LevelLayout &lvl);
 
   void AddBonusAnimation(std::unique_ptr<FireballBonusAnimation> p);
   std::vector<FireballBonusAnimation *> GetBonusAnimations();
