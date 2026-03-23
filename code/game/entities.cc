@@ -130,9 +130,9 @@ BonusScore::BonusScore(LevelController *pAc_, Point p_, int nScore_)
 
 void SoundControls::Update() {
   if (nTheme != -1)
-    plr.SwitchTheme(nTheme);
+    plr->SwitchTheme(nTheme);
   else
-    plr.StopMusic();
+    plr->StopMusic();
 }
 
 /*virtual*/ void HighScoreShower::Draw(ScalingDrawer * /*pDr*/) {

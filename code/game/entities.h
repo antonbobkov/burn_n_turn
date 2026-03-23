@@ -334,7 +334,7 @@ public:
   std::string get_class_name() override { return "SoundControls"; }
 
   SoundControls(BackgroundMusicPlayer &plr_, int nTheme_)
-      : plr(plr_), nTheme(nTheme_) {}
+      : plr(&plr_), nTheme(nTheme_) {}
   SoundControls(const SoundControls &) = default;
   SoundControls &operator=(const SoundControls &) = delete;
 
@@ -343,7 +343,7 @@ public:
   void Update() override;
 
 private:
-  BackgroundMusicPlayer &plr;
+  BackgroundMusicPlayer *plr;
   int nTheme;
 };
 
