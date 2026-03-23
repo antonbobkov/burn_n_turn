@@ -11,20 +11,20 @@
 #include <string>
 #include <vector>
 
-struct DragonGameController;
-struct GameController;
-struct LevelLayout;
-struct MenuController;
+class DragonGameController;
+class GameController;
+class LevelLayout;
+class MenuController;
 class Preloader;
-struct ImageSequence;
-struct SoundSequence;
-struct TimedFireballBonus;
+class ImageSequence;
+class SoundSequence;
+class TimedFireballBonus;
 class FilePath;
 class Event;
 class Index;
-struct ScalingDrawer;
-struct NumberDrawer;
-struct FontWriter;
+class ScalingDrawer;
+class NumberDrawer;
+class FontWriter;
 template <typename T> class GraphicalInterface;
 template <typename T> class SoundInterface;
 class SoundInterfaceProxy;
@@ -32,7 +32,8 @@ class SoundInterfaceProxy;
 /** The realm's scroll of choices—sound, music, tutorial, fullscreen, cheats.
  * The menu keeper reads and writes these; they are saved between sessions.
  */
-struct DragonGameSettings {
+class DragonGameSettings {
+public:
   SavableVariable<int> snProgress;
   SavableVariable<bool> sbSoundOn;
   SavableVariable<bool> sbMusicOn;
@@ -47,7 +48,8 @@ struct DragonGameSettings {
 /** The great hall of the realm: where levels dwell, who holds the throne,
  * sights and sounds, the hero's tally, scrolls of choice, and the bard's song.
  */
-struct DragonGameController {
+class DragonGameController {
+public:
   DragonGameController(ScalingDrawer *pDr_, NumberDrawer *pNum_,
                        NumberDrawer *pBigNum_, FontWriter *pFancyNum_,
                        SoundInterface<Index> *pSndRaw_,

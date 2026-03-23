@@ -8,13 +8,13 @@
 #include <memory>
 #include <vector>
 
-struct DragonGameController;
+class DragonGameController;
 class FilePath;
-struct LevelLayout;
+class LevelLayout;
 class FileManager;
-struct FontWriter;
-struct ScalingDrawer;
-struct NumberDrawer;
+class FontWriter;
+class ScalingDrawer;
+class NumberDrawer;
 
 /** The top of the tower: holds the chest, builds the chapters and runs the
  * tale. */

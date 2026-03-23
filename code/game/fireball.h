@@ -5,11 +5,12 @@
 #include "../game_utils/image_sequence.h"
 #include "entities.h"
 
-struct LevelController;
+class LevelController;
 
 /** The dragon's fire strength: named numbers and flags; += combines, Add
  * gathers more. */
-struct FireballBonus : virtual public Entity {
+class FireballBonus : virtual public Entity {
+public:
   std::string get_class_name() override { return "FireballBonus"; }
   std::map<std::string, float> fMap;
   std::map<std::string, int> uMap;
@@ -35,7 +36,8 @@ std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
 
 /** How many echoes the blast may spawn, or endless; Evolve steps it down,
  * IsLast when there are no more. */
-struct Chain {
+class Chain {
+public:
   bool bInfinite;
   int nGeneration;
 
@@ -49,7 +51,8 @@ struct Chain {
 
 /** A growing blast; it strikes all it touches and may birth more blasts
  * through the chain. */
-struct ChainExplosion : public AnimationOnce {
+class ChainExplosion : public AnimationOnce {
+public:
   std::string get_class_name() override { return "ChainExplosion"; }
   float r_in, r;
   float delta;
@@ -73,7 +76,8 @@ struct ChainExplosion : public AnimationOnce {
   void Draw(ScalingDrawer *pDr) override { AnimationOnce::Draw(pDr); }
 };
 
-struct KnightOnFire : public Critter {
+class KnightOnFire : public Critter {
+public:
   std::string get_class_name() override { return "KnightOnFire"; }
   LevelController *pBc;
   int nTimer, nTimer_i;
@@ -91,7 +95,8 @@ struct KnightOnFire : public Critter {
 
 /** The dragon's fireball: may pass through or stop on first hit; strikes
  * all consumable souls it meets. */
-struct Fireball : public Critter {
+class Fireball : public Critter {
+public:
   std::string get_class_name() override { return "Fireball"; }
   LevelController *pBc;
   bool bThrough;
@@ -111,7 +116,8 @@ struct Fireball : public Critter {
 };
 
 /** A fire strength that fades with time (e.g. a temporary boon). */
-struct TimedFireballBonus : public FireballBonus {
+class TimedFireballBonus : public FireballBonus {
+public:
   std::string get_class_name() override { return "TimedFireballBonus"; }
   Timer t;
 
@@ -122,8 +128,9 @@ struct TimedFireballBonus : public FireballBonus {
 };
 
 /** A fireball that circles at a fixed radius around the dragon. */
-struct CircularFireball : virtual public Fireball,
+class CircularFireball : virtual public Fireball,
                           virtual public TimedFireballBonus {
+public:
   std::string get_class_name() override { return "CircularFireball"; }
   float fRadius;
   fPoint i_pos;
@@ -138,7 +145,8 @@ struct CircularFireball : virtual public Fireball,
 
 /** A treasure shimmer with a radius; when the dragon touches it, the treasure
  * is gathered. */
-struct FireballBonusAnimation : public Animation {
+class FireballBonusAnimation : public Animation {
+public:
   std::string get_class_name() override { return "FireballBonusAnimation"; }
   int n;
   Timer tm;

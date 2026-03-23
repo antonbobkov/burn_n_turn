@@ -21,7 +21,8 @@ public:
 
 /** A path made of segments: vEdges holds the point sequences; CloseLast,
  * Add, AddLine, Join, and stream read/write. */
-struct BrokenLine {
+class BrokenLine {
+public:
   typedef std::vector<fPoint> VecLine;
   typedef std::vector<VecLine> VecLines;
 
@@ -52,7 +53,8 @@ std::istream &operator>>(std::istream &ifs, BrokenLine &bl);
 
 /** A stretch of road in the chapter: vertical or horizontal, with coordinate
  * and bounds; Draw paints the gray bar. */
-struct Road : public Entity {
+class Road : public Entity {
+public:
   std::string get_class_name() override { return "Road"; }
   bool ShouldDraw() override { return true; }
   bool bVertical;
@@ -80,10 +82,11 @@ inline std::istream &operator>>(std::istream &ifs, Road &r) {
   return ifs >> r.bVertical >> r.nCoord;
 }
 
-struct LevelController;
+class LevelController;
 
 /** A road with a tiled image; needs the level keeper for its art. */
-struct FancyRoad : public Road {
+class FancyRoad : public Road {
+public:
   FancyRoad(const Road &rd, LevelController *pAd_) : Road(rd), pAd(pAd_) {}
   LevelController *pAd;
 
@@ -92,7 +95,8 @@ struct FancyRoad : public Road {
 
 /** One chapter: bounds, where knights appear, castle spots, roads, timer, and
  * spawn rates; Convert scales the realm's measure. */
-struct LevelLayout {
+class LevelLayout {
+public:
   Rectangle sBound;
 
   int nLvl;

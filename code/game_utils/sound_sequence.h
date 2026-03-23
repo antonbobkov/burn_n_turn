@@ -12,7 +12,8 @@
 
 /** Sequence of sound indices with per-sound intervals; for multi-sound
  * effects. */
-struct SoundSequence {
+class SoundSequence {
+public:
   std::vector<Index> vSounds;
   std::vector<int> vIntervals;
   int nActive;

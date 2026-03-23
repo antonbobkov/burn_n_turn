@@ -10,7 +10,8 @@
 #include "GuiGen.h"
 #include "color.h"
 
-struct FontWriter {
+class FontWriter {
+public:
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
   GraphicalInterface<Index> *pGr;

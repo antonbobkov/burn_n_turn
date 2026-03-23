@@ -12,8 +12,8 @@
 
 #include <list>
 
-struct DragonGameController;
-struct LevelController;
+class DragonGameController;
+class LevelController;
 
 /** The root of all things in the realm; a flag says if it still exists.
  * Combines movement (Move/Update), screen presence (GetPosition), visuals

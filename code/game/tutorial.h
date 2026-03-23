@@ -6,11 +6,12 @@
 #include <string>
 #include <vector>
 
-struct DragonGameController;
+class DragonGameController;
 
 /** The wise one's scrolling words. SetText queues new lines; Update scrolls
  * between the old and the new. */
-struct TutorialTextEntity : public Entity {
+class TutorialTextEntity : public Entity {
+public:
   std::string get_class_name() override { return "TutorialTextEntity"; }
   bool ShouldDraw() override { return true; }
   float dPriority;
@@ -27,7 +28,7 @@ struct TutorialTextEntity : public Entity {
 
   int nTextVerticalSpacing;
 
-  struct DragonGameController *pGl;
+  DragonGameController *pGl;
 
   TutorialTextEntity(float dPriority_, Point pos_, NumberDrawer *pNum_,
                      DragonGameController *pGl_)

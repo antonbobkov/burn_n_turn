@@ -35,14 +35,16 @@
 #include "../wrappers/color.h"
 
 /** Functor that flips an image horizontally via the graphical interface. */
-struct ImageFlipper {
+class ImageFlipper {
+public:
   GraphicalInterface<Index> *pGr;
   ImageFlipper(GraphicalInterface<Index> *pGr_);
   void operator()(Index &img);
 };
 
 /** Functor that copies an image and applies a list of color replacements. */
-struct ImagePainter {
+class ImagePainter {
+public:
   typedef std::pair<Color, Color> ColorMap;
 
   GraphicalInterface<Index> *pGr;

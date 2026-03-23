@@ -7,7 +7,8 @@
 #include <memory>
 
 /** The keeper of the buy-now screen: slime dances and a countdown. */
-struct BuyNowController : public EntityListController {
+class BuyNowController : public EntityListController {
+public:
   std::string get_class_name() { return "BuyNowController"; }
   int t;
   std::vector<std::unique_ptr<Animation>> mSlimes;
@@ -39,7 +40,8 @@ struct BuyNowController : public EntityListController {
 };
 
 /** A sight that paints the slime dances on the buy-now screen. */
-struct SlimeUpdater : public Entity {
+class SlimeUpdater : public Entity {
+public:
   bool ShouldDraw() override { return true; }
   BuyNowController *pBuy;
 

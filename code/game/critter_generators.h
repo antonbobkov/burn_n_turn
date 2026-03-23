@@ -5,10 +5,11 @@
 #include "entities.h"
 #include "level.h"
 
-struct LevelController;
+class LevelController;
 
 /** Summons skeleton knights on a timer at a spot. */
-struct SkellyGenerator : public Entity {
+class SkellyGenerator : public Entity {
+public:
   std::string get_class_name() override { return "SkellyGenerator"; }
   Timer t;
   Point p;
@@ -21,7 +22,8 @@ struct SkellyGenerator : public Entity {
 };
 
 /** Summons knights along the path on a timer. */
-struct KnightGenerator : public Entity {
+class KnightGenerator : public Entity {
+public:
   std::string get_class_name() override { return "KnightGenerator"; }
   bool bFirst;
 
@@ -47,7 +49,8 @@ struct KnightGenerator : public Entity {
 };
 
 /** Summons princesses at a rate within the chapter bounds. */
-struct PrincessGenerator : public Entity {
+class PrincessGenerator : public Entity {
+public:
   std::string get_class_name() override { return "PrincessGenerator"; }
   float dRate;
   Rectangle rBound;
@@ -65,7 +68,8 @@ struct PrincessGenerator : public Entity {
   void Update() override;
 };
 
-struct MageGenerator : public Entity {
+class MageGenerator : public Entity {
+public:
   std::string get_class_name() override { return "MageGenerator"; }
   float dRate;
   Rectangle rBound;
@@ -82,7 +86,8 @@ struct MageGenerator : public Entity {
 };
 
 /** Summons traders at a rate within the chapter bounds. */
-struct TraderGenerator : public Entity {
+class TraderGenerator : public Entity {
+public:
   std::string get_class_name() override { return "TraderGenerator"; }
   float dRate;
   Rectangle rBound;

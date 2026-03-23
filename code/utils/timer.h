@@ -13,7 +13,8 @@
  * Check() returns true when the counter is on a period boundary.
  * UntilTick() returns how many steps until the next period.
  * NextTick() sets the counter so the next Tick() returns true. */
-struct Timer {
+class Timer {
+public:
   int nTimer, nPeriod;
 
   /* Build a timer with the given period (default 1). Counter starts at 0. */

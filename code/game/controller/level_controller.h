@@ -13,23 +13,24 @@
 #include <memory>
 #include <vector>
 
-struct Castle;
-struct Dragon;
-struct DragonGameController;
-struct FireballBonusAnimation;
-struct Road;
-struct Slime;
-struct MegaSlime;
-struct Sliminess;
-struct MegaSliminess;
-struct SoundControls;
+class Castle;
+class Dragon;
+class DragonGameController;
+class FireballBonusAnimation;
+class Road;
+class Slime;
+class MegaSlime;
+class Sliminess;
+class MegaSliminess;
+class SoundControls;
 class Tutorial;
-struct TutorialTextEntity;
+class TutorialTextEntity;
 enum class TutorialEvent;
 
 /** The keeper of the chapter: castles, roads, dragon, spawners, treasures,
  * and the hero's input. */
-struct LevelController : public EntityListController {
+class LevelController : public EntityListController {
+public:
   std::string get_class_name() { return "LevelController"; }
 
   /** Deliver a game event to the active tutorial handler. */
@@ -106,8 +107,8 @@ struct LevelController : public EntityListController {
   void GetRandomRoadLocation(Point &p, Point &v);
 
  private:
-  friend struct AdNumberDrawer;
-  friend struct BonusDrawer;
+  friend class AdNumberDrawer;
+  friend class BonusDrawer;
 
   std::list<std::unique_ptr<ConsumableEntity>> lsPpl_;
 

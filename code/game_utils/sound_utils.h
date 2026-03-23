@@ -26,7 +26,8 @@ public:
 
 /** Plays level music from vThemes; SwitchTheme/StopMusic/ToggleOff control
  * playback. */
-struct BackgroundMusicPlayer {
+class BackgroundMusicPlayer {
+public:
   int nCurrTheme;
   std::vector<Index> vThemes;
   SoundInterface<Index> *pSnd;

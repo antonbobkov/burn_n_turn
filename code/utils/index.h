@@ -16,7 +16,8 @@ class Index;
 /* Interface for objects that must be notified when an Index is destroyed.
  * Used so that when the last reference to an Index goes away, the backend
  * can free the underlying resource (e.g. delete image/sound handle). */
-struct IndexRemover {
+class IndexRemover {
+public:
   virtual void DeleteIndex(const Index &i) = 0;
 };
 

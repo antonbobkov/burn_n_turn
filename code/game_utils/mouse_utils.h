@@ -17,7 +17,8 @@ template <class T> class GraphicalInterface;
 
 /* Tracks mouse position and relative movement: OnMouse(Point),
  * GetRelMovement(). */
-struct MouseTracker {
+class MouseTracker {
+public:
   Point pLastRead;
   Point pCurPos;
 
@@ -44,7 +45,8 @@ struct MouseTracker {
 };
 
 /** Tracks mouse for trackball-style steering (angle and fire). */
-struct TrackballTracker {
+class TrackballTracker {
+public:
   MouseTracker mtr;
 
   std::list<Point> lsMouse;
@@ -64,7 +66,8 @@ struct TrackballTracker {
 };
 
 /** Tracks mouse position, last down, press state and counter for input. */
-struct PositionTracker {
+class PositionTracker {
+public:
   Point pMouse;
   Point pLastDownPosition;
   bool bPressed;
@@ -83,7 +86,8 @@ struct PositionTracker {
 };
 
 /** Cursor image and position; Draw/Update for rendering and click state. */
-struct MouseCursor {
+class MouseCursor {
+public:
   bool bPressed;
   ImageSequence imgCursor;
   Point pCursorPos;

@@ -7,10 +7,11 @@
 #include "entities.h"
 #include <memory>
 
-struct LevelController;
-struct Dragon;
+class LevelController;
+class Dragon;
 
-struct Castle : public Critter {
+class Castle : public Critter {
+public:
   std::string get_class_name() override { return "Castle"; }
   int nPrincesses;
   LevelController *pAv;
@@ -26,7 +27,8 @@ struct Castle : public Critter {
 };
 
 /** The princess: a soul the dragon can rescue and carry to the castle. */
-struct Princess : public Critter, public ConsumableEntity {
+class Princess : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "Princess"; }
   LevelController *pAc;
 
@@ -42,7 +44,8 @@ struct Princess : public Critter, public ConsumableEntity {
   void Draw(ScalingDrawer *pDr) override;
 };
 
-struct Mage : public Critter, public ConsumableEntity {
+class Mage : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "Mage"; }
   LevelController *pAc;
 
@@ -72,7 +75,8 @@ int RandomBonus(bool bInTower = true);
 std::string GetBonusImage(int n);
 
 /** The trader: drops a treasure when felled; first-bonus is tracked elsewhere. */
-struct Trader : public Critter, public ConsumableEntity {
+class Trader : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "Trader"; }
   LevelController *pAc;
   bool &bFirstBns;
@@ -90,7 +94,8 @@ struct Trader : public Critter, public ConsumableEntity {
 };
 
 /** The knight: chases princess and castle, and may rise again as a ghost. */
-struct Knight : public Critter, public ConsumableEntity {
+class Knight : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "Knight"; }
   LevelController *pAc;
 
@@ -124,7 +129,8 @@ struct Knight : public Critter, public ConsumableEntity {
 };
 
 /** The great slime: it may split or merge in the dance of the MegaSlime. */
-struct MegaSlime : public Critter, public ConsumableEntity {
+class MegaSlime : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "MegaSlime"; }
   LevelController *pAc;
 
@@ -151,7 +157,8 @@ struct MegaSlime : public Critter, public ConsumableEntity {
 };
 
 /** The ghost's echo: a brief shimmer where the knight fell. */
-struct Ghostiness : public Entity {
+class Ghostiness : public Entity {
+public:
   std::string get_class_name() override { return "Ghostiness"; }
   Timer t;
   Point p;
@@ -167,7 +174,8 @@ struct Ghostiness : public Entity {
 };
 
 /** A slime: it drifts toward its prey, a timer guiding its steps. */
-struct Slime : public Critter, public ConsumableEntity {
+class Slime : public Critter, public ConsumableEntity {
+public:
   std::string get_class_name() override { return "Slime"; }
   LevelController *pAc;
   Timer t;
@@ -191,7 +199,8 @@ struct Slime : public Critter, public ConsumableEntity {
 };
 
 /** Summons slimes on a timer at a spot in the realm. */
-struct Sliminess : public Entity {
+class Sliminess : public Entity {
+public:
   std::string get_class_name() override { return "Sliminess"; }
   Timer t;
   Point p;
@@ -214,7 +223,8 @@ struct Sliminess : public Entity {
 };
 
 /** Summons the great slimes; keeps the spot and the realm's keeper. */
-struct MegaSliminess : public Entity {
+class MegaSliminess : public Entity {
+public:
   std::string get_class_name() override { return "MegaSliminess"; }
   Point p;
   LevelController *pAdv;
@@ -229,7 +239,8 @@ struct MegaSliminess : public Entity {
 };
 
 /** A drifting slime that moves with position and velocity (e.g. in the menu). */
-struct FloatingSlime : public SimpleVisualEntity {
+class FloatingSlime : public SimpleVisualEntity {
+public:
   std::string get_class_name() override { return "FloatingSlime"; }
   fPoint fPos;
   fPoint fVel;

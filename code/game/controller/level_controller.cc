@@ -18,7 +18,8 @@
 #include "../../wrappers/geometry.h"
 
 /* Local helpers for level UI: score/time/level and bonus icons. */
-struct AdNumberDrawer : public Entity {
+class AdNumberDrawer : public Entity {
+public:
   bool ShouldDraw() override { return true; }
   LevelController *pAd;
 
@@ -70,7 +71,8 @@ struct AdNumberDrawer : public Entity {
   float GetPriority() override { return 10; }
 };
 
-struct BonusDrawer : public Entity {
+class BonusDrawer : public Entity {
+public:
   bool ShouldDraw() override { return true; }
   LevelController *pAd;
 

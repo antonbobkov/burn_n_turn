@@ -1,5 +1,6 @@
 - All relevant code is under code/. Ignore unused_old_ignore/
 - When commiting changes, push them, and show github link to commit.
+- When merging worktree with master, read through master commit messages to get more context. Run tests afterwards.
 
 ## Build system
 

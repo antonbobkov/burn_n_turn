@@ -14,7 +14,8 @@
 
 /** Sequence of image indices with timing; Toggle / ToggleTimed for animation.
  */
-struct ImageSequence {
+class ImageSequence {
+public:
   std::vector<Index> vImage;
   std::vector<int> vIntervals;
   int nActive;

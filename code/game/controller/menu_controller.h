@@ -14,9 +14,9 @@
 #include <memory>
 #include <vector>
 
-struct DragonGameSettings;
-struct MenuDisplay;
-struct MenuController;
+class DragonGameSettings;
+class MenuDisplay;
+class MenuController;
 
 /** A spell the menu keeper can cast when a choice is chosen. */
 typedef void (MenuDisplay::*EvntPntr)();
@@ -45,7 +45,8 @@ std::string TutorialString();
 std::string FullTextString();
 
 /** The list of choices on the wall and which one the caret points to. */
-struct MenuEntryManager {
+class MenuEntryManager {
+public:
   std::vector<MenuEntry> vEntries;
   int nMenuPosition;
 
@@ -54,7 +55,8 @@ struct MenuEntryManager {
 
 /** The pause hall's face: draws choices and caret, answers mouse and key;
  * side chambers and option toggles. */
-struct MenuDisplay : public Entity {
+class MenuDisplay : public Entity {
+public:
   std::string get_class_name() override { return "MenuDisplay"; }
   bool ShouldDraw() override { return true; }
   MenuEntryManager *pCurr;
@@ -114,7 +116,8 @@ struct MenuDisplay : public Entity {
 };
 
 /** The keeper of the pause hall: the display and options from the scrolls. */
-struct MenuController : public EntityListController {
+class MenuController : public EntityListController {
+public:
   std::string get_class_name() { return "MenuController"; }
   std::unique_ptr<Animation> pMenuCaret;
   std::unique_ptr<MenuDisplay> pMenuDisplay;

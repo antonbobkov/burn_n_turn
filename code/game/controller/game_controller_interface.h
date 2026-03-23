@@ -4,11 +4,12 @@
 #include "../../wrappers/geometry.h"
 #include "../../wrappers/gui_key_type.h"
 
-struct DragonGameController;
+class DragonGameController;
 
 /** The base of all screen keepers: holds the realm and bounds; input and
  * tick are virtual (OnKey, OnMouse, Fire, etc.). */
-struct GameController {
+class GameController {
+public:
   DragonGameController *pGl;
 
   Rectangle rBound;

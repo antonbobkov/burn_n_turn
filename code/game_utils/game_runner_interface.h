@@ -10,7 +10,8 @@
 #include "../wrappers/SuiGen.h"
 
 class FileManager;
-struct ProgramInfo {
+class ProgramInfo {
+public:
   Size szScreenRez;
   std::string strTitle;
   int nFramerate;
@@ -31,7 +32,8 @@ struct ProgramInfo {
 
 ProgramInfo GetProgramInfo();
 
-struct ProgramEngine {
+class ProgramEngine {
+public:
   std::unique_ptr<Event> pExitProgram;
 
   GraphicalInterface<Index> *pGr;

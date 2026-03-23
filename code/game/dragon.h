@@ -9,10 +9,11 @@
 #include <list>
 #include <memory>
 
-struct LevelController;
-struct PositionTracker;
+class LevelController;
+class PositionTracker;
 
-struct DragonLeash {
+class DragonLeash {
+public:
   fPoint lastVel;
   float tilt;
   float speed;
@@ -34,7 +35,8 @@ struct DragonLeash {
 };
 
 /** The hero's key bindings—which keys mean fire, steer, and so on. */
-struct ButtonSet {
+class ButtonSet {
+public:
   std::vector<int> vCodes;
 
   ButtonSet(int q, int w, int e, int d, int c, int x, int z, int a, int sp);
@@ -46,7 +48,8 @@ struct ButtonSet {
 
 /** The player's dragon: carries treasures and fireballs, steers and shoots,
  * and meets the world in collision. */
-struct Dragon : public Critter {
+class Dragon : public Critter {
+public:
   std::string get_class_name() override { return "Dragon"; }
   std::list<std::unique_ptr<TimedFireballBonus>> lsBonuses;
 

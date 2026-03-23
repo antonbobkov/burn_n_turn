@@ -57,7 +57,8 @@ public:
 
 /* Per-pixel transparency grid (Size + vector<Byte>); Set/Get(Point), Safe
  * variants throw. */
-struct TransparencyGrid {
+class TransparencyGrid {
+public:
   Size sz;
   std::vector<Byte> vGrid;
 
@@ -252,7 +253,7 @@ public:
 /* GraphicalInterface<Index> wrapper: delegates to a real GI, uses IndexKeeper
  * and IndexRemover so images are freed when Index is destroyed. */
 template <class ImageHndl>
-struct SimpleGraphicalInterface : public GraphicalInterface<Index>,
+class SimpleGraphicalInterface : public GraphicalInterface<Index>,
                                   public IndexRemover {
   GraphicalInterface<ImageHndl> *pGr;
 

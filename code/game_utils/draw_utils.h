@@ -18,7 +18,8 @@ template <class T> class GraphicalInterface;
 
 /** Base for drawing an image at a point; ScalingDrawer adds scale and color
  * key. */
-struct Drawer {
+class Drawer {
+public:
   GraphicalInterface<Index> *pGr;
 
   Drawer() : pGr(nullptr) {}
@@ -27,7 +28,8 @@ struct Drawer {
 };
 
 /** Drawer that scales images by nFactor and uses cTr as transparency key. */
-struct ScalingDrawer : public Drawer {
+class ScalingDrawer : public Drawer {
+public:
   int nFactor;
   Color cTr;
 
@@ -47,7 +49,8 @@ struct ScalingDrawer : public Drawer {
 
 /** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for
  * recolored text. */
-struct NumberDrawer {
+class NumberDrawer {
+public:
   ScalingDrawer *pDr;
   std::vector<int> vImgIndx;
   std::vector<Index> vImg;
