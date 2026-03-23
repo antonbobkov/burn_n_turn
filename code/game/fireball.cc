@@ -106,7 +106,8 @@ void ChainExplosion::Update() {
 }
 
 void KnightOnFire::RandomizeVelocity() {
-  fVel = fPoint::Normalized(RandomAngle(), (float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
+  fVel = RandomAngle();
+  fVel.Normalize((float(rand()) / RAND_MAX + .5F) * fKnightFireSpeed);
 }
 
 KnightOnFire::KnightOnFire(const Critter &cr, LevelController *pBc_,

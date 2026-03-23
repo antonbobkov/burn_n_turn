@@ -666,8 +666,9 @@ void Castle::OnKnight(char cWhat) {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
       for (int i = 0; i < nPrincesses; ++i) {
-        fPoint v = fPoint::Normalized(fPoint(sin(r + i * 2 * 3.1415F / nPrincesses),
-                 cos(r + i * 2 * 3.1415F / nPrincesses)), fPrincessSpeed * 3.F);
+        fPoint v(sin(r + i * 2 * 3.1415F / nPrincesses),
+                 cos(r + i * 2 * 3.1415F / nPrincesses));
+        v.Normalize(fPrincessSpeed * 3.F);
 
         pAv->AddOwnedConsumable(std::make_unique<Princess>(
             Critter(7, GetPosition(), v, rBound, 0,
