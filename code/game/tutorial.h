@@ -62,17 +62,28 @@ enum class TutorialEvent {
   TraderGenerate,
 };
 
-/** Abstract tutorial handler: receives game events and decides what to show. */
+/** Abstract tutorial handler: receives game events and decides what to show.
+ * Subclasses implement GetText() to describe the current state; Update()
+ * pushes it to the text entity. */
 class Tutorial {
  public:
+  explicit Tutorial(TutorialTextEntity *pTexter) : pTexter_(pTexter) {}
   virtual ~Tutorial() = default;
-  /** Inform the tutorial that a game event has occurred. */
   virtual void Notify(TutorialEvent event) = 0;
+
+ protected:
+  /** Push GetText() result to the text entity. */
+  void Update();
+
+ private:
+  virtual std::vector<std::string> GetText() { return {}; }
+  TutorialTextEntity *pTexter_;
 };
 
 /** Tutorial that does nothing; used for levels without tutorial guidance. */
 class NoopTutorial : public Tutorial {
  public:
+  NoopTutorial() : Tutorial(nullptr) {}
   void Notify(TutorialEvent /*event*/) override {}
 };
 
@@ -88,16 +99,12 @@ class TutorialLevelOne : public Tutorial {
   bool flying_;
   bool princess_generated_;
   bool princess_captured_;
-  TutorialTextEntity *pTexter_;
   std::string steer_message_;
   std::string shooting_message_;
   std::string take_off_message_;
   bool show_flying_shoot_hint_;
 
-  /** Choose which lines to show for the current state. */
-  std::vector<std::string> GetText();
-  /** Push current lines to the text entity. */
-  void Update();
+  std::vector<std::string> GetText() override;
 };
 
 /** Second chapter tutorial: tracks trader appearance and bonus milestones. */
@@ -110,12 +117,8 @@ class TutorialLevelTwo : public Tutorial {
   bool trader_generated_;
   bool trader_killed_;
   bool bonus_picked_up_;
-  TutorialTextEntity *pTexter_;
 
-  /** Choose which lines to show for the current state. */
-  std::vector<std::string> GetText();
-  /** Push current lines to the text entity. */
-  void Update();
+  std::vector<std::string> GetText() override;
 };
 
 #endif

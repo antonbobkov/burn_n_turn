@@ -47,10 +47,15 @@ void TutorialTextEntity::Update() {
   }
 }
 
+void Tutorial::Update() {
+  if (pTexter_ != nullptr)
+    pTexter_->SetText(GetText());
+}
+
 TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter, bool is_joystick,
                                    bool is_keyboard)
-    : killed_knight_(false), flying_(false), princess_generated_(false),
-      princess_captured_(false), pTexter_(pTexter),
+    : Tutorial(pTexter), killed_knight_(false), flying_(false),
+      princess_generated_(false), princess_captured_(false),
       show_flying_shoot_hint_(!is_joystick) {
   if (is_joystick) {
     steer_message_    = "steer with joystick";
@@ -72,18 +77,16 @@ std::vector<std::string> TutorialLevelOne::GetText() {
   std::vector<std::string> text;
 
   if (flying_) {
+    text.push_back(steer_message_);
     if (!killed_knight_ || !princess_generated_) {
-      text.push_back(steer_message_);
       text.push_back("fly back to your tower");
-      return text;
     } else {
-      text.push_back(steer_message_);
       text.push_back("fly over the princess to pick her up");
       text.push_back("bring captured princess to the tower");
       if (show_flying_shoot_hint_)
         text.push_back("(you can shoot while flying!)");
-      return text;
     }
+    return text;
   }
 
   if (!killed_knight_) {
@@ -97,20 +100,13 @@ std::vector<std::string> TutorialLevelOne::GetText() {
     if (!princess_captured_) {
       text.push_back("princess in sight!");
       text.push_back(take_off_message_);
-      return text;
+    } else {
+      text.push_back("capture four princesses to beat the level");
+      text.push_back("don't let knights get to the tower!");
     }
-
-    text.push_back("capture four princesses to beat the level");
-    text.push_back("don't let knights get to the tower!");
-    return text;
   }
 
   return text;
-}
-
-void TutorialLevelOne::Update() {
-  if (pTexter_ != nullptr)
-    pTexter_->SetText(GetText());
 }
 
 void TutorialLevelOne::Notify(TutorialEvent event) {
@@ -143,36 +139,23 @@ void TutorialLevelOne::Notify(TutorialEvent event) {
 }
 
 TutorialLevelTwo::TutorialLevelTwo(TutorialTextEntity *pTexter)
-    : trader_generated_(false), trader_killed_(false),
-      bonus_picked_up_(false), pTexter_(pTexter) {
+    : Tutorial(pTexter), trader_generated_(false), trader_killed_(false),
+      bonus_picked_up_(false) {
   Update();
 }
 
 std::vector<std::string> TutorialLevelTwo::GetText() {
-  std::vector<std::string> text;
-
   if (!trader_generated_)
-    return text;
+    return {};
 
-  if (!trader_killed_) {
-    text.push_back("trader in sight!");
-    text.push_back("kill a trader to get a power up");
-    return text;
-  }
+  if (!trader_killed_)
+    return {"trader in sight!", "kill a trader to get a power up"};
 
-  if (!bonus_picked_up_) {
-    text.push_back("traders drop power ups");
-    text.push_back("fly over to pick them up");
-    text.push_back("collect as many as you can!");
-    return text;
-  }
+  if (!bonus_picked_up_)
+    return {"traders drop power ups", "fly over to pick them up",
+            "collect as many as you can!"};
 
-  return text;
-}
-
-void TutorialLevelTwo::Update() {
-  if (pTexter_ != nullptr)
-    pTexter_->SetText(GetText());
+  return {};
 }
 
 void TutorialLevelTwo::Notify(TutorialEvent event) {
