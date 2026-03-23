@@ -18,7 +18,7 @@ SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
 }
 
 float KnightGenerator::GetRate() {
-  if (pBc->bGhostTime)
+  if (pBc->IsGhostTime())
     return dRate / fIncreaseKnightRate2;
 
   if (pBc->GetCompletionRate() < fIncreaseRateFraction1)
@@ -33,18 +33,19 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_, const BrokenLine &bl_)
     : bFirst(false), dRate(dRate_), rBound(rBound_), pBc(pBc_),
       seq(pBc_->pGl->GetImgSeq("knight")), tm(1), bl(bl_) {
-  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
+  if (pBc->GetLevel() == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
-  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1)
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->GetLevel() == 1)
     bFirst = true;
 }
 
 void KnightGenerator::Generate(bool bGolem) {
   Point p = bl.RandomByLength().ToPnt();
 
-  int n = rand() % (int)pBc->vCs.size();
+  std::vector<Castle *> vCs = pBc->GetCastlePointers();
+  int n = rand() % (int)vCs.size();
 
-  fPoint v = pBc->vCs[n]->GetPosition() - p;
+  fPoint v = vCs[n]->GetPosition() - p;
   v.Normalize(fKnightSpeed);
   p += rBound.p;
 
@@ -63,7 +64,7 @@ void KnightGenerator::Generate(bool bGolem) {
                         : pBc->pGl->GetImgSeq("golem_f"),
                 true),
         pBc, 'W');
-  } else if (pBc->bGhostTime) {
+  } else if (pBc->IsGhostTime()) {
     pCr->seq = pBc->pGl->GetImgSeq("ghost_knight");
     pCr->cType = 'G';
     pCr->fVel.Normalize(fKnightSpeed * fGhostSpeedMultiplier);
@@ -83,9 +84,9 @@ PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
                                      LevelController *pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
-  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0)
+  if (pBc->GetLevel() == 1 && pBc->pGl->GetHighScore() == 0)
     bFirst = true;
-  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1)
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->GetLevel() == 1)
     bFirst = true;
 }
 
@@ -95,7 +96,8 @@ void PrincessGenerator::Update() {
 
     Point p, v;
 
-    pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+    std::vector<Road *> vRd = pBc->GetRoadPointers();
+    vRd[rand() % vRd.size()]->RoadMap(p, v);
 
     fPoint vel(v);
 
@@ -143,7 +145,8 @@ void MageGenerator::Update() {
 void MageGenerator::MageGenerate() {
   Point p, v;
 
-  pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+  std::vector<Road *> vRd = pBc->GetRoadPointers();
+  vRd[rand() % vRd.size()]->RoadMap(p, v);
 
   fPoint vel(v);
 
@@ -170,11 +173,11 @@ TraderGenerator::TraderGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false), bFirstBns(false) {
-  if (pBc->nLvl == 1 && pBc->pGl->GetHighScore() == 0) {
+  if (pBc->GetLevel() == 1 && pBc->pGl->GetHighScore() == 0) {
     bFirst = true;
     bFirstBns = true;
   }
-  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->nLvl == 1) {
+  if (pBc->pGl->GetGameConfig().IsTrialVersion() && pBc->GetLevel() == 1) {
     bFirst = true;
     bFirstBns = true;
   }
@@ -186,7 +189,8 @@ void TraderGenerator::Update() {
 
     Point p, v;
 
-    pBc->vRd[rand() % pBc->vRd.size()]->RoadMap(p, v);
+    std::vector<Road *> vRd = pBc->GetRoadPointers();
+    vRd[rand() % vRd.size()]->RoadMap(p, v);
 
     fPoint vel(v);
     vel.Normalize(fTraderSpeed);
@@ -213,9 +217,10 @@ void TraderGenerator::Update() {
   if (t.Tick()) {
     bExist = false;
 
-    int n = rand() % (int)pAdv->vCs.size();
+    std::vector<Castle *> vCs = pAdv->GetCastlePointers();
+    int n = rand() % (int)vCs.size();
 
-    fPoint v = pAdv->vCs[n]->GetPosition() - p;
+    fPoint v = vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
     pAdv->AddOwnedConsumable(std::make_unique<Knight>(

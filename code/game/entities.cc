@@ -209,7 +209,7 @@ void SoundControls::Update() {
 }
 
 void BonusScore::Update() {
-  if (pAc->bGhostTime)
+  if (pAc->IsGhostTime())
     bExist = false;
 
   if (t.Tick()) {

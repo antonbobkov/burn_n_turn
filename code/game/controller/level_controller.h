@@ -31,60 +31,13 @@ struct TutorialTextEntity;
  * and the hero's input. */
 struct LevelController : public EntityListController {
   std::string get_class_name() { return "LevelController"; }
-  std::vector<std::unique_ptr<Castle>> vCs;
-  std::vector<std::unique_ptr<Road>> vRd;
-  std::vector<std::unique_ptr<Dragon>> vDr;
-
-  std::list<std::unique_ptr<FireballBonusAnimation>> lsBonus;
-  std::list<std::unique_ptr<Slime>> lsSlimes;
-  std::list<std::unique_ptr<MegaSlime>> lsMegaSlimes;
-  std::list<std::unique_ptr<Sliminess>> lsSliminess;
-  std::list<std::unique_ptr<MegaSliminess>> lsMegaSliminess;
-
-  TrackballTracker tr;
-
-  Timer t;
-
-  bool bFirstUpdate;
-
-  bool bGhostTime;
-
-  bool bTimerFlash;
-  Timer tBlink;
-  bool bBlink;
-
-  Timer tStep;
-  bool bLeft;
-
-  bool bCh;
-
-  bool bLeftDown, bRightDown;
-  int nLastDir;
-  bool bWasDirectionalInput;
-
-  int nLvl;
-
-  int nSlimeNum;
-
-  Timer tLoseTimer;
-
-  std::unique_ptr<KnightGenerator> pKnightGen;
-  std::unique_ptr<PrincessGenerator> pPGen;
-  std::unique_ptr<TraderGenerator> pTGen;
-  std::unique_ptr<MageGenerator> pMGen;
-  KnightGenerator *pGr;
-  MageGenerator *pMgGen;
-  std::list<std::unique_ptr<Entity>> lsSpawnedGenerators;
-  std::unique_ptr<SoundControls> pSc;
-
-  LevelController *pSelf;
 
   PositionTracker pt;
-  bool bTakeOffToggle;
 
   std::unique_ptr<TutorialLevelOne> tutOne;
   std::unique_ptr<TutorialLevelTwo> tutTwo;
-  std::unique_ptr<TutorialTextEntity> pTutorialText;
+
+  LevelController *pSelf;
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
@@ -129,13 +82,80 @@ struct LevelController : public EntityListController {
 
   std::vector<Entity *> GetNonOwnedEntities() override;
 
-  MouseCursor mc;
-
   void MegaGeneration();
   void MegaGeneration(Point p);
 
+  // Narrow accessors replacing direct public-variable access
+  int GetLevel() const { return nLvl_; }
+  bool IsGhostTime() const { return bGhostTime_; }
+  bool IsCheating() const { return bCh_; }
+  /** Start the lose countdown if not already started. */
+  void StartLoseTimer();
+  /** Frame index for castle destruction animation. */
+  int GetLoseTimerFrame() const;
+  /** Stop background music (set theme to silent). */
+  void StopMusic();
+  /** Increment live slime count. */
+  void IncrementSlimeCount() { ++nSlimeNum_; }
+  /** Decrement live slime count. */
+  void DecrementSlimeCount() { --nSlimeNum_; }
+  /** Current live slime count. */
+  int GetSlimeCount() const { return nSlimeNum_; }
+  /** Kill all active slimes/sliminess and trigger mega-generation at centroid. */
+  void DoSlimeMassKill();
+
+  void SetSoundControls(std::unique_ptr<SoundControls> p);
+
+  Castle *GetFirstCastle();
+  std::vector<Castle *> GetCastlePointers();
+  std::vector<Road *> GetRoadPointers();
+
  private:
+  friend struct AdNumberDrawer;
+  friend struct BonusDrawer;
+
   std::list<std::unique_ptr<ConsumableEntity>> lsPpl_;
+
+  std::vector<std::unique_ptr<Castle>> vCs_;
+  std::vector<std::unique_ptr<Road>> vRd_;
+  std::vector<std::unique_ptr<Dragon>> vDr_;
+
+  std::list<std::unique_ptr<FireballBonusAnimation>> lsBonus_;
+  std::list<std::unique_ptr<Slime>> lsSlimes_;
+  std::list<std::unique_ptr<MegaSlime>> lsMegaSlimes_;
+  std::list<std::unique_ptr<Sliminess>> lsSliminess_;
+  std::list<std::unique_ptr<MegaSliminess>> lsMegaSliminess_;
+
+  Timer t_;
+  bool bFirstUpdate_;
+  bool bGhostTime_;
+  bool bTimerFlash_;
+  Timer tBlink_;
+  bool bBlink_;
+  Timer tStep_;
+  bool bLeft_;
+  bool bCh_;
+  bool bLeftDown_, bRightDown_;
+  int nLastDir_;
+  bool bWasDirectionalInput_;
+  int nLvl_;
+  int nSlimeNum_;
+  Timer tLoseTimer_;
+  bool bTakeOffToggle_;
+  TrackballTracker tr_;
+
+  std::unique_ptr<KnightGenerator> pKnightGen_;
+  std::unique_ptr<PrincessGenerator> pPGen_;
+  std::unique_ptr<TraderGenerator> pTGen_;
+  std::unique_ptr<MageGenerator> pMGen_;
+  KnightGenerator *pGr_;
+  MageGenerator *pMgGen_;
+  std::list<std::unique_ptr<Entity>> lsSpawnedGenerators_;
+
+  std::unique_ptr<SoundControls> pSc_;
+  std::unique_ptr<TutorialTextEntity> pTutorialText_;
+
+  MouseCursor mc_;
 };
 
 #endif

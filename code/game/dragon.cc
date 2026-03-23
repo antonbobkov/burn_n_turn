@@ -70,9 +70,9 @@ Point ButtonSet::GetPoint(int nCode) {
 
 std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
                                                      int nTime) {
-  if (pAd->nLvl > 6)
+  if (pAd->GetLevel() > 6)
     nTime = int(nTime * fBonusTimeMutiplierTwo);
-  else if (pAd->nLvl > 3)
+  else if (pAd->GetLevel() > 3)
     nTime = int(nTime * fBonusTimeMutiplierOne);
 
   std::unique_ptr<TimedFireballBonus> pBonus;
@@ -188,7 +188,7 @@ FireballBonus Dragon::GetAllBonuses() {
 Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
                ImageSequence imgFly_, ButtonSet bt_)
     : Critter(13,
-              pCs_ == nullptr ? pAd_->vCs[0]->GetPosition()
+              pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
               Point(), pAd_->rBound, 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nPrCr(0), nExtraFireballs(0),
@@ -205,7 +205,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, ImageSequence imgStable_,
   } else {
     bFly = true;
     Critter::dPriority = 5;
-    Critter::fPos = pAd->vCs[0]->GetPosition();
+    Critter::fPos = pAd->GetFirstCastle()->GetPosition();
   }
 
   SimpleVisualEntity::seq = imgStable;
@@ -242,9 +242,9 @@ void Dragon::Update() {
   if (bFly) {
     bool bHitCastle = false;
 
-    for (int i = 0; i < (int)pAd->vCs.size(); ++i)
-      if (this->HitDetection(pAd->vCs[i].get())) {
-        if (pAd->vCs[i]->pDrag != nullptr)
+    for (Castle *pC : pAd->GetCastlePointers())
+      if (this->HitDetection(pC)) {
+        if (pC->pDrag != nullptr)
           continue;
         bHitCastle = true;
         break;
@@ -279,15 +279,13 @@ void Dragon::Update() {
   }
 
   if (bFly) {
-    CleanUp(pAd->lsBonus);
-
-    for (auto &bonus : pAd->lsBonus) {
-      if (!bonus->bExist)
+    for (FireballBonusAnimation *pBns : pAd->GetBonusAnimations()) {
+      if (!pBns->bExist)
         continue;
 
-      if (this->HitDetection(bonus.get())) {
-        AddBonus(GetBonus(bonus->n, nBonusPickUpTime));
-        bonus->bExist = false;
+      if (this->HitDetection(pBns)) {
+        AddBonus(GetBonus(pBns->n, nBonusPickUpTime));
+        pBns->bExist = false;
 
         pAd->tutTwo->BonusPickUp();
       }
@@ -427,55 +425,58 @@ void Dragon::Toggle() {
     return;
   }
 
-  for (int i = 0; i < (int)pAd->vCs.size(); ++i)
-    if (this->HitDetection(pAd->vCs[i].get())) {
-      if (pAd->vCs[i]->pDrag != nullptr || bTookOff || pAd->vCs[i]->bBroken)
-        continue;
+  for (Castle *pC : pAd->GetCastlePointers()) {
+    if (!this->HitDetection(pC))
+      continue;
+    if (pC->pDrag != nullptr || bTookOff || pC->bBroken)
+      continue;
 
-      pAd->pt.Off();
+    pAd->pt.Off();
 
-      bFly = false;
+    bFly = false;
 
-      pAd->tutOne->FlyOff();
+    pAd->tutOne->FlyOff();
 
-      pCs = pAd->vCs[i].get();
-      pCs->pDrag = pAd->FindDragon(this);
+    pCs = pC;
+    pCs->pDrag = pAd->FindDragon(this);
 
-      if (cCarry == 'P') {
-        pAd->tutOne->PrincessCaptured();
-        pAd->vCs[i]->nPrincesses += nPrCr;
+    if (cCarry == 'P') {
+      pAd->tutOne->PrincessCaptured();
+      pC->nPrincesses += nPrCr;
 
-        int j;
-        for (j = 0; j < (int)pAd->vCs.size(); ++j) {
-          if (pAd->vCs[j]->nPrincesses < 4)
-            break;
+      bool bAllFull = true;
+      for (Castle *pCs2 : pAd->GetCastlePointers()) {
+        if (pCs2->nPrincesses < 4) {
+          bAllFull = false;
+          break;
         }
+      }
 
-        if (j != (int)pAd->vCs.size()) {
-          pAd->pGl->PlaySound("princess_capture");
-        } else {
-          FlushBonuses();
+      if (!bAllFull) {
+        pAd->pGl->PlaySound("princess_capture");
+      } else {
+        FlushBonuses();
 
-          pAd->pGl->PlaySound("win_level");
-          pAd->pGl->Next();
-        }
-      } else if (cCarry == 'T')
-        AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
-      else
-        pAd->pGl->PlaySound("return_tower");
+        pAd->pGl->PlaySound("win_level");
+        pAd->pGl->Next();
+      }
+    } else if (cCarry == 'T')
+      AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
+    else
+      pAd->pGl->PlaySound("return_tower");
 
-      bCarry = false;
-      cCarry = ' ';
-      nPrCr = 0;
+    bCarry = false;
+    cCarry = ' ';
+    nPrCr = 0;
 
-      SimpleVisualEntity::dPriority = 3;
+    SimpleVisualEntity::dPriority = 3;
 
-      SimpleVisualEntity::seq = imgStable;
-      Critter::fPos = pAd->vCs[i]->GetPosition();
-      Critter::fVel = Point();
+    SimpleVisualEntity::seq = imgStable;
+    Critter::fPos = pC->GetPosition();
+    Critter::fVel = Point();
 
-      return;
-    }
+    return;
+  }
 
   if (bCarry)
     return;
