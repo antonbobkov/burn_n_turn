@@ -3,6 +3,8 @@
 
 #include "../game_utils/draw_utils.h"
 #include "entities.h"
+#include <string>
+#include <vector>
 
 struct DragonGameController;
 
@@ -47,81 +49,76 @@ struct TutorialTextEntity : public Entity {
   void Update() override;
 };
 
-/** First tale: tracks when the knight falls, when the dragon flies, when the
- * princess appears or is captured; GetText/Update feed the scrolling words. */
-struct TutorialLevelOne {
-  bool bKilledKnight;
-  bool bFlying;
-  bool bPrincessGenerated;
-  bool bPrincessCaptured;
-
-  TutorialTextEntity *pTexter;
-
-  /* Control-scheme messages; set from GameConfig before the first Update(). */
-  std::string sSteerMessage;
-  std::string sShootingMessage;
-  std::string sTakeOffMessage;
-  bool bShowFlyingShootHint;
-
-  TutorialLevelOne()
-      : bKilledKnight(false), bFlying(false), bPrincessGenerated(false),
-        bPrincessCaptured(false), pTexter(),
-        sSteerMessage("click and hold to steer"),
-        sShootingMessage("click anywhere to shoot a fireball"),
-        sTakeOffMessage("press space or click the tower to take off"),
-        bShowFlyingShootHint(true) {}
-
-  /** Choose which lines the wise one speaks for the first chapter. */
-  std::vector<std::string> GetText();
-
-  /** Send the current lines to the scroll. */
-  void Update();
-
-  void ShotFired() {}
-
-  /** Mark that the knight fell and refresh the wise one's words. */
-  void KnightKilled();
-
-  /** Mark that the dragon took flight and refresh the words. */
-  void FlyOn();
-
-  /** Mark that the dragon landed and refresh the words. */
-  void FlyOff();
-
-  /** Mark that the princess appeared and refresh the words. */
-  void PrincessGenerate();
-
-  /** Mark that the princess was captured and refresh the words. */
-  void PrincessCaptured();
+/** Game event that can trigger a tutorial state change. */
+enum class TutorialEvent {
+  KnightKilled,
+  FlyOn,
+  FlyOff,
+  PrincessCaptured,
+  PrincessGenerate,
+  ShotFired,
+  BonusPickUp,
+  TraderKilled,
+  TraderGenerate,
 };
 
-/** Second tale: trader appearing and falling, bonus picked up; GetText/Update
- * feed the scrolling words. */
-struct TutorialLevelTwo {
-  bool bTraderGenerated;
-  bool bTraderKilled;
-  bool bBonusPickedUp;
+/** Abstract tutorial handler: receives game events and decides what to show. */
+class Tutorial {
+ public:
+  virtual ~Tutorial() = default;
+  /** Inform the tutorial that a game event has occurred. */
+  virtual void Notify(TutorialEvent event) = 0;
+};
 
-  TutorialTextEntity *pTexter;
+/** Tutorial that does nothing; used for levels without tutorial guidance. */
+class NoopTutorial : public Tutorial {
+ public:
+  void Notify(TutorialEvent /*event*/) override {}
+};
 
-  TutorialLevelTwo()
-      : bTraderGenerated(false), bTraderKilled(false), bBonusPickedUp(false),
-        pTexter() {}
+/** First chapter tutorial: tracks knight, flight, and princess milestones. */
+class TutorialLevelOne : public Tutorial {
+ public:
+  TutorialLevelOne(TutorialTextEntity *pTexter,
+                   std::string steer_message,
+                   std::string shooting_message,
+                   std::string take_off_message,
+                   bool show_flying_shoot_hint);
+  void Notify(TutorialEvent event) override;
 
-  /** Build the wise one's lines from trader and bonus state. */
+ private:
+  bool killed_knight_;
+  bool flying_;
+  bool princess_generated_;
+  bool princess_captured_;
+  TutorialTextEntity *pTexter_;
+  std::string steer_message_;
+  std::string shooting_message_;
+  std::string take_off_message_;
+  bool show_flying_shoot_hint_;
+
+  /** Choose which lines to show for the current state. */
   std::vector<std::string> GetText();
-
-  /** Send the current lines to the scroll. */
+  /** Push current lines to the text entity. */
   void Update();
+};
 
-  /** Mark that the trader fell and refresh the words. */
-  void TraderKilled();
+/** Second chapter tutorial: tracks trader appearance and bonus milestones. */
+class TutorialLevelTwo : public Tutorial {
+ public:
+  explicit TutorialLevelTwo(TutorialTextEntity *pTexter);
+  void Notify(TutorialEvent event) override;
 
-  /** Mark that the trader appeared and refresh the words. */
-  void TraderGenerate();
+ private:
+  bool trader_generated_;
+  bool trader_killed_;
+  bool bonus_picked_up_;
+  TutorialTextEntity *pTexter_;
 
-  /** Mark that a bonus was picked up and refresh the words. */
-  void BonusPickUp();
+  /** Choose which lines to show for the current state. */
+  std::vector<std::string> GetText();
+  /** Push current lines to the text entity. */
+  void Update();
 };
 
 #endif

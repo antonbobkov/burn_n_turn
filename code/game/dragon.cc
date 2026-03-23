@@ -288,11 +288,11 @@ void Dragon::Update() {
         AddBonus(GetBonus(pBns->n, nBonusPickUpTime));
         pBns->bExist = false;
 
-        pAd->tutTwo->BonusPickUp();
+        pAd->GetTutorial()->Notify(TutorialEvent::BonusPickUp);
       }
     }
 
-    pAd->tutTwo->BonusPickUp();
+    pAd->GetTutorial()->Notify(TutorialEvent::BonusPickUp);
   }
 
   Critter::Update();
@@ -350,7 +350,7 @@ void Dragon::Fire(fPoint fDir) {
     return;
 
   if (!bFly)
-    pAd->tutOne->ShotFired();
+    pAd->GetTutorial()->Notify(TutorialEvent::ShotFired);
 
   tFireballRegen.nTimer = 0;
   bRegenLocked = true;
@@ -406,7 +406,7 @@ void Dragon::TakeOff() {
   bFly = true;
   bTookOff = true;
 
-  pAd->tutOne->FlyOn();
+  pAd->GetTutorial()->Notify(TutorialEvent::FlyOn);
 
   SimpleVisualEntity::seq = imgFly;
   SimpleVisualEntity::dPriority = 5;
@@ -438,13 +438,13 @@ void Dragon::Toggle() {
 
     bFly = false;
 
-    pAd->tutOne->FlyOff();
+    pAd->GetTutorial()->Notify(TutorialEvent::FlyOff);
 
     pCs = pC;
     pCs->pDrag = pAd->FindDragon(this);
 
     if (cCarry == 'P') {
-      pAd->tutOne->PrincessCaptured();
+      pAd->GetTutorial()->Notify(TutorialEvent::PrincessCaptured);
       pC->nPrincesses += nPrCr;
 
       bool bAllFull = true;

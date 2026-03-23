@@ -47,125 +47,144 @@ void TutorialTextEntity::Update() {
   }
 }
 
+TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *pTexter,
+                                   std::string steer_message,
+                                   std::string shooting_message,
+                                   std::string take_off_message,
+                                   bool show_flying_shoot_hint)
+    : killed_knight_(false), flying_(false), princess_generated_(false),
+      princess_captured_(false), pTexter_(pTexter),
+      steer_message_(std::move(steer_message)),
+      shooting_message_(std::move(shooting_message)),
+      take_off_message_(std::move(take_off_message)),
+      show_flying_shoot_hint_(show_flying_shoot_hint) {
+  Update();
+}
+
 std::vector<std::string> TutorialLevelOne::GetText() {
-  std::vector<std::string> sText;
+  std::vector<std::string> text;
 
-  if (bFlying) {
-    if (!bKilledKnight || !bPrincessGenerated) {
-      sText.push_back(sSteerMessage);
-      sText.push_back("fly back to your tower");
-
-      return sText;
+  if (flying_) {
+    if (!killed_knight_ || !princess_generated_) {
+      text.push_back(steer_message_);
+      text.push_back("fly back to your tower");
+      return text;
     } else {
-      sText.push_back(sSteerMessage);
-      sText.push_back("fly over the princess to pick her up");
-      sText.push_back("bring captured princess to the tower");
-      if (bShowFlyingShootHint)
-        sText.push_back("(you can shoot while flying!)");
-
-      return sText;
+      text.push_back(steer_message_);
+      text.push_back("fly over the princess to pick her up");
+      text.push_back("bring captured princess to the tower");
+      if (show_flying_shoot_hint_)
+        text.push_back("(you can shoot while flying!)");
+      return text;
     }
   }
 
-  if (!bKilledKnight) {
-    sText.push_back(sShootingMessage);
-    sText.push_back("aim for the knights!");
-    sText.push_back("don't let them get to the tower");
-
-    return sText;
+  if (!killed_knight_) {
+    text.push_back(shooting_message_);
+    text.push_back("aim for the knights!");
+    text.push_back("don't let them get to the tower");
+    return text;
   }
 
-  if (bPrincessGenerated) {
-    if (!bPrincessCaptured) {
-      sText.push_back("princess in sight!");
-      sText.push_back(sTakeOffMessage);
-
-      return sText;
+  if (princess_generated_) {
+    if (!princess_captured_) {
+      text.push_back("princess in sight!");
+      text.push_back(take_off_message_);
+      return text;
     }
 
-    sText.push_back("capture four princesses to beat the level");
-    sText.push_back("don't let knights get to the tower!");
-
-    return sText;
+    text.push_back("capture four princesses to beat the level");
+    text.push_back("don't let knights get to the tower!");
+    return text;
   }
 
-  return sText;
+  return text;
 }
 
 void TutorialLevelOne::Update() {
-  if (pTexter != nullptr)
-    pTexter->SetText(GetText());
+  if (pTexter_ != nullptr)
+    pTexter_->SetText(GetText());
 }
 
-void TutorialLevelOne::KnightKilled() {
-  if (bKilledKnight == false) {
-    bKilledKnight = true;
-    Update();
+void TutorialLevelOne::Notify(TutorialEvent event) {
+  switch (event) {
+    case TutorialEvent::KnightKilled:
+      if (!killed_knight_) {
+        killed_knight_ = true;
+        Update();
+      }
+      break;
+    case TutorialEvent::FlyOn:
+      flying_ = true;
+      Update();
+      break;
+    case TutorialEvent::FlyOff:
+      flying_ = false;
+      Update();
+      break;
+    case TutorialEvent::PrincessGenerate:
+      princess_generated_ = true;
+      Update();
+      break;
+    case TutorialEvent::PrincessCaptured:
+      princess_captured_ = true;
+      Update();
+      break;
+    default:
+      break;
   }
 }
 
-void TutorialLevelOne::FlyOn() {
-  bFlying = true;
-  Update();
-}
-
-void TutorialLevelOne::FlyOff() {
-  bFlying = false;
-  Update();
-}
-
-void TutorialLevelOne::PrincessGenerate() {
-  bPrincessGenerated = true;
-  Update();
-}
-
-void TutorialLevelOne::PrincessCaptured() {
-  bPrincessCaptured = true;
+TutorialLevelTwo::TutorialLevelTwo(TutorialTextEntity *pTexter)
+    : trader_generated_(false), trader_killed_(false),
+      bonus_picked_up_(false), pTexter_(pTexter) {
   Update();
 }
 
 std::vector<std::string> TutorialLevelTwo::GetText() {
-  std::vector<std::string> sText;
+  std::vector<std::string> text;
 
-  if (!bTraderGenerated)
-    return sText;
+  if (!trader_generated_)
+    return text;
 
-  if (!bTraderKilled) {
-    sText.push_back("trader in sight!");
-    sText.push_back("kill a trader to get a power up");
-
-    return sText;
+  if (!trader_killed_) {
+    text.push_back("trader in sight!");
+    text.push_back("kill a trader to get a power up");
+    return text;
   }
 
-  if (!bBonusPickedUp) {
-    sText.push_back("traders drop power ups");
-    sText.push_back("fly over to pick them up");
-    sText.push_back("collect as many as you can!");
-
-    return sText;
+  if (!bonus_picked_up_) {
+    text.push_back("traders drop power ups");
+    text.push_back("fly over to pick them up");
+    text.push_back("collect as many as you can!");
+    return text;
   }
 
-  return sText;
+  return text;
 }
 
 void TutorialLevelTwo::Update() {
-  if (pTexter != nullptr)
-    pTexter->SetText(GetText());
+  if (pTexter_ != nullptr)
+    pTexter_->SetText(GetText());
 }
 
-void TutorialLevelTwo::TraderKilled() {
-  if (bTraderKilled == false) {
-    bTraderKilled = true;
-    Update();
+void TutorialLevelTwo::Notify(TutorialEvent event) {
+  switch (event) {
+    case TutorialEvent::TraderGenerate:
+      trader_generated_ = true;
+      Update();
+      break;
+    case TutorialEvent::TraderKilled:
+      if (!trader_killed_) {
+        trader_killed_ = true;
+        Update();
+      }
+      break;
+    case TutorialEvent::BonusPickUp:
+      bonus_picked_up_ = true;
+      Update();
+      break;
+    default:
+      break;
   }
-}
-
-void TutorialLevelTwo::TraderGenerate() {
-  bTraderGenerated = true;
-  Update();
-}
-
-void TutorialLevelTwo::BonusPickUp() {
-  bBonusPickedUp = true;
-  Update();
 }

@@ -23,8 +23,7 @@ struct MegaSlime;
 struct Sliminess;
 struct MegaSliminess;
 struct SoundControls;
-struct TutorialLevelOne;
-struct TutorialLevelTwo;
+class Tutorial;
 struct TutorialTextEntity;
 
 /** The keeper of the chapter: castles, roads, dragon, spawners, treasures,
@@ -32,10 +31,10 @@ struct TutorialTextEntity;
 struct LevelController : public EntityListController {
   std::string get_class_name() { return "LevelController"; }
 
-  std::unique_ptr<TutorialLevelOne> tutOne;
-  std::unique_ptr<TutorialLevelTwo> tutTwo;
-
   LevelController *pSelf;
+
+  /** Return the active tutorial handler for this level. */
+  Tutorial *GetTutorial() const;
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
@@ -152,6 +151,7 @@ struct LevelController : public EntityListController {
 
   std::unique_ptr<SoundControls> pSc_;
   std::unique_ptr<TutorialTextEntity> pTutorialText_;
+  std::unique_ptr<Tutorial> pTutorial_;
 
   MouseCursor mc_;
 };

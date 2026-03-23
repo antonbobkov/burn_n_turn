@@ -130,6 +130,8 @@ static const float fSpreadFactor = 2.0f;
 
 LevelController::~LevelController() = default;
 
+Tutorial *LevelController::GetTutorial() const { return pTutorial_.get(); }
+
 LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  Color c, const LevelLayout &lvl,
                                  std::unique_ptr<SoundControls> pSc)
@@ -138,8 +140,7 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
       bLeft_(false), bCh_(false), bLeftDown_(false), bRightDown_(false),
       nLastDir_(0), bWasDirectionalInput_(0), nLvl_(lvl.nLvl), nSlimeNum_(0),
       pGr_(0), bTakeOffToggle_(false),
-      tutOne(std::make_unique<TutorialLevelOne>()),
-      tutTwo(std::make_unique<TutorialLevelTwo>()), pTutorialText_(),
+      pTutorialText_(), pTutorial_(std::make_unique<NoopTutorial>()),
       pSc_(std::move(pSc)),
       mc_(pGl->GetImgSeq("claw"), Point()) {}
 
@@ -191,30 +192,31 @@ void LevelController::Init(LevelController *pSelf, const LevelLayout &lvl) {
 
   if (pGl->GetGameConfig().IsPcVersion()) {
     if (nLvl_ == 1) {
-      tutOne->pTexter = pTutorialText_.get();
       const GameConfig &cfg = pGl->GetGameConfig();
+      std::string steer, shoot, take_off;
+      bool fly_hint;
       if (cfg.IsJoystickTutorial()) {
-        tutOne->sSteerMessage    = "steer with joystick";
-        tutOne->sShootingMessage = "move joystick to shoot a fireball";
-        tutOne->sTakeOffMessage  = "press button to take off";
-        tutOne->bShowFlyingShootHint = false;
+        steer    = "steer with joystick";
+        shoot    = "move joystick to shoot a fireball";
+        take_off = "press button to take off";
+        fly_hint = false;
       } else if (cfg.IsKeyboardControls()) {
-        tutOne->sSteerMessage    = "steer with left and right keys";
-        tutOne->sShootingMessage = "shoot with arrow keys";
-        tutOne->sTakeOffMessage  = "press space to take off";
-        tutOne->bShowFlyingShootHint = true;
+        steer    = "steer with left and right keys";
+        shoot    = "shoot with arrow keys";
+        take_off = "press space to take off";
+        fly_hint = true;
       } else {
-        tutOne->sSteerMessage    = "click and hold to steer";
-        tutOne->sShootingMessage = "click anywhere to shoot a fireball";
-        tutOne->sTakeOffMessage  = "press space or click the tower to take off";
-        tutOne->bShowFlyingShootHint = true;
+        steer    = "click and hold to steer";
+        shoot    = "click anywhere to shoot a fireball";
+        take_off = "press space or click the tower to take off";
+        fly_hint = true;
       }
-      tutOne->Update();
+      pTutorial_ = std::make_unique<TutorialLevelOne>(
+          pTutorialText_.get(), steer, shoot, take_off, fly_hint);
     }
 
     if (nLvl_ == 2) {
-      tutTwo->pTexter = pTutorialText_.get();
-      tutTwo->Update();
+      pTutorial_ = std::make_unique<TutorialLevelTwo>(pTutorialText_.get());
     }
   }
 }
