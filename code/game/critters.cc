@@ -23,8 +23,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
     nNum = 8;
 
   for (int i = 0; i < nNum; ++i) {
-    fPoint f = GetWedgeAngle(Point(1, 1), 1, i, nNum + 1);
-    f.Normalize(15);
+    fPoint f = fPoint::Normalized(GetWedgeAngle(Point(1, 1), 1, i, nNum + 1), 15);
 
     pAc->pGl->PlaySound("slime_summon");
     pAc->AddSpawnedGenerator(
@@ -477,8 +476,7 @@ void Slime::OnHit(char cWhat) {
     return;
 
   for (int i = 0; i < 2; ++i) {
-    fPoint f = RandomAngle();
-    f.Normalize(4);
+    fPoint f = fPoint::Normalized(RandomAngle(), 4);
 
     pAc->AddSliminess(std::make_unique<Sliminess>(
         GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
@@ -597,8 +595,7 @@ void Mage::Update() {
 
 void Mage::SummonSlimes() {
   for (int i = 0; i < 2; ++i) {
-    fPoint f = RandomAngle();
-    f.Normalize(10);
+    fPoint f = fPoint::Normalized(RandomAngle(), 10);
 
     pAc->AddSliminess(std::make_unique<Sliminess>(
         GetPosition() + f.ToPnt(), pAc, true, 0));
@@ -639,8 +636,7 @@ void Castle::OnKnight(char cWhat) {
       fPoint dragVel = pAv->pt.GetDirection(GetPosition());
       if (dragVel.Length() == 0)
         dragVel = fPoint(0, -1);
-      dragVel.Normalize(pDrag->leash.speed);
-      pDrag->SetVel(dragVel);
+      pDrag->SetVel(fPoint::Normalized(dragVel, pDrag->leash.speed));
 
       pDrag = nullptr;
     }
@@ -654,8 +650,7 @@ void Castle::OnKnight(char cWhat) {
     --nPrincesses;
 
     if (cWhat == 'K') {
-      fPoint v = RandomAngle();
-      v.Normalize(fPrincessSpeed * 3.F);
+      fPoint v = fPoint::Normalized(RandomAngle(), fPrincessSpeed * 3.F);
 
       pAv->AddOwnedConsumable(std::make_unique<Princess>(
           Critter(7, GetPosition(), v, rBound, 0,
@@ -671,9 +666,8 @@ void Castle::OnKnight(char cWhat) {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
       for (int i = 0; i < nPrincesses; ++i) {
-        fPoint v(sin(r + i * 2 * 3.1415F / nPrincesses),
-                 cos(r + i * 2 * 3.1415F / nPrincesses));
-        v.Normalize(fPrincessSpeed * 3.F);
+        fPoint v = fPoint::Normalized(fPoint(sin(r + i * 2 * 3.1415F / nPrincesses),
+                 cos(r + i * 2 * 3.1415F / nPrincesses)), fPrincessSpeed * 3.F);
 
         pAv->AddOwnedConsumable(std::make_unique<Princess>(
             Critter(7, GetPosition(), v, rBound, 0,

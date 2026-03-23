@@ -45,6 +45,10 @@ struct fPoint {
 
   Point ToPnt() const;
   void Normalize(float f = 1);
+  static fPoint Normalized(fPoint f, float speed = 1) {
+    f.Normalize(speed);
+    return f;
+  }
   float Length() const;
 };
 

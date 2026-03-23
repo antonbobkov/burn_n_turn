@@ -273,9 +273,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       if (!vDr[i]->bFly)
         vDr[i]->Toggle();
       else {
-        fPoint fFb = vDr[0]->GetVel();
-        fFb.Normalize(100);
-        vDr[0]->Fire(fFb);
+        vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
       }
     }
 
@@ -361,10 +359,7 @@ void LevelController::OnMouseDown(Point pPos) {
     vDr[0]->Toggle();
   } else {
     if (!vDr[0]->bFly) {
-      fPoint fFb = pt.GetDirection(vDr[0]->GetPosition() + Point(-10, -25));
-
-      fFb.Normalize(100);
-      vDr[0]->Fire(fFb);
+      vDr[0]->Fire(fPoint::Normalized(pt.GetDirection(vDr[0]->GetPosition() + Point(-10, -25)), 100));
     }
   }
 }
@@ -375,10 +370,7 @@ void LevelController::OnMouseUp() {
 
   if (vDr[0]->bFly && fTime <= .2 && !bTakeOffToggle &&
       pt.GetDirection(vDr[0]->GetPosition()).Length() > vDr[0]->GetRadius()) {
-    fPoint fFb = vDr[0]->GetVel();
-
-    fFb.Normalize(100);
-    vDr[0]->Fire(fFb);
+    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
   }
 
   if (bTakeOffToggle)
@@ -387,10 +379,7 @@ void LevelController::OnMouseUp() {
 
 void LevelController::Fire() {
   if (vDr[0]->bFly) {
-    fPoint fFb = vDr[0]->GetVel();
-
-    fFb.Normalize(100);
-    vDr[0]->Fire(fFb);
+    vDr[0]->Fire(fPoint::Normalized(vDr[0]->GetVel(), 100));
   }
 }
 
@@ -580,11 +569,8 @@ void LevelController::Update() {
       if (d.Length() == 0)
         d = v;
 
-      d.Normalize(v.Length());
-
-      fPoint newVel = v * fFlightCoefficient + d;
-      newVel.Normalize(vDr[0]->leash.speed);
-      vDr[0]->SetVel(newVel);
+      d = fPoint::Normalized(d, v.Length());
+      vDr[0]->SetVel(fPoint::Normalized(v * fFlightCoefficient + d, vDr[0]->leash.speed));
     } else if (bLeftDown || bRightDown) {
       fPoint v = vDr[0]->GetVel();
       fPoint d(v.y, v.x);
@@ -592,9 +578,7 @@ void LevelController::Update() {
         d.y *= -1;
       else
         d.x *= -1;
-      fPoint newVel2 = v * fFlightCoefficient * 1.2f + d;
-      newVel2.Normalize(vDr[0]->leash.speed);
-      vDr[0]->SetVel(newVel2);
+      vDr[0]->SetVel(fPoint::Normalized(v * fFlightCoefficient * 1.2f + d, vDr[0]->leash.speed));
     }
   }
 
