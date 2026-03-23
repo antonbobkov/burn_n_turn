@@ -57,7 +57,7 @@ struct DragonGameController {
                        ConfigurationFile *game_data,
                        GameConfig game_config);
 
-  void StartUp(DragonGameController *pSelf);
+  void StartUp();
   void Next();
   void Restart(int nActive_ = -1);
 
@@ -197,8 +197,6 @@ private:
 
   ConfigurationFile *p_config_;
   GameConfig game_config_;
-
-  DragonGameController *pSelf;
 
   std::unique_ptr<Preloader> pr;
 };

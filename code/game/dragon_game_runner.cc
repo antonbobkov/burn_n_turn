@@ -63,7 +63,7 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe)
       pDr.get(), pNum.get(), pBigNum.get(), pFancyNum.get(), pSm, vLvl,
       rBound, szActualRez, pExitProgram, fp_.get(), config_.get(),
       game_data_.get(), game_config_);
-  pCnt->StartUp(pCnt.get());
+  pCnt->StartUp();
 }
 
 DragonGameRunner::~DragonGameRunner() = default;

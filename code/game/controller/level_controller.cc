@@ -148,36 +148,35 @@ Dragon *LevelController::FindDragon(Dragon *p) {
   return nullptr;
 }
 
-void LevelController::Init(LevelController *pSelf_, const LevelLayout &lvl) {
-  pSelf = pSelf_;
+void LevelController::Init(const LevelLayout &lvl) {
   bNoRefresh = true;
 
   tLoseTimer.nPeriod = 0;
 
-  AddOwnedEntity(std::make_unique<AdNumberDrawer>(pSelf));
-  AddOwnedEntity(std::make_unique<BonusDrawer>(pSelf));
+  AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
+  AddOwnedEntity(std::make_unique<BonusDrawer>(this));
 
-  pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, pSelf,
+  pKnightGen = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, this,
                                                  lvl.blKnightGen);
-  pPGen = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, pSelf);
-  pTGen = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, pSelf);
+  pPGen = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, this);
+  pTGen = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, this);
   pMGen = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
-                                          rBound, pSelf);
+                                          rBound, this);
 
   pGr = pKnightGen.get();
   pMgGen = pMGen.get();
 
   int i;
   for (i = 0; i < (int)lvl.vRoadGen.size(); ++i)
-    vRd.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], pSelf));
+    vRd.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], this));
 
   for (i = 0; i < (int)lvl.vCastleLoc.size(); ++i)
-    vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, pSelf));
+    vCs.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, this));
 
   t = Timer(lvl.nTimer);
 
   vDr.push_back(std::make_unique<Dragon>(
-      vCs[0].get(), pSelf, pGl->GetImgSeq("dragon_stable"),
+      vCs[0].get(), this, pGl->GetImgSeq("dragon_stable"),
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr.back()->pCs != nullptr)
@@ -506,7 +505,7 @@ void LevelController::MegaGeneration() {
 }
 
 void LevelController::MegaGeneration(Point p) {
-  AddMegaSliminess(std::make_unique<MegaSliminess>(p, pSelf));
+  AddMegaSliminess(std::make_unique<MegaSliminess>(p, this));
 }
 
 void LevelController::Update() {

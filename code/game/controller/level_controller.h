@@ -77,8 +77,6 @@ struct LevelController : public EntityListController {
   std::list<std::unique_ptr<Entity>> lsSpawnedGenerators;
   std::unique_ptr<SoundControls> pSc;
 
-  LevelController *pSelf;
-
   PositionTracker pt;
   bool bTakeOffToggle;
 
@@ -101,7 +99,7 @@ struct LevelController : public EntityListController {
                   const LevelLayout &lvl);
   ~LevelController();
 
-  void Init(LevelController *pSelf, const LevelLayout &lvl);
+  void Init(const LevelLayout &lvl);
 
   void AddBonusAnimation(std::unique_ptr<FireballBonusAnimation> p);
   std::vector<FireballBonusAnimation *> GetBonusAnimations();
