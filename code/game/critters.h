@@ -175,17 +175,17 @@ private:
 class Ghostiness : public Entity {
 public:
   std::string get_class_name() override { return "Ghostiness"; }
-  Timer t;
-  Point p;
-
-  LevelController *pAdv;
-
-  Critter knCp;
-  int nGhostHit;
 
   Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_, int nGhostHit_);
 
   void Update() override;
+
+private:
+  Timer t;
+  Point p;
+  LevelController *pAdv;
+  Critter knCp;
+  int nGhostHit;
 };
 
 /** A slime: it drifts toward its prey, a timer guiding its steps. */
