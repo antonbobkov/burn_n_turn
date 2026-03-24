@@ -10,13 +10,6 @@
 class BuyNowController : public EntityListController {
 public:
   std::string get_class_name() { return "BuyNowController"; }
-  int t;
-  std::vector<std::unique_ptr<Animation>> mSlimes;
-  std::vector<fPoint> mSlimeVel;
-  std::vector<fPoint> mSlimePos;
-  int nSlimeCount;
-
-  Timer tVel;
 
   BuyNowController(DragonGameController *pGl_, Rectangle rBound, Color c);
 
@@ -37,18 +30,28 @@ public:
 
   void OnMouseDown(Point pPos) override;
   std::string GetControllerName() const override { return "buy"; }
+
+private:
+  int t;
+  std::vector<std::unique_ptr<Animation>> mSlimes;
+  std::vector<fPoint> mSlimeVel;
+  std::vector<fPoint> mSlimePos;
+  int nSlimeCount;
+  Timer tVel;
 };
 
 /** A sight that paints the slime dances on the buy-now screen. */
 class SlimeUpdater : public Entity {
 public:
   bool ShouldDraw() override { return true; }
-  BuyNowController *pBuy;
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
 
   /*virtual*/ void Draw(ScalingDrawer *pDr);
   /*virtual*/ float GetPriority() { return 0; }
+
+private:
+  BuyNowController *pBuy;
 };
 
 #endif
