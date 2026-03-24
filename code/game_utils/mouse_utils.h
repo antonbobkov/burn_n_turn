@@ -19,11 +19,6 @@ template <class T> class GraphicalInterface;
  * GetRelMovement(). */
 class MouseTracker {
 public:
-  Point pLastRead;
-  Point pCurPos;
-
-  bool bInitialized;
-
   MouseTracker() : bInitialized(false) {}
 
   void OnMouse(Point p) {
@@ -42,17 +37,16 @@ public:
     pLastRead = pCurPos;
     return pRet;
   }
+
+private:
+  Point pLastRead;
+  Point pCurPos;
+  bool bInitialized;
 };
 
 /** Tracks mouse for trackball-style steering (angle and fire). */
 class TrackballTracker {
 public:
-  MouseTracker mtr;
-
-  std::list<Point> lsMouse;
-  int nMaxLength;
-  bool trigFlag;
-  int threshold;
   TrackballTracker();
 
   void Update();
@@ -63,16 +57,18 @@ public:
   fPoint GetAvMovement();
   int GetLengthSq(Point p);
   int GetDerivative();
+
+private:
+  MouseTracker mtr;
+  std::list<Point> lsMouse;
+  int nMaxLength;
+  bool trigFlag;
+  int threshold;
 };
 
 /** Tracks mouse position, last down, press state and counter for input. */
 class PositionTracker {
 public:
-  Point pMouse;
-  Point pLastDownPosition;
-  bool bPressed;
-  int nCounter;
-
   PositionTracker() : bPressed(false) {}
 
   void On();
@@ -83,20 +79,30 @@ public:
   void UpdateLastDownPosition(Point pMouse_);
   fPoint GetDirection(fPoint fDragonPos) { return pMouse - fDragonPos; }
   fPoint GetFlightDirection(fPoint fDragonPos);
+
+  bool IsPressed() const { return bPressed; }
+
+private:
+  Point pMouse;
+  Point pLastDownPosition;
+  bool bPressed;
+  int nCounter;
 };
 
 /** Cursor image and position; Draw/Update for rendering and click state. */
 class MouseCursor {
 public:
-  bool bPressed;
-  ImageSequence imgCursor;
-  Point pCursorPos;
-
   MouseCursor(ImageSequence imgCursor_, Point pCursorPos_)
       : bPressed(false), imgCursor(imgCursor_), pCursorPos(pCursorPos_) {}
 
   void DrawCursor(GraphicalInterface<Index> *pGr);
   void SetCursorPos(Point pPos);
+  void SetPressed(bool b) { bPressed = b; }
+
+private:
+  bool bPressed;
+  ImageSequence imgCursor;
+  Point pCursorPos;
 };
 
 #endif
