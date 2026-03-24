@@ -1,6 +1,10 @@
 - All relevant code is under code/. Ignore unused_old_ignore/
 - When commiting changes, push them, and show github link to commit.
 - When merging worktree with master, read through master commit messages to get more context. Run tests afterwards.
+- Comments should use simple non-technical language.
+- Comments under game/ should be written using epic video game language, telling a magical fairy tale of dragons, knights, and wizards. Role-play, be silly, tell a story.
+- Any function longer than a line should be defined in .cc class. Only define short functions in .h files.
+
 
 ## Build system
 
