@@ -70,12 +70,12 @@ int main(int /*argc*/, char * /*argv*/[]) {
 
     Point pOffSet(0, 0);
 
-    Rectangle sBound = Rectangle(Point(0, 0), inf.GetScreenRez());
+    Rectangle sBound = Rectangle(Point(0, 0), inf.szScreenRez);
 
     Rectangle rOffSet = sBound;
 
     auto pGraph = std::make_unique<SdlGraphicalInterface>(
-        sBound.sz, inf.IsFullScreen(), rOffSet);
+        sBound.sz, inf.bFullScreen, rOffSet);
     auto pGr = std::make_unique<SimpleGraphicalInterface<SdlImage *>>(
         pGraph.get());
 
@@ -85,11 +85,11 @@ int main(int /*argc*/, char * /*argv*/[]) {
 
     // SDL_WM_SetIcon(SDL_LoadBMP("icon\\game_icon.bmp"), NULL);
     // pGraph->SetIcon("icon\\game_icon.bmp");
-    pGraph->SetTitle(inf.GetTitle().c_str());
+    pGraph->SetTitle(inf.strTitle.c_str());
 
     pGr->DrawRectangle(sBound, Color(0, 0, 0), true);
 
-    if (inf.IsMouseCapture()) {
+    if (inf.bMouseCapture) {
       SDL_ShowCursor(SDL_DISABLE);
       SDL_SetWindowGrab(pGraph->pScreenWindow, SDL_TRUE);
     }
@@ -97,7 +97,7 @@ int main(int /*argc*/, char * /*argv*/[]) {
     std::unique_ptr<FileManager> fm(new StdFileManager());
     ProgramEngine pe(
         std::make_unique<SwitchEvent<bool, bool>>(bExit, bTrue), pGr.get(),
-        pSndMng.get(), std::make_unique<IoWriter>(), inf.GetScreenRez(), fm.get());
+        pSndMng.get(), std::make_unique<IoWriter>(), inf.szScreenRez, fm.get());
 
     // if(inf.bFlexibleResolution && inf.bFullScreen && inf.bBlackBox)
     //	pe.szActualRez = Size(pInf->current_w, pInf->current_h);
@@ -111,7 +111,7 @@ int main(int /*argc*/, char * /*argv*/[]) {
 
     Point pMousePos = Point(0, 0);
     while (!bExit) {
-      if (SDL_GetTicks() - nTimer > static_cast<Uint32>(inf.GetFramerate())) {
+      if (SDL_GetTicks() - nTimer > static_cast<Uint32>(inf.nFramerate)) {
         nTimer = SDL_GetTicks();
         pGl->Update();
       }
@@ -129,7 +129,7 @@ int main(int /*argc*/, char * /*argv*/[]) {
           SDL_GetRelativeMouseState(&x, &y);
 
           pMousePos += Point(x, y);
-          if (inf.IsMouseCapture())
+          if (inf.bMouseCapture)
             pGl->MouseMove(pMousePos);
           else
             pGl->MouseMove(Point(event.motion.x, event.motion.y));
