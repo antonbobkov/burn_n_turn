@@ -48,7 +48,7 @@ void StaticImage::Draw(ScalingDrawer *pDr) {
 }
 
 void StaticRectangle::Draw(ScalingDrawer *pDr) {
-  pDr->pGr->DrawRectangle(r, c, false);
+  pDr->GetGraphics()->DrawRectangle(r, c, false);
 }
 
 void SimpleSoundEntity::Update() {

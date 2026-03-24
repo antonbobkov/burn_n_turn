@@ -20,19 +20,19 @@ template <class T> class GraphicalInterface;
  * key. */
 class Drawer {
 public:
-  GraphicalInterface<Index> *pGr;
-
   Drawer() : pGr(nullptr) {}
   virtual ~Drawer() = default;
   virtual void Draw(Index nImg, Point p, bool bCentered = true) = 0;
+
+  GraphicalInterface<Index> *GetGraphics() { return pGr; }
+
+protected:
+  GraphicalInterface<Index> *pGr;
 };
 
 /** Drawer that scales images by nFactor and uses cTr as transparency key. */
 class ScalingDrawer : public Drawer {
 public:
-  int nFactor;
-  Color cTr;
-
   ScalingDrawer(GraphicalInterface<Index> *pGr_,
                 int nFactor_,
                 Color cTr_ = Color(0, 255, 255))
@@ -45,18 +45,18 @@ public:
   void Draw(Index nImg, Point p, bool bCentered = true) override;
 
   virtual Index LoadImage(std::string strFile);
+
+  int GetFactor() const { return nFactor; }
+
+private:
+  int nFactor;
+  Color cTr;
 };
 
 /** Draws digits/words from a font bitmap; CacheColor/DrawColorWord for
  * recolored text. */
 class NumberDrawer {
 public:
-  ScalingDrawer *pDr;
-  std::vector<int> vImgIndx;
-  std::vector<Index> vImg;
-
-  std::map<Color, std::vector<Index>> mpCachedRecolorings;
-
   void CacheColor(Color c);
 
   NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
@@ -75,6 +75,12 @@ public:
   void DrawWord(std::string s, Point p, bool bCenter = false);
 
   void DrawColorWord(std::string s, Point p, Color c, bool bCenter = false);
+
+private:
+  ScalingDrawer *pDr;
+  std::vector<int> vImgIndx;
+  std::vector<Index> vImg;
+  std::map<Color, std::vector<Index>> mpCachedRecolorings;
 };
 
 #endif

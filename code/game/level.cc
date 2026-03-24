@@ -8,13 +8,13 @@
 #include "../wrappers/geometry.h"
 
 void Road::Draw(ScalingDrawer *pDr) {
-  int n = pDr->nFactor;
+  int n = pDr->GetFactor();
   if (bVertical)
-    pDr->pGr->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
+    pDr->GetGraphics()->DrawRectangle(Rectangle((nCoord - 5) * n, rBound.p.y * n,
                                       (nCoord + 5) * n, rBound.sz.y * n),
                             Color(63, 63, 63), false);
   else
-    pDr->pGr->DrawRectangle(Rectangle(rBound.p.x * n, (nCoord - 5) * n,
+    pDr->GetGraphics()->DrawRectangle(Rectangle(rBound.p.x * n, (nCoord - 5) * n,
                                       rBound.sz.x * n, (nCoord + 5) * n),
                             Color(63, 63, 63), false);
 }
@@ -302,17 +302,17 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
 }
 
 void FancyRoad::Draw(ScalingDrawer *pDr) {
-  int n = pDr->nFactor;
-  Image *p = pDr->pGr->GetImage(pAd->pGl->GetImg("road"));
+  int n = pDr->GetFactor();
+  Image *p = pDr->GetGraphics()->GetImage(pAd->pGl->GetImg("road"));
   Size sz = p->GetSize();
 
   if (bVertical)
     for (int i = 0; (i - 1) * sz.y < rBound.sz.y * int(n); ++i)
-      pDr->pGr->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
+      pDr->GetGraphics()->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
                           pAd->pGl->GetImg("road"), false);
   else
     for (int i = 0; (i - 1) * sz.x < rBound.sz.x * int(n); ++i)
-      pDr->pGr->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
+      pDr->GetGraphics()->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
                           pAd->pGl->GetImg("road"), false);
 }
 
