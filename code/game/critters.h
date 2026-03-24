@@ -192,9 +192,6 @@ private:
 class Slime : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "Slime"; }
-  LevelController *pAc;
-  Timer t;
-  int nGeneration;
 
   Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_, int nGeneration_);
 
@@ -211,6 +208,11 @@ public:
   char GetType() override { return 'L'; }
 
   ~Slime();
+
+private:
+  LevelController *pAc;
+  Timer t;
+  int nGeneration;
 };
 
 /** Summons slimes on a timer at a spot in the realm. */
