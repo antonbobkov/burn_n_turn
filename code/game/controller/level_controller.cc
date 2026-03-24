@@ -96,14 +96,14 @@ public:
       for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
         TimedFireballBonus *pBns = itr->get();
 
-        if (pBns->t.IsActive() &&
-            pBns->t.UntilTick() < 4 * nFramesInSecond)
+        if (pBns->IsActive() &&
+            pBns->UntilTick() < 4 * nFramesInSecond)
           if (nAnimationCounter % 2 == 1) {
             p.x += 10;
             continue;
           }
 
-        ImageSequence img = pAd->pGl->GetImgSeq(GetBonusImage(pBns->nNum));
+        ImageSequence img = pAd->pGl->GetImgSeq(GetBonusImage(pBns->GetNum()));
 
         pDr->Draw(img.GetImageAt(nAnimationCounter % img.GetImageCount()), p, false);
 

@@ -156,7 +156,7 @@ void KnightOnFire::Update() {
 }
 
 int GetFireballRaduis(FireballBonus &fb) {
-  int n = fb.uMap["big"];
+  int n = fb.GetU("big");
 
   if (n == 0)
     return 6;
@@ -169,7 +169,7 @@ int GetFireballRaduis(FireballBonus &fb) {
 }
 
 std::string GetSizeSuffix(FireballBonus &fb) {
-  int n = fb.uMap["big"];
+  int n = fb.GetU("big");
 
   if (n == 0)
     return "";
@@ -182,7 +182,7 @@ std::string GetSizeSuffix(FireballBonus &fb) {
 }
 
 float GetExplosionInitialRaduis(FireballBonus &fb) {
-  int n = fb.uMap["big"];
+  int n = fb.GetU("big");
   float fCf;
 
   if (n == 0)
@@ -198,7 +198,7 @@ float GetExplosionInitialRaduis(FireballBonus &fb) {
 }
 
 float GetExplosionExpansionRate(FireballBonus &fb) {
-  int n = fb.uMap["big"];
+  int n = fb.GetU("big");
   float fCf;
 
   if (n == 0)
@@ -214,7 +214,7 @@ float GetExplosionExpansionRate(FireballBonus &fb) {
 }
 
 int GetFireballChainNum(FireballBonus &fb) {
-  int nRet = fb.uMap["fireballchainnum"];
+  int nRet = fb.GetU("fireballchainnum");
 
   if (nRet != 0)
     ++nRet;
@@ -227,9 +227,9 @@ Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
     : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
               nFramesInSecond / 10),
       pBc(pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
-  Critter::fVel.Normalize(fb.fMap["speed"]);
+  Critter::fVel.Normalize(fb.GetF("speed"));
 
-  if (!fb.bMap["laser"])
+  if (!fb.GetB("laser"))
     Critter::seq = pBc->pGl->GetImgSeq("fireball" + GetSizeSuffix(fb));
   else {
     Polar pol(Critter::fVel);
@@ -258,27 +258,27 @@ void Fireball::Update() {
       } else
         pBc->pGl->PlaySound("death");
 
-      if (ptr->GetType() != 'K' || (fb.uMap["setonfire"] == 0))
+      if (ptr->GetType() != 'K' || (fb.GetU("setonfire") == 0))
         ptr->OnHit('F');
       else {
         ptr->Destroy();
         pBc->AddOwnedEntity(std::make_unique<KnightOnFire>(
             Critter(ptr->GetRadius(), ptr->GetPosition(), fPoint(),
                     rBound, 1.F, ImageSequence(), true),
-            pBc, 15 * nFramesInSecond, Chain(fb.uMap["setonfire"])));
+            pBc, 15 * nFramesInSecond, Chain(fb.GetU("setonfire"))));
       }
 
       if (!bMultiHit) {
-        bool bKeepGoing = (fb.uMap["through"] != 0) || fb.bMap["through_flag"];
+        bool bKeepGoing = (fb.GetU("through") != 0) || fb.GetB("through_flag");
 
         if (nChain != 0 || !bKeepGoing)
           this->Destroy();
 
         if (bKeepGoing) {
-          if (fb.bMap["through_flag"])
-            fb.bMap["through_flag"] = false;
+          if (fb.GetB("through_flag"))
+            fb.SetB("through_flag", false);
           else
-            --fb.uMap["through"];
+            fb.SetU("through", fb.GetU("through") - 1);
         }
 
         if (bKeepGoing) {
@@ -291,15 +291,15 @@ void Fireball::Update() {
           }
         }
 
-        if (fb.uMap["explode"] > 0) {
-          if (!fb.bMap["laser"]) {
+        if (fb.GetU("explode") > 0) {
+          if (!fb.GetB("laser")) {
             pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
                     pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
                     nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
-                pBc, Chain(fb.uMap["explode"] - 1)));
+                pBc, Chain(fb.GetU("explode") - 1)));
           } else {
             pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
@@ -307,7 +307,7 @@ void Fireball::Update() {
                     pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
                     nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
-                pBc, Chain(fb.uMap["explode"] - 1)));
+                pBc, Chain(fb.GetU("explode") - 1)));
           }
 
           pBc->pGl->PlaySound("explosion");
@@ -342,7 +342,7 @@ void CircularFireball::Update() {
   fPen.Normalize(fVel.Length());
   fVel = fPen;
 
-  if (fb.bMap["laser"]) {
+  if (fb.GetB("laser")) {
     Polar pol(Critter::fVel);
     int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
