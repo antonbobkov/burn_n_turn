@@ -259,7 +259,7 @@ void MenuDisplay::UpdateMenuEntries() {
   memOptions.At(nTutorial).sText =
       TutorialString() + OnOffString(settings->sbTutorialOn.Get());
 
-  bool bFullScreenNow = GetProgramInfo().IsFullScreen();
+  bool bFullScreenNow = GetProgramInfo().bFullScreen;
   bool bFullScreenSetting = pMenuController->GetGl()->IsFullScreenSetting();
   std::string sExtra = "";
   if (bFullScreenNow != bFullScreenSetting)

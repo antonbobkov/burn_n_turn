@@ -10,8 +10,7 @@
 #include "../wrappers/SuiGen.h"
 
 class FileManager;
-class ProgramInfo {
-public:
+struct ProgramInfo {
   ProgramInfo()
       : bMouseCapture(false), bFullScreen(false), bFlexibleResolution(false),
         bBlackBox(false), nFramerate(0) {}
@@ -22,15 +21,6 @@ public:
         bMouseCapture(bMouseCapture_), bFullScreen(bFullScreen_),
         bFlexibleResolution(bFlexibleResolution_), bBlackBox(bBlackBox_) {}
 
-  Size GetScreenRez() const { return szScreenRez; }
-  std::string GetTitle() const { return strTitle; }
-  int GetFramerate() const { return nFramerate; }
-  bool IsMouseCapture() const { return bMouseCapture; }
-  bool IsFullScreen() const { return bFullScreen; }
-  bool IsFlexibleResolution() const { return bFlexibleResolution; }
-  bool IsBlackBox() const { return bBlackBox; }
-
-private:
   Size szScreenRez;
   std::string strTitle;
   int nFramerate;
@@ -42,15 +32,14 @@ private:
 
 ProgramInfo GetProgramInfo();
 
-class ProgramEngine {
-public:
+struct ProgramEngine {
   ProgramEngine(std::unique_ptr<Event> pExitProgram_,
                 GraphicalInterface<Index> *pGr_,
                 SoundInterface<Index> *pSndMng_,
                 std::unique_ptr<MessageWriter> pMsg_, FileManager *p_fm_)
       : pExitProgram(std::move(pExitProgram_)), pGr(pGr_), pSndMng(pSndMng_),
         pMsg(std::move(pMsg_)), p_fm(p_fm_) {
-    szScreenRez = GetProgramInfo().GetScreenRez();
+    szScreenRez = GetProgramInfo().szScreenRez;
     szActualRez = szScreenRez;
   }
 
@@ -67,15 +56,6 @@ public:
   ProgramEngine(ProgramEngine const&) = delete;
   ProgramEngine& operator=(ProgramEngine const&) = delete;
 
-  FileManager *GetFileManager() const { return p_fm; }
-  Event *GetExitProgram() const { return pExitProgram.get(); }
-  GraphicalInterface<Index> *GetGraphics() const { return pGr; }
-  SoundInterface<Index> *GetSound() const { return pSndMng; }
-  MessageWriter *GetMessageWriter() const { return pMsg.get(); }
-  Size GetScreenRez() const { return szScreenRez; }
-  Size GetActualRez() const { return szActualRez; }
-
-private:
   std::unique_ptr<Event> pExitProgram;
   GraphicalInterface<Index> *pGr;
   SoundInterface<Index> *pSndMng;
