@@ -107,16 +107,14 @@ private:
 class Knight : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "Knight"; }
-  LevelController *pAc;
 
-  char cType;
-
-  int nGhostHit;
-  int nGolemHealth;
-
-  Knight(const Critter &cr, LevelController *pAc_, char cType_)
-      : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(1),
+  Knight(const Critter &cr, LevelController *pAc_, char cType_,
+         int nGhostHit_ = 1)
+      : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(nGhostHit_),
         nGolemHealth(nGolemHealthMax) {}
+
+  /** Change the type to ghost ('G'), used when a knight spawns as a ghost. */
+  void SetAsGhost() { cType = 'G'; }
 
   void Draw(ScalingDrawer *pDr) override;
 
@@ -136,6 +134,12 @@ public:
   Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return cType; }
+
+private:
+  LevelController *pAc;
+  char cType;
+  int nGhostHit;
+  int nGolemHealth;
 };
 
 /** The great slime: it may split or merge in the dance of the MegaSlime. */

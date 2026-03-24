@@ -343,12 +343,11 @@ void Ghostiness::Update() {
     if (nGhostHit == 0)
       return;
 
-    auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G');
+    auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G', nGhostHit - 1);
     if (nGhostHit == 1)
       pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost"));
     else
       pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost_knight"));
-    pCr->nGhostHit = nGhostHit - 1;
     pAdv->AddOwnedConsumable(std::move(pCr));
   }
 }
