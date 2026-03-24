@@ -12,11 +12,6 @@ class LevelController;
 class FireballBonus : virtual public Entity {
 public:
   std::string get_class_name() override { return "FireballBonus"; }
-  std::map<std::string, float> fMap;
-  std::map<std::string, int> uMap;
-  std::map<std::string, bool> bMap;
-
-  int nNum;
 
   FireballBonus(int nNum_, bool bDef);
 
@@ -30,6 +25,31 @@ public:
   }
 
   FireballBonus &operator+=(const FireballBonus &f);
+
+  float GetF(std::string key) const {
+    auto it = fMap.find(key);
+    return it != fMap.end() ? it->second : 0.f;
+  }
+  int GetU(std::string key) const {
+    auto it = uMap.find(key);
+    return it != uMap.end() ? it->second : 0;
+  }
+  bool GetB(std::string key) const {
+    auto it = bMap.find(key);
+    return it != bMap.end() ? it->second : false;
+  }
+  void SetF(std::string key, float val) { fMap[key] = val; }
+  void SetU(std::string key, int val) { uMap[key] = val; }
+  void SetB(std::string key, bool val) { bMap[key] = val; }
+  int GetNum() const { return nNum; }
+
+  friend std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
+
+private:
+  std::map<std::string, float> fMap;
+  std::map<std::string, int> uMap;
+  std::map<std::string, bool> bMap;
+  int nNum;
 };
 
 std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
@@ -38,15 +58,16 @@ std::ostream &operator<<(std::ostream &ofs, FireballBonus b);
  * IsLast when there are no more. */
 class Chain {
 public:
-  bool bInfinite;
-  int nGeneration;
-
   Chain(bool bInfinite_ = false) : bInfinite(bInfinite_), nGeneration(0) {}
   Chain(int nGeneration_) : bInfinite(false), nGeneration(nGeneration_) {}
 
   Chain Evolve();
 
   bool IsLast() { return (!bInfinite) && (nGeneration == 0); }
+
+private:
+  bool bInfinite;
+  int nGeneration;
 };
 
 /** A growing blast; it strikes all it touches and may birth more blasts
@@ -54,12 +75,6 @@ public:
 class ChainExplosion : public AnimationOnce {
 public:
   std::string get_class_name() override { return "ChainExplosion"; }
-  float r_in, r;
-  float delta;
-
-  Chain ch;
-
-  LevelController *pBc;
 
   ChainExplosion(const AnimationOnce &av, float r_, float delta_,
                  LevelController *pBc_, Chain ch_ = Chain())
@@ -74,15 +89,17 @@ public:
   void Update() override;
 
   void Draw(ScalingDrawer *pDr) override { AnimationOnce::Draw(pDr); }
+
+private:
+  float r_in, r;
+  float delta;
+  Chain ch;
+  LevelController *pBc;
 };
 
 class KnightOnFire : public Critter {
 public:
   std::string get_class_name() override { return "KnightOnFire"; }
-  LevelController *pBc;
-  int nTimer, nTimer_i;
-  Timer t;
-  Chain c;
 
   /** Send the burning knight in a random direction at fire speed. */
   void RandomizeVelocity();
@@ -91,6 +108,12 @@ public:
                 int nTimer_, Chain c_);
 
   void Update() override;
+
+private:
+  LevelController *pBc;
+  int nTimer, nTimer_i;
+  Timer t;
+  Chain c;
 };
 
 /** The dragon's fireball: may pass through or stop on first hit; strikes
@@ -98,12 +121,6 @@ public:
 class Fireball : public Critter {
 public:
   std::string get_class_name() override { return "Fireball"; }
-  LevelController *pBc;
-  bool bThrough;
-  FireballBonus fb;
-
-  Chain ch;
-  int nChain;
 
   Fireball(const Fireball &f)
       : Critter(f), pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
@@ -113,18 +130,32 @@ public:
            Chain ch_ = Chain(), int nChain_ = 1);
 
   void Update() override;
+
+protected:
+  LevelController *pBc;
+  FireballBonus fb;
+
+private:
+  bool bThrough;
+  Chain ch;
+  int nChain;
 };
 
 /** A fire strength that fades with time (e.g. a temporary boon). */
 class TimedFireballBonus : public FireballBonus {
 public:
   std::string get_class_name() override { return "TimedFireballBonus"; }
-  Timer t;
 
   TimedFireballBonus(const FireballBonus &fb, int nPeriod)
       : FireballBonus(fb), t(nPeriod) {}
 
   void Update() override;
+
+  bool IsActive() const { return t.IsActive(); }
+  int UntilTick() { return t.UntilTick(); }
+
+private:
+  Timer t;
 };
 
 /** A fireball that circles at a fixed radius around the dragon. */
@@ -132,15 +163,17 @@ class CircularFireball : virtual public Fireball,
                           virtual public TimedFireballBonus {
 public:
   std::string get_class_name() override { return "CircularFireball"; }
-  float fRadius;
-  fPoint i_pos;
-  Timer t;
 
   CircularFireball(const Fireball &f, float fRadius_, int nPeriod)
       : Fireball(f), TimedFireballBonus(FireballBonus(8, false), nPeriod),
         fRadius(fRadius_), i_pos(f.GetFPos()), t(nPeriod) {}
 
   void Update() override;
+
+private:
+  float fRadius;
+  fPoint i_pos;
+  Timer t;
 };
 
 /** A treasure shimmer with a radius; when the dragon touches it, the treasure
@@ -148,12 +181,6 @@ public:
 class FireballBonusAnimation : public Animation {
 public:
   std::string get_class_name() override { return "FireballBonusAnimation"; }
-  int n;
-  Timer tm;
-  bool bBlink;
-  LevelController *pAd;
-  std::string sUnderText;
-  ImageSequence coronaSeq;
 
   FireballBonusAnimation(Point p_, int n_, LevelController *pAd_);
 
@@ -162,6 +189,17 @@ public:
   void Draw(ScalingDrawer *pDr) override;
 
   void Update() override;
+
+  int GetN() const { return n; }
+  void SetUnderText(std::string s) { sUnderText = s; }
+
+private:
+  int n;
+  Timer tm;
+  bool bBlink;
+  LevelController *pAd;
+  std::string sUnderText;
+  ImageSequence coronaSeq;
 };
 
 int GetFireballRaduis(FireballBonus &fb);

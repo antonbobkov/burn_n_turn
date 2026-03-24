@@ -143,7 +143,7 @@ void Trader::OnHit(char /*cWhat*/) {
   auto pFb = std::make_unique<FireballBonusAnimation>(
       GetPosition(), RandomBonus(false), pAc);
   if (bFirstBns) {
-    pFb->sUnderText = "loot";
+    pFb->SetUnderText("loot");
     bFirstBns = false;
   }
   pAc->AddBonusAnimation(std::move(pFb));

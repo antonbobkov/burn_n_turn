@@ -113,7 +113,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     if (pCs != nullptr)
       p = pCs->GetPosition();
 
-    int nNumCirc = fb.uMap["pershot"] + 1;
+    int nNumCirc = fb.GetU("pershot") + 1;
 
     fPoint fVel = RandomAngle();
 
@@ -136,13 +136,13 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
       if (entity->GetType() == 'K' || entity->GetType() == 'S' ||
           entity->GetType() == 'L') {
         if (entity->GetType() == 'K' &&
-            GetAllBonuses().uMap["setonfire"] != 0) {
+            GetAllBonuses().GetU("setonfire") != 0) {
           entity->Destroy();
           pAd->AddOwnedEntity(std::make_unique<KnightOnFire>(
               Critter(entity->GetRadius(), entity->GetPosition(), fPoint(),
                       rBound, 1.F, ImageSequence(), true),
               pAd, 15 * nFramesInSecond,
-              Chain(GetAllBonuses().uMap["setonfire"])));
+              Chain(GetAllBonuses().GetU("setonfire"))));
         } else
           entity->OnHit('F');
       }
@@ -175,12 +175,12 @@ void Dragon::RecoverBonuses() {
 FireballBonus Dragon::GetAllBonuses() {
   CleanUp(lsBonuses);
   FireballBonus fbRet(-1, true);
-  fbRet.uMap["total"] = pAd->pGl->GetGameConfig().InitialFireballs();
+  fbRet.SetU("total", pAd->pGl->GetGameConfig().InitialFireballs());
 
   for (auto itr = lsBonuses.begin(), etr = lsBonuses.end(); itr != etr; ++itr)
     fbRet += **itr;
 
-  fbRet.uMap["total"] += nExtraFireballs;
+  fbRet.Add("total", nExtraFireballs);
 
   return fbRet;
 }
@@ -196,7 +196,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
       pAd(pAd_), pPt(pPt_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_),
       bt(bt_) {
-  nFireballCount = GetAllBonuses().uMap["total"];
+  nFireballCount = GetAllBonuses().GetU("total");
 
   if (pCs != nullptr && pCs->pDrag == nullptr) {
     pCs->pDrag = pAd->FindDragon(this);
@@ -231,9 +231,9 @@ void Dragon::Update() {
     if (tFireballRegen.GetTimer() >= nPeriod) {
       tFireballRegen.Reset();
 
-      if (nFireballCount < int(fb.uMap["total"])) {
+      if (nFireballCount < int(fb.GetU("total"))) {
         if (nInitialRegen == 0)
-          nFireballCount = int(fb.uMap["total"]);
+          nFireballCount = int(fb.GetU("total"));
         else
           ++nFireballCount;
       }
@@ -285,7 +285,7 @@ void Dragon::Update() {
         continue;
 
       if (this->HitDetection(pBns)) {
-        AddBonus(GetBonus(pBns->n, nBonusPickUpTime));
+        AddBonus(GetBonus(pBns->GetN(), nBonusPickUpTime));
         pBns->Destroy();
 
         pAd->TutorialNotify(TutorialEvent::BonusPickUp);
@@ -340,9 +340,9 @@ void Dragon::Fire(fPoint fDir) {
   FireballBonus fb(-1, true);
   if (pAd->pGl->GetGameConfig().IsFlightPowerMode() || !bFly)
     fb = GetAllBonuses();
-  fb.fMap["speed"] *= fFireballSpeed;
+  fb.SetF("speed", fb.GetF("speed") * fFireballSpeed);
   if (bFly)
-    fb.fMap["speed"] += fDragonSpeed;
+    fb.Add("speed", fDragonSpeed);
 
   if (nFireballCount == 0)
     return;
@@ -358,7 +358,7 @@ void Dragon::Fire(fPoint fDir) {
 
   nTimer = 4;
 
-  int nNumber = fb.uMap["pershot"];
+  int nNumber = fb.GetU("pershot");
 
   float fSpread = 1.F;
 
@@ -394,7 +394,7 @@ void Dragon::Fire(fPoint fDir) {
                                                  GetFireballChainNum(fb)));
   }
 
-  if (fb.bMap["laser"])
+  if (fb.GetB("laser"))
     pAd->pGl->PlaySound("laser");
   else
     pAd->pGl->PlaySound("shoot");
