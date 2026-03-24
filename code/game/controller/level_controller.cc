@@ -142,7 +142,7 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
     : EntityListController(pGl_, rBound, c),
       bFirstUpdate_(true), bGhostTime_(false), bTimerFlash_(false), bBlink_(true),
       bLeft_(false), bCh_(false), bLeftDown_(false), bRightDown_(false),
-      nLastDir_(0), bWasDirectionalInput_(0), nLvl_(lvl.nLvl), nSlimeNum_(0),
+      nLastDir_(0), bWasDirectionalInput_(0), nLvl_(lvl.GetLevel()), nSlimeNum_(0),
       pGr_(0), bTakeOffToggle_(false),
       pTutorialText_(), pTutorial_(std::make_unique<NoopTutorial>()),
       pSc_(std::move(pSc)),
@@ -163,24 +163,25 @@ void LevelController::Init(const LevelLayout &lvl) {
   AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
   AddOwnedEntity(std::make_unique<BonusDrawer>(this));
 
-  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.vFreq.at(0), rBound, this,
-                                                  lvl.blKnightGen);
-  pPGen_ = std::make_unique<PrincessGenerator>(lvl.vFreq.at(1), rBound, this);
-  pTGen_ = std::make_unique<TraderGenerator>(lvl.vFreq.at(2), rBound, this);
-  pMGen_ = std::make_unique<MageGenerator>(lvl.vFreq.at(3), lvl.vFreq.at(4),
+  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.GetFreq(0), rBound, this,
+                                                  lvl.GetKnightPath());
+  pPGen_ = std::make_unique<PrincessGenerator>(lvl.GetFreq(1), rBound, this);
+  pTGen_ = std::make_unique<TraderGenerator>(lvl.GetFreq(2), rBound, this);
+  pMGen_ = std::make_unique<MageGenerator>(lvl.GetFreq(3), lvl.GetFreq(4),
                                            rBound, this);
 
   pGr_ = pKnightGen_.get();
   pMgGen_ = pMGen_.get();
 
-  int i;
-  for (i = 0; i < (int)lvl.vRoadGen.size(); ++i)
-    vRd_.push_back(std::make_unique<FancyRoad>(lvl.vRoadGen[i], this));
+  const std::vector<Road> &vRoads = lvl.GetRoads();
+  for (int i = 0; i < (int)vRoads.size(); ++i)
+    vRd_.push_back(std::make_unique<FancyRoad>(vRoads[i], this));
 
-  for (i = 0; i < (int)lvl.vCastleLoc.size(); ++i)
-    vCs_.push_back(std::make_unique<Castle>(lvl.vCastleLoc[i], rBound, this));
+  const std::vector<Point> &vCastles = lvl.GetCastleLocations();
+  for (int i = 0; i < (int)vCastles.size(); ++i)
+    vCs_.push_back(std::make_unique<Castle>(vCastles[i], rBound, this));
 
-  t_ = Timer(lvl.nTimer);
+  t_ = Timer(lvl.GetTime());
 
   vDr_.push_back(std::make_unique<Dragon>(
       vCs_[0].get(), this, &pt_, pGl->GetImgSeq("dragon_stable"),

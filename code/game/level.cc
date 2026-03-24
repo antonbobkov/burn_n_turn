@@ -43,6 +43,8 @@ void Road::RoadMap(Point &p, Point &v) {
   }
 }
 
+void Road::ScaleCoord(float s) { nCoord = int(nCoord * s); }
+
 void BrokenLine::CloseLast() {
   if (vEdges.empty() || vEdges.back().empty())
     throw SegmentSimpleException("CloseLast", "Invalid (empty) segment arrays");
@@ -60,6 +62,14 @@ void BrokenLine::Add(fPoint p) {
 void BrokenLine::Join(const BrokenLine &b) {
   for (int i = 0; i < (int)b.vEdges.size(); ++i)
     vEdges.push_back(b.vEdges[i]);
+}
+
+void BrokenLine::Scale(float sx, float sy) {
+  for (int i = 0; i < (int)vEdges.size(); ++i)
+    for (int j = 0; j < (int)vEdges[i].size(); ++j) {
+      vEdges[i][j].x *= sx;
+      vEdges[i][j].y *= sy;
+    }
 }
 
 BrokenLine::BrokenLine(fPoint p1, fPoint p2) {
@@ -193,24 +203,15 @@ void LevelLayout::Convert(int n) {
   float p1 = float(sBound.sz.x) / n;
   float p2 = float(sBound.sz.y) / n;
 
-  int i, j;
+  blKnightGen.Scale(p1, p2);
 
-  for (i = 0; i < (int)blKnightGen.vEdges.size(); ++i)
-    for (j = 0; j < (int)blKnightGen.vEdges[i].size(); ++j) {
-      blKnightGen.vEdges[i][j].x *= p1;
-      blKnightGen.vEdges[i][j].y *= p2;
-    }
-
-  for (i = 0; i < (int)vCastleLoc.size(); ++i) {
+  for (int i = 0; i < (int)vCastleLoc.size(); ++i) {
     vCastleLoc[i].x = Crd(vCastleLoc[i].x * p1);
     vCastleLoc[i].y = Crd(vCastleLoc[i].y * p2);
   }
 
-  for (i = 0; i < (int)vRoadGen.size(); ++i)
-    if (vRoadGen[i].bVertical)
-      vRoadGen[i].nCoord = Crd(vRoadGen[i].nCoord * p1);
-    else
-      vRoadGen[i].nCoord = Crd(vRoadGen[i].nCoord * p2);
+  for (int i = 0; i < (int)vRoadGen.size(); ++i)
+    vRoadGen[i].ScaleCoord(vRoadGen[i].IsVertical() ? p1 : p2);
 }
 
 std::ostream &operator<<(std::ostream &ofs, const LevelLayout &f) {
@@ -305,14 +306,16 @@ void FancyRoad::Draw(ScalingDrawer *pDr) {
   int n = pDr->GetFactor();
   Image *p = pDr->GetGraphics()->GetImage(pAd->pGl->GetImg("road"));
   Size sz = p->GetSize();
+  Rectangle rb = GetBound();
+  int coord = GetCoord();
 
-  if (bVertical)
-    for (int i = 0; (i - 1) * sz.y < rBound.sz.y * int(n); ++i)
-      pDr->GetGraphics()->DrawImage(Point(nCoord * n - sz.x / 2, i * sz.y),
+  if (IsVertical())
+    for (int i = 0; (i - 1) * sz.y < rb.sz.y * int(n); ++i)
+      pDr->GetGraphics()->DrawImage(Point(coord * n - sz.x / 2, i * sz.y),
                           pAd->pGl->GetImg("road"), false);
   else
-    for (int i = 0; (i - 1) * sz.x < rBound.sz.x * int(n); ++i)
-      pDr->GetGraphics()->DrawImage(Point(i * sz.x, nCoord * n - sz.y / 2),
+    for (int i = 0; (i - 1) * sz.x < rb.sz.x * int(n); ++i)
+      pDr->GetGraphics()->DrawImage(Point(i * sz.x, coord * n - sz.y / 2),
                           pAd->pGl->GetImg("road"), false);
 }
 
