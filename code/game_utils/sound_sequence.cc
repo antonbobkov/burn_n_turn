@@ -23,3 +23,9 @@ void SoundSequence::Add(Index iSnd, int nTime) {
   vSounds.push_back(iSnd);
   vIntervals.push_back(nTime);
 }
+
+bool SoundSequence::IsEmpty() const { return vSounds.empty(); }
+
+bool SoundSequence::IsLast() const {
+  return nActive == (int)vSounds.size() - 1;
+}

@@ -14,10 +14,6 @@
  * effects. */
 class SoundSequence {
 public:
-  std::vector<Index> vSounds;
-  std::vector<int> vIntervals;
-  int nActive;
-
   /** Advance to next sound; wraps to 0 at end. Returns true on wrap. */
   bool Toggle();
   Index GetSound();
@@ -26,6 +22,16 @@ public:
   void Add(Index iSnd, int nTime = 1);
 
   SoundSequence();
+
+  /** True if the sequence has no sounds. */
+  bool IsEmpty() const;
+  /** True if currently on the last sound. */
+  bool IsLast() const;
+
+private:
+  std::vector<Index> vSounds;
+  std::vector<int> vIntervals;
+  int nActive;
 };
 
 #endif // SOUND_SEQUENCE_HEADER

@@ -348,7 +348,7 @@ void Preloader::LoadSndSeq(std::string fName, std::string key) {
       throw;
     }
   }
-  if (sndSeq.vSounds.empty())
+  if (sndSeq.IsEmpty())
     throw PreloaderExceptionLoad("LoadSnd", fName, true);
   mpSndSeq[key] = sndSeq;
 }
