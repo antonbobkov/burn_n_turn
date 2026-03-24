@@ -55,7 +55,7 @@ void SimpleSoundEntity::Update() {
   if (t.Tick()) {
     pSnd->PlaySound(seq.GetSound());
 
-    if (seq.nActive == (int)seq.vSounds.size() - 1) {
+    if (seq.IsLast()) {
       this->Destroy();
       return;
     }
