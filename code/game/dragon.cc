@@ -93,7 +93,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
                                                   nTime);
   else if (n == 4) {
     pBonus = std::make_unique<TimedFireballBonus>(
-        FireballBonus(n, "total", pAd->pGl->GetGameConfig().FireballsPerBonus()), nTime * 2);
+        FireballBonus(n, "total", pAd->GetGl()->GetGameConfig().FireballsPerBonus()), nTime * 2);
   } else if (n == 5)
     pBonus = std::make_unique<TimedFireballBonus>(
         FireballBonus(n, "explode", 1), nTime);
@@ -163,11 +163,11 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
 void Dragon::FlushBonuses() {
   for (auto itr = lsBonuses.begin(), etr = lsBonuses.end(); itr != etr;
        itr = lsBonuses.erase(itr))
-    pAd->pGl->AddBonusToCarryOver(std::move(*itr));
+    pAd->GetGl()->AddBonusToCarryOver(std::move(*itr));
 }
 
 void Dragon::RecoverBonuses() {
-  auto lst = pAd->pGl->TakeBonusesToCarryOver();
+  auto lst = pAd->GetGl()->TakeBonusesToCarryOver();
   for (auto &u : lst)
     AddBonus(std::move(u), true);
 }
@@ -175,7 +175,7 @@ void Dragon::RecoverBonuses() {
 FireballBonus Dragon::GetAllBonuses() {
   CleanUp(lsBonuses);
   FireballBonus fbRet(-1, true);
-  fbRet.SetU("total", pAd->pGl->GetGameConfig().InitialFireballs());
+  fbRet.SetU("total", pAd->GetGl()->GetGameConfig().InitialFireballs());
 
   for (auto itr = lsBonuses.begin(), etr = lsBonuses.end(); itr != etr; ++itr)
     fbRet += **itr;
@@ -190,7 +190,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
     : Critter(13,
               pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
-              Point(), pAd_->rBound, 1, ImageSequence()),
+              Point(), pAd_->GetBound(), 1, ImageSequence()),
       bFly(), bCarry(false), cCarry(' '), nPrCr(0), nExtraFireballs(0),
       nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
@@ -273,7 +273,7 @@ void Dragon::Update() {
 
         entity->Destroy();
 
-        pAd->pGl->PlaySound("pickup");
+        pAd->GetGl()->PlaySound("pickup");
         break;
       }
     }
@@ -325,7 +325,7 @@ void Dragon::Draw(ScalingDrawer *pDr) {
 void Dragon::AddBonus(std::unique_ptr<TimedFireballBonus> pBonus,
                       bool bSilent) {
   if (!bSilent)
-    pAd->pGl->PlaySound("powerup");
+    pAd->GetGl()->PlaySound("powerup");
 
   if (!pBonus)
     return;
@@ -338,7 +338,7 @@ void Dragon::Fire(fPoint fDir) {
     return;
 
   FireballBonus fb(-1, true);
-  if (pAd->pGl->GetGameConfig().IsFlightPowerMode() || !bFly)
+  if (pAd->GetGl()->GetGameConfig().IsFlightPowerMode() || !bFly)
     fb = GetAllBonuses();
   fb.SetF("speed", fb.GetF("speed") * fFireballSpeed);
   if (bFly)
@@ -395,9 +395,9 @@ void Dragon::Fire(fPoint fDir) {
   }
 
   if (fb.GetB("laser"))
-    pAd->pGl->PlaySound("laser");
+    pAd->GetGl()->PlaySound("laser");
   else
-    pAd->pGl->PlaySound("shoot");
+    pAd->GetGl()->PlaySound("shoot");
 }
 
 void Dragon::TakeOff() {
@@ -421,7 +421,7 @@ void Dragon::TakeOff() {
 
 void Dragon::Toggle() {
   if (!bFly) {
-    pAd->pGl->PlaySound("leave_tower");
+    pAd->GetGl()->PlaySound("leave_tower");
     TakeOff();
     return;
   }
@@ -454,17 +454,17 @@ void Dragon::Toggle() {
       }
 
       if (!bAllFull) {
-        pAd->pGl->PlaySound("princess_capture");
+        pAd->GetGl()->PlaySound("princess_capture");
       } else {
         FlushBonuses();
 
-        pAd->pGl->PlaySound("win_level");
-        pAd->pGl->Next();
+        pAd->GetGl()->PlaySound("win_level");
+        pAd->GetGl()->Next();
       }
     } else if (cCarry == 'T')
       AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
     else
-      pAd->pGl->PlaySound("return_tower");
+      pAd->GetGl()->PlaySound("return_tower");
 
     bCarry = false;
     cCarry = ' ';
@@ -495,7 +495,7 @@ void Dragon::Toggle() {
         imgCarry = entity->GetImage();
         cCarry = entity->GetType();
 
-        pAd->pGl->PlaySound("pickup");
+        pAd->GetGl()->PlaySound("pickup");
       } else {
         throw SimpleException("not supposed to drop things");
       }

@@ -185,7 +185,7 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
 }
 
 void MenuDisplay::PositionIncrement(bool bUp) {
-  pMenuController->pGl->PlaySound("B");
+  pMenuController->GetGl()->PlaySound("B");
 
   int nDelta = bUp ? 1 : -1;
 
@@ -207,29 +207,29 @@ void MenuDisplay::PositionIncrement(bool bUp) {
 void MenuDisplay::Boop() {
   if (pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent ==
       &MenuDisplay::Escape)
-    pMenuController->pGl->PlaySound("C");
+    pMenuController->GetGl()->PlaySound("C");
   else
-    pMenuController->pGl->PlaySound("A");
+    pMenuController->GetGl()->PlaySound("A");
   (this->*(pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent))();
 }
 
-void MenuDisplay::Restart() { pMenuController->pGl->Restart(); }
+void MenuDisplay::Restart() { pMenuController->GetGl()->Restart(); }
 
 void MenuDisplay::Continue() {
-  pMenuController->pGl->ExitMenuResume();
+  pMenuController->GetGl()->ExitMenuResume();
 }
 
 void MenuDisplay::MusicToggle() {
-  pMenuController->pGl->ToggleMusicPlayback();
+  pMenuController->GetGl()->ToggleMusicPlayback();
   pMenuController->settings->sbMusicOn.Set(
-      !pMenuController->pGl->IsMusicPlaybackOff());
+      !pMenuController->GetGl()->IsMusicPlaybackOff());
   UpdateMenuEntries();
 }
 
 void MenuDisplay::SoundToggle() {
-  pMenuController->pGl->ToggleSoundOutput();
+  pMenuController->GetGl()->ToggleSoundOutput();
   pMenuController->settings->sbSoundOn.Set(
-      pMenuController->pGl->IsSoundOutputOn());
+      pMenuController->GetGl()->IsSoundOutputOn());
   UpdateMenuEntries();
 }
 
@@ -239,8 +239,8 @@ void MenuDisplay::TutorialToggle() {
 }
 
 void MenuDisplay::FullScreenToggle() {
-  pMenuController->pGl->SetFullScreenSetting(
-      !pMenuController->pGl->IsFullScreenSetting());
+  pMenuController->GetGl()->SetFullScreenSetting(
+      !pMenuController->GetGl()->IsFullScreenSetting());
   UpdateMenuEntries();
 }
 
@@ -249,7 +249,7 @@ void MenuDisplay::CheatsToggle() {
   UpdateMenuEntries();
 }
 
-void MenuDisplay::Exit() { pMenuController->pGl->ExitProgram(); }
+void MenuDisplay::Exit() { pMenuController->GetGl()->ExitProgram(); }
 
 void MenuDisplay::Escape() {
   if (pCurr != &memMain)
@@ -272,7 +272,7 @@ void MenuDisplay::UpdateMenuEntries() {
       OnOffString(pMenuController->settings->sbTutorialOn.Get());
 
   bool bFullScreenNow = GetProgramInfo().IsFullScreen();
-  bool bFullScreenSetting = pMenuController->pGl->IsFullScreenSetting();
+  bool bFullScreenSetting = pMenuController->GetGl()->IsFullScreenSetting();
   std::string sExtra = "";
   if (bFullScreenNow != bFullScreenSetting)
     sExtra = "changes will take effect next launch";
@@ -298,13 +298,13 @@ void MenuDisplay::UpdateMenuEntries() {
 }
 
 void MenuDisplay::Chapter1() {
-  pMenuController->pGl->RestartFromChapter(0);
+  pMenuController->GetGl()->RestartFromChapter(0);
 }
 
 void MenuDisplay::Chapter2() {
-  pMenuController->pGl->RestartFromChapter(1);
+  pMenuController->GetGl()->RestartFromChapter(1);
 }
 
 void MenuDisplay::Chapter3() {
-  pMenuController->pGl->RestartFromChapter(2);
+  pMenuController->GetGl()->RestartFromChapter(2);
 }

@@ -114,7 +114,7 @@ KnightOnFire::KnightOnFire(const Critter &cr, LevelController *pBc_,
                            int nTimer_, Chain c_)
     : Critter(cr), pBc(pBc_), nTimer(nTimer_), nTimer_i(nTimer_),
       t(nFramesInSecond / 5), c(c_) {
-  Critter::seq = pBc->pGl->GetImgSeq("knight_fire");
+  Critter::seq = pBc->GetGl()->GetImgSeq("knight_fire");
   RandomizeVelocity();
 }
 
@@ -147,7 +147,7 @@ void KnightOnFire::Update() {
     this->Destroy();
 
     pBc->AddOwnedEntity(std::make_unique<AnimationOnce>(
-        dPriority, pBc->pGl->GetImgSeq("knight_die"),
+        dPriority, pBc->GetGl()->GetImgSeq("knight_die"),
         int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
   }
 
@@ -224,18 +224,18 @@ int GetFireballChainNum(FireballBonus &fb) {
 
 Fireball::Fireball(Point p, fPoint v, LevelController *pBc_, FireballBonus &fb_,
                    Chain ch_, int nChain_)
-    : Critter(GetFireballRaduis(fb_), p, v, pBc_->rBound, 5.F, ImageSequence(),
+    : Critter(GetFireballRaduis(fb_), p, v, pBc_->GetBound(), 5.F, ImageSequence(),
               nFramesInSecond / 10),
       pBc(pBc_), fb(fb_), ch(ch_), nChain(nChain_) {
   Critter::fVel.Normalize(fb.GetF("speed"));
 
   if (!fb.GetB("laser"))
-    Critter::seq = pBc->pGl->GetImgSeq("fireball" + GetSizeSuffix(fb));
+    Critter::seq = pBc->GetGl()->GetImgSeq("fireball" + GetSizeSuffix(fb));
   else {
     Polar pol(Critter::fVel);
     int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
-        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
+        pBc->GetGl()->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
   }
 }
 
@@ -256,7 +256,7 @@ void Fireball::Update() {
         this->Destroy();
         return;
       } else
-        pBc->pGl->PlaySound("death");
+        pBc->GetGl()->PlaySound("death");
 
       if (ptr->GetType() != 'K' || (fb.GetU("setonfire") == 0))
         ptr->OnHit('F');
@@ -296,7 +296,7 @@ void Fireball::Update() {
             pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
-                    pBc->pGl->GetImgSeq("explosion" + GetSizeSuffix(fb)),
+                    pBc->GetGl()->GetImgSeq("explosion" + GetSizeSuffix(fb)),
                     nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.GetU("explode") - 1)));
@@ -304,13 +304,13 @@ void Fireball::Update() {
             pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
                 AnimationOnce(
                     GetPriority(),
-                    pBc->pGl->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
+                    pBc->GetGl()->GetImgSeq("laser_expl" + GetSizeSuffix(fb)),
                     nFramesInSecond / 10, ptr->GetPosition(), true),
                 GetExplosionInitialRaduis(fb), GetExplosionExpansionRate(fb),
                 pBc, Chain(fb.GetU("explode") - 1)));
           }
 
-          pBc->pGl->PlaySound("explosion");
+          pBc->GetGl()->PlaySound("explosion");
         }
       }
 
@@ -346,7 +346,7 @@ void CircularFireball::Update() {
     Polar pol(Critter::fVel);
     int n = DiscreetAngle(pol.a, 16);
     Critter::seq = ImageSequence(
-        pBc->pGl->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
+        pBc->GetGl()->GetImgSeq("laser" + GetSizeSuffix(fb)).GetImageAt(n));
   }
 }
 
@@ -354,8 +354,8 @@ FireballBonusAnimation::FireballBonusAnimation(Point p_, int n_,
                                                LevelController *pAd_)
     : Animation(.5F, ImageSequence(), nFramesInSecond / 10, p_, true), n(n_),
       tm(nBonusOnGroundTime), bBlink(false), pAd(pAd_), sUnderText("") {
-  seq = pAd->pGl->GetImgSeq(GetBonusImage(n));
-  coronaSeq = pAd->pGl->GetImgSeq("corona");
+  seq = pAd->GetGl()->GetImgSeq(GetBonusImage(n));
+  coronaSeq = pAd->GetGl()->GetImgSeq("corona");
 }
 
 void FireballBonusAnimation::Draw(ScalingDrawer *pDr) {
@@ -365,8 +365,8 @@ void FireballBonusAnimation::Draw(ScalingDrawer *pDr) {
   Point p = GetPosition();
   p.y += 13;
 
-  if (pAd->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
-    pAd->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
+  if (pAd->GetGl()->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
+    pAd->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
 void FireballBonusAnimation::Update() {
@@ -391,7 +391,7 @@ void FireballBonusAnimation::Update() {
         nLm = 1;
       for (int j = 0; j < nLm; ++j) {
         img.Add(seq.GetImageAt(i));
-        img.Add(pAd->pGl->GetImg("empty"));
+        img.Add(pAd->GetGl()->GetImg("empty"));
       }
     }
 

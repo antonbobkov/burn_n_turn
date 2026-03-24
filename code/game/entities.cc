@@ -203,9 +203,9 @@ void SoundControls::Update() {
 
 /*virtual*/ void BonusScore::Draw(ScalingDrawer * /*pDr*/) {
   if (nC < 11)
-    pAc->pGl->GetNumberDrawer()->DrawWord(sText, p, true);
+    pAc->GetGl()->GetNumberDrawer()->DrawWord(sText, p, true);
   else
-    pAc->pGl->GetNumberDrawer()->DrawColorWord(sText, p, c, true);
+    pAc->GetGl()->GetNumberDrawer()->DrawColorWord(sText, p, c, true);
 }
 
 void BonusScore::Update() {
@@ -216,7 +216,7 @@ void BonusScore::Update() {
     ++nC;
     if (nC < 11) {
       nScoreSoFar += nScore / 11;
-      pAc->pGl->AddScore(nScore / 11);
+      pAc->GetGl()->AddScore(nScore / 11);
       --p.y;
     } else {
       c.R -= 50;
@@ -224,7 +224,7 @@ void BonusScore::Update() {
     }
 
     if (nC == 11) {
-      pAc->pGl->AddScore(nScore - nScoreSoFar);
+      pAc->GetGl()->AddScore(nScore - nScoreSoFar);
     }
 
     if (nC >= 15) {
