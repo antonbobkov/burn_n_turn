@@ -15,11 +15,11 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe)
     : p_fm_(pe.GetFileManager()),
       config_(std::make_unique<ConfigurationFile>(p_fm_, "config.txt")),
       game_config_(ReadGameConfig(*config_)) {
-  szActualRez = pe.szActualRez;
+  szActualRez = pe.GetActualRez();
 
-  pExitProgram = pe.pExitProgram.get();
+  pExitProgram = pe.GetExitProgram();
 
-  pWr = pe.pMsg.get();
+  pWr = pe.GetMessageWriter();
 
   {
     std::string systemVal = config_->GetEntry("SYSTEM");
@@ -30,13 +30,13 @@ DragonGameRunner::DragonGameRunner(ProgramEngine const& pe)
     fp_ = FilePath::Create(inLinux, pathVal, p_fm_);
   }
   game_data_ = std::make_unique<ConfigurationFile>(p_fm_, "game_data.txt");
-  Rectangle sBound = Rectangle(pe.szScreenRez);
+  Rectangle sBound = Rectangle(pe.GetScreenRez());
   int nScale = 2;
   Rectangle rBound =
       Rectangle(0, 0, sBound.sz.x / nScale, sBound.sz.y / nScale);
 
-  pGr = pe.pGr;
-  pSm = pe.pSndMng;
+  pGr = pe.GetGraphics();
+  pSm = pe.GetSound();
 
   pDr = std::make_unique<ScalingDrawer>(pGr, nScale);
   pBigDr = std::make_unique<ScalingDrawer>(pGr, nScale * 2);
