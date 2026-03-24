@@ -12,14 +12,6 @@
 
 class FontWriter {
 public:
-  std::vector<int> vImgIndx;
-  std::vector<Index> vImg;
-  GraphicalInterface<Index> *pGr;
-
-  Size szSymbol;
-  Color clSymbol;
-  int nGap;
-
   FontWriter(FilePath *fp, std::string sFont,
              GraphicalInterface<Index> *pGr_, int nZoom = 1);
 
@@ -38,6 +30,14 @@ public:
 
   void Recolor(Color c);
   void SetGap(int nG);
+
+private:
+  std::vector<int> vImgIndx;
+  std::vector<Index> vImg;
+  GraphicalInterface<Index> *pGr;
+  Size szSymbol;
+  Color clSymbol;
+  int nGap;
 };
 
 #endif
