@@ -14,13 +14,6 @@ class PositionTracker;
 
 class DragonLeash {
 public:
-  fPoint lastVel;
-  float tilt;
-  float speed;
-  float trackballScaleFactor;
-  float naturalScaleFactor;
-  float maxTilt;
-
   DragonLeash() : lastVel(0, -1) {
     tilt = 0;
     speed = fDragonSpeed;
@@ -32,18 +25,29 @@ public:
   void ModifyTilt(Point trackball);
 
   fPoint GetNewVelocity(Point trackball);
+
+  float GetSpeed() const { return speed; }
+
+private:
+  fPoint lastVel;
+  float tilt;
+  float speed;
+  float trackballScaleFactor;
+  float naturalScaleFactor;
+  float maxTilt;
 };
 
 /** The hero's key bindings—which keys mean fire, steer, and so on. */
 class ButtonSet {
 public:
-  std::vector<int> vCodes;
-
   ButtonSet(int q, int w, int e, int d, int c, int x, int z, int a, int sp);
 
   bool IsSpace(int nCode) { return nCode == vCodes[8]; }
 
   Point GetPoint(int nCode);
+
+private:
+  std::vector<int> vCodes;
 };
 
 /** The player's dragon: carries treasures and fireballs, steers and shoots,
@@ -51,9 +55,6 @@ public:
 class Dragon : public Critter {
 public:
   std::string get_class_name() override { return "Dragon"; }
-  std::list<std::unique_ptr<TimedFireballBonus>> lsBonuses;
-
-  DragonLeash leash;
 
   std::unique_ptr<TimedFireballBonus> GetBonus(int n, int nTime);
 
@@ -62,6 +63,38 @@ public:
   void RecoverBonuses();
 
   FireballBonus GetAllBonuses();
+
+  Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
+         ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
+
+  void Update() override;
+
+  Point GetPosition() override;
+
+  void Draw(ScalingDrawer *pDr) override;
+
+  void AddBonus(std::unique_ptr<TimedFireballBonus> pBonus, bool bSilent = false);
+
+  void Fire(fPoint fDir);
+
+  /** Leave the tower: set flying state, initial velocity from cursor direction. */
+  void TakeOff();
+
+  void Toggle();
+
+  bool IsFlying() const { return bFly; }
+  int GetFireballCount() const { return nFireballCount; }
+  Castle *GetCastle() const { return pCs; }
+  float GetLeashSpeed() const { return leash.GetSpeed(); }
+  bool IsSpace(int nCode) { return bt.IsSpace(nCode); }
+  const std::list<std::unique_ptr<TimedFireballBonus>> &GetBonuses() const {
+    return lsBonuses;
+  }
+
+private:
+  std::list<std::unique_ptr<TimedFireballBonus>> lsBonuses;
+
+  DragonLeash leash;
 
   bool bFly;
 
@@ -90,24 +123,6 @@ public:
   ImageSequence imgFly;
 
   ButtonSet bt;
-
-  Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
-         ImageSequence imgStable_, ImageSequence imgFly_, ButtonSet bt_);
-
-  void Update() override;
-
-  Point GetPosition() override;
-
-  void Draw(ScalingDrawer *pDr) override;
-
-  void AddBonus(std::unique_ptr<TimedFireballBonus> pBonus, bool bSilent = false);
-
-  void Fire(fPoint fDir);
-
-  /** Leave the tower: set flying state, initial velocity from cursor direction. */
-  void TakeOff();
-
-  void Toggle();
 };
 
 #endif

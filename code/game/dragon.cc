@@ -416,7 +416,7 @@ void Dragon::TakeOff() {
 
   if (fVel.Length() == 0)
     fVel = fPoint(0, -1);
-  fVel.Normalize(leash.speed);
+  fVel.Normalize(leash.GetSpeed());
 }
 
 void Dragon::Toggle() {
