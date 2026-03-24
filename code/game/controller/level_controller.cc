@@ -188,7 +188,7 @@ void LevelController::Init(const LevelLayout &lvl) {
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr_.back()->GetCastle() != nullptr)
-    vDr_.back()->GetCastle()->pDrag = vDr_.back().get();
+    vDr_.back()->GetCastle()->SetDragon(vDr_.back().get());
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
   pTutorialText_ =
@@ -389,7 +389,7 @@ void LevelController::Fire() {
 float LevelController::GetCompletionRate() {
   float fCap = 0;
   for (int i = 0; i < (int)vCs_.size(); ++i)
-    fCap += vCs_[i]->nPrincesses;
+    fCap += vCs_[i]->GetPrincessCount();
 
   fCap /= (4 * vCs_.size());
 
