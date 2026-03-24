@@ -13,17 +13,23 @@ class Dragon;
 class Castle : public Critter {
 public:
   std::string get_class_name() override { return "Castle"; }
-  int nPrincesses;
-  LevelController *pAv;
-  Dragon *pDrag;
-
-  bool bBroken;
 
   Castle(Point p, Rectangle rBound_, LevelController *pAv_);
 
   void OnKnight(char cWhat);
-
   void Draw(ScalingDrawer *pDr) override;
+
+  int GetPrincessCount() const { return nPrincesses; }
+  void AddPrincesses(int n) { nPrincesses += n; }
+  bool HasDragon() const { return pDrag != nullptr; }
+  void SetDragon(Dragon *d) { pDrag = d; }
+  bool IsBroken() const { return bBroken; }
+
+private:
+  int nPrincesses;
+  LevelController *pAv;
+  Dragon *pDrag;
+  bool bBroken;
 };
 
 /** The princess: a soul the dragon can rescue and carry to the castle. */

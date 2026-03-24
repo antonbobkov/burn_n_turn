@@ -198,8 +198,8 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
       bt(bt_) {
   nFireballCount = GetAllBonuses().GetU("total");
 
-  if (pCs != nullptr && pCs->pDrag == nullptr) {
-    pCs->pDrag = pAd->FindDragon(this);
+  if (pCs != nullptr && !pCs->HasDragon()) {
+    pCs->SetDragon(pAd->FindDragon(this));
     bFly = false;
     Critter::dPriority = 3;
     Critter::fPos = pCs->GetPosition();
@@ -245,7 +245,7 @@ void Dragon::Update() {
 
     for (Castle *pC : pAd->GetCastlePointers())
       if (this->HitDetection(pC)) {
-        if (pC->pDrag != nullptr)
+        if (pC->HasDragon())
           continue;
         bHitCastle = true;
         break;
@@ -409,7 +409,7 @@ void Dragon::TakeOff() {
   SimpleVisualEntity::seq = imgFly;
   SimpleVisualEntity::dPriority = 5;
 
-  pCs->pDrag = nullptr;
+  pCs->SetDragon(nullptr);
   pCs = nullptr;
 
   fVel = pPt->GetFlightDirection(GetPosition());
@@ -429,7 +429,7 @@ void Dragon::Toggle() {
   for (Castle *pC : pAd->GetCastlePointers()) {
     if (!this->HitDetection(pC))
       continue;
-    if (pC->pDrag != nullptr || bTookOff || pC->bBroken)
+    if (pC->HasDragon() || bTookOff || pC->IsBroken())
       continue;
 
     pPt->Off();
@@ -439,15 +439,15 @@ void Dragon::Toggle() {
     pAd->TutorialNotify(TutorialEvent::FlyOff);
 
     pCs = pC;
-    pCs->pDrag = pAd->FindDragon(this);
+    pCs->SetDragon(pAd->FindDragon(this));
 
     if (cCarry == 'P') {
       pAd->TutorialNotify(TutorialEvent::PrincessCaptured);
-      pC->nPrincesses += nPrCr;
+      pC->AddPrincesses(nPrCr);
 
       bool bAllFull = true;
       for (Castle *pCs2 : pAd->GetCastlePointers()) {
-        if (pCs2->nPrincesses < 4) {
+        if (pCs2->GetPrincessCount() < 4) {
           bAllFull = false;
           break;
         }
