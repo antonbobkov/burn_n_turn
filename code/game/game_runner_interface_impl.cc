@@ -6,24 +6,15 @@
 #include "../wrappers/geometry.h"
 
 ProgramInfo GetProgramInfo() {
-  ProgramInfo inf;
-
-  inf.strTitle = "Tower Defense";
-  inf.nFramerate = 1000 / nFramesInSecond;
-  inf.bMouseCapture = false;
-
   StdFileManager fm;
   ConfigurationFile cfg(&fm, "config.txt");
-  inf.szScreenRez = (cfg.GetEntry("SCREEN_SIZE") == "small")
-                    ? Size(854, 480) : Size(960, 600);
 
-  if (cfg.GetEntry("FULLSCREEN") == "true") {
-    inf.bFullScreen = true;
-    inf.bFlexibleResolution = true;
-    inf.bBlackBox = true;
-  }
+  Size szScreenRez = (cfg.GetEntry("SCREEN_SIZE") == "small")
+                     ? Size(854, 480) : Size(960, 600);
+  bool bFullScreen = (cfg.GetEntry("FULLSCREEN") == "true");
 
-  return inf;
+  return ProgramInfo(szScreenRez, "Tower Defense", 1000 / nFramesInSecond,
+                     false, bFullScreen, bFullScreen, bFullScreen);
 }
 
 std::unique_ptr<GameRunner> GetGameRunner(ProgramEngine const& pe) {

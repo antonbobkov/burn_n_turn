@@ -308,7 +308,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
 }
 
 void LevelController::OnMouse(Point pPos) {
-  Size sz1 = GetProgramInfo().szScreenRez;
+  Size sz1 = GetProgramInfo().GetScreenRez();
   Size sz2 = pGl->GetActualResolution();
 
   float fX = float(sz1.x) / sz2.x;
@@ -322,7 +322,7 @@ void LevelController::OnMouse(Point pPos) {
 }
 
 void LevelController::OnMouseDown(Point pPos) {
-  Size sz1 = GetProgramInfo().szScreenRez;
+  Size sz1 = GetProgramInfo().GetScreenRez();
   Size sz2 = pGl->GetActualResolution();
 
   float fX = float(sz1.x) / sz2.x;

@@ -271,7 +271,7 @@ void MenuDisplay::UpdateMenuEntries() {
       TutorialString() +
       OnOffString(pMenuController->settings->sbTutorialOn.Get());
 
-  bool bFullScreenNow = GetProgramInfo().bFullScreen;
+  bool bFullScreenNow = GetProgramInfo().IsFullScreen();
   bool bFullScreenSetting = pMenuController->pGl->IsFullScreenSetting();
   std::string sExtra = "";
   if (bFullScreenNow != bFullScreenSetting)
