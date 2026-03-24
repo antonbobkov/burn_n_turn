@@ -37,9 +37,11 @@
 /** Functor that flips an image horizontally via the graphical interface. */
 class ImageFlipper {
 public:
-  GraphicalInterface<Index> *pGr;
   ImageFlipper(GraphicalInterface<Index> *pGr_);
   void operator()(Index &img);
+
+private:
+  GraphicalInterface<Index> *pGr;
 };
 
 /** Functor that copies an image and applies a list of color replacements. */
@@ -47,14 +49,15 @@ class ImagePainter {
 public:
   typedef std::pair<Color, Color> ColorMap;
 
-  GraphicalInterface<Index> *pGr;
-  std::vector<ColorMap> vTr;
-
   ImagePainter(GraphicalInterface<Index> *pGr_, Color cFrom, Color cTo);
   ImagePainter(GraphicalInterface<Index> *pGr_,
                const std::vector<ColorMap> &vTr_);
   /** Copy image and apply all vTr color replacements (from -> to). */
   void operator()(Index &img);
+
+private:
+  GraphicalInterface<Index> *pGr;
+  std::vector<ColorMap> vTr;
 };
 
 /** Base exception for Preloader-related errors. */
