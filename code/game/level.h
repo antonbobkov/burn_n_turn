@@ -26,8 +26,6 @@ public:
   typedef std::vector<fPoint> VecLine;
   typedef std::vector<VecLine> VecLines;
 
-  VecLines vEdges;
-
   void CloseLast();
 
   void Add(fPoint p);
@@ -44,8 +42,16 @@ public:
   BrokenLine(Rectangle r);
 
   fPoint RandomByLength();
-
   fPoint RandomBySegment();
+
+  /** Scale all points by (sx, sy). */
+  void Scale(float sx, float sy);
+
+  friend std::ostream &operator<<(std::ostream &, const BrokenLine &);
+  friend std::istream &operator>>(std::istream &, BrokenLine &);
+
+private:
+  VecLines vEdges;
 };
 
 std::ostream &operator<<(std::ostream &ofs, const BrokenLine &bl);
@@ -57,9 +63,6 @@ class Road : public Entity {
 public:
   std::string get_class_name() override { return "Road"; }
   bool ShouldDraw() override { return true; }
-  bool bVertical;
-  int nCoord;
-  Rectangle rBound;
 
   Road(bool bVertical_, int nCoord_, Rectangle rBound_)
       : bVertical(bVertical_), nCoord(nCoord_), rBound(rBound_) {}
@@ -70,16 +73,29 @@ public:
   Point GetPosition() override { return Point(); }
 
   void Draw(ScalingDrawer *pDr) override;
-
   void RoadMap(Point &p, Point &v);
+
+  bool IsVertical() const { return bVertical; }
+  int GetCoord() const { return nCoord; }
+  Rectangle GetBound() const { return rBound; }
+  /** Scale the coordinate by s (used when converting level units). */
+  void ScaleCoord(float s);
+
+private:
+  bool bVertical;
+  int nCoord;
+  Rectangle rBound;
 };
 
 inline std::ostream &operator<<(std::ostream &ofs, const Road &r) {
-  return ofs << r.bVertical << " " << r.nCoord << " ";
+  return ofs << r.IsVertical() << " " << r.GetCoord() << " ";
 }
 
 inline std::istream &operator>>(std::istream &ifs, Road &r) {
-  return ifs >> r.bVertical >> r.nCoord;
+  bool bV; int nC;
+  ifs >> bV >> nC;
+  r = Road(bV, nC, r.GetBound());
+  return ifs;
 }
 
 class LevelController;
@@ -88,29 +104,39 @@ class LevelController;
 class FancyRoad : public Road {
 public:
   FancyRoad(const Road &rd, LevelController *pAd_) : Road(rd), pAd(pAd_) {}
-  LevelController *pAd;
 
   /*virtual*/ void Draw(ScalingDrawer *pDr);
+
+private:
+  LevelController *pAd;
 };
 
 /** One chapter: bounds, where knights appear, castle spots, roads, timer, and
  * spawn rates; Convert scales the realm's measure. */
 class LevelLayout {
 public:
-  Rectangle sBound;
-
-  int nLvl;
-
   LevelLayout(Rectangle sBound_) : sBound(sBound_) {}
 
+  void Convert(int n = 24);
+
+  int GetLevel() const { return nLvl; }
+  const BrokenLine &GetKnightPath() const { return blKnightGen; }
+  const std::vector<Point> &GetCastleLocations() const { return vCastleLoc; }
+  const std::vector<Road> &GetRoads() const { return vRoadGen; }
+  int GetTime() const { return nTimer; }
+  float GetFreq(int i) const { return vFreq.at(i); }
+
+  friend std::ostream &operator<<(std::ostream &, const LevelLayout &);
+  friend std::istream &operator>>(std::istream &, LevelLayout &);
+
+private:
+  Rectangle sBound;
+  int nLvl;
   BrokenLine blKnightGen;
   std::vector<Point> vCastleLoc;
   std::vector<Road> vRoadGen;
   int nTimer;
-
   std::vector<float> vFreq;
-
-  void Convert(int n = 24);
 };
 
 void ReadLevels(FilePath *fp, std::string sFile, Rectangle rBound,
