@@ -304,7 +304,7 @@ std::istream &operator>>(std::istream &ifs, LevelLayout &f) {
 
 void FancyRoad::Draw(ScalingDrawer *pDr) {
   int n = pDr->GetFactor();
-  Image *p = pDr->GetGraphics()->GetImage(pAd->pGl->GetImg("road"));
+  Image *p = pDr->GetGraphics()->GetImage(pAd->GetGl()->GetImg("road"));
   Size sz = p->GetSize();
   Rectangle rb = GetBound();
   int coord = GetCoord();
@@ -312,11 +312,11 @@ void FancyRoad::Draw(ScalingDrawer *pDr) {
   if (IsVertical())
     for (int i = 0; (i - 1) * sz.y < rb.sz.y * int(n); ++i)
       pDr->GetGraphics()->DrawImage(Point(coord * n - sz.x / 2, i * sz.y),
-                          pAd->pGl->GetImg("road"), false);
+                          pAd->GetGl()->GetImg("road"), false);
   else
     for (int i = 0; (i - 1) * sz.x < rb.sz.x * int(n); ++i)
       pDr->GetGraphics()->DrawImage(Point(i * sz.x, coord * n - sz.y / 2),
-                          pAd->pGl->GetImg("road"), false);
+                          pAd->GetGl()->GetImg("road"), false);
 }
 
 void ReadLevels(FilePath *fp, std::string sFile, Rectangle rBound,

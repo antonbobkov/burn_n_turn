@@ -10,10 +10,6 @@ class DragonGameController;
  * tick are virtual (OnKey, OnMouse, Fire, etc.). */
 class GameController {
 public:
-  DragonGameController *pGl;
-
-  Rectangle rBound;
-
   GameController(const GameController &gc)
       : pGl(gc.pGl), rBound(gc.rBound) {}
 
@@ -31,6 +27,13 @@ public:
 
   /** The name of this screen for scribes and trials (e.g. menu, level). */
   virtual std::string GetControllerName() const { return "basic"; }
+
+  DragonGameController *GetGl() const { return pGl; }
+  Rectangle GetBound() const { return rBound; }
+
+protected:
+  DragonGameController *pGl;
+  Rectangle rBound;
 };
 
 #endif

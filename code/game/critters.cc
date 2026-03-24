@@ -25,7 +25,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
   for (int i = 0; i < nNum; ++i) {
     fPoint f = fPoint::Normalized(GetWedgeAngle(Point(1, 1), 1, i, nNum + 1), 15);
 
-    pAc->pGl->PlaySound("slime_summon");
+    pAc->GetGl()->PlaySound("slime_summon");
     pAc->AddSpawnedGenerator(
         std::make_unique<SkellyGenerator>(p + f.ToPnt(), pAc));
   }
@@ -38,8 +38,8 @@ void Princess::OnHit(char /*cWhat*/) {
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->GetImgSeq("princess_die_f")
-                 : pAc->pGl->GetImgSeq("princess_die"),
+      fVel.x < 0 ? pAc->GetGl()->GetImgSeq("princess_die_f")
+                 : pAc->GetGl()->GetImgSeq("princess_die"),
       int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 }
 
@@ -48,8 +48,8 @@ void Princess::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
-    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
+  if (pAc->GetGl()->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
+    pAc->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
 Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
@@ -59,7 +59,7 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
   fMvVel = Critter::fVel;
 
   bAngry = true;
-  pAc->pGl->SetAngry();
+  pAc->GetGl()->SetAngry();
 }
 
 void Mage::OnHit(char /*cWhat*/) {
@@ -67,11 +67,11 @@ void Mage::OnHit(char /*cWhat*/) {
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->GetImgSeq("mage_die_f")
-                 : pAc->pGl->GetImgSeq("mage_die"),
+      fVel.x < 0 ? pAc->GetGl()->GetImgSeq("mage_die_f")
+                 : pAc->GetGl()->GetImgSeq("mage_die"),
       int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
-  pAc->pGl->SetAngry();
+  pAc->GetGl()->SetAngry();
 
   if (pAc->GetLevel() > 6)
     SummonSlimes();
@@ -136,8 +136,8 @@ void Trader::OnHit(char /*cWhat*/) {
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       GetPriority(),
-      fVel.x < 0 ? pAc->pGl->GetImgSeq("trader_die")
-                 : pAc->pGl->GetImgSeq("trader_die_f"),
+      fVel.x < 0 ? pAc->GetGl()->GetImgSeq("trader_die")
+                 : pAc->GetGl()->GetImgSeq("trader_die_f"),
       int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
   auto pFb = std::make_unique<FireballBonusAnimation>(
@@ -154,8 +154,8 @@ void Trader::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
-    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
+  if (pAc->GetGl()->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
+    pAc->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
 void Knight::Draw(ScalingDrawer *pDr) {
@@ -163,8 +163,8 @@ void Knight::Draw(ScalingDrawer *pDr) {
 
   Point p = GetPosition();
   p.y += 13;
-  if (pAc->pGl->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
-    pAc->pGl->GetNumberDrawer()->DrawWord(sUnderText, p, true);
+  if (pAc->GetGl()->GetGameConfig().IsUnderlineUnitText() && sUnderText != "")
+    pAc->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
 void Knight::KnockBack() {
@@ -188,7 +188,7 @@ void Knight::Update() {
 
       if (this->HitDetection(entity)) {
         if (entity->GetType() == 'P' || entity->GetType() == 'T') {
-          pAc->pGl->PlaySound("death");
+          pAc->GetGl()->PlaySound("death");
           entity->OnHit('S');
         }
       }
@@ -199,7 +199,7 @@ void Knight::Update() {
         continue;
 
       if (this->HitDetection(ptr)) {
-        pAc->pGl->PlaySound("skeleton_bonus");
+        pAc->GetGl()->PlaySound("skeleton_bonus");
         ptr->Destroy();
       }
     }
@@ -213,9 +213,9 @@ void Knight::Update() {
       seq.Toggle();
 
       if (seq.GetActive() == 3)
-        pAc->pGl->PlaySound("step_left");
+        pAc->GetGl()->PlaySound("step_left");
       else if (seq.GetActive() == 6)
-        pAc->pGl->PlaySound("step_right");
+        pAc->GetGl()->PlaySound("step_right");
     }
   }
   pPrev = p;
@@ -226,11 +226,11 @@ void Knight::OnHit(char /*cWhat*/) {
     KnockBack();
     if (nGolemHealth > 0) {
       --nGolemHealth;
-      pAc->pGl->PlaySound("hit_golem");
+      pAc->GetGl()->PlaySound("hit_golem");
       return;
     }
 
-    pAc->pGl->PlaySound("golem_death");
+    pAc->GetGl()->PlaySound("golem_death");
 
     pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
   }
@@ -242,15 +242,15 @@ void Knight::OnHit(char /*cWhat*/) {
   if (cType != 'G') {
     pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
 
-    ImageSequence seqDead = pAc->pGl->GetImgSeq("knight_die");
+    ImageSequence seqDead = pAc->GetGl()->GetImgSeq("knight_die");
 
     if (cType == 'S')
-      seqDead = pAc->pGl->GetImgSeq("skelly_die");
+      seqDead = pAc->GetGl()->GetImgSeq("skelly_die");
     else if (cType == 'W') {
       if (this->fVel.x < 0)
-        seqDead = pAc->pGl->GetImgSeq("golem_die");
+        seqDead = pAc->GetGl()->GetImgSeq("golem_die");
       else
-        seqDead = pAc->pGl->GetImgSeq("golem_die_f");
+        seqDead = pAc->GetGl()->GetImgSeq("golem_die_f");
     }
 
     pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
@@ -264,7 +264,7 @@ void Knight::OnHit(char /*cWhat*/) {
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
     : Critter(8, fPos, fPoint(0, 0), rBound, 3,
-              pAc_->pGl->GetImgSeq("megaslime"), nFramesInSecond / 5),
+              pAc_->GetGl()->GetImgSeq("megaslime"), nFramesInSecond / 5),
       pAc(pAc_), nHealth(nSlimeHealthMax) {
   bDieOnExit = false;
 }
@@ -285,7 +285,7 @@ void MegaSlime::Update() {
 
     if (this->HitDetection(ptr)) {
       ptr->Destroy();
-      pAc->pGl->PlaySound("megaslime_bonus");
+      pAc->GetGl()->PlaySound("megaslime_bonus");
     }
   }
 
@@ -294,11 +294,11 @@ void MegaSlime::Update() {
     t = Timer(nPeriod * seq.GetTime() + rand() % 2);
 
     if (seq.GetActive() == 11) {
-      pAc->pGl->PlaySound("megaslime_jump");
+      pAc->GetGl()->PlaySound("megaslime_jump");
       RandomizeVelocity();
     } else if (seq.GetActive() == 16) {
       fVel = fPoint(0, 0);
-      pAc->pGl->PlaySound("megaslime_land");
+      pAc->GetGl()->PlaySound("megaslime_land");
     }
   }
 }
@@ -306,7 +306,7 @@ void MegaSlime::Update() {
 void MegaSlime::OnHit(char /*cWhat*/) {
   if (nHealth > 0) {
     --nHealth;
-    pAc->pGl->PlaySound("megaslime_hit");
+    pAc->GetGl()->PlaySound("megaslime_hit");
     return;
   }
 
@@ -314,8 +314,8 @@ void MegaSlime::OnHit(char /*cWhat*/) {
 
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 500));
 
-  ImageSequence seqDead = pAc->pGl->GetImgSeq("megaslime_die");
-  pAc->pGl->PlaySound("megaslime_die");
+  ImageSequence seqDead = pAc->GetGl()->GetImgSeq("megaslime_die");
+  pAc->GetGl()->PlaySound("megaslime_die");
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
       dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
@@ -325,9 +325,9 @@ void MegaSlime::OnHit(char /*cWhat*/) {
 Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
                        int nGhostHit_)
     : p(p_), pAdv(pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
-  ImageSequence seq = pAdv->pGl->GetImgSeq("ghost_knight_burn");
+  ImageSequence seq = pAdv->GetGl()->GetImgSeq("ghost_knight_burn");
   if (nGhostHit == 0)
-    seq = pAdv->pGl->GetImgSeq("ghost_burn");
+    seq = pAdv->GetGl()->GetImgSeq("ghost_burn");
 
   int n = int(.2F * nFramesInSecond / fDeathMultiplier);
 
@@ -345,9 +345,9 @@ void Ghostiness::Update() {
 
     auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G');
     if (nGhostHit == 1)
-      pCr->SetSeq(pAdv->pGl->GetImgSeq("ghost"));
+      pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost"));
     else
-      pCr->SetSeq(pAdv->pGl->GetImgSeq("ghost_knight"));
+      pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost_knight"));
     pCr->nGhostHit = nGhostHit - 1;
     pAdv->AddOwnedConsumable(std::move(pCr));
   }
@@ -355,7 +355,7 @@ void Ghostiness::Update() {
 
 Slime::Slime(fPoint fPos, Rectangle rBound, LevelController *pAc_,
              int nGeneration_)
-    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->pGl->GetImgSeq("slime"),
+    : Critter(5, fPos, fPoint(0, 0), rBound, 3, pAc_->GetGl()->GetImgSeq("slime"),
               true),
       pAc(pAc_), t(nFramesInSecond / 2), nGeneration(nGeneration_) {
   RandomizeVelocity();
@@ -387,12 +387,12 @@ void Slime::Update() {
 
     if (this->HitDetection(entity)) {
       if (entity->GetType() == 'K') {
-        pAc->pGl->PlaySound("slime_poke");
+        pAc->GetGl()->PlaySound("slime_poke");
 
         this->Destroy();
 
         pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
-            dPriority, pAc->pGl->GetImgSeq("slime_poke"), nFramesInSecond / 5,
+            dPriority, pAc->GetGl()->GetImgSeq("slime_poke"), nFramesInSecond / 5,
             GetPosition(), true));
 
         break;
@@ -418,7 +418,7 @@ void Slime::OnHit(char cWhat) {
   }
 
   pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
-      dPriority, pAc->pGl->GetImgSeq(bRevive ? "slime_die" : "slime_poke"),
+      dPriority, pAc->GetGl()->GetImgSeq(bRevive ? "slime_die" : "slime_poke"),
       nFramesInSecond / 5, GetPosition(), true));
 
   if (!bRevive)
@@ -435,8 +435,8 @@ void Slime::OnHit(char cWhat) {
 Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
                      int nGeneration_)
     : p(p_), bFast(bFast_), nGeneration(nGeneration_), pAdv(pAdv_), pSlm_() {
-  ImageSequence seq = bFast ? pAdv->pGl->GetImgSeq("slime_reproduce_fast")
-                            : pAdv->pGl->GetImgSeq("slime_reproduce");
+  ImageSequence seq = bFast ? pAdv->GetGl()->GetImgSeq("slime_reproduce_fast")
+                            : pAdv->GetGl()->GetImgSeq("slime_reproduce");
 
   t = bFast ? Timer(int(1.3F * nFramesInSecond))
             : Timer(int(2.3F * nFramesInSecond));
@@ -451,7 +451,7 @@ void Sliminess::Update() {
     this->Destroy();
 
     pAdv->AddSlime(
-        std::make_unique<Slime>(p, pAdv->rBound, pAdv, nGeneration));
+        std::make_unique<Slime>(p, pAdv->GetBound(), pAdv, nGeneration));
   }
 }
 
@@ -467,11 +467,11 @@ Sliminess::~Sliminess() {
 
 MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
     : p(p_), pAdv(pAdv_), pSlm_() {
-  ImageSequence seq = pAdv->pGl->GetImgSeq("megaslime_reproduce");
+  ImageSequence seq = pAdv->GetGl()->GetImgSeq("megaslime_reproduce");
 
   pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
 
-  pAdv->pGl->PlaySound("slime_spawn");
+  pAdv->GetGl()->PlaySound("slime_spawn");
 }
 
 void MegaSliminess::Update() {
@@ -479,7 +479,7 @@ void MegaSliminess::Update() {
     this->Destroy();
 
     pAdv->AddMegaSlime(
-        std::make_unique<MegaSlime>(p, pAdv->rBound, pAdv));
+        std::make_unique<MegaSlime>(p, pAdv->GetBound(), pAdv));
   }
 }
 
@@ -520,7 +520,7 @@ void Mage::Update() {
       if (!bNearCastle)
         if (rand() % nSummonChance == 0) {
           bCasting = true;
-          Critter::seq = pAc->pGl->GetImgSeq("mage_spell");
+          Critter::seq = pAc->GetGl()->GetImgSeq("mage_spell");
           Critter::fVel = fPoint(0, 0);
         }
     } else {
@@ -535,8 +535,8 @@ void Mage::Update() {
       if (tSpell.Tick()) {
         bCasting = false;
         Critter::fVel = fMvVel;
-        Critter::seq = fMvVel.x < 0 ? pAc->pGl->GetImgSeq("mage_f")
-                                    : pAc->pGl->GetImgSeq("mage");
+        Critter::seq = fMvVel.x < 0 ? pAc->GetGl()->GetImgSeq("mage_f")
+                                    : pAc->GetGl()->GetImgSeq("mage");
       }
     }
   }
@@ -554,7 +554,7 @@ void Mage::SummonSlimes() {
 }
 
 Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
-    : Critter(15, p, Point(), rBound_, 3, pAv_->pGl->GetImgSeq("castle")),
+    : Critter(15, p, Point(), rBound_, 3, pAv_->GetGl()->GetImgSeq("castle")),
       nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
 void Castle::OnKnight(char cWhat) {
@@ -563,9 +563,9 @@ void Castle::OnKnight(char cWhat) {
 
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
-      pAv->pGl->PlaySound("destroy_castle_sound");
+      pAv->GetGl()->PlaySound("destroy_castle_sound");
       pAv->StopMusic();
-      Critter::seq = pAv->pGl->GetImgSeq("destroy_castle");
+      Critter::seq = pAv->GetGl()->GetImgSeq("destroy_castle");
     }
 
     pAv->StartLoseTimer();
@@ -582,7 +582,7 @@ void Castle::OnKnight(char cWhat) {
   }
 
   if (pDrag != nullptr) {
-    pAv->pGl->PlaySound("one_princess");
+    pAv->GetGl()->PlaySound("one_princess");
 
     --nPrincesses;
 
@@ -591,13 +591,13 @@ void Castle::OnKnight(char cWhat) {
 
       pAv->AddOwnedConsumable(std::make_unique<Princess>(
           Critter(7, GetPosition(), v, rBound, 0,
-                  v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                           : pAv->pGl->GetImgSeq("princess"),
+                  v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
+                           : pAv->GetGl()->GetImgSeq("princess"),
                   true),
           pAv));
     }
   } else {
-    pAv->pGl->PlaySound("all_princess_escape");
+    pAv->GetGl()->PlaySound("all_princess_escape");
 
     if (cWhat == 'K') {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
@@ -609,8 +609,8 @@ void Castle::OnKnight(char cWhat) {
 
         pAv->AddOwnedConsumable(std::make_unique<Princess>(
             Critter(7, GetPosition(), v, rBound, 0,
-                    v.x < 0 ? pAv->pGl->GetImgSeq("princess_f")
-                             : pAv->pGl->GetImgSeq("princess"),
+                    v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
+                             : pAv->GetGl()->GetImgSeq("princess"),
                     true),
             pAv));
       }
