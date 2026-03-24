@@ -464,8 +464,7 @@ std::vector<Entity *> LevelController::GetNonOwnedEntities() {
     out.push_back(u.get());
   for (auto &u : lsSliminess_) {
     out.push_back(u.get());
-    if (u->pSlm_)
-      out.push_back(u->pSlm_.get());
+    u->AppendSlimAnimation(out);
   }
   for (auto &u : lsMegaSliminess_) {
     out.push_back(u.get());

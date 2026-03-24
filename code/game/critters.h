@@ -219,13 +219,6 @@ private:
 class Sliminess : public Entity {
 public:
   std::string get_class_name() override { return "Sliminess"; }
-  Timer t;
-  Point p;
-
-  bool bFast;
-  int nGeneration;
-  LevelController *pAdv;
-  std::unique_ptr<AnimationOnce> pSlm_;
 
   Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
@@ -236,7 +229,22 @@ public:
 
   Point GetPosition() override { return p; }
 
+  /** If the shimmer animation exists, add it to out (used when building the
+   * full entity draw list). */
+  void AppendSlimAnimation(std::vector<Entity *> &out) {
+    if (pSlm_)
+      out.push_back(pSlm_.get());
+  }
+
   ~Sliminess();
+
+private:
+  Timer t;
+  Point p;
+  bool bFast;
+  int nGeneration;
+  LevelController *pAdv;
+  std::unique_ptr<AnimationOnce> pSlm_;
 };
 
 /** Summons the great slimes; keeps the spot and the realm's keeper. */
