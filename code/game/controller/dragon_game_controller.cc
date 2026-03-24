@@ -559,8 +559,7 @@ void DragonGameController::Next() {
       if (static_cast<int>(nActive) == vLevelPointers.at(i) &&
           settings_.snProgress.Get() < int(i)) {
         settings_.snProgress.Set(i);
-        if (pMenu->pMenuDisplay)
-          pMenu->pMenuDisplay->UpdateMenuEntries();
+        pMenu->UpdateMenuDisplay();
       }
     }
   }

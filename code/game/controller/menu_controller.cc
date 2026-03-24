@@ -24,17 +24,16 @@ std::string FullTextString() { return "full screen: "; }
 
 void MenuDisplay::Draw(ScalingDrawer * /*pDr*/) {
   Point p = pLeftTop;
-  for (int i = 0; i < (int)pCurr->vEntries.size(); ++i) {
-    if (!pCurr->vEntries[i].bDisabled)
-      pNum->DrawWord(pCurr->vEntries[i].sText, p, false);
+  for (int i = 0; i < pCurr->Size(); ++i) {
+    if (!(*pCurr)[i].bDisabled)
+      pNum->DrawWord((*pCurr)[i].sText, p, false);
     else
-      pNum->DrawColorWord(pCurr->vEntries[i].sText, p, Color(125, 125, 125),
-                          false);
+      pNum->DrawColorWord((*pCurr)[i].sText, p, Color(125, 125, 125), false);
 
-    if (pCurr->nMenuPosition == static_cast<int>(i) && pMenuCaret)
-      pMenuCaret->SetPos(p + Point(-11, pCurr->vEntries[i].szSize.y / 4));
+    if (pCurr->GetPosition() == i && pMenuCaret)
+      pMenuCaret->SetPos(p + Point(-11, (*pCurr)[i].szSize.y / 4));
 
-    p.y += pCurr->vEntries[i].szSize.y;
+    p.y += (*pCurr)[i].szSize.y;
   }
 }
 
@@ -43,13 +42,13 @@ void MenuDisplay::OnMouseMove(Point pMouse) {
   pMouse.y /= 4;
 
   Point p = pLeftTop;
-  for (int i = 0; i < (int)pCurr->vEntries.size(); ++i) {
-    if (!pCurr->vEntries[i].bDisabled &&
-        InsideRectangle(Rectangle(p, pCurr->vEntries[i].szSize), pMouse)) {
-      pCurr->nMenuPosition = i;
+  for (int i = 0; i < pCurr->Size(); ++i) {
+    if (!(*pCurr)[i].bDisabled &&
+        InsideRectangle(Rectangle(p, (*pCurr)[i].szSize), pMouse)) {
+      pCurr->SetPosition(i);
       return;
     }
-    p.y += pCurr->vEntries[i].szSize.y;
+    p.y += (*pCurr)[i].szSize.y;
   }
 }
 
@@ -111,7 +110,7 @@ void MenuController::Update() {
 
   if (!pMenuDisplay)
     return;
-  if (pMenuDisplay->pCurr == &(pMenuDisplay->memOptions)) {
+  if (pMenuDisplay->IsInOptionsMenu()) {
     if (pOptionText)
       pOptionText->Draw(pGl->GetDrawer());
   } else {
@@ -130,52 +129,44 @@ MenuDisplay::MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
       pLeftTop(pLeftTop_), pNum(pNum_), pMenuCaret(pMenuCaret_),
       pMenuController(pMenuController_) {
   Size szSpacing(50, 10);
-  memMain.vEntries.push_back(
-      MenuEntry(szSpacing, "continue", &MenuDisplay::Continue));
-  memMain.vEntries.push_back(
-      MenuEntry(szSpacing, "restart", &MenuDisplay::Restart));
-  memMain.vEntries.push_back(
+  memMain.AddEntry(MenuEntry(szSpacing, "continue", &MenuDisplay::Continue));
+  memMain.AddEntry(MenuEntry(szSpacing, "restart", &MenuDisplay::Restart));
+  memMain.AddEntry(
       MenuEntry(szSpacing, "load chapter", &MenuDisplay::LoadChapterSubmenu));
-  memMain.vEntries.push_back(
-      MenuEntry(szSpacing, "options", &MenuDisplay::OptionsSubmenu));
-  memMain.vEntries.push_back(MenuEntry(szSpacing, "exit", &MenuDisplay::Exit));
+  memMain.AddEntry(MenuEntry(szSpacing, "options", &MenuDisplay::OptionsSubmenu));
+  memMain.AddEntry(MenuEntry(szSpacing, "exit", &MenuDisplay::Exit));
 
-  memLoadChapter.vEntries.push_back(
+  memLoadChapter.AddEntry(
       MenuEntry(szSpacing, "chapter 1", &MenuDisplay::Chapter1));
-  memLoadChapter.vEntries.push_back(
+  memLoadChapter.AddEntry(
       MenuEntry(szSpacing, "chapter 2", &MenuDisplay::Chapter2));
-  memLoadChapter.vEntries.push_back(
+  memLoadChapter.AddEntry(
       MenuEntry(szSpacing, "chapter 3", &MenuDisplay::Chapter3));
-  memLoadChapter.vEntries.push_back(
-      MenuEntry(szSpacing, "back", &MenuDisplay::Escape));
+  memLoadChapter.AddEntry(MenuEntry(szSpacing, "back", &MenuDisplay::Escape));
 
-  memOptions.vEntries.push_back(
-      MenuEntry(szSpacing, "", &MenuDisplay::MusicToggle));
-  nMusic = memOptions.vEntries.size() - 1;
+  memOptions.AddEntry(MenuEntry(szSpacing, "", &MenuDisplay::MusicToggle));
+  nMusic = memOptions.Size() - 1;
 
-  memOptions.vEntries.push_back(
-      MenuEntry(szSpacing, "", &MenuDisplay::SoundToggle));
-  nSound = memOptions.vEntries.size() - 1;
+  memOptions.AddEntry(MenuEntry(szSpacing, "", &MenuDisplay::SoundToggle));
+  nSound = memOptions.Size() - 1;
 
-  memOptions.vEntries.push_back(
-      MenuEntry(szSpacing, "", &MenuDisplay::TutorialToggle));
-  nTutorial = memOptions.vEntries.size() - 1;
+  memOptions.AddEntry(MenuEntry(szSpacing, "", &MenuDisplay::TutorialToggle));
+  nTutorial = memOptions.Size() - 1;
 
-  memOptions.vEntries.push_back(
+  memOptions.AddEntry(
       MenuEntry(szSpacing, "", &MenuDisplay::FullScreenToggle));
-  nFullScreen = memOptions.vEntries.size() - 1;
+  nFullScreen = memOptions.Size() - 1;
 
   if (bCheatsUnlocked) {
-    memOptions.vEntries.push_back(
+    memOptions.AddEntry(
         MenuEntry(szSpacing, "", &MenuDisplay::CheatsToggle));
-    nCheats = memOptions.vEntries.size() - 1;
+    nCheats = memOptions.Size() - 1;
   } else
     nCheats = -1;
 
-  memOptions.vEntries.push_back(
-      MenuEntry(szSpacing, "back", &MenuDisplay::Escape));
+  memOptions.AddEntry(MenuEntry(szSpacing, "back", &MenuDisplay::Escape));
 
-  vOptionText.resize(memOptions.vEntries.size());
+  vOptionText.resize(memOptions.Size());
 
   if (bCheatsUnlocked)
     vOptionText.at(nCheats) =
@@ -190,27 +181,24 @@ void MenuDisplay::PositionIncrement(bool bUp) {
   int nDelta = bUp ? 1 : -1;
 
   while (true) {
-    pCurr->nMenuPosition += nDelta;
-    pCurr->nMenuPosition += pCurr->vEntries.size();
-    pCurr->nMenuPosition %= pCurr->vEntries.size();
+    pCurr->SetPosition(
+        (pCurr->GetPosition() + nDelta + pCurr->Size()) % pCurr->Size());
 
-    if (pCurr->nMenuPosition == 0 ||
-        !pCurr->vEntries[pCurr->nMenuPosition].bDisabled)
+    if (pCurr->GetPosition() == 0 ||
+        !(*pCurr)[pCurr->GetPosition()].bDisabled)
       break;
   }
 
-  if (pMenuController->pOptionText)
-    pMenuController->pOptionText->SetText(
-        vOptionText.at(memOptions.nMenuPosition));
+  pMenuController->SetOptionTextContent(
+      vOptionText.at(memOptions.GetPosition()));
 }
 
 void MenuDisplay::Boop() {
-  if (pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent ==
-      &MenuDisplay::Escape)
+  if (pCurr->At(pCurr->GetPosition()).pTriggerEvent == &MenuDisplay::Escape)
     pMenuController->GetGl()->PlaySound("C");
   else
     pMenuController->GetGl()->PlaySound("A");
-  (this->*(pCurr->vEntries.at(pCurr->nMenuPosition).pTriggerEvent))();
+  (this->*(pCurr->At(pCurr->GetPosition()).pTriggerEvent))();
 }
 
 void MenuDisplay::Restart() { pMenuController->GetGl()->Restart(); }
@@ -221,20 +209,20 @@ void MenuDisplay::Continue() {
 
 void MenuDisplay::MusicToggle() {
   pMenuController->GetGl()->ToggleMusicPlayback();
-  pMenuController->settings->sbMusicOn.Set(
+  pMenuController->GetSettings()->sbMusicOn.Set(
       !pMenuController->GetGl()->IsMusicPlaybackOff());
   UpdateMenuEntries();
 }
 
 void MenuDisplay::SoundToggle() {
   pMenuController->GetGl()->ToggleSoundOutput();
-  pMenuController->settings->sbSoundOn.Set(
+  pMenuController->GetSettings()->sbSoundOn.Set(
       pMenuController->GetGl()->IsSoundOutputOn());
   UpdateMenuEntries();
 }
 
 void MenuDisplay::TutorialToggle() {
-  BoolToggle(pMenuController->settings->sbTutorialOn);
+  BoolToggle(pMenuController->GetSettings()->sbTutorialOn);
   UpdateMenuEntries();
 }
 
@@ -245,7 +233,7 @@ void MenuDisplay::FullScreenToggle() {
 }
 
 void MenuDisplay::CheatsToggle() {
-  BoolToggle(pMenuController->settings->sbCheatsOn);
+  BoolToggle(pMenuController->GetSettings()->sbCheatsOn);
   UpdateMenuEntries();
 }
 
@@ -263,13 +251,13 @@ void MenuDisplay::LoadChapterSubmenu() { pCurr = &memLoadChapter; }
 void MenuDisplay::OptionsSubmenu() { pCurr = &memOptions; }
 
 void MenuDisplay::UpdateMenuEntries() {
-  memOptions.vEntries.at(nMusic).sText =
-      MusicString() + OnOffString(pMenuController->settings->sbMusicOn.Get());
-  memOptions.vEntries.at(nSound).sText =
-      SoundString() + OnOffString(pMenuController->settings->sbSoundOn.Get());
-  memOptions.vEntries.at(nTutorial).sText =
-      TutorialString() +
-      OnOffString(pMenuController->settings->sbTutorialOn.Get());
+  DragonGameSettings *settings = pMenuController->GetSettings();
+  memOptions.At(nMusic).sText =
+      MusicString() + OnOffString(settings->sbMusicOn.Get());
+  memOptions.At(nSound).sText =
+      SoundString() + OnOffString(settings->sbSoundOn.Get());
+  memOptions.At(nTutorial).sText =
+      TutorialString() + OnOffString(settings->sbTutorialOn.Get());
 
   bool bFullScreenNow = GetProgramInfo().IsFullScreen();
   bool bFullScreenSetting = pMenuController->GetGl()->IsFullScreenSetting();
@@ -277,24 +265,20 @@ void MenuDisplay::UpdateMenuEntries() {
   if (bFullScreenNow != bFullScreenSetting)
     sExtra = "changes will take effect next launch";
 
-  memOptions.vEntries.at(nFullScreen).sText =
+  memOptions.At(nFullScreen).sText =
       FullTextString() + OnOffString(bFullScreenSetting);
 
   vOptionText.at(nFullScreen) = sExtra;
 
-  bool bCheatsOn = pMenuController->settings->sbCheatsOn.Get();
+  bool bCheatsOn = settings->sbCheatsOn.Get();
 
   if (bCheatsUnlocked)
-    memOptions.vEntries.at(nCheats).sText = "cheats: " + OnOffString(bCheatsOn);
+    memOptions.At(nCheats).sText = "cheats: " + OnOffString(bCheatsOn);
 
-  memLoadChapter.vEntries.at(1).bDisabled =
-      (pMenuController->settings->snProgress.Get() < 1);
-  memLoadChapter.vEntries.at(2).bDisabled =
-      (pMenuController->settings->snProgress.Get() < 2);
+  memLoadChapter.At(1).bDisabled = (settings->snProgress.Get() < 1);
+  memLoadChapter.At(2).bDisabled = (settings->snProgress.Get() < 2);
 
-  if (pMenuController->pOptionText)
-    pMenuController->pOptionText->SetText(
-        vOptionText.at(memOptions.nMenuPosition));
+  pMenuController->SetOptionTextContent(vOptionText.at(memOptions.GetPosition()));
 }
 
 void MenuDisplay::Chapter1() {
