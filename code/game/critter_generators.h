@@ -11,30 +11,21 @@ class LevelController;
 class SkellyGenerator : public Entity {
 public:
   std::string get_class_name() override { return "SkellyGenerator"; }
-  Timer t;
-  Point p;
-
-  LevelController *pAdv;
 
   SkellyGenerator(Point p_, LevelController *pAdv_);
 
   void Update() override;
+
+private:
+  Timer t;
+  Point p;
+  LevelController *pAdv;
 };
 
 /** Summons knights along the path on a timer. */
 class KnightGenerator : public Entity {
 public:
   std::string get_class_name() override { return "KnightGenerator"; }
-  bool bFirst;
-
-  float dRate;
-  Rectangle rBound;
-  LevelController *pBc;
-  ImageSequence seq;
-
-  Timer tm;
-
-  BrokenLine bl;
 
   /** The current rate at which knights appear (by completion and ghost mode). */
   float GetRate();
@@ -46,17 +37,21 @@ public:
   void Generate(bool bGolem = false);
 
   void Update() override;
+
+private:
+  bool bFirst;
+  float dRate;
+  Rectangle rBound;
+  LevelController *pBc;
+  ImageSequence seq;
+  Timer tm;
+  BrokenLine bl;
 };
 
 /** Summons princesses at a rate within the chapter bounds. */
 class PrincessGenerator : public Entity {
 public:
   std::string get_class_name() override { return "PrincessGenerator"; }
-  float dRate;
-  Rectangle rBound;
-  LevelController *pBc;
-  Timer tm;
-  bool bFirst;
 
   PrincessGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
@@ -66,15 +61,18 @@ public:
    * the realm, play the arrival tune, and tell the wise one.
    */
   void Update() override;
+
+private:
+  float dRate;
+  Rectangle rBound;
+  LevelController *pBc;
+  Timer tm;
+  bool bFirst;
 };
 
 class MageGenerator : public Entity {
 public:
   std::string get_class_name() override { return "MageGenerator"; }
-  float dRate;
-  Rectangle rBound;
-  LevelController *pBc;
-  Timer tm;
 
   MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
                  LevelController *pBc_);
@@ -83,24 +81,32 @@ public:
 
   /** Summon one mage on a random road and add to the realm. */
   void MageGenerate();
+
+private:
+  float dRate;
+  Rectangle rBound;
+  LevelController *pBc;
+  Timer tm;
 };
 
 /** Summons traders at a rate within the chapter bounds. */
 class TraderGenerator : public Entity {
 public:
   std::string get_class_name() override { return "TraderGenerator"; }
-  float dRate;
-  Rectangle rBound;
-  LevelController *pBc;
-  Timer tm;
-  bool bFirst;
-  bool bFirstBns;
 
   float GetRate();
 
   TraderGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
   void Update() override;
+
+private:
+  float dRate;
+  Rectangle rBound;
+  LevelController *pBc;
+  Timer tm;
+  bool bFirst;
+  bool bFirstBns;
 };
 
 #endif
