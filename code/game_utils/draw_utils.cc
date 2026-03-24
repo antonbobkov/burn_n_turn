@@ -47,8 +47,8 @@ void NumberDrawer::CacheColor(Color c) {
   std::vector<Index> vNewColors;
 
   for (size_t i = 0, sz = vImg.size(); i < sz; ++i) {
-    Index vColImg = pDr->pGr->CopyImage(vImg[i]);
-    pDr->pGr->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
+    Index vColImg = pDr->GetGraphics()->CopyImage(vImg[i]);
+    pDr->GetGraphics()->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
     vNewColors.push_back(vColImg);
   }
 
@@ -69,10 +69,10 @@ NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
 
   std::string bmpPath = fp->GetRelativePath(sFontPath + sFontName + ".bmp");
   Index nImg = pDr->LoadImage(bmpPath);
-  Image *pImg = pDr->pGr->GetImage(nImg);
+  Image *pImg = pDr->GetGraphics()->GetImage(nImg);
   for (int i = 0; i < n; ++i) {
-    Index nCurr = pDr->pGr->GetBlankImage(Size(3, 5));
-    Image *pCurr = pDr->pGr->GetImage(nCurr);
+    Index nCurr = pDr->GetGraphics()->GetBlankImage(Size(3, 5));
+    Image *pCurr = pDr->GetGraphics()->GetImage(nCurr);
 
     Point p;
     for (p.y = 0; p.y < 5; ++p.y)
@@ -82,7 +82,7 @@ NumberDrawer::NumberDrawer(ScalingDrawer *pDr_, FilePath *fp,
     vImg.push_back(nCurr);
   }
 
-  pDr->pGr->DeleteImage(nImg);
+  pDr->GetGraphics()->DeleteImage(nImg);
 }
 
 std::string NumberDrawer::GetNumber(int n, int nDigits) {
@@ -145,8 +145,8 @@ void NumberDrawer::DrawColorWord(std::string s, Point p, Color c,
       continue;
 
     if (bManualRecolor) {
-      Index vColImg = pDr->pGr->CopyImage(vImg[vImgIndx[n]]);
-      pDr->pGr->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
+      Index vColImg = pDr->GetGraphics()->CopyImage(vImg[vImgIndx[n]]);
+      pDr->GetGraphics()->GetImage(vColImg)->ChangeColor(Color(255, 255, 0), c);
       pDr->Draw(vColImg, Point(p.x + 4 * i, p.y), false);
     } else {
       pDr->Draw((*pImageVector)[vImgIndx[n]], Point(p.x + 4 * i, p.y), false);

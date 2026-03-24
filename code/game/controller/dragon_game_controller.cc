@@ -69,14 +69,14 @@ DragonGameController::DragonGameController(
     ConfigurationFile *config, ConfigurationFile *game_data,
     GameConfig game_config)
     : nActive(1), nResumePosition(0), vLevelPointers(3), pMenu(nullptr),
-      pGraph(pDr_ ? pDr_->pGr : 0), pDr(pDr_),
+      pGraph(pDr_ ? pDr_->GetGraphics() : nullptr), pDr(pDr_),
       pNum(pNum_), pBigNum(pBigNum_), pFancyNum(pFancyNum_),
       pSnd(std::make_unique<SoundInterfaceProxy>(pSndRaw_)),
       vLvl(vLvl_), nScore(0), nHighScore(0), bAngry(false),
       settings_(game_data), rBound(rBound_),
       szActualRez(szActualRez_), pExitProgram(pExitProgram_), fp_(fp),
       p_config_(config), game_config_(game_config),
-      pr(std::make_unique<Preloader>(pDr_->pGr, pSndRaw_, fp)) {
+      pr(std::make_unique<Preloader>(pDr_->GetGraphics(), pSndRaw_, fp)) {
   nHighScore = settings_.snHighScore.Get();
 
   typedef ImagePainter::ColorMap ColorMap;
@@ -631,7 +631,7 @@ ScalingDrawer *DragonGameController::GetDrawer() const {
 }
 
 int DragonGameController::GetDrawScaleFactor() const {
-  return pDr ? pDr->nFactor : 0;
+  return pDr ? pDr->GetFactor() : 0;
 }
 
 NumberDrawer *DragonGameController::GetNumberDrawer() const {
