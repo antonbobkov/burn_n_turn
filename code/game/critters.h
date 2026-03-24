@@ -86,8 +86,6 @@ std::string GetBonusImage(int n);
 class Trader : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "Trader"; }
-  LevelController *pAc;
-  bool &bFirstBns;
 
   Trader(const Critter &cr, LevelController *pAc_, bool &bFirstBns_)
       : Critter(cr), pAc(pAc_), bFirstBns(bFirstBns_) {}
@@ -99,6 +97,10 @@ public:
   void OnHit(char cWhat) override;
 
   void Draw(ScalingDrawer *pDr) override;
+
+private:
+  LevelController *pAc;
+  bool &bFirstBns;
 };
 
 /** The knight: chases princess and castle, and may rise again as a ghost. */
