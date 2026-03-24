@@ -114,7 +114,7 @@ public:
         nGolemHealth(nGolemHealthMax) {}
 
   /** Change the type to ghost ('G'), used when a knight spawns as a ghost. */
-  void SetAsGhost() { cType = 'G'; }
+  void MakeGhost() { cType = 'G'; }
 
   void Draw(ScalingDrawer *pDr) override;
 
