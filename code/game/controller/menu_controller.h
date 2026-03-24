@@ -47,10 +47,19 @@ std::string FullTextString();
 /** The list of choices on the wall and which one the caret points to. */
 class MenuEntryManager {
 public:
+  MenuEntryManager() : nMenuPosition(0) {}
+
+  void AddEntry(MenuEntry e) { vEntries.push_back(e); }
+  int Size() const { return int(vEntries.size()); }
+  MenuEntry &At(int i) { return vEntries.at(i); }
+  MenuEntry &operator[](int i) { return vEntries[i]; }
+  const MenuEntry &operator[](int i) const { return vEntries[i]; }
+  int GetPosition() const { return nMenuPosition; }
+  void SetPosition(int i) { nMenuPosition = i; }
+
+private:
   std::vector<MenuEntry> vEntries;
   int nMenuPosition;
-
-  MenuEntryManager() : nMenuPosition(0) {}
 };
 
 /** The pause hall's face: draws choices and caret, answers mouse and key;
@@ -59,23 +68,6 @@ class MenuDisplay : public Entity {
 public:
   std::string get_class_name() override { return "MenuDisplay"; }
   bool ShouldDraw() override { return true; }
-  MenuEntryManager *pCurr;
-
-  MenuEntryManager memMain;
-  MenuEntryManager memLoadChapter;
-  MenuEntryManager memOptions;
-  std::vector<std::string> vOptionText;
-
-  int nMusic, nSound, nTutorial, nFullScreen, nCheats;
-  bool bCheatsUnlocked;
-
-  Point pLeftTop;
-  NumberDrawer *pNum;
-
-  Animation *pMenuCaret;
-
-  /** The menu keeper who owns this hall (we only point). */
-  MenuController *pMenuController;
 
   MenuDisplay(Point pLeftTop_, NumberDrawer *pNum_,
               Animation *pMenuCaret_,
@@ -87,7 +79,7 @@ public:
 
   float GetPriority() override { return 0; }
 
-  void Update() override { pCurr->vEntries.at(0).bDisabled = false; }
+  void Update() override { pCurr->At(0).bDisabled = false; }
 
   /** Move the caret to the choice under the mouse. */
   void OnMouseMove(Point pMouse);
@@ -113,21 +105,28 @@ public:
   void Chapter1();
   void Chapter2();
   void Chapter3();
+
+  /** Returns true when the options sub-menu is the active page. */
+  bool IsInOptionsMenu() const { return pCurr == &memOptions; }
+
+private:
+  MenuEntryManager *pCurr;
+  MenuEntryManager memMain;
+  MenuEntryManager memLoadChapter;
+  MenuEntryManager memOptions;
+  std::vector<std::string> vOptionText;
+  int nMusic, nSound, nTutorial, nFullScreen, nCheats;
+  bool bCheatsUnlocked;
+  Point pLeftTop;
+  NumberDrawer *pNum;
+  Animation *pMenuCaret;
+  MenuController *pMenuController;
 };
 
 /** The keeper of the pause hall: the display and options from the scrolls. */
 class MenuController : public EntityListController {
 public:
   std::string get_class_name() { return "MenuController"; }
-  std::unique_ptr<Animation> pMenuCaret;
-  std::unique_ptr<MenuDisplay> pMenuDisplay;
-
-  MouseCursor mc;
-
-  std::unique_ptr<TextDrawEntity> pHintText;
-  std::unique_ptr<TextDrawEntity> pOptionText;
-
-  DragonGameSettings *settings;
 
   MenuController(DragonGameController *pGl_, DragonGameSettings *settings_,
                  Rectangle rBound, Color c);
@@ -140,6 +139,20 @@ public:
     return pMenuCaret ? pMenuCaret.get() : nullptr;
   }
 
+  /** Refresh the menu entry labels if a display is attached. */
+  void UpdateMenuDisplay() {
+    if (pMenuDisplay)
+      pMenuDisplay->UpdateMenuEntries();
+  }
+
+  DragonGameSettings *GetSettings() const { return settings; }
+
+  /** Forward option-text content to the option text entity if present. */
+  void SetOptionTextContent(const std::string &s) {
+    if (pOptionText)
+      pOptionText->SetText(s);
+  }
+
   std::vector<Entity *> GetNonOwnedEntities() override;
 
   void OnKey(GuiKeyType c, bool bUp) override;
@@ -148,6 +161,14 @@ public:
 
   void Update() override;
   std::string GetControllerName() const override { return "menu"; }
+
+private:
+  std::unique_ptr<Animation> pMenuCaret;
+  std::unique_ptr<MenuDisplay> pMenuDisplay;
+  MouseCursor mc;
+  std::unique_ptr<TextDrawEntity> pHintText;
+  std::unique_ptr<TextDrawEntity> pOptionText;
+  DragonGameSettings *settings;
 };
 
 #endif
