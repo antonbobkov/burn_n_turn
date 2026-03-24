@@ -91,7 +91,7 @@ public:
     Point p(1, 3);
 
     for (int nDr = 0; nDr < (int)pAd->vDr_.size(); ++nDr) {
-      auto &lst = pAd->vDr_[nDr]->lsBonuses;
+      const auto &lst = pAd->vDr_[nDr]->GetBonuses();
 
       for (auto itr = lst.begin(), etr = lst.end(); itr != etr; ++itr) {
         TimedFireballBonus *pBns = itr->get();
@@ -114,7 +114,7 @@ public:
 
       p.x = 3;
 
-      for (int i = 0; i < pAd->vDr_[nDr]->nFireballCount; ++i) {
+      for (int i = 0; i < pAd->vDr_[nDr]->GetFireballCount(); ++i) {
         pDr->Draw(pAd->pGl->GetImgSeq("fireball_icon").GetImage(), p, false);
 
         p.x += 7;
@@ -187,8 +187,8 @@ void LevelController::Init(const LevelLayout &lvl) {
       vCs_[0].get(), this, &pt_, pGl->GetImgSeq("dragon_stable"),
       pGl->GetImgSeq("dragon_fly"),
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
-  if (vDr_.back()->pCs != nullptr)
-    vDr_.back()->pCs->pDrag = vDr_.back().get();
+  if (vDr_.back()->GetCastle() != nullptr)
+    vDr_.back()->GetCastle()->pDrag = vDr_.back().get();
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
   pTutorialText_ =
@@ -260,8 +260,8 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
     pGl->EnterMenu();
 
   for (int i = 0; i < (int)vDr_.size(); ++i)
-    if (vDr_[i]->bt.IsSpace(c)) {
-      if (!vDr_[i]->bFly)
+    if (vDr_[i]->IsSpace(c)) {
+      if (!vDr_[i]->IsFlying())
         vDr_[i]->Toggle();
       else {
         fPoint fFb = vDr_[0]->GetVel();
@@ -299,7 +299,7 @@ void LevelController::OnKey(GuiKeyType c, bool bUp) {
       fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
       fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-      if (!vDr_[0]->bFly) {
+      if (!vDr_[0]->IsFlying()) {
         vDr_[0]->Fire(fp);
         pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
@@ -338,20 +338,20 @@ void LevelController::OnMouseDown(Point pPos) {
 
   bool bHit = false;
 
-  if (!vDr_[0]->bFly)
-    bHit = (pt_.GetDirection(vDr_[0]->pCs->GetPosition()).Length() <
+  if (!vDr_[0]->IsFlying())
+    bHit = (pt_.GetDirection(vDr_[0]->GetCastle()->GetPosition()).Length() <
             fTowerClickRadius);
   else
     bHit =
         (pt_.GetDirection(vDr_[0]->GetPosition()).Length() < fDragonClickRadius);
 
   if (bHit) {
-    if (!vDr_[0]->bFly)
+    if (!vDr_[0]->IsFlying())
       bTakeOffToggle_ = true;
 
     vDr_[0]->Toggle();
   } else {
-    if (!vDr_[0]->bFly) {
+    if (!vDr_[0]->IsFlying()) {
       fPoint fFb = pt_.GetDirection(vDr_[0]->GetPosition() + Point(-10, -25));
 
 
@@ -365,7 +365,7 @@ void LevelController::OnMouseUp() {
   float fTime = float(pt_.Off());
   fTime = fTime / nFramesInSecond;
 
-  if (vDr_[0]->bFly && fTime <= .2 && !bTakeOffToggle_ &&
+  if (vDr_[0]->IsFlying() && fTime <= .2 && !bTakeOffToggle_ &&
       pt_.GetDirection(vDr_[0]->GetPosition()).Length() > vDr_[0]->GetRadius()) {
     fPoint fFb = vDr_[0]->GetVel();
 
@@ -378,7 +378,7 @@ void LevelController::OnMouseUp() {
 }
 
 void LevelController::Fire() {
-  if (vDr_[0]->bFly) {
+  if (vDr_[0]->IsFlying()) {
     fPoint fFb = vDr_[0]->GetVel();
 
     fFb.Normalize(100);
@@ -475,7 +475,7 @@ std::vector<Entity *> LevelController::GetNonOwnedEntities() {
   for (size_t i = 0; i < vDr_.size(); ++i)
     out.push_back(vDr_[i].get());
   for (size_t i = 0; i < vDr_.size(); ++i)
-    for (auto &u : vDr_[i]->lsBonuses)
+    for (const auto &u : vDr_[i]->GetBonuses())
       out.push_back(u.get());
   if (pKnightGen_)
     out.push_back(pKnightGen_.get());
@@ -630,7 +630,7 @@ void LevelController::Update() {
   }
 
   tr_.Update();
-  if (!vDr_[0]->bFly) {
+  if (!vDr_[0]->IsFlying()) {
     if (tr_.IsTrigger()) {
       fPoint p = tr_.GetMovement();
 
@@ -652,7 +652,7 @@ void LevelController::Update() {
       d.Normalize(v.Length());
 
       fPoint newVel = v * fFlightCoefficient + d;
-      newVel.Normalize(vDr_[0]->leash.speed);
+      newVel.Normalize(vDr_[0]->GetLeashSpeed());
       vDr_[0]->SetVel(newVel);
     } else if (bLeftDown_ || bRightDown_) {
       fPoint v = vDr_[0]->GetVel();
@@ -662,7 +662,7 @@ void LevelController::Update() {
       else
         d.x *= -1;
       fPoint newVel = v * fFlightCoefficient * 1.2f + d;
-      newVel.Normalize(vDr_[0]->leash.speed);
+      newVel.Normalize(vDr_[0]->GetLeashSpeed());
       vDr_[0]->SetVel(newVel);
     }
   }
@@ -703,7 +703,7 @@ void LevelController::Update() {
       fp.x += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
       fp.y += (float(rand()) / RAND_MAX - .5F) / fSpreadFactor;
 
-      if (!vDr_[0]->bFly) {
+      if (!vDr_[0]->IsFlying()) {
         vDr_[0]->Fire(fp);
         pt_.UpdateLastDownPosition(Point(fp.x * 10000, fp.y * 10000));
       }
