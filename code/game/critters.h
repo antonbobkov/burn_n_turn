@@ -146,9 +146,6 @@ private:
 class MegaSlime : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "MegaSlime"; }
-  LevelController *pAc;
-
-  int nHealth;
 
   MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_);
 
@@ -168,6 +165,10 @@ public:
   Index GetImage() override { return seq.GetImageAt(0); }
 
   char GetType() override { return 'E'; }
+
+private:
+  LevelController *pAc;
+  int nHealth;
 };
 
 /** The ghost's echo: a brief shimmer where the knight fell. */
