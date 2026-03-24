@@ -276,15 +276,16 @@ private:
 class FloatingSlime : public SimpleVisualEntity {
 public:
   std::string get_class_name() override { return "FloatingSlime"; }
-  fPoint fPos;
-  fPoint fVel;
-
-  Timer tTermination;
 
   FloatingSlime(ImageSequence seq, Point pStart, Point pEnd, int nTime);
 
   Point GetPosition() override { return fPos.ToPnt(); }
   void Update() override;
+
+private:
+  fPoint fPos;
+  fPoint fVel;
+  Timer tTermination;
 };
 
 void SummonSkeletons(LevelController *pAc, Point p);
