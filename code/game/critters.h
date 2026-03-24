@@ -55,15 +55,6 @@ private:
 class Mage : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "Mage"; }
-  LevelController *pAc;
-
-  bool bAngry;
-  bool bCasting;
-  Timer tUntilSpell;
-  Timer tSpell;
-  Timer tSpellAnimate;
-
-  fPoint fMvVel;
 
   Mage(const Critter &cr, LevelController *pAc_, bool bAngry_);
 
@@ -76,6 +67,15 @@ public:
   void Update() override;
 
   void OnHit(char cWhat) override;
+
+private:
+  LevelController *pAc;
+  bool bAngry;
+  bool bCasting;
+  Timer tUntilSpell;
+  Timer tSpell;
+  Timer tSpellAnimate;
+  fPoint fMvVel;
 };
 
 int RandomBonus(bool bInTower = true);
