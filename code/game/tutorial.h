@@ -14,21 +14,6 @@ class TutorialTextEntity : public Entity {
 public:
   std::string get_class_name() override { return "TutorialTextEntity"; }
   bool ShouldDraw() override { return true; }
-  float dPriority;
-  Point pos;
-
-  std::vector<std::string> sText;
-  std::vector<std::string> sNewText;
-
-  NumberDrawer *pNum;
-
-  Timer t;
-  int nOffset;
-  int nDelta;
-
-  int nTextVerticalSpacing;
-
-  DragonGameController *pGl;
 
   TutorialTextEntity(float dPriority_, Point pos_, NumberDrawer *pNum_,
                      DragonGameController *pGl_)
@@ -48,6 +33,18 @@ public:
   /** Advance the scroll each tick; when it ends, the new words replace the
    * old. */
   void Update() override;
+
+private:
+  float dPriority;
+  Point pos;
+  std::vector<std::string> sText;
+  std::vector<std::string> sNewText;
+  NumberDrawer *pNum;
+  Timer t;
+  int nOffset;
+  int nDelta;
+  int nTextVerticalSpacing;
+  DragonGameController *pGl;
 };
 
 /** Game event that can trigger a tutorial state change. */
