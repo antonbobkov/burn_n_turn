@@ -618,7 +618,7 @@ void LevelController::Update() {
   EntityListController::Update();
 
   if (pGl->GetGameConfig().IsPcVersion() && !pGl->GetGameConfig().IsKeyboardControls()) {
-    mc_.bPressed = pt_.bPressed;
+    mc_.SetPressed(pt_.IsPressed());
     mc_.DrawCursor(pGl->GetGraphics());
   }
   pGl->RefreshAll();
@@ -641,7 +641,7 @@ void LevelController::Update() {
       }
     }
   } else {
-    if (pt_.bPressed) {
+    if (pt_.IsPressed()) {
       fPoint v = vDr_[0]->GetVel();
       fPoint d = pt_.GetDirection(vDr_[0]->GetPosition());
 
