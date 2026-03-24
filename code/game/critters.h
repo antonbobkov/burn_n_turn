@@ -251,9 +251,6 @@ private:
 class MegaSliminess : public Entity {
 public:
   std::string get_class_name() override { return "MegaSliminess"; }
-  Point p;
-  LevelController *pAdv;
-  std::unique_ptr<AnimationOnce> pSlm_;
 
   MegaSliminess(Point p_, LevelController *pAdv_);
 
@@ -261,6 +258,18 @@ public:
 
   Point GetPosition() override { return p; }
   void Destroy();
+
+  /** If the shimmer animation exists, add it to out (used when building the
+   * full entity draw list). */
+  void AppendSlimAnimation(std::vector<Entity *> &out) {
+    if (pSlm_)
+      out.push_back(pSlm_.get());
+  }
+
+private:
+  Point p;
+  LevelController *pAdv;
+  std::unique_ptr<AnimationOnce> pSlm_;
 };
 
 /** A drifting slime that moves with position and velocity (e.g. in the menu). */
