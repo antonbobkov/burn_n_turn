@@ -36,7 +36,6 @@ private:
 class Princess : public Critter, public ConsumableEntity {
 public:
   std::string get_class_name() override { return "Princess"; }
-  LevelController *pAc;
 
   Princess(const Critter &cr, LevelController *pAc_) : Critter(cr), pAc(pAc_) {}
 
@@ -48,6 +47,9 @@ public:
   void OnHit(char cWhat) override;
 
   void Draw(ScalingDrawer *pDr) override;
+
+private:
+  LevelController *pAc;
 };
 
 class Mage : public Critter, public ConsumableEntity {
