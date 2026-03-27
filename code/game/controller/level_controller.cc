@@ -146,7 +146,10 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
       pGr_(0), bTakeOffToggle_(false),
       pTutorialText_(), pTutorial_(std::make_unique<NoopTutorial>()),
       pSc_(std::move(pSc)),
-      mc_(pGl->GetImgSeq("claw"), Point()) {}
+      mc_(pGl->GetImgSeq("claw"), Point()) {
+  /* The sound herald answers the call from the very first tick. */
+  if (pSc_) Register(pSc_.get());
+}
 
 Dragon *LevelController::FindDragon(Dragon *p) {
   for (size_t i = 0; i < vDr_.size(); ++i)
@@ -165,21 +168,29 @@ void LevelController::Init(const LevelLayout &lvl) {
 
   pKnightGen_ = std::make_unique<KnightGenerator>(lvl.GetFreq(0), rBound, this,
                                                   lvl.GetKnightPath());
+  Register(pKnightGen_.get());
   pPGen_ = std::make_unique<PrincessGenerator>(lvl.GetFreq(1), rBound, this);
+  Register(pPGen_.get());
   pTGen_ = std::make_unique<TraderGenerator>(lvl.GetFreq(2), rBound, this);
+  Register(pTGen_.get());
   pMGen_ = std::make_unique<MageGenerator>(lvl.GetFreq(3), lvl.GetFreq(4),
                                            rBound, this);
+  Register(pMGen_.get());
 
   pGr_ = pKnightGen_.get();
   pMgGen_ = pMGen_.get();
 
   const std::vector<Road> &vRoads = lvl.GetRoads();
-  for (int i = 0; i < (int)vRoads.size(); ++i)
+  for (int i = 0; i < (int)vRoads.size(); ++i) {
     vRd_.push_back(std::make_unique<FancyRoad>(vRoads[i], this));
+    Register(vRd_.back().get());
+  }
 
   const std::vector<Point> &vCastles = lvl.GetCastleLocations();
-  for (int i = 0; i < (int)vCastles.size(); ++i)
+  for (int i = 0; i < (int)vCastles.size(); ++i) {
     vCs_.push_back(std::make_unique<Castle>(vCastles[i], rBound, this));
+    Register(vCs_.back().get());
+  }
 
   t_ = Timer(lvl.GetTime());
 
@@ -189,10 +200,13 @@ void LevelController::Init(const LevelLayout &lvl) {
       ButtonSet('q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', ' ')));
   if (vDr_.back()->GetCastle() != nullptr)
     vDr_.back()->GetCastle()->SetDragon(vDr_.back().get());
+  /* The great dragon joins the ledger once it has chosen its keep. */
+  Register(vDr_.back().get());
 
   Point pos(pGl->GetBounds().sz.x / 2, pGl->GetBounds().sz.y);
   pTutorialText_ =
       std::make_unique<TutorialTextEntity>(1, pos, pGl->GetNumberDrawer(), pGl);
+  Register(pTutorialText_.get());
 
   if (pGl->GetGameConfig().IsPcVersion()) {
     if (nLvl_ == 1) {
@@ -445,17 +459,12 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
 }
 
 std::vector<Entity *> LevelController::GetNonOwnedEntities() {
+  /* Fixed entities (roads, castles, dragon, generators, sound, tutorial text)
+   * now register directly and are no longer gathered here. Only dynamic lists
+   * and sub-entities that haven't migrated yet remain. */
   std::vector<Entity *> out;
   for (auto &u : lsPpl_)
     out.push_back(u.get());
-  for (size_t i = 0; i < vCs_.size(); ++i)
-    out.push_back(vCs_[i].get());
-  for (size_t i = 0; i < vRd_.size(); ++i)
-    out.push_back(vRd_[i].get());
-  if (pTutorialText_)
-    out.push_back(pTutorialText_.get());
-  if (pSc_)
-    out.push_back(pSc_.get());
   for (auto &u : lsBonus_)
     out.push_back(u.get());
   for (auto &u : lsSlimes_)
@@ -471,18 +480,8 @@ std::vector<Entity *> LevelController::GetNonOwnedEntities() {
     u->AppendSlimAnimation(out);
   }
   for (size_t i = 0; i < vDr_.size(); ++i)
-    out.push_back(vDr_[i].get());
-  for (size_t i = 0; i < vDr_.size(); ++i)
     for (const auto &u : vDr_[i]->GetBonuses())
       out.push_back(u.get());
-  if (pKnightGen_)
-    out.push_back(pKnightGen_.get());
-  if (pPGen_)
-    out.push_back(pPGen_.get());
-  if (pTGen_)
-    out.push_back(pTGen_.get());
-  if (pMGen_)
-    out.push_back(pMGen_.get());
   for (auto &u : lsSpawnedGenerators_)
     out.push_back(u.get());
   return out;
