@@ -8,7 +8,11 @@
 #include <memory>
 
 void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
+  Entity *raw = p.get();
   owned_entities.push_back(std::move(p));
+  /* Inscribe the new soul so it joins the tick even though the ledger owns
+   * its lifetime. */
+  Register(raw);
 }
 
 void EntityListController::Register(Entity *e) {
@@ -39,40 +43,41 @@ EntityListController::EntityListController(DragonGameController *pGl_,
 }
 
 void EntityListController::Update() {
+  /* Remove fallen souls from the owned list (their destructors fire Unregister,
+   * which nulls their slots in registered_entities_). */
   CleanUp(owned_entities);
 
+  /* Non-owned entities not yet migrated to registration are gathered the old
+   * way; they share the same Move/Update/Draw loops below. */
   auto nonOwned = GetNonOwnedEntities();
 
-  for (auto &pEx : owned_entities) {
-    if (pEx->Exists())
-      pEx->Move();
-  }
+  /* Capture size before loops: souls that register mid-tick join next tick. */
+  int n = (int)registered_entities_.size();
 
-  for (Entity *pEx : nonOwned) {
-    if (pEx->Exists())
-      pEx->Move();
+  for (int i = 0; i < n; ++i) {
+    Entity *pEx = registered_entities_[i];
+    if (pEx && pEx->Exists()) pEx->Move();
   }
+  for (Entity *pEx : nonOwned)
+    if (pEx->Exists()) pEx->Move();
 
-  for (auto &pEx : owned_entities) {
-    if (pEx->Exists())
-      pEx->Update();
+  for (int i = 0; i < n; ++i) {
+    Entity *pEx = registered_entities_[i];
+    if (pEx && pEx->Exists()) pEx->Update();
   }
-
-  for (Entity *pEx : nonOwned) {
-    if (pEx->Exists())
-      pEx->Update();
-  }
+  for (Entity *pEx : nonOwned)
+    if (pEx->Exists()) pEx->Update();
 
   {
     typedef std::multimap<ScreenPos, Entity *> DrawMap;
     DrawMap mmp;
 
-    for (auto &pOw : owned_entities) {
-      if (pOw->Exists() && pOw->ShouldDraw())
+    for (int i = 0; i < n; ++i) {
+      Entity *pEx = registered_entities_[i];
+      if (pEx && pEx->Exists() && pEx->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
-            ScreenPos(pOw->GetPriority(), pOw->GetPosition()), pOw.get()));
+            ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
     }
-
     for (Entity *pEx : nonOwned) {
       if (pEx && pEx->Exists() && pEx->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
@@ -82,6 +87,12 @@ void EntityListController::Update() {
     for (auto &entry : mmp)
       entry.second->Draw(pGl->GetDrawer());
   }
+
+  /* Purge null slots left by Unregister calls during this tick. */
+  registered_entities_.erase(
+      std::remove(registered_entities_.begin(), registered_entities_.end(),
+                  nullptr),
+      registered_entities_.end());
 
   if (!bNoRefresh)
     pGl->RefreshAll();
@@ -98,8 +109,8 @@ void EntityListController::OnMouseDown(Point /*pPos*/) { pGl->Next(); }
 
 int EntityListController::CountDrawable() {
   int n = 0;
-  for (auto &p : owned_entities)
-    if (p->Exists() && p->ShouldDraw())
+  for (Entity *p : registered_entities_)
+    if (p && p->Exists() && p->ShouldDraw())
       ++n;
   return n;
 }
