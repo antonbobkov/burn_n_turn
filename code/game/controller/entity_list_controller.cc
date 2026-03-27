@@ -44,24 +44,38 @@ EntityListController::EntityListController(DragonGameController *pGl_,
   AddBackground(c);
 }
 
-void EntityListController::Update() {
-  /* Remove fallen souls from the owned list (their destructors fire Unregister,
-   * which nulls their slots in registered_entities_). */
-  CleanUp(owned_entities);
+void EntityListController::CleanUpRegistered() {
+  /* Sweep out null slots left by Unregister calls during this tick. */
+  registered_entities_.erase(
+      std::remove(registered_entities_.begin(), registered_entities_.end(),
+                  nullptr),
+      registered_entities_.end());
+}
 
-  /* Capture size before loops: souls that register mid-tick join next tick. */
+void EntityListController::Update() {
+  /* Capture the current roster size before the loops begin. Any soul that
+   * registers mid-tick (spawned by another entity's Update) appends beyond
+   * this index and is deferred to the next tick — they have not yet moved
+   * or set up this frame. */
   int n = (int)registered_entities_.size();
 
+  /* Step 1: Move every living soul forward one beat in time. */
   for (int i = 0; i < n; ++i) {
     Entity *pEx = registered_entities_[i];
     if (pEx && pEx->Exists()) pEx->Move();
   }
 
+  /* Step 2: Let each soul react to the world — it may destroy itself or
+   * summon new allies (those new souls wait until next tick). */
   for (int i = 0; i < n; ++i) {
     Entity *pEx = registered_entities_[i];
     if (pEx && pEx->Exists()) pEx->Update();
   }
 
+  /* Step 3: Paint the scene from back to front. A multimap keyed by
+   * (priority, y-position) yields correct draw order: background layers
+   * first, then floor-level sprites sorted by depth, then foreground effects.
+   * Null and non-existent slots are skipped. */
   {
     typedef std::multimap<ScreenPos, Entity *> DrawMap;
     DrawMap mmp;
@@ -77,11 +91,14 @@ void EntityListController::Update() {
       entry.second->Draw(pGl->GetDrawer());
   }
 
-  /* Purge null slots left by Unregister calls during this tick. */
-  registered_entities_.erase(
-      std::remove(registered_entities_.begin(), registered_entities_.end(),
-                  nullptr),
-      registered_entities_.end());
+  /* Step 4: Evict dead owned souls — their destructors fire Unregister,
+   * which nulls their slots in registered_entities_. Doing this after the
+   * loops means the whole frame ran before anything is evicted. */
+  CleanUp(owned_entities);
+
+  /* Step 5: Sweep null slots left by Unregister calls (including those just
+   * created by CleanUp above) so the list stays compact. */
+  CleanUpRegistered();
 
   if (!bNoRefresh)
     pGl->RefreshAll();

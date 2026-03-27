@@ -48,6 +48,9 @@ public:
   std::string GetControllerName() const override { return "basic"; }
 
 private:
+  /** Erase null slots left by Unregister calls — called at the end of each
+   * tick after all owned dead entities have been evicted. */
+  void CleanUpRegistered();
   /** Souls inscribed in this ledger — includes both owned and non-owned
    * entities. Declared before owned_entities so it outlives it during
    * destruction (entity destructors call Unregister). Slots are null-outed
