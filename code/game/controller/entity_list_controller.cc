@@ -3,11 +3,25 @@
 #include "../entities.h"
 #include "../../wrappers/color.h"
 #include "../../wrappers/geometry.h"
+#include <algorithm>
 #include <map>
 #include <memory>
 
 void EntityListController::AddOwnedEntity(std::unique_ptr<Entity> p) {
   owned_entities.push_back(std::move(p));
+}
+
+void EntityListController::Register(Entity *e) {
+  if (!e) return;
+  e->SetLedger(this);
+  registered_entities_.push_back(e);
+}
+
+void EntityListController::Unregister(Entity *e) {
+  /* Null-out the slot rather than erasing so any in-progress frame loop
+   * can safely skip it — the null is purged at the end of the tick. */
+  for (Entity *&ptr : registered_entities_)
+    if (ptr == e) { ptr = nullptr; return; }
 }
 
 void EntityListController::AddBackground(Color c) {

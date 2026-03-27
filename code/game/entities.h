@@ -12,6 +12,8 @@
 
 #include <list>
 
+#include "entity_ledger.h"
+
 class DragonGameController;
 class LevelController;
 
@@ -20,11 +22,11 @@ class LevelController;
  * (Draw/GetPriority), and collision (GetRadius/HitDetection). */
 class Entity {
 public:
-  Entity() : bExist(true) {}
+  Entity() : bExist(true), ledger_(nullptr) {}
   Entity(const Entity &) = default;
   Entity &operator=(const Entity &) = default;
   Entity &operator=(Entity &&) = delete;
-  virtual ~Entity() {}
+  virtual ~Entity();
   virtual std::string get_class_name() { return "Entity"; }
   virtual void Move() {}
   virtual void Update() {}
@@ -38,8 +40,14 @@ public:
   bool Exists() const { return bExist; }
   void Destroy() { bExist = false; }
 
+  /** Bind this soul to a ledger so it will be freed when the soul is
+   * destroyed. */
+  void SetLedger(EntityLedger *r) { ledger_ = r; }
+
 private:
   bool bExist;
+  /** The ledger this soul is inscribed in; null if not registered anywhere. */
+  EntityLedger *ledger_;
 };
 
 /** A sight that paints lines of text at a point on the vista. */

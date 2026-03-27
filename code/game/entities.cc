@@ -9,6 +9,10 @@
 
 #include <sstream>
 
+Entity::~Entity() {
+  if (ledger_) ledger_->Unregister(this);
+}
+
 void TextDrawEntity::SetText(std::string sText) {
   vText = BreakUpString(sText);
 }

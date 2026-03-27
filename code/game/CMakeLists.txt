@@ -21,6 +21,11 @@ add_library(GameCore STATIC
 )
 target_link_libraries(GameCore PUBLIC GameUtils)
 
+add_executable(entity_registrar_test controller/entity_registrar_test.cc)
+target_link_libraries(entity_registrar_test PRIVATE GameCore GuiMock SuiMock Catch2::Catch2WithMain)
+add_test(NAME entity_registrar_test COMMAND $<TARGET_FILE:entity_registrar_test>)
+set_tests_properties(entity_registrar_test PROPERTIES LABELS "unit")
+
 add_executable(tower_defense
   ${CMAKE_SOURCE_DIR}/code/wrappers_sdl_impl/sdl_game_runner_main.cc)
 target_include_directories(tower_defense PRIVATE
