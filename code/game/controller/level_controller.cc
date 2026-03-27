@@ -410,6 +410,12 @@ float LevelController::GetCompletionRate() {
   return fCap;
 }
 
+void LevelController::AddOwnedConsumable(std::unique_ptr<ConsumableEntity> p) {
+  ConsumableEntity *raw = p.get();
+  lsPpl_.push_back(std::move(p));
+  Register(raw);
+}
+
 void LevelController::AddBonusAnimation(
     std::unique_ptr<FireballBonusAnimation> p) {
   Entity *raw = p.get();
