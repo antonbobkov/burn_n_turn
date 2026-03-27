@@ -38,7 +38,9 @@ public:
 
   /** Own a consumable entity (knight, princess, …). */
   template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
+    ConsumableEntity *raw = p.get();
     lsPpl_.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
+    Register(raw);
   }
 
   /** Pointers to people (non-slime consumables) for targeted iteration. */

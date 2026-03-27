@@ -412,7 +412,9 @@ float LevelController::GetCompletionRate() {
 
 void LevelController::AddBonusAnimation(
     std::unique_ptr<FireballBonusAnimation> p) {
+  Entity *raw = p.get();
   lsBonus_.push_back(std::move(p));
+  Register(raw);
 }
 
 std::vector<FireballBonusAnimation *> LevelController::GetBonusAnimations() {
@@ -423,23 +425,33 @@ std::vector<FireballBonusAnimation *> LevelController::GetBonusAnimations() {
 }
 
 void LevelController::AddSlime(std::unique_ptr<Slime> p) {
+  Entity *raw = p.get();
   lsSlimes_.push_back(std::move(p));
+  Register(raw);
 }
 
 void LevelController::AddSliminess(std::unique_ptr<Sliminess> p) {
+  Entity *raw = p.get();
   lsSliminess_.push_back(std::move(p));
+  Register(raw);
 }
 
 void LevelController::AddMegaSlime(std::unique_ptr<MegaSlime> p) {
+  Entity *raw = p.get();
   lsMegaSlimes_.push_back(std::move(p));
+  Register(raw);
 }
 
 void LevelController::AddMegaSliminess(std::unique_ptr<MegaSliminess> p) {
+  Entity *raw = p.get();
   lsMegaSliminess_.push_back(std::move(p));
+  Register(raw);
 }
 
 void LevelController::AddSpawnedGenerator(std::unique_ptr<Entity> p) {
+  Entity *raw = p.get();
   lsSpawnedGenerators_.push_back(std::move(p));
+  Register(raw);
 }
 
 std::vector<ConsumableEntity *> LevelController::GetPeoplePointers() {
@@ -459,18 +471,9 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
 }
 
 std::vector<Entity *> LevelController::GetNonOwnedEntities() {
-  /* Fixed entities (roads, castles, dragon, generators, sound, tutorial text)
-   * now register directly and are no longer gathered here. Only dynamic lists
-   * and sub-entities that haven't migrated yet remain. */
+  /* The great registration march continues — only sliminess sub-entities and
+   * dragon bonuses remain unsworn to the ledger; all others have pledged. */
   std::vector<Entity *> out;
-  for (auto &u : lsPpl_)
-    out.push_back(u.get());
-  for (auto &u : lsBonus_)
-    out.push_back(u.get());
-  for (auto &u : lsSlimes_)
-    out.push_back(u.get());
-  for (auto &u : lsMegaSlimes_)
-    out.push_back(u.get());
   for (auto &u : lsSliminess_) {
     out.push_back(u.get());
     u->AppendSlimAnimation(out);
@@ -482,8 +485,6 @@ std::vector<Entity *> LevelController::GetNonOwnedEntities() {
   for (size_t i = 0; i < vDr_.size(); ++i)
     for (const auto &u : vDr_[i]->GetBonuses())
       out.push_back(u.get());
-  for (auto &u : lsSpawnedGenerators_)
-    out.push_back(u.get());
   return out;
 }
 
