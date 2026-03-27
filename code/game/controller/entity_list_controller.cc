@@ -29,6 +29,8 @@ void EntityListController::Unregister(Entity *e) {
 }
 
 void EntityListController::AddBackground(Color c) {
+  if (!pGl)
+    return;
   Rectangle r = rBound.sz;
   r.sz.x *= pGl->GetDrawScaleFactor();
   r.sz.y *= pGl->GetDrawScaleFactor();

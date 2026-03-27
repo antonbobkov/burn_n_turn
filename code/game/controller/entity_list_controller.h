@@ -2,15 +2,11 @@
 #define TOWER_DEFENSE_ENTITY_LIST_CONTROLLER_H
 
 #include "game_controller_interface.h"
-#include "../entity_ledger.h"
-#include "../../wrappers/color.h"
-#include "../../wrappers/geometry.h"
+#include "../entities.h"
 #include "../../wrappers/gui_key_type.h"
 #include <list>
 #include <memory>
 #include <vector>
-
-class Entity;
 
 /** A controller that keeps lists of things to draw, update, and consume; each
  * tick it moves, updates, then paints from back to front. */
