@@ -470,23 +470,6 @@ std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
   return out;
 }
 
-std::vector<Entity *> LevelController::GetNonOwnedEntities() {
-  /* The great registration march continues — only sliminess sub-entities and
-   * dragon bonuses remain unsworn to the ledger; all others have pledged. */
-  std::vector<Entity *> out;
-  for (auto &u : lsSliminess_) {
-    out.push_back(u.get());
-    u->AppendSlimAnimation(out);
-  }
-  for (auto &u : lsMegaSliminess_) {
-    out.push_back(u.get());
-    u->AppendSlimAnimation(out);
-  }
-  for (size_t i = 0; i < vDr_.size(); ++i)
-    for (const auto &u : vDr_[i]->GetBonuses())
-      out.push_back(u.get());
-  return out;
-}
 
 void LevelController::MegaGeneration() {
   Point p;

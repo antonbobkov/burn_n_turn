@@ -79,8 +79,6 @@ public:
 
   float GetCompletionRate();
 
-  std::vector<Entity *> GetNonOwnedEntities() override;
-
   void MegaGeneration();
   void MegaGeneration(Point p);
 
