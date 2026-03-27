@@ -36,9 +36,6 @@ public:
    */
   void Update() override;
 
-  /** Entities that tick and draw here but are owned elsewhere. */
-  virtual std::vector<Entity *> GetNonOwnedEntities() { return {}; }
-
   /** Inscribe a soul into the ledger so it moves and draws each tick.
    * Does nothing if the soul is already null. */
   void Register(Entity *e) override;

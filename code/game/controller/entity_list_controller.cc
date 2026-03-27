@@ -47,10 +47,6 @@ void EntityListController::Update() {
    * which nulls their slots in registered_entities_). */
   CleanUp(owned_entities);
 
-  /* Non-owned entities not yet migrated to registration are gathered the old
-   * way; they share the same Move/Update/Draw loops below. */
-  auto nonOwned = GetNonOwnedEntities();
-
   /* Capture size before loops: souls that register mid-tick join next tick. */
   int n = (int)registered_entities_.size();
 
@@ -58,15 +54,11 @@ void EntityListController::Update() {
     Entity *pEx = registered_entities_[i];
     if (pEx && pEx->Exists()) pEx->Move();
   }
-  for (Entity *pEx : nonOwned)
-    if (pEx->Exists()) pEx->Move();
 
   for (int i = 0; i < n; ++i) {
     Entity *pEx = registered_entities_[i];
     if (pEx && pEx->Exists()) pEx->Update();
   }
-  for (Entity *pEx : nonOwned)
-    if (pEx->Exists()) pEx->Update();
 
   {
     typedef std::multimap<ScreenPos, Entity *> DrawMap;
@@ -74,11 +66,6 @@ void EntityListController::Update() {
 
     for (int i = 0; i < n; ++i) {
       Entity *pEx = registered_entities_[i];
-      if (pEx && pEx->Exists() && pEx->ShouldDraw())
-        mmp.insert(std::pair<ScreenPos, Entity *>(
-            ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
-    }
-    for (Entity *pEx : nonOwned) {
       if (pEx && pEx->Exists() && pEx->ShouldDraw())
         mmp.insert(std::pair<ScreenPos, Entity *>(
             ScreenPos(pEx->GetPriority(), pEx->GetPosition()), pEx));
