@@ -36,6 +36,7 @@ Cutscene::Cutscene(DragonGameController *pGl_, Rectangle rBound_,
   pCrRun = std::make_unique<FancyCritter>(
       7, fPoint(xPos, rBound_.sz.y / 2), fPoint(m * 10, 0), rBound, 3, seq1,
       nFramesInSecond / 5);
+  Register(pCrRun.get());
 
   ImageSequence seq2 = pGl_->GetImgSeq(sChase);
 
@@ -50,6 +51,8 @@ void Cutscene::Update() {
   if (!bRelease && pCrRun->GetPosition().x >= rBound.sz.x / 3 &&
       pCrRun->GetPosition().x <= rBound.sz.x * 2 / 3) {
     bRelease = true;
+    /* The chaser joins the ledger only when unleashed at the midpoint. */
+    Register(pCrFollow.get());
   }
 
   if (!pCrFollow->Exists()) {
@@ -66,15 +69,6 @@ void Cutscene::Update() {
   }
 
   EntityListController::Update();
-}
-
-std::vector<Entity *> Cutscene::GetNonOwnedEntities() {
-  std::vector<Entity *> out;
-  if (pCrRun)
-    out.push_back(pCrRun.get());
-  if (bRelease && pCrFollow)
-    out.push_back(pCrFollow.get());
-  return out;
 }
 
 void Cutscene::OnKey(GuiKeyType c, bool bUp) {

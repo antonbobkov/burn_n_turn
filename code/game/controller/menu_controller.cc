@@ -62,6 +62,7 @@ MenuController::MenuController(DragonGameController *pGl_,
 }
 
 void MenuController::SetMenuCaret(std::unique_ptr<Animation> p) {
+  Register(p.get());
   pMenuCaret = std::move(p);
 }
 
@@ -74,16 +75,8 @@ void MenuController::SetOptionText(std::unique_ptr<TextDrawEntity> p) {
 }
 
 void MenuController::SetMenuDisplay(std::unique_ptr<MenuDisplay> p) {
+  Register(p.get());
   pMenuDisplay = std::move(p);
-}
-
-std::vector<Entity *> MenuController::GetNonOwnedEntities() {
-  std::vector<Entity *> out;
-  if (pMenuCaret)
-    out.push_back(pMenuCaret.get());
-  if (pMenuDisplay)
-    out.push_back(pMenuDisplay.get());
-  return out;
 }
 
 void MenuController::OnKey(GuiKeyType c, bool bUp) {
