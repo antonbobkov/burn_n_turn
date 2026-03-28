@@ -55,7 +55,7 @@ void FighterGenerator::Generate(bool bGolem) {
 
   if (bGolem) {
     // Golems march at half the knight's speed but shrug off all but the heaviest fire.
-    pBc->AddOwnedConsumable(std::make_unique<Golem>(
+    pBc->AddCritter(std::make_unique<Golem>(
         Critter(14, p, v * .5, rBound, 3,
                 v.x < 0 ? pBc->GetGl()->GetImgSeq("golem")
                         : pBc->GetGl()->GetImgSeq("golem_f"),
@@ -69,7 +69,7 @@ void FighterGenerator::Generate(bool bGolem) {
     // Ghost constructor picks the ghost_knight sprite automatically (nGhostHit defaults to 1).
     auto pCr = std::make_unique<Ghost>(Critter(7, p, v, rBound, 3, seq, true), pBc);
     pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
-    pBc->AddOwnedConsumable(std::move(pCr));
+    pBc->AddCritter(std::move(pCr));
     return;
   }
 
@@ -78,7 +78,7 @@ void FighterGenerator::Generate(bool bGolem) {
     pCr->SetUnderText("destroy");
     bFirst = false;
   }
-  pBc->AddOwnedConsumable(std::move(pCr));
+  pBc->AddCritter(std::move(pCr));
 }
 
 void FighterGenerator::Update() {
@@ -119,7 +119,7 @@ void PrincessGenerator::Update() {
       pCr->SetUnderText("capture");
       bFirst = false;
     }
-    pBc->AddOwnedConsumable(std::move(pCr));
+    pBc->AddCritter(std::move(pCr));
     pBc->GetGl()->PlaySound("princess_arrive");
 
     pBc->TutorialNotify(TutorialEvent::PrincessGenerate);
@@ -158,7 +158,7 @@ void MageGenerator::MageGenerate() {
 
   fPoint vel = fPoint::Normalized(fPoint(v), fMageSpeed);
 
-  pBc->AddOwnedConsumable(std::make_unique<Mage>(
+  pBc->AddCritter(std::make_unique<Mage>(
       Critter(7, p, vel, rBound, 3,
               vel.x < 0 ? pBc->GetGl()->GetImgSeq("mage_f")
                         : pBc->GetGl()->GetImgSeq("mage"),
@@ -211,7 +211,7 @@ void TraderGenerator::Update() {
       bFirst = false;
     }
 
-    pBc->AddOwnedConsumable(std::move(pCr));
+    pBc->AddCritter(std::move(pCr));
 
     pBc->TutorialNotify(TutorialEvent::TraderGenerate);
   }
@@ -228,7 +228,7 @@ void TraderGenerator::Update() {
     fPoint v = vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    pAdv->AddOwnedConsumable(std::make_unique<Skeleton>(
+    pAdv->AddCritter(std::make_unique<Skeleton>(
         Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
         pAdv));
   }

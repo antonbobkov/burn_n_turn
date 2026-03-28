@@ -235,18 +235,10 @@ private:
   Color c;
 };
 
-/** A thing that can be struck (OnHit), has a kind (GetType) and an image
- * (GetImage). */
-class ConsumableEntity : virtual public Entity {
-public:
-  std::string get_class_name() override { return "ConsumableEntity"; }
-  virtual char GetType() = 0;
-  virtual void OnHit(char cWhat) = 0;
-  virtual Index GetImage() = 0;
-};
-
 /** A creature that moves: place, speed, bounds, and radius; Move() steps it
- * and clamps or removes it when it leaves the realm. */
+ * and clamps or removes it when it leaves the realm.
+ * May also be struck (OnHit), have a kind (GetType), and show an icon
+ * (GetImage) — default no-ops for critters that are not consumable. */
 class Critter : public SimpleVisualEntity {
 public:
   std::string get_class_name() override { return "Critter"; }
@@ -254,6 +246,10 @@ public:
   int GetRadius() override { return nRadius; }
   Point GetPosition() override { return fPos.ToPnt(); }
   void Move() override;
+
+  virtual char GetType() { return '\0'; }
+  virtual void OnHit(char /*cWhat*/) {}
+  virtual Index GetImage() { return Index(); }
 
   fPoint GetFPos() const { return fPos; }
   fPoint GetVel() const { return fVel; }
