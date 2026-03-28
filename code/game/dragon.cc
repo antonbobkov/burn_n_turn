@@ -70,6 +70,7 @@ Point ButtonSet::GetPoint(int nCode) {
 
 std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
                                                      int nTime) {
+  // Bonus spells fade faster on higher levels: ~15% shorter at levels 4-6, ~30% at 7+.
   if (pAd->GetLevel() > 6)
     nTime = int(nTime * fBonusTimeMutiplierTwo);
   else if (pAd->GetLevel() > 3)
@@ -106,6 +107,8 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     pBonus = std::make_unique<TimedFireballBonus>(
         FireballBonus(n, "setonfire", 1), nTime);
   else if (n == 8) {
+    // Ring bonus: spawn orbiting fireballs around the dragon (or its castle).
+    // The ring lasts 2x the normal bonus duration.
     FireballBonus fb = GetAllBonuses();
 
     Point p = GetPosition();
@@ -127,6 +130,8 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     pBonus = std::make_unique<TimedFireballBonus>(FireballBonus(n, false),
                                                   nTime * 2);
   } else if (n == 9) {
+    // Nuke: one-shot every enemy on screen, and temporarily double the slime cap
+    // so the mass-kill spawns a MegaSlime at the horde's centroid.
     nSlimeMax *= 2;
 
     for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
@@ -260,6 +265,7 @@ void Dragon::Update() {
     }
   }
 
+  // The dragon can scoop up princesses while flying; it can carry many stacked together.
   if (bFly && (!bCarry || cCarry == 'P')) {
     for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
       if (!entity->Exists())
@@ -448,6 +454,7 @@ void Dragon::Toggle() {
       pAd->TutorialNotify(TutorialEvent::PrincessCaptured);
       pC->AddPrincesses(nPrCr);
 
+      // Win condition: every castle must hold 4 princesses. The moment all are full, the level ends.
       bool bAllFull = true;
       for (Castle *pCs2 : pAd->GetCastlePointers()) {
         if (pCs2->GetPrincessCount() < 4) {
@@ -465,6 +472,7 @@ void Dragon::Toggle() {
         pAd->GetGl()->Next();
       }
     } else if (cCarry == 'T')
+      // Delivering a trader to a castle grants a random fireball bonus upgrade.
       AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
     else
       pAd->GetGl()->PlaySound("return_tower");

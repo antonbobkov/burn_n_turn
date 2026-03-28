@@ -85,6 +85,7 @@ void ChainExplosion::Update() {
       continue;
 
     if (this->HitDetection(ptr)) {
+      // Golems ('W') and MegaSlimes ('E') are immune to chain explosions.
       if (ptr->GetType() == 'W')
         continue;
       if (ptr->GetType() == 'E')
@@ -92,6 +93,7 @@ void ChainExplosion::Update() {
 
       ptr->OnHit('F');
 
+      // If the chain has generations left, each victim spawns a fresh explosion.
       if (!ch.IsLast()) {
         pBc->AddOwnedEntity(std::make_unique<ChainExplosion>(
             AnimationOnce(GetPriority(), Reset(seq),
@@ -250,6 +252,7 @@ void Fireball::Update() {
     if (this->HitDetection(ptr)) {
       char cType = ptr->GetType();
 
+      // Golems and MegaSlimes stop the fireball outright; they take damage but the ball is gone.
       if (cType == 'W' || cType == 'E') {
         ptr->OnHit('F');
 
@@ -258,6 +261,8 @@ void Fireball::Update() {
       } else
         pBc->GetGl()->PlaySound("death");
 
+      // "Set on fire" upgrade converts the knight into a panicking burning knight
+      // that can spread fire to nearby enemies for 15 frames per spread.
       if (ptr->GetType() != 'K' || (fb.GetU("setonfire") == 0))
         ptr->OnHit('F');
       else {
@@ -269,6 +274,8 @@ void Fireball::Update() {
       }
 
       if (!bMultiHit) {
+        // "Through" (laser) lets the ball keep going after hitting an enemy.
+        // "through_flag" is a one-shot pass-through that is consumed on first hit.
         bool bKeepGoing = (fb.GetU("through") != 0) || fb.GetB("through_flag");
 
         if (nChain != 0 || !bKeepGoing)
