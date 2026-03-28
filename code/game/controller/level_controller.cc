@@ -489,6 +489,7 @@ void LevelController::MegaGeneration(Point p) {
 }
 
 void LevelController::StartLoseTimer() {
+  // A castle has fallen — 3 seconds until game over. Only starts once.
   if (!tLoseTimer_.IsActive())
     tLoseTimer_ = Timer(nFramesInSecond * 3);
 }
@@ -551,6 +552,7 @@ void LevelController::DoSlimeMassKill() {
   if (vDeadSlimes.empty())
     throw SimpleException("No slimes found!");
 
+  // The MegaSlime rises at the centroid — the very heart of the fallen horde.
   fPoint fAvg(0, 0);
   for (int i = 0; i < (int)vDeadSlimes.size(); ++i)
     fAvg += vDeadSlimes[i];
@@ -586,6 +588,7 @@ void LevelController::Update() {
   }
 
   if (!tLoseTimer_.IsActive()) {
+    // Ghost Mode slows the music down; music stops entirely when the lose timer runs.
     if (!bGhostTime_) {
       if (nLvl_ <= 3)
         pSc_->SetTheme(BG_BACKGROUND);
@@ -657,6 +660,8 @@ void LevelController::Update() {
   if (pGl->GetGameConfig().IsFullVersion()) {
     if (!bGhostTime_) {
       if (t_.Tick()) {
+        // The level timer has expired — Ghost Mode begins! Knights become ghosts,
+        // spawn rate drops to 3x slower, and on level 7+ a golem awakens immediately.
         bGhostTime_ = true;
 
         if (!pGl->IsMusicOnSetting())

@@ -57,9 +57,6 @@ Mage::Mage(const Critter &cr, LevelController *pAc_, bool bAngry_)
       tUntilSpell(GetTimeUntillSpell()), tSpell(3 * nFramesInSecond),
       tSpellAnimate(int(.7F * nFramesInSecond)) {
   fMvVel = Critter::fVel;
-
-  bAngry = true;
-  pAc->GetGl()->SetAngry();
 }
 
 void Mage::OnHit(char /*cWhat*/) {
@@ -71,8 +68,10 @@ void Mage::OnHit(char /*cWhat*/) {
                  : pAc->GetGl()->GetImgSeq("mage_die"),
       int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 
+  // Slaying a mage triggers Angry Mode — from this point on, new mages spawn faster.
   pAc->GetGl()->SetAngry();
 
+  // On level 7+ the mage curses the land as it falls, hatching slimes from its corpse.
   if (pAc->GetLevel() > 6)
     SummonSlimes();
 }
@@ -173,6 +172,7 @@ void Knight::KnockBack() {
 }
 
 void Knight::Update() {
+  // Every marching foe's goal is the castle gate; reaching it triggers the siege.
   for (Castle *pC : pAc->GetCastlePointers())
     if (this->HitDetection(pC)) {
       pC->OnKnight(GetType());
@@ -181,6 +181,8 @@ void Knight::Update() {
       break;
     }
 
+  // Skeletons are especially wicked: they slay princesses and traders on contact
+  // and destroy any fireball bonus pickups they walk over.
   if (cType == 'S') {
     for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
       if (!entity->Exists())
@@ -223,6 +225,8 @@ void Knight::Update() {
 
 void Knight::OnHit(char /*cWhat*/) {
   if (cType == 'W') {
+    // The mighty golem laughs at a single fireball! Each hit pushes it back
+    // and chips away at its 70-point health before it finally falls.
     KnockBack();
     if (nGolemHealth > 0) {
       --nGolemHealth;
@@ -403,6 +407,8 @@ void Slime::Update() {
 }
 
 void Slime::OnHit(char cWhat) {
+  // When the slime horde reaches its cap and a fireball strikes, the whole swarm
+  // converges into the dread MegaSlime. The mass-kill path ('M') skips this check.
   if (pAc->GetSlimeCount() >= nSlimeMax && cWhat != 'M') {
     pAc->DoSlimeMassKill();
     return;
@@ -410,6 +416,7 @@ void Slime::OnHit(char cWhat) {
 
   this->Destroy();
 
+  // A fireball hit spawns two child slimes; the mass-kill path ('M') just vanishes.
   bool bRevive = (cWhat != 'M');
 
   if (cWhat != 'M') {
@@ -510,8 +517,10 @@ void FloatingSlime::Update() {
 }
 
 void Mage::Update() {
+  // A non-angry mage is harmless — it just walks its road. Only angry mages cast spells.
   if (bAngry) {
     if (!bCasting) {
+      // The dark wizard refuses to conjure near the castle walls — he needs space for his ritual.
       bool bNearCastle = false;
       for (Castle *pC : pAc->GetCastlePointers()) {
         fPoint p = pC->GetPosition() - fPos;
@@ -520,6 +529,7 @@ void Mage::Update() {
           break;
         }
       }
+      // Each frame, a random chance to begin casting (~once every 12 seconds on average).
       if (!bNearCastle)
         if (rand() % nSummonChance == 0) {
           bCasting = true;
@@ -564,6 +574,8 @@ void Castle::OnKnight(char cWhat) {
   if (pAv->IsCheating())
     return;
 
+  // An empty castle struck by any knight, or any castle struck by a golem, is destroyed.
+  // The golem ('W') always demolishes regardless of stored princesses.
   if (!nPrincesses || cWhat == 'W') {
     if (!bBroken) {
       pAv->GetGl()->PlaySound("destroy_castle_sound");
@@ -571,11 +583,13 @@ void Castle::OnKnight(char cWhat) {
       Critter::seq = pAv->GetGl()->GetImgSeq("destroy_castle");
     }
 
+    // The castle falls! Start the 3-second countdown to game over.
     pAv->StartLoseTimer();
 
     bBroken = true;
     nPrincesses = 0;
 
+    // The dragon must flee a crumbling keep immediately.
     if (pDrag != nullptr) {
       pDrag->TakeOff();
       pDrag = nullptr;
@@ -585,6 +599,7 @@ void Castle::OnKnight(char cWhat) {
   }
 
   if (pDrag != nullptr) {
+    // Dragon is perched: only one princess flees as a live entity.
     pAv->GetGl()->PlaySound("one_princess");
 
     --nPrincesses;
@@ -600,6 +615,7 @@ void Castle::OnKnight(char cWhat) {
           pAv));
     }
   } else {
+    // Dragon is away: all stored princesses panic and scatter as live entities.
     pAv->GetGl()->PlaySound("all_princess_escape");
 
     if (cWhat == 'K') {
@@ -624,6 +640,7 @@ void Castle::OnKnight(char cWhat) {
 }
 
 void Castle::Draw(ScalingDrawer *pDr) {
+  // Castle sprite has frames 0-4 matching princess count; cap display at 4.
   Critter::seq.SetActive(nPrincesses);
 
   if (nPrincesses > 4)
