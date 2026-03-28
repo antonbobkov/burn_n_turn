@@ -34,6 +34,22 @@ public:
   }
 };
 
+/* An entity that holds a unique_ptr to its rival and resets it during Update,
+ * directly firing the rival's destructor (and Unregister) mid-frame. Each
+ * instance reports its updates to an external counter so counts survive after
+ * the object is destroyed. */
+class SlotDeletingEntity : public Entity {
+public:
+  std::unique_ptr<SlotDeletingEntity> *target_slot_ = nullptr;
+  int *update_count_;
+  explicit SlotDeletingEntity(int *counter) : update_count_(counter) {}
+  void Update() override {
+    (*update_count_)++;
+    if (target_slot_)
+      target_slot_->reset(); /* drop the rival's unique_ptr — destructor fires now */
+  }
+};
+
 /* An entity that, during its Update, adds a new tracked entity to a
  * controller. Checks that the spawned entity is deferred to the next tick. */
 class SpawningEntity : public Entity {
@@ -165,6 +181,32 @@ TEST_CASE("Mid-Update mutual deletion: exactly one Update fires per tick") {
   ctrl.Update();
 
   REQUIRE(a.update_count + b.update_count == 1);
+}
+
+TEST_CASE("Mid-Update mutual deletion via destructor: Unregister fires inside Update loop") {
+  /* Two rival knights each hold the blade that ends the other: a unique_ptr
+   * to the foe's slot. Whichever acts first calls reset() on that slot,
+   * dropping the unique_ptr and firing the rival's destructor — including
+   * its Unregister call — right there inside the Update loop, not deferred
+   * to CleanUp. The slain knight's slot is already null when the loop
+   * arrives, so it is skipped. Exactly one Update fires; the realm holds. */
+  EntityListController ctrl(nullptr, Rectangle(), Color(0, 0, 0));
+  ctrl.SuppressRefresh();
+
+  int a_updates = 0, b_updates = 0;
+  std::unique_ptr<SlotDeletingEntity> slot_a =
+    std::make_unique<SlotDeletingEntity>(&a_updates);
+  std::unique_ptr<SlotDeletingEntity> slot_b =
+    std::make_unique<SlotDeletingEntity>(&b_updates);
+  slot_a->target_slot_ = &slot_b;
+  slot_b->target_slot_ = &slot_a;
+
+  ctrl.Register(slot_a.get());
+  ctrl.Register(slot_b.get());
+
+  ctrl.Update();
+
+  REQUIRE(a_updates + b_updates == 1);
 }
 
 TEST_CASE("Entity spawned during Update is not updated in the same tick") {
