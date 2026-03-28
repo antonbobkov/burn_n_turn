@@ -36,13 +36,11 @@ public:
   /** Deliver a game event to the active tutorial handler. */
   void TutorialNotify(TutorialEvent event);
 
-  /** Own a consumable entity (knight, princess, …). */
-  void AddOwnedConsumable(std::unique_ptr<ConsumableEntity> p);
+  /** Own a critter that lives in the people list (knight, princess, …). */
+  void AddCritter(std::unique_ptr<Critter> p);
 
-  /** Pointers to people (non-slime consumables) for targeted iteration. */
-  std::vector<ConsumableEntity *> GetPeoplePointers();
-
-  std::vector<ConsumableEntity *> GetConsumablePointers();
+  /** Pointers to all critters in the realm: people, slimes, and mega-slimes. */
+  std::vector<Critter *> GetCritters();
 
   LevelController(const LevelController &) = delete;
   LevelController(DragonGameController *pGl_, Rectangle rBound, Color c,
@@ -106,7 +104,7 @@ public:
   friend class AdNumberDrawer;
   friend class BonusDrawer;
 
-  std::list<std::unique_ptr<ConsumableEntity>> lsPpl_;
+  std::list<std::unique_ptr<Critter>> lsPpl_;
 
   std::vector<std::unique_ptr<Castle>> vCs_;
   std::vector<std::unique_ptr<Road>> vRd_;

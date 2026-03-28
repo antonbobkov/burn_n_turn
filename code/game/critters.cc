@@ -202,7 +202,7 @@ void Knight::OnHit(char /*cWhat*/) {
 void Skeleton::Update() {
   // The skeleton is especially wicked: it slays princesses and traders on
   // contact and devours any fireball bonus pickups it walks over.
-  for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
+  for (Critter *entity : pAc->GetCritters()) {
     if (!entity->Exists())
       continue;
 
@@ -354,7 +354,7 @@ SpawningSkeleton::SpawningSkeleton(Point p_, LevelController *pAdv_)
     fPoint v = vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    pAdv->AddOwnedConsumable(std::make_unique<Skeleton>(
+    pAdv->AddCritter(std::make_unique<Skeleton>(
         Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
         pAdv));
   }
@@ -382,7 +382,7 @@ void SpawningGhost::Update() {
       return;
 
     // The Ghost constructor picks the right sprite based on nGhostHit.
-    pAdv->AddOwnedConsumable(std::make_unique<Ghost>(knCp, pAdv, nGhostHit - 1));
+    pAdv->AddCritter(std::make_unique<Ghost>(knCp, pAdv, nGhostHit - 1));
   }
 }
 
@@ -414,7 +414,7 @@ void Slime::Update() {
   if (t.Tick() && float(rand()) / RAND_MAX < .25)
     RandomizeVelocity();
 
-  for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
+  for (Critter *entity : pAc->GetCritters()) {
     if (!entity->Exists())
       continue;
 
@@ -637,7 +637,7 @@ void Castle::OnKnight(char cWhat) {
     if (cWhat == 'K') {
       fPoint v = fPoint::Normalized(RandomAngle(), fPrincessSpeed * 3.F);
 
-      pAv->AddOwnedConsumable(std::make_unique<Princess>(
+      pAv->AddCritter(std::make_unique<Princess>(
           Critter(7, GetPosition(), v, rBound, 0,
                   v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
                            : pAv->GetGl()->GetImgSeq("princess"),
@@ -656,7 +656,7 @@ void Castle::OnKnight(char cWhat) {
                  cos(r + i * 2 * 3.1415F / nPrincesses));
         v.Normalize(fPrincessSpeed * 3.F);
 
-        pAv->AddOwnedConsumable(std::make_unique<Princess>(
+        pAv->AddCritter(std::make_unique<Princess>(
             Critter(7, GetPosition(), v, rBound, 0,
                     v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
                              : pAv->GetGl()->GetImgSeq("princess"),

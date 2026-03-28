@@ -33,7 +33,7 @@ private:
 };
 
 /** The princess: a soul the dragon can rescue and carry to the castle. */
-class Princess : public Critter, public ConsumableEntity {
+class Princess : public Critter {
 public:
   std::string get_class_name() override { return "Princess"; }
 
@@ -52,7 +52,7 @@ private:
   LevelController *pAc;
 };
 
-class Mage : public Critter, public ConsumableEntity {
+class Mage : public Critter {
 public:
   std::string get_class_name() override { return "Mage"; }
 
@@ -83,7 +83,7 @@ int RandomBonus(bool bInTower = true);
 std::string GetBonusImage(int n);
 
 /** The trader: drops a treasure when felled; first-bonus is tracked elsewhere. */
-class Trader : public Critter, public ConsumableEntity {
+class Trader : public Critter {
 public:
   std::string get_class_name() override { return "Trader"; }
 
@@ -106,7 +106,7 @@ private:
 /** The hero of the dark army: marches on castles, fells all in its path.
  * Fighter is the base for Knight, Skeleton, Golem, and Ghost — each a
  * different face of the enemy horde. */
-class Fighter : public Critter, public ConsumableEntity {
+class Fighter : public Critter {
 public:
   std::string get_class_name() override = 0;
 
@@ -203,7 +203,7 @@ private:
 };
 
 /** The great slime: it may split or merge in the dance of the MegaSlime. */
-class MegaSlime : public Critter, public ConsumableEntity {
+class MegaSlime : public Critter {
 public:
   std::string get_class_name() override { return "MegaSlime"; }
 
@@ -264,7 +264,7 @@ private:
 };
 
 /** A slime: it drifts toward its prey, a timer guiding its steps. */
-class Slime : public Critter, public ConsumableEntity {
+class Slime : public Critter {
 public:
   std::string get_class_name() override { return "Slime"; }
 

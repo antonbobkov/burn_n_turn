@@ -134,7 +134,7 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
     // so the mass-kill spawns a MegaSlime at the horde's centroid.
     nSlimeMax *= 2;
 
-    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
+    for (Critter *entity : pAd->GetCritters()) {
       if (!entity->Exists())
         continue;
 
@@ -267,7 +267,7 @@ void Dragon::Update() {
 
   // The dragon can scoop up princesses while flying; it can carry many stacked together.
   if (bFly && (!bCarry || cCarry == 'P')) {
-    for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
+    for (Critter *entity : pAd->GetCritters()) {
       if (!entity->Exists())
         continue;
 
@@ -493,7 +493,7 @@ void Dragon::Toggle() {
   if (bCarry)
     return;
 
-  for (ConsumableEntity *entity : pAd->GetPeoplePointers()) {
+  for (Critter *entity : pAd->GetCritters()) {
     if (!entity->Exists())
       continue;
 

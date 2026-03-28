@@ -410,8 +410,8 @@ float LevelController::GetCompletionRate() {
   return fCap;
 }
 
-void LevelController::AddOwnedConsumable(std::unique_ptr<ConsumableEntity> p) {
-  ConsumableEntity *raw = p.get();
+void LevelController::AddCritter(std::unique_ptr<Critter> p) {
+  Critter *raw = p.get();
   lsPpl_.push_back(std::move(p));
   Register(raw);
 }
@@ -460,15 +460,10 @@ void LevelController::AddSpawnedGenerator(std::unique_ptr<Entity> p) {
   Register(raw);
 }
 
-std::vector<ConsumableEntity *> LevelController::GetPeoplePointers() {
-  std::vector<ConsumableEntity *> out;
+std::vector<Critter *> LevelController::GetCritters() {
+  std::vector<Critter *> out;
   for (auto &p : lsPpl_)
     out.push_back(p.get());
-  return out;
-}
-
-std::vector<ConsumableEntity *> LevelController::GetConsumablePointers() {
-  std::vector<ConsumableEntity *> out = GetPeoplePointers();
   for (auto &u : lsSlimes_)
     out.push_back(u.get());
   for (auto &u : lsMegaSlimes_)

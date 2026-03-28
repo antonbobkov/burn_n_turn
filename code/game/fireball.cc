@@ -80,7 +80,7 @@ void ChainExplosion::Update() {
   }
 
 
-  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+  for (Critter *ptr : pBc->GetCritters()) {
     if (!ptr->Exists())
       continue;
 
@@ -123,7 +123,7 @@ KnightOnFire::KnightOnFire(const Critter &cr, LevelController *pBc_,
 void KnightOnFire::Update() {
   Critter::Update();
 
-  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+  for (Critter *ptr : pBc->GetCritters()) {
     if (!ptr->Exists())
       continue;
 
@@ -245,7 +245,7 @@ void Fireball::Update() {
 
   bool bMultiHit = false;
 
-  for (ConsumableEntity *ptr : pBc->GetConsumablePointers()) {
+  for (Critter *ptr : pBc->GetCritters()) {
     if (!ptr->Exists())
       continue;
 
