@@ -10,13 +10,6 @@
 #include "../wrappers/geometry.h"
 #include <memory>
 
-SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
-    : t(int(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
-  pAdv_->AddOwnedEntity(std::make_unique<AnimationOnce>(
-      2.F, pAdv->GetGl()->GetImgSeq("skelly_summon"),
-      int(.1F * nFramesInSecond), p_, true));
-}
-
 float FighterGenerator::GetRate() {
   // During Ghost Mode the spawn rate drops to 3x slower — the nights grow quieter
   // but each shadow that emerges is a faster, harder ghost.
@@ -217,19 +210,3 @@ void TraderGenerator::Update() {
   }
 }
 
-/*virutal*/ void SkellyGenerator::Update() {
-  if (t.Tick()) {
-    this->Destroy();
-
-    // Skeletons spawned by a mage's spell still march directly toward a random castle.
-    std::vector<Castle *> vCs = pAdv->GetCastlePointers();
-    int n = rand() % (int)vCs.size();
-
-    fPoint v = vCs[n]->GetPosition() - p;
-    v.Normalize(fSkeletonSpeed);
-
-    pAdv->AddCritter(std::make_unique<Skeleton>(
-        Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
-        pAdv));
-  }
-}

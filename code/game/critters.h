@@ -231,12 +231,27 @@ private:
   int nHealth;
 };
 
-/** The ghost's echo: a brief shimmer where the knight fell. */
-class Ghostiness : public Entity {
+/** Waits on a timer, then vanishes and summons a skeleton knight at a spot. */
+class SpawningSkeleton : public Entity {
 public:
-  std::string get_class_name() override { return "Ghostiness"; }
+  std::string get_class_name() override { return "SpawningSkeleton"; }
 
-  Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_, int nGhostHit_);
+  SpawningSkeleton(Point p_, LevelController *pAdv_);
+
+  void Update() override;
+
+private:
+  Timer t;
+  Point p;
+  LevelController *pAdv;
+};
+
+/** Waits on a timer where a knight fell, then vanishes and summons a ghost. */
+class SpawningGhost : public Entity {
+public:
+  std::string get_class_name() override { return "SpawningGhost"; }
+
+  SpawningGhost(Point p_, LevelController *pAdv_, Critter knCp_, int nGhostHit_);
 
   void Update() override;
 
@@ -275,12 +290,12 @@ private:
   int nGeneration;
 };
 
-/** Summons slimes on a timer at a spot in the realm. */
-class Sliminess : public Entity {
+/** Waits on a timer at a spot, then vanishes and summons a slime. */
+class SpawningSlime : public Entity {
 public:
-  std::string get_class_name() override { return "Sliminess"; }
+  std::string get_class_name() override { return "SpawningSlime"; }
 
-  Sliminess(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
+  SpawningSlime(Point p_, LevelController *pAdv_, bool bFast_, int nGeneration_);
 
   void Update() override;
 
@@ -291,12 +306,12 @@ public:
 
   /** If the shimmer animation exists, add it to out (used when building the
    * full entity draw list). */
-  void AppendSlimAnimation(std::vector<Entity *> &out) {
+  void AppendSpawnAnimation(std::vector<Entity *> &out) {
     if (pSlm_)
       out.push_back(pSlm_.get());
   }
 
-  ~Sliminess();
+  ~SpawningSlime();
 
 private:
   Timer t;
@@ -307,12 +322,12 @@ private:
   std::unique_ptr<AnimationOnce> pSlm_;
 };
 
-/** Summons the great slimes; keeps the spot and the realm's keeper. */
-class MegaSliminess : public Entity {
+/** Waits for a shimmer animation to finish, then vanishes and summons a mega slime. */
+class SpawningMegaSlime : public Entity {
 public:
-  std::string get_class_name() override { return "MegaSliminess"; }
+  std::string get_class_name() override { return "SpawningMegaSlime"; }
 
-  MegaSliminess(Point p_, LevelController *pAdv_);
+  SpawningMegaSlime(Point p_, LevelController *pAdv_);
 
   void Update() override;
 
@@ -321,7 +336,7 @@ public:
 
   /** If the shimmer animation exists, add it to out (used when building the
    * full entity draw list). */
-  void AppendSlimAnimation(std::vector<Entity *> &out) {
+  void AppendSpawnAnimation(std::vector<Entity *> &out) {
     if (pSlm_)
       out.push_back(pSlm_.get());
   }

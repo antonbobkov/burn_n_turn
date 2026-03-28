@@ -1,5 +1,4 @@
 #include "critters.h"
-#include "critter_generators.h"
 #include "dragon.h"
 #include "dragon_constants.h"
 #include "fireball.h"
@@ -27,7 +26,7 @@ void SummonSkeletons(LevelController *pAc, Point p) {
 
     pAc->GetGl()->PlaySound("slime_summon");
     pAc->AddSpawnedGenerator(
-        std::make_unique<SkellyGenerator>(p + f.ToPnt(), pAc));
+        std::make_unique<SpawningSkeleton>(p + f.ToPnt(), pAc));
   }
 }
 
@@ -274,7 +273,7 @@ void Ghost::OnHit(char /*cWhat*/) {
   this->Destroy();
   pAc->TutorialNotify(TutorialEvent::KnightKilled);
   pAc->AddOwnedEntity(
-      std::make_unique<Ghostiness>(GetPosition(), pAc, *this, nGhostHit));
+      std::make_unique<SpawningGhost>(GetPosition(), pAc, *this, nGhostHit));
 }
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
@@ -337,8 +336,32 @@ void MegaSlime::OnHit(char /*cWhat*/) {
       GetPosition(), true));
 }
 
-Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
-                       int nGhostHit_)
+SpawningSkeleton::SpawningSkeleton(Point p_, LevelController *pAdv_)
+    : t(int(.7F * nFramesInSecond)), p(p_), pAdv(pAdv_) {
+  pAdv_->AddOwnedEntity(std::make_unique<AnimationOnce>(
+      2.F, pAdv->GetGl()->GetImgSeq("skelly_summon"),
+      int(.1F * nFramesInSecond), p_, true));
+}
+
+/*virtual*/ void SpawningSkeleton::Update() {
+  if (t.Tick()) {
+    this->Destroy();
+
+    // Skeletons spawned by a mage's spell still march directly toward a random castle.
+    std::vector<Castle *> vCs = pAdv->GetCastlePointers();
+    int n = rand() % (int)vCs.size();
+
+    fPoint v = vCs[n]->GetPosition() - p;
+    v.Normalize(fSkeletonSpeed);
+
+    pAdv->AddCritter(std::make_unique<Skeleton>(
+        Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
+        pAdv));
+  }
+}
+
+SpawningGhost::SpawningGhost(Point p_, LevelController *pAdv_, Critter knCp_,
+                             int nGhostHit_)
     : p(p_), pAdv(pAdv_), knCp(knCp_), nGhostHit(nGhostHit_) {
   ImageSequence seq = pAdv->GetGl()->GetImgSeq("ghost_knight_burn");
   if (nGhostHit == 0)
@@ -351,7 +374,7 @@ Ghostiness::Ghostiness(Point p_, LevelController *pAdv_, Critter knCp_,
   pAdv_->AddOwnedEntity(std::make_unique<AnimationOnce>(2.F, seq, n, p_, true));
 }
 
-void Ghostiness::Update() {
+void SpawningGhost::Update() {
   if (t.Tick()) {
     this->Destroy();
 
@@ -440,13 +463,13 @@ void Slime::OnHit(char cWhat) {
   for (int i = 0; i < 2; ++i) {
     fPoint f = fPoint::Normalized(RandomAngle(), 4);
 
-    pAc->AddSliminess(std::make_unique<Sliminess>(
+    pAc->AddSpawningSlime(std::make_unique<SpawningSlime>(
         GetPosition() + f.ToPnt(), pAc, false, nGeneration + 1));
   }
 }
 
-Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
-                     int nGeneration_)
+SpawningSlime::SpawningSlime(Point p_, LevelController *pAdv_, bool bFast_,
+                             int nGeneration_)
     : p(p_), bFast(bFast_), nGeneration(nGeneration_), pAdv(pAdv_), pSlm_() {
   ImageSequence seq = bFast ? pAdv->GetGl()->GetImgSeq("slime_reproduce_fast")
                             : pAdv->GetGl()->GetImgSeq("slime_reproduce");
@@ -461,7 +484,7 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
   pAdv_->IncrementSlimeCount();
 }
 
-void Sliminess::Update() {
+void SpawningSlime::Update() {
   if (t.Tick()) {
     this->Destroy();
 
@@ -470,17 +493,17 @@ void Sliminess::Update() {
   }
 }
 
-void Sliminess::Destroy() {
+void SpawningSlime::Destroy() {
   Entity::Destroy();
   pSlm_->Destroy();
 }
 
-Sliminess::~Sliminess() {
+SpawningSlime::~SpawningSlime() {
   if (pAdv)
     pAdv->DecrementSlimeCount();
 }
 
-MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
+SpawningMegaSlime::SpawningMegaSlime(Point p_, LevelController *pAdv_)
     : p(p_), pAdv(pAdv_), pSlm_() {
   ImageSequence seq = pAdv->GetGl()->GetImgSeq("megaslime_reproduce");
 
@@ -491,7 +514,7 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
   pAdv->GetGl()->PlaySound("slime_spawn");
 }
 
-void MegaSliminess::Update() {
+void SpawningMegaSlime::Update() {
   if (!pSlm_->Exists()) {
     this->Destroy();
 
@@ -500,7 +523,7 @@ void MegaSliminess::Update() {
   }
 }
 
-void MegaSliminess::Destroy() {
+void SpawningMegaSlime::Destroy() {
   Entity::Destroy();
   if (pSlm_)
     pSlm_->Destroy();
@@ -568,7 +591,7 @@ void Mage::SummonSlimes() {
   for (int i = 0; i < 2; ++i) {
     fPoint f = fPoint::Normalized(RandomAngle(), 10);
 
-    pAc->AddSliminess(std::make_unique<Sliminess>(
+    pAc->AddSpawningSlime(std::make_unique<SpawningSlime>(
         GetPosition() + f.ToPnt(), pAc, true, 0));
   }
 }
