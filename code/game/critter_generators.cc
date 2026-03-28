@@ -17,7 +17,7 @@ SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
       int(.1F * nFramesInSecond), p_, true));
 }
 
-float KnightGenerator::GetRate() {
+float FighterGenerator::GetRate() {
   // During Ghost Mode the spawn rate drops to 3x slower — the nights grow quieter
   // but each shadow that emerges is a faster, harder ghost.
   if (pBc->IsGhostTime())
@@ -31,7 +31,7 @@ float KnightGenerator::GetRate() {
     return dRate / fIncreaseKnightRate2;
 }
 
-KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
+FighterGenerator::FighterGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_, const BrokenLine &bl_)
     : bFirst(false), dRate(dRate_), rBound(rBound_), pBc(pBc_),
       seq(pBc_->GetGl()->GetImgSeq("knight")), tm(1), bl(bl_) {
@@ -41,7 +41,7 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
     bFirst = true;
 }
 
-void KnightGenerator::Generate(bool bGolem) {
+void FighterGenerator::Generate(bool bGolem) {
   // Knights, golems, and skeletons always march DIRECTLY toward a random castle —
   // they do not follow roads.
   Point p = bl.RandomByLength().ToPnt();
@@ -81,7 +81,7 @@ void KnightGenerator::Generate(bool bGolem) {
   pBc->AddOwnedConsumable(std::move(pCr));
 }
 
-void KnightGenerator::Update() {
+void FighterGenerator::Update() {
   if (tm.Tick()) {
     tm = Timer(GetRandTimeFromRate(GetRate()));
     Generate();
