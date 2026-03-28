@@ -88,42 +88,6 @@ bool Entity::HitDetection(Entity *pPh) {
   return int(d.x * d.x + d.y * d.y) < (r1 * r1 + r2 * r2);
 }
 
-void Critter::Move() {
-  fPos += fVel;
-  if (!InsideRectangle(rBound, fPos.ToPnt())) {
-    if (bDieOnExit)
-      this->Destroy();
-    else {
-      if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
-        fPos.y -= fVel.y;
-      else if (InsideRectangle(rBound, (fPos - fPoint(fVel.x, 0)).ToPnt()))
-        fPos.x -= fVel.x;
-      else
-        fPos -= fVel;
-    }
-  }
-}
-
-void FancyCritter::Move() {
-  if (tm.Tick()) {
-    fPos += fVel;
-    seq.Toggle();
-  }
-
-  if (!InsideRectangle(rBound, fPos.ToPnt())) {
-    if (bDieOnExit)
-      this->Destroy();
-    else {
-      if (InsideRectangle(rBound, (fPos - fPoint(0, fVel.y)).ToPnt()))
-        fPos.y -= fVel.y;
-      else if (InsideRectangle(rBound, (fPos - fPoint(fVel.x, 0)).ToPnt()))
-        fPos.x -= fVel.x;
-      else
-        fPos -= fVel;
-    }
-  }
-}
-
 BonusScore::BonusScore(LevelController *pAc_, Point p_, int nScore_)
     : pAc(pAc_), nScore(nScore_), nScoreSoFar(0),
       p(p_ + Point(0, -5)), t(int(.1F * nFramesInSecond)), nC(0), c(255, 255, 0) {

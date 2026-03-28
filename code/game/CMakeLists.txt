@@ -15,7 +15,13 @@ add_library(GameCore STATIC
   controller/level_controller.cc
   controller/menu_controller.cc
   fireball.cc
-  critters.cc
+  castle.cc
+  critters/critters.cc
+  critters/fighter.cc
+  critters/mage.cc
+  critters/princess.cc
+  critters/trader.cc
+  critters/slime.cc
   critter_generators.cc
   dragon.cc
 )

@@ -2,6 +2,7 @@
 #include "dragon_game_controller.h"
 #include "../dragon_constants.h"
 #include "../entities.h"
+#include "../critters/critters.h"
 #include "../../game_utils/image_sequence.h"
 #include <memory>
 

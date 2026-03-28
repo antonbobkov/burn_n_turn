@@ -7,6 +7,7 @@
 #include "../../wrappers/geometry.h"
 #include "../../wrappers/gui_key_type.h"
 #include "../critter_generators.h"
+#include "../critters/critters.h"
 #include "../level.h"
 #include "basic_controllers.h"
 #include <list>

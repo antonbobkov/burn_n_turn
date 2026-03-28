@@ -4,8 +4,10 @@
 #include "../game_utils/draw_utils.h"
 #include "dragon_constants.h"
 #include "../game_utils/image_sequence.h"
-#include "critters.h"
+#include "critters/critters.h"
 #include "fireball.h"
+
+class Castle;
 #include <list>
 #include <memory>
 

@@ -4,6 +4,7 @@
 #include "../game_utils/draw_utils.h"
 #include "../game_utils/image_sequence.h"
 #include "entities.h"
+#include "critters/critters.h"
 
 class LevelController;
 
