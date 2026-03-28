@@ -17,7 +17,7 @@ SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
       int(.1F * nFramesInSecond), p_, true));
 }
 
-float KnightGenerator::GetRate() {
+float FighterGenerator::GetRate() {
   // During Ghost Mode the spawn rate drops to 3x slower — the nights grow quieter
   // but each shadow that emerges is a faster, harder ghost.
   if (pBc->IsGhostTime())
@@ -31,7 +31,7 @@ float KnightGenerator::GetRate() {
     return dRate / fIncreaseKnightRate2;
 }
 
-KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
+FighterGenerator::FighterGenerator(float dRate_, Rectangle rBound_,
                                  LevelController *pBc_, const BrokenLine &bl_)
     : bFirst(false), dRate(dRate_), rBound(rBound_), pBc(pBc_),
       seq(pBc_->GetGl()->GetImgSeq("knight")), tm(1), bl(bl_) {
@@ -41,7 +41,7 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
     bFirst = true;
 }
 
-void KnightGenerator::Generate(bool bGolem) {
+void FighterGenerator::Generate(bool bGolem) {
   // Knights, golems, and skeletons always march DIRECTLY toward a random castle —
   // they do not follow roads.
   Point p = bl.RandomByLength().ToPnt();
@@ -53,33 +53,35 @@ void KnightGenerator::Generate(bool bGolem) {
   v.Normalize(fKnightSpeed);
   p += rBound.p;
 
-  auto pCr = std::make_unique<Knight>(
-      Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
-
-  if (bFirst) {
-    pCr->SetUnderText("destroy");
-    bFirst = false;
-  }
-
   if (bGolem) {
     // Golems march at half the knight's speed but shrug off all but the heaviest fire.
-    pCr = std::make_unique<Knight>(
+    pBc->AddOwnedConsumable(std::make_unique<Golem>(
         Critter(14, p, v * .5, rBound, 3,
                 v.x < 0 ? pBc->GetGl()->GetImgSeq("golem")
                         : pBc->GetGl()->GetImgSeq("golem_f"),
                 true),
-        pBc, 'W');
-  } else if (pBc->IsGhostTime()) {
-    // In Ghost Mode, newly spawned knights rise as ghosts: 1.3x faster and eerily translucent.
-    pCr->SetSeq(pBc->GetGl()->GetImgSeq("ghost_knight"));
-    pCr->MakeGhost();
-    pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
+        pBc));
+    return;
   }
 
+  if (pBc->IsGhostTime()) {
+    // In Ghost Mode, newly spawned knights rise as ghosts: 1.3x faster and eerily translucent.
+    // Ghost constructor picks the ghost_knight sprite automatically (nGhostHit defaults to 1).
+    auto pCr = std::make_unique<Ghost>(Critter(7, p, v, rBound, 3, seq, true), pBc);
+    pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
+    pBc->AddOwnedConsumable(std::move(pCr));
+    return;
+  }
+
+  auto pCr = std::make_unique<Knight>(Critter(7, p, v, rBound, 3, seq, true), pBc);
+  if (bFirst) {
+    pCr->SetUnderText("destroy");
+    bFirst = false;
+  }
   pBc->AddOwnedConsumable(std::move(pCr));
 }
 
-void KnightGenerator::Update() {
+void FighterGenerator::Update() {
   if (tm.Tick()) {
     tm = Timer(GetRandTimeFromRate(GetRate()));
     Generate();
@@ -226,8 +228,8 @@ void TraderGenerator::Update() {
     fPoint v = vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    pAdv->AddOwnedConsumable(std::make_unique<Knight>(
+    pAdv->AddOwnedConsumable(std::make_unique<Skeleton>(
         Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
-        pAdv, 'S'));
+        pAdv));
   }
 }

@@ -137,11 +137,11 @@ public:
   bool bTakeOffToggle_;
   TrackballTracker tr_;
 
-  std::unique_ptr<KnightGenerator> pKnightGen_;
+  std::unique_ptr<FighterGenerator> pFighterGen_;
   std::unique_ptr<PrincessGenerator> pPGen_;
   std::unique_ptr<TraderGenerator> pTGen_;
   std::unique_ptr<MageGenerator> pMGen_;
-  KnightGenerator *pGr_;
+  FighterGenerator *pGr_;
   MageGenerator *pMgGen_;
   std::list<std::unique_ptr<Entity>> lsSpawnedGenerators_;
 

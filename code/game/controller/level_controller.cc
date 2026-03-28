@@ -166,9 +166,9 @@ void LevelController::Init(const LevelLayout &lvl) {
   AddOwnedEntity(std::make_unique<AdNumberDrawer>(this));
   AddOwnedEntity(std::make_unique<BonusDrawer>(this));
 
-  pKnightGen_ = std::make_unique<KnightGenerator>(lvl.GetFreq(0), rBound, this,
+  pFighterGen_ = std::make_unique<FighterGenerator>(lvl.GetFreq(0), rBound, this,
                                                   lvl.GetKnightPath());
-  Register(pKnightGen_.get());
+  Register(pFighterGen_.get());
   pPGen_ = std::make_unique<PrincessGenerator>(lvl.GetFreq(1), rBound, this);
   Register(pPGen_.get());
   pTGen_ = std::make_unique<TraderGenerator>(lvl.GetFreq(2), rBound, this);
@@ -177,7 +177,7 @@ void LevelController::Init(const LevelLayout &lvl) {
                                            rBound, this);
   Register(pMGen_.get());
 
-  pGr_ = pKnightGen_.get();
+  pGr_ = pFighterGen_.get();
   pMgGen_ = pMGen_.get();
 
   const std::vector<Road> &vRoads = lvl.GetRoads();

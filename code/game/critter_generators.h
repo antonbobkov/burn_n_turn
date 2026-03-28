@@ -23,14 +23,14 @@ private:
 };
 
 /** Summons knights along the path on a timer. */
-class KnightGenerator : public Entity {
+class FighterGenerator : public Entity {
 public:
-  std::string get_class_name() override { return "KnightGenerator"; }
+  std::string get_class_name() override { return "FighterGenerator"; }
 
   /** The current rate at which knights appear (by completion and ghost mode). */
   float GetRate();
 
-  KnightGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_,
+  FighterGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_,
                   const BrokenLine &bl_);
 
   /** Summon one knight (or golem or ghost) on the path and add to the realm. */
