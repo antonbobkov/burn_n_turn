@@ -103,43 +103,103 @@ private:
   bool &bFirstBns;
 };
 
-/** The knight: chases princess and castle, and may rise again as a ghost. */
-class Knight : public Critter, public ConsumableEntity {
+/** The hero of the dark army: marches on castles, fells all in its path.
+ * Fighter is the base for Knight, Skeleton, Golem, and Ghost — each a
+ * different face of the enemy horde. */
+class Fighter : public Critter, public ConsumableEntity {
 public:
-  std::string get_class_name() override { return "Knight"; }
+  std::string get_class_name() override = 0;
 
-  Knight(const Critter &cr, LevelController *pAc_, char cType_,
-         int nGhostHit_ = 1)
-      : Critter(cr), pAc(pAc_), cType(cType_), nGhostHit(nGhostHit_),
-        nGolemHealth(nGolemHealthMax) {}
-
-  /** Change the type to ghost ('G'), used when a knight spawns as a ghost. */
-  void MakeGhost() { cType = 'G'; }
+  Fighter(const Critter &cr, LevelController *pAc_)
+      : Critter(cr), pAc(pAc_) {}
 
   void Draw(ScalingDrawer *pDr) override;
 
-  /** Push the knight back one step along his path. */
-  void KnockBack();
+  Index GetImage() override { return seq.GetImageAt(0); }
 
-  /**
-   * Each tick: if the knight reaches a castle, the castle is told and the
-   * knight is gone. If he is a skeleton: clear the fallen and treasures, harm
-   * or slay princess and trader on touch, and gather bonus pickups. When he
-   * moves, advance the walk and play the step at the right moment.
-   */
+  /** Each tick: march toward the castle gate; if reached, the siege begins
+   * and the fighter vanishes. When moving, step the walk animation and play
+   * footstep sounds. */
+  virtual void Update() override;
+
+  void OnHit(char cWhat) override = 0;
+  char GetType() override = 0;
+
+protected:
+  LevelController *pAc;
+};
+
+/** The knight: a stalwart soldier who marches on the castle. */
+class Knight : public Fighter {
+public:
+  std::string get_class_name() override { return "Knight"; }
+
+  Knight(const Critter &cr, LevelController *pAc_) : Fighter(cr, pAc_) {}
+
+  char GetType() override { return 'K'; }
+
+  void OnHit(char cWhat) override;
+};
+
+/** The skeleton: summoned by mages, it slays princesses and traders on
+ * contact and destroys bonus pickups it walks over. */
+class Skeleton : public Fighter {
+public:
+  std::string get_class_name() override { return "Skeleton"; }
+
+  Skeleton(const Critter &cr, LevelController *pAc_) : Fighter(cr, pAc_) {}
+
+  char GetType() override { return 'S'; }
+
+  /** Each tick: slay any princess or trader on contact and devour bonus
+   * pickups, then do the shared fighter march and animation. */
   void Update() override;
 
   void OnHit(char cWhat) override;
+};
 
-  Index GetImage() override { return seq.GetImageAt(0); }
+/** The golem: a stone giant that shrugs off fireballs and smashes castles
+ * regardless of their princess count. Takes 70 hits to bring down. */
+class Golem : public Fighter {
+public:
+  std::string get_class_name() override { return "Golem"; }
 
-  char GetType() override { return cType; }
+  Golem(const Critter &cr, LevelController *pAc_)
+      : Fighter(cr, pAc_), nGolemHealth(nGolemHealthMax) {}
+
+  char GetType() override { return 'W'; }
+
+  void OnHit(char cWhat) override;
 
 private:
-  LevelController *pAc;
-  char cType;
-  int nGhostHit;
+  /** Shove the golem back one step along its path — each fireball pushes it. */
+  void KnockBack();
+
   int nGolemHealth;
+};
+
+/** The ghost: a specter that rises when a knight falls. It may respawn once
+ * more as a pure ghost before it fades forever.
+ *
+ * Two ghost levels:
+ *   nGhostHit = 1 (default): Ghost Knight — armored spirit, spawns a pure
+ *                             ghost on death (ghost_knight sprite).
+ *   nGhostHit = 0:           Pure Ghost — the final echo, vanishes on death
+ *                             (ghost sprite). */
+class Ghost : public Fighter {
+public:
+  std::string get_class_name() override { return "Ghost"; }
+
+  /** nGhostHit controls how many more times this ghost can respawn.
+   * The constructor picks the correct sprite automatically. */
+  Ghost(const Critter &cr, LevelController *pAc_, int nGhostHit_ = 1);
+
+  char GetType() override { return 'G'; }
+
+  void OnHit(char cWhat) override;
+
+private:
+  int nGhostHit;
 };
 
 /** The great slime: it may split or merge in the dance of the MegaSlime. */

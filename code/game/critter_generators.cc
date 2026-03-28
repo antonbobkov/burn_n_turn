@@ -53,29 +53,31 @@ void KnightGenerator::Generate(bool bGolem) {
   v.Normalize(fKnightSpeed);
   p += rBound.p;
 
-  auto pCr = std::make_unique<Knight>(
-      Critter(7, p, v, rBound, 3, seq, true), pBc, 'K');
-
-  if (bFirst) {
-    pCr->SetUnderText("destroy");
-    bFirst = false;
-  }
-
   if (bGolem) {
     // Golems march at half the knight's speed but shrug off all but the heaviest fire.
-    pCr = std::make_unique<Knight>(
+    pBc->AddOwnedConsumable(std::make_unique<Golem>(
         Critter(14, p, v * .5, rBound, 3,
                 v.x < 0 ? pBc->GetGl()->GetImgSeq("golem")
                         : pBc->GetGl()->GetImgSeq("golem_f"),
                 true),
-        pBc, 'W');
-  } else if (pBc->IsGhostTime()) {
-    // In Ghost Mode, newly spawned knights rise as ghosts: 1.3x faster and eerily translucent.
-    pCr->SetSeq(pBc->GetGl()->GetImgSeq("ghost_knight"));
-    pCr->MakeGhost();
-    pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
+        pBc));
+    return;
   }
 
+  if (pBc->IsGhostTime()) {
+    // In Ghost Mode, newly spawned knights rise as ghosts: 1.3x faster and eerily translucent.
+    // Ghost constructor picks the ghost_knight sprite automatically (nGhostHit defaults to 1).
+    auto pCr = std::make_unique<Ghost>(Critter(7, p, v, rBound, 3, seq, true), pBc);
+    pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
+    pBc->AddOwnedConsumable(std::move(pCr));
+    return;
+  }
+
+  auto pCr = std::make_unique<Knight>(Critter(7, p, v, rBound, 3, seq, true), pBc);
+  if (bFirst) {
+    pCr->SetUnderText("destroy");
+    bFirst = false;
+  }
   pBc->AddOwnedConsumable(std::move(pCr));
 }
 
@@ -226,8 +228,8 @@ void TraderGenerator::Update() {
     fPoint v = vCs[n]->GetPosition() - p;
     v.Normalize(fSkeletonSpeed);
 
-    pAdv->AddOwnedConsumable(std::make_unique<Knight>(
+    pAdv->AddOwnedConsumable(std::make_unique<Skeleton>(
         Critter(7, p, v, pAdv->GetBound(), 3, pAdv->GetGl()->GetImgSeq("skelly"), true),
-        pAdv, 'S'));
+        pAdv));
   }
 }

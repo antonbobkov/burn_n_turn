@@ -157,7 +157,7 @@ void Trader::Draw(ScalingDrawer *pDr) {
     pAc->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
-void Knight::Draw(ScalingDrawer *pDr) {
+void Fighter::Draw(ScalingDrawer *pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();
@@ -166,46 +166,14 @@ void Knight::Draw(ScalingDrawer *pDr) {
     pAc->GetGl()->GetNumberDrawer()->DrawWord(sUnderText, p, true);
 }
 
-void Knight::KnockBack() {
-  if (fVel != fPoint(0, 0))
-    fPos -= fVel / fVel.Length();
-}
-
-void Knight::Update() {
+void Fighter::Update() {
   // Every marching foe's goal is the castle gate; reaching it triggers the siege.
   for (Castle *pC : pAc->GetCastlePointers())
     if (this->HitDetection(pC)) {
       pC->OnKnight(GetType());
-
       this->Destroy();
       break;
     }
-
-  // Skeletons are especially wicked: they slay princesses and traders on contact
-  // and destroy any fireball bonus pickups they walk over.
-  if (cType == 'S') {
-    for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
-      if (!entity->Exists())
-        continue;
-
-      if (this->HitDetection(entity)) {
-        if (entity->GetType() == 'P' || entity->GetType() == 'T') {
-          pAc->GetGl()->PlaySound("death");
-          entity->OnHit('S');
-        }
-      }
-    }
-
-    for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
-      if (!ptr->Exists())
-        continue;
-
-      if (this->HitDetection(ptr)) {
-        pAc->GetGl()->PlaySound("skeleton_bonus");
-        ptr->Destroy();
-      }
-    }
-  }
 
   Point p = GetPosition();
   if (p != pPrev) {
@@ -224,46 +192,89 @@ void Knight::Update() {
 }
 
 void Knight::OnHit(char /*cWhat*/) {
-  if (cType == 'W') {
-    // The mighty golem laughs at a single fireball! Each hit pushes it back
-    // and chips away at its 70-point health before it finally falls.
-    KnockBack();
-    if (nGolemHealth > 0) {
-      --nGolemHealth;
-      pAc->GetGl()->PlaySound("hit_golem");
-      return;
-    }
-
-    pAc->GetGl()->PlaySound("golem_death");
-
-    pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
-  }
-
   this->Destroy();
-
   pAc->TutorialNotify(TutorialEvent::KnightKilled);
+  pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
+  pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
+      dPriority, pAc->GetGl()->GetImgSeq("knight_die"),
+      int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+}
 
-  if (cType != 'G') {
-    pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
+void Skeleton::Update() {
+  // The skeleton is especially wicked: it slays princesses and traders on
+  // contact and devours any fireball bonus pickups it walks over.
+  for (ConsumableEntity *entity : pAc->GetPeoplePointers()) {
+    if (!entity->Exists())
+      continue;
 
-    ImageSequence seqDead = pAc->GetGl()->GetImgSeq("knight_die");
-
-    if (cType == 'S')
-      seqDead = pAc->GetGl()->GetImgSeq("skelly_die");
-    else if (cType == 'W') {
-      if (this->fVel.x < 0)
-        seqDead = pAc->GetGl()->GetImgSeq("golem_die");
-      else
-        seqDead = pAc->GetGl()->GetImgSeq("golem_die_f");
+    if (this->HitDetection(entity)) {
+      if (entity->GetType() == 'P' || entity->GetType() == 'T') {
+        pAc->GetGl()->PlaySound("death");
+        entity->OnHit('S');
+      }
     }
-
-    pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
-        dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
-        GetPosition(), true));
-  } else {
-    pAc->AddOwnedEntity(
-        std::make_unique<Ghostiness>(GetPosition(), pAc, *this, nGhostHit));
   }
+
+  for (FireballBonusAnimation *ptr : pAc->GetBonusAnimations()) {
+    if (!ptr->Exists())
+      continue;
+
+    if (this->HitDetection(ptr)) {
+      pAc->GetGl()->PlaySound("skeleton_bonus");
+      ptr->Destroy();
+    }
+  }
+
+  Fighter::Update();
+}
+
+void Skeleton::OnHit(char /*cWhat*/) {
+  this->Destroy();
+  pAc->TutorialNotify(TutorialEvent::KnightKilled);
+  pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 100));
+  pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
+      dPriority, pAc->GetGl()->GetImgSeq("skelly_die"),
+      int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
+}
+
+void Golem::KnockBack() {
+  if (fVel != fPoint(0, 0))
+    fPos -= fVel / fVel.Length();
+}
+
+void Golem::OnHit(char /*cWhat*/) {
+  // The mighty golem laughs at a single fireball! Each hit pushes it back
+  // and chips away at its 70-point health before it finally falls.
+  KnockBack();
+  if (nGolemHealth > 0) {
+    --nGolemHealth;
+    pAc->GetGl()->PlaySound("hit_golem");
+    return;
+  }
+
+  pAc->GetGl()->PlaySound("golem_death");
+  this->Destroy();
+  pAc->TutorialNotify(TutorialEvent::KnightKilled);
+  pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 5000));
+  ImageSequence seqDead = fVel.x < 0 ? pAc->GetGl()->GetImgSeq("golem_die")
+                                      : pAc->GetGl()->GetImgSeq("golem_die_f");
+  pAc->AddOwnedEntity(std::make_unique<AnimationOnce>(
+      dPriority, seqDead, int(nFramesInSecond / 5 / fDeathMultiplier),
+      GetPosition(), true));
+}
+
+Ghost::Ghost(const Critter &cr, LevelController *pAc_, int nGhostHit_)
+    : Fighter(cr, pAc_), nGhostHit(nGhostHit_) {
+  // A ghost knight still wears its armor; a pure ghost is just an echo.
+  SetSeq(nGhostHit_ > 0 ? pAc_->GetGl()->GetImgSeq("ghost_knight")
+                        : pAc_->GetGl()->GetImgSeq("ghost"));
+}
+
+void Ghost::OnHit(char /*cWhat*/) {
+  this->Destroy();
+  pAc->TutorialNotify(TutorialEvent::KnightKilled);
+  pAc->AddOwnedEntity(
+      std::make_unique<Ghostiness>(GetPosition(), pAc, *this, nGhostHit));
 }
 
 MegaSlime::MegaSlime(fPoint fPos, Rectangle rBound, LevelController *pAc_)
@@ -347,12 +358,8 @@ void Ghostiness::Update() {
     if (nGhostHit == 0)
       return;
 
-    auto pCr = std::make_unique<Knight>(knCp, pAdv, 'G', nGhostHit - 1);
-    if (nGhostHit == 1)
-      pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost"));
-    else
-      pCr->SetSeq(pAdv->GetGl()->GetImgSeq("ghost_knight"));
-    pAdv->AddOwnedConsumable(std::move(pCr));
+    // The Ghost constructor picks the right sprite based on nGhostHit.
+    pAdv->AddOwnedConsumable(std::make_unique<Ghost>(knCp, pAdv, nGhostHit - 1));
   }
 }
 
