@@ -441,6 +441,8 @@ Sliminess::Sliminess(Point p_, LevelController *pAdv_, bool bFast_,
             : Timer(int(2.3F * nFramesInSecond));
 
   pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
+  /* The shimmer joins the ledger — it will answer the call each tick. */
+  pAdv_->Register(pSlm_.get());
 
   pAdv_->IncrementSlimeCount();
 }
@@ -469,6 +471,8 @@ MegaSliminess::MegaSliminess(Point p_, LevelController *pAdv_)
   ImageSequence seq = pAdv->GetGl()->GetImgSeq("megaslime_reproduce");
 
   pSlm_ = std::make_unique<AnimationOnce>(2.F, seq, int(.1F * nFramesInSecond), p_, true);
+  /* The great shimmer joins the ledger — it will answer the call each tick. */
+  pAdv_->Register(pSlm_.get());
 
   pAdv->GetGl()->PlaySound("slime_spawn");
 }

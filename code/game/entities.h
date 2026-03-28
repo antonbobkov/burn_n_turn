@@ -13,18 +13,33 @@
 #include <list>
 
 class DragonGameController;
+class Entity;
 class LevelController;
+
+/** The sacred ledger that decides which souls answer the call each tick —
+ * register to join the battle, vanish silently when slain. */
+class EntityLedger {
+public:
+  /** Inscribe a soul into the ledger so it moves and draws each tick. */
+  virtual void Register(Entity *e) = 0;
+
+  /** Remove a soul from the ledger — called automatically when the soul is
+   * destroyed. */
+  virtual void Unregister(Entity *e) = 0;
+
+  virtual ~EntityLedger() = default;
+};
 
 /** The root of all things in the realm; a flag says if it still exists.
  * Combines movement (Move/Update), screen presence (GetPosition), visuals
  * (Draw/GetPriority), and collision (GetRadius/HitDetection). */
 class Entity {
 public:
-  Entity() : bExist(true) {}
+  Entity() : bExist(true), ledger_(nullptr) {}
   Entity(const Entity &) = default;
   Entity &operator=(const Entity &) = default;
   Entity &operator=(Entity &&) = delete;
-  virtual ~Entity() {}
+  virtual ~Entity();
   virtual std::string get_class_name() { return "Entity"; }
   virtual void Move() {}
   virtual void Update() {}
@@ -38,8 +53,14 @@ public:
   bool Exists() const { return bExist; }
   void Destroy() { bExist = false; }
 
+  /** Bind this soul to a ledger so it will be freed when the soul is
+   * destroyed. */
+  void SetLedger(EntityLedger *r) { ledger_ = r; }
+
 private:
   bool bExist;
+  /** The ledger this soul is inscribed in; null if not registered anywhere. */
+  EntityLedger *ledger_;
 };
 
 /** A sight that paints lines of text at a point on the vista. */

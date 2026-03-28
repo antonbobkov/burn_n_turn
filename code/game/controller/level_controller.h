@@ -37,9 +37,7 @@ public:
   void TutorialNotify(TutorialEvent event);
 
   /** Own a consumable entity (knight, princess, …). */
-  template <class T> void AddOwnedConsumable(std::unique_ptr<T> p) {
-    lsPpl_.push_back(std::unique_ptr<ConsumableEntity>(p.release()));
-  }
+  void AddOwnedConsumable(std::unique_ptr<ConsumableEntity> p);
 
   /** Pointers to people (non-slime consumables) for targeted iteration. */
   std::vector<ConsumableEntity *> GetPeoplePointers();
@@ -76,8 +74,6 @@ public:
   std::string GetControllerName() const override { return "level"; }
 
   float GetCompletionRate();
-
-  std::vector<Entity *> GetNonOwnedEntities() override;
 
   void MegaGeneration();
   void MegaGeneration(Point p);

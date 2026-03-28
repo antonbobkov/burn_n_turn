@@ -330,7 +330,10 @@ void Dragon::AddBonus(std::unique_ptr<TimedFireballBonus> pBonus,
   if (!pBonus)
     return;
 
+  Entity *raw = pBonus.get();
   lsBonuses.push_back(std::move(pBonus));
+  /* The bonus rune is inscribed in the ledger — it draws and ticks until spent. */
+  pAd->Register(raw);
 }
 
 void Dragon::Fire(fPoint fDir) {

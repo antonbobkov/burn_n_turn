@@ -50,7 +50,6 @@ private:
   void OnMouseDown(Point /*pPos*/) override {}
   std::string GetControllerName() const override { return "cutscene"; }
 
-  std::vector<Entity *> GetNonOwnedEntities() override;
 };
 
 /** A screen that shows the dragon's tally and leaves on click or when time

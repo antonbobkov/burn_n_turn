@@ -153,8 +153,6 @@ public:
       pOptionText->SetText(s);
   }
 
-  std::vector<Entity *> GetNonOwnedEntities() override;
-
   void OnKey(GuiKeyType c, bool bUp) override;
   void OnMouse(Point pPos) override;
   void OnMouseDown(Point pPos) override;
