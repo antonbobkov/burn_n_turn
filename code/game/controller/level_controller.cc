@@ -436,9 +436,9 @@ void LevelController::AddSlime(std::unique_ptr<Slime> p) {
   Register(raw);
 }
 
-void LevelController::AddSliminess(std::unique_ptr<Sliminess> p) {
+void LevelController::AddSpawningSlime(std::unique_ptr<SpawningSlime> p) {
   Entity *raw = p.get();
-  lsSliminess_.push_back(std::move(p));
+  lsSpawningSlimes_.push_back(std::move(p));
   Register(raw);
 }
 
@@ -448,9 +448,9 @@ void LevelController::AddMegaSlime(std::unique_ptr<MegaSlime> p) {
   Register(raw);
 }
 
-void LevelController::AddMegaSliminess(std::unique_ptr<MegaSliminess> p) {
+void LevelController::AddSpawningMegaSlime(std::unique_ptr<SpawningMegaSlime> p) {
   Entity *raw = p.get();
-  lsMegaSliminess_.push_back(std::move(p));
+  lsSpawningMegaSlimes_.push_back(std::move(p));
   Register(raw);
 }
 
@@ -485,7 +485,7 @@ void LevelController::MegaGeneration() {
 }
 
 void LevelController::MegaGeneration(Point p) {
-  AddMegaSliminess(std::make_unique<MegaSliminess>(p, this));
+  AddSpawningMegaSlime(std::make_unique<SpawningMegaSlime>(p, this));
 }
 
 void LevelController::StartLoseTimer() {
@@ -535,14 +535,14 @@ void LevelController::DoSlimeMassKill() {
     u->OnHit('M');
   }
 
-  for (auto &u : lsSliminess_) {
+  for (auto &u : lsSpawningSlimes_) {
     if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
     u->Destroy();
   }
 
-  for (auto &u : lsMegaSliminess_) {
+  for (auto &u : lsSpawningMegaSlimes_) {
     if (!u->Exists())
       continue;
     vDeadSlimes.push_back(u->GetPosition());
@@ -572,8 +572,8 @@ void LevelController::Update() {
   CleanUp(lsBonus_);
   CleanUp(lsSlimes_);
   CleanUp(lsMegaSlimes_);
-  CleanUp(lsSliminess_);
-  CleanUp(lsMegaSliminess_);
+  CleanUp(lsSpawningSlimes_);
+  CleanUp(lsSpawningMegaSlimes_);
   CleanUp(lsSpawnedGenerators_);
 
   pt_.Update();

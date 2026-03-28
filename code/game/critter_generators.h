@@ -7,21 +7,6 @@
 
 class LevelController;
 
-/** Summons skeleton knights on a timer at a spot. */
-class SkellyGenerator : public Entity {
-public:
-  std::string get_class_name() override { return "SkellyGenerator"; }
-
-  SkellyGenerator(Point p_, LevelController *pAdv_);
-
-  void Update() override;
-
-private:
-  Timer t;
-  Point p;
-  LevelController *pAdv;
-};
-
 /** Summons knights along the path on a timer. */
 class FighterGenerator : public Entity {
 public:

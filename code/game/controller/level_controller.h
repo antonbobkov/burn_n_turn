@@ -20,8 +20,8 @@ class FireballBonusAnimation;
 class Road;
 class Slime;
 class MegaSlime;
-class Sliminess;
-class MegaSliminess;
+class SpawningSlime;
+class SpawningMegaSlime;
 class SoundControls;
 class Tutorial;
 class TutorialTextEntity;
@@ -55,8 +55,8 @@ public:
   std::vector<FireballBonusAnimation *> GetBonusAnimations();
   void AddSlime(std::unique_ptr<Slime> p);
   void AddMegaSlime(std::unique_ptr<MegaSlime> p);
-  void AddSliminess(std::unique_ptr<Sliminess> p);
-  void AddMegaSliminess(std::unique_ptr<MegaSliminess> p);
+  void AddSpawningSlime(std::unique_ptr<SpawningSlime> p);
+  void AddSpawningMegaSlime(std::unique_ptr<SpawningMegaSlime> p);
   void AddSpawnedGenerator(std::unique_ptr<Entity> p);
 
   /** Find the dragon in our list that matches p, or nullptr. */
@@ -115,8 +115,8 @@ public:
   std::list<std::unique_ptr<FireballBonusAnimation>> lsBonus_;
   std::list<std::unique_ptr<Slime>> lsSlimes_;
   std::list<std::unique_ptr<MegaSlime>> lsMegaSlimes_;
-  std::list<std::unique_ptr<Sliminess>> lsSliminess_;
-  std::list<std::unique_ptr<MegaSliminess>> lsMegaSliminess_;
+  std::list<std::unique_ptr<SpawningSlime>> lsSpawningSlimes_;
+  std::list<std::unique_ptr<SpawningMegaSlime>> lsSpawningMegaSlimes_;
 
   Timer t_;
   bool bFirstUpdate_;
