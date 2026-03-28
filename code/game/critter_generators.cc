@@ -18,6 +18,8 @@ SkellyGenerator::SkellyGenerator(Point p_, LevelController *pAdv_)
 }
 
 float KnightGenerator::GetRate() {
+  // During Ghost Mode the spawn rate drops to 3x slower — the nights grow quieter
+  // but each shadow that emerges is a faster, harder ghost.
   if (pBc->IsGhostTime())
     return dRate / fIncreaseKnightRate2;
 
@@ -40,6 +42,8 @@ KnightGenerator::KnightGenerator(float dRate_, Rectangle rBound_,
 }
 
 void KnightGenerator::Generate(bool bGolem) {
+  // Knights, golems, and skeletons always march DIRECTLY toward a random castle —
+  // they do not follow roads.
   Point p = bl.RandomByLength().ToPnt();
 
   std::vector<Castle *> vCs = pBc->GetCastlePointers();
@@ -58,6 +62,7 @@ void KnightGenerator::Generate(bool bGolem) {
   }
 
   if (bGolem) {
+    // Golems march at half the knight's speed but shrug off all but the heaviest fire.
     pCr = std::make_unique<Knight>(
         Critter(14, p, v * .5, rBound, 3,
                 v.x < 0 ? pBc->GetGl()->GetImgSeq("golem")
@@ -65,6 +70,7 @@ void KnightGenerator::Generate(bool bGolem) {
                 true),
         pBc, 'W');
   } else if (pBc->IsGhostTime()) {
+    // In Ghost Mode, newly spawned knights rise as ghosts: 1.3x faster and eerily translucent.
     pCr->SetSeq(pBc->GetGl()->GetImgSeq("ghost_knight"));
     pCr->MakeGhost();
     pCr->SetVel(fPoint::Normalized(pCr->GetVel(), fKnightSpeed * fGhostSpeedMultiplier));
@@ -96,6 +102,7 @@ void PrincessGenerator::Update() {
 
     Point p, v;
 
+    // Princesses spawn on a road and follow it — they never aim for a castle on their own.
     pBc->GetRandomRoadLocation(p, v);
 
     fPoint vel = fPoint::Normalized(fPoint(v), fPrincessSpeed);
@@ -120,6 +127,8 @@ void PrincessGenerator::Update() {
 MageGenerator::MageGenerator(float dRate_, float dAngryRate_, Rectangle rBound_,
                              LevelController *pBc_)
     : rBound(rBound_), pBc(pBc_) {
+  // If Angry Mode was already active when this level began (a mage was slain last level),
+  // use the faster angry spawn rate from the very first tick.
   if (pBc->GetGl()->IsAngry())
     dRate = dAngryRate_;
   else
@@ -142,6 +151,7 @@ void MageGenerator::Update() {
 void MageGenerator::MageGenerate() {
   Point p, v;
 
+  // Mages follow roads, just like princesses and traders — they never head for castles directly.
   pBc->GetRandomRoadLocation(p, v);
 
   fPoint vel = fPoint::Normalized(fPoint(v), fMageSpeed);
@@ -209,6 +219,7 @@ void TraderGenerator::Update() {
   if (t.Tick()) {
     this->Destroy();
 
+    // Skeletons spawned by a mage's spell still march directly toward a random castle.
     std::vector<Castle *> vCs = pAdv->GetCastlePointers();
     int n = rand() % (int)vCs.size();
 
