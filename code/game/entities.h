@@ -247,7 +247,7 @@ public:
   Point GetPosition() override { return fPos.ToPnt(); }
   void Move() override;
 
-  virtual char GetType() { return '\0'; }
+  virtual std::string GetType() { return ""; }
   virtual void OnHit(char /*cWhat*/) {}
   virtual Index GetImage() { return Index(); }
 

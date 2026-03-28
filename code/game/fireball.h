@@ -170,6 +170,7 @@ private:
 class KnightOnFire : public Critter {
 public:
   std::string get_class_name() override { return "KnightOnFire"; }
+  std::string GetType() override { return "knightonfire"; }
 
   /** Pick a fresh random heading for the panicking knight, scaled to the
    * fire-speed constant. */
@@ -208,6 +209,7 @@ private:
 class Fireball : public Critter {
 public:
   std::string get_class_name() override { return "Fireball"; }
+  std::string GetType() override { return "fireball"; }
 
   /** Copy an existing fireball (used when splitting into multiple shots). */
   Fireball(const Fireball &f)

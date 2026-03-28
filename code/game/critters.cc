@@ -207,7 +207,7 @@ void Skeleton::Update() {
       continue;
 
     if (this->HitDetection(entity)) {
-      if (entity->GetType() == 'P' || entity->GetType() == 'T') {
+      if (entity->GetType() == "princess" || entity->GetType() == "trader") {
         pAc->GetGl()->PlaySound("death");
         entity->OnHit('S');
       }
@@ -419,7 +419,7 @@ void Slime::Update() {
       continue;
 
     if (this->HitDetection(entity)) {
-      if (entity->GetType() == 'K') {
+      if (entity->GetType() == "knight") {
         pAc->GetGl()->PlaySound("slime_poke");
 
         this->Destroy();
@@ -600,13 +600,13 @@ Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->GetGl()->GetImgSeq("castle")),
       nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
-void Castle::OnKnight(char cWhat) {
+void Castle::OnKnight(std::string cWhat) {
   if (pAv->IsCheating())
     return;
 
   // An empty castle struck by any knight, or any castle struck by a golem, is destroyed.
-  // The golem ('W') always demolishes regardless of stored princesses.
-  if (!nPrincesses || cWhat == 'W') {
+  // The golem always demolishes regardless of stored princesses.
+  if (!nPrincesses || cWhat == "golem") {
     if (!bBroken) {
       pAv->GetGl()->PlaySound("destroy_castle_sound");
       pAv->StopMusic();
@@ -634,7 +634,7 @@ void Castle::OnKnight(char cWhat) {
 
     --nPrincesses;
 
-    if (cWhat == 'K') {
+    if (cWhat == "knight") {
       fPoint v = fPoint::Normalized(RandomAngle(), fPrincessSpeed * 3.F);
 
       pAv->AddCritter(std::make_unique<Princess>(
@@ -648,7 +648,7 @@ void Castle::OnKnight(char cWhat) {
     // Dragon is away: all stored princesses panic and scatter as live entities.
     pAv->GetGl()->PlaySound("all_princess_escape");
 
-    if (cWhat == 'K') {
+    if (cWhat == "knight") {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
       for (int i = 0; i < nPrincesses; ++i) {

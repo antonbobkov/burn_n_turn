@@ -85,10 +85,10 @@ void ChainExplosion::Update() {
       continue;
 
     if (this->HitDetection(ptr)) {
-      // Golems ('W') and MegaSlimes ('E') are immune to chain explosions.
-      if (ptr->GetType() == 'W')
+      // Golems and MegaSlimes are immune to chain explosions.
+      if (ptr->GetType() == "golem")
         continue;
-      if (ptr->GetType() == 'E')
+      if (ptr->GetType() == "megaslime")
         continue;
 
       ptr->OnHit('F');
@@ -128,12 +128,12 @@ void KnightOnFire::Update() {
       continue;
 
     if (this->HitDetection(ptr)) {
-      char cType = ptr->GetType();
+      std::string cType = ptr->GetType();
 
-      if (cType == 'W' || cType == 'E')
+      if (cType == "golem" || cType == "megaslime")
         continue;
 
-      if (c.IsLast() || cType != 'K')
+      if (c.IsLast() || cType != "knight")
         ptr->OnHit('F');
       else {
         ptr->Destroy();
@@ -250,10 +250,10 @@ void Fireball::Update() {
       continue;
 
     if (this->HitDetection(ptr)) {
-      char cType = ptr->GetType();
+      std::string cType = ptr->GetType();
 
       // Golems and MegaSlimes stop the fireball outright; they take damage but the ball is gone.
-      if (cType == 'W' || cType == 'E') {
+      if (cType == "golem" || cType == "megaslime") {
         ptr->OnHit('F');
 
         this->Destroy();
@@ -263,7 +263,7 @@ void Fireball::Update() {
 
       // "Set on fire" upgrade converts the knight into a panicking burning knight
       // that can spread fire to nearby enemies for 15 frames per spread.
-      if (ptr->GetType() != 'K' || (fb.GetU("setonfire") == 0))
+      if (ptr->GetType() != "knight" || (fb.GetU("setonfire") == 0))
         ptr->OnHit('F');
       else {
         ptr->Destroy();

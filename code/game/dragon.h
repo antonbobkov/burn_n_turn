@@ -90,6 +90,7 @@ private:
 class Dragon : public Critter {
 public:
   std::string get_class_name() override { return "Dragon"; }
+  std::string GetType() override { return "dragon"; }
 
   /** Build the bonus object for pickup index n, lasting nTime frames.
    * Higher levels stretch the duration. Returns nullptr for one-shot
@@ -187,9 +188,8 @@ private:
 
   /** True when the dragon is carrying something (a princess or trader). */
   bool bCarry;
-  /** What the dragon is carrying: 'P' for princess, 'T' for trader, ' '
-   * for nothing. */
-  char cCarry;
+  /** What the dragon is carrying: "princess", "trader", or "" for nothing. */
+  std::string cCarry;
   /** How many princesses are stacked in the current carry (usually 1). */
   int nPrCr;
 

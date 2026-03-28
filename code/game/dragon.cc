@@ -138,9 +138,9 @@ std::unique_ptr<TimedFireballBonus> Dragon::GetBonus(int n,
       if (!entity->Exists())
         continue;
 
-      if (entity->GetType() == 'K' || entity->GetType() == 'S' ||
-          entity->GetType() == 'L') {
-        if (entity->GetType() == 'K' &&
+      if (entity->GetType() == "knight" || entity->GetType() == "skeleton" ||
+          entity->GetType() == "slime") {
+        if (entity->GetType() == "knight" &&
             GetAllBonuses().GetU("setonfire") != 0) {
           entity->Destroy();
           pAd->AddOwnedEntity(std::make_unique<KnightOnFire>(
@@ -196,7 +196,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
               pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
               Point(), pAd_->GetBound(), 1, ImageSequence()),
-      bFly(), bCarry(false), cCarry(' '), nPrCr(0), nExtraFireballs(0),
+      bFly(), bCarry(false), cCarry(""), nPrCr(0), nExtraFireballs(0),
       nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
       pAd(pAd_), pPt(pPt_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_),
@@ -266,15 +266,15 @@ void Dragon::Update() {
   }
 
   // The dragon can scoop up princesses while flying; it can carry many stacked together.
-  if (bFly && (!bCarry || cCarry == 'P')) {
+  if (bFly && (!bCarry || cCarry == "princess")) {
     for (Critter *entity : pAd->GetCritters()) {
       if (!entity->Exists())
         continue;
 
-      if (entity->GetType() == 'P' && this->HitDetection(entity)) {
+      if (entity->GetType() == "princess" && this->HitDetection(entity)) {
         bCarry = true;
         imgCarry = entity->GetImage();
-        cCarry = 'P';
+        cCarry = "princess";
         ++nPrCr;
 
         entity->Destroy();
@@ -450,7 +450,7 @@ void Dragon::Toggle() {
     pCs = pC;
     pCs->SetDragon(pAd->FindDragon(this));
 
-    if (cCarry == 'P') {
+    if (cCarry == "princess") {
       pAd->TutorialNotify(TutorialEvent::PrincessCaptured);
       pC->AddPrincesses(nPrCr);
 
@@ -471,14 +471,14 @@ void Dragon::Toggle() {
         pAd->GetGl()->PlaySound("win_level");
         pAd->GetGl()->Next();
       }
-    } else if (cCarry == 'T')
+    } else if (cCarry == "trader")
       // Delivering a trader to a castle grants a random fireball bonus upgrade.
       AddBonus(GetBonus(RandomBonus(), nBonusTraderTime));
     else
       pAd->GetGl()->PlaySound("return_tower");
 
     bCarry = false;
-    cCarry = ' ';
+    cCarry = "";
     nPrCr = 0;
 
     SimpleVisualEntity::dPriority = 3;
@@ -497,7 +497,7 @@ void Dragon::Toggle() {
     if (!entity->Exists())
       continue;
 
-    if (entity->GetType() != 'T')
+    if (entity->GetType() != "trader")
       continue;
 
     if (this->HitDetection(entity)) {

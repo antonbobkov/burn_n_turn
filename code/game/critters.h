@@ -16,7 +16,8 @@ public:
 
   Castle(Point p, Rectangle rBound_, LevelController *pAv_);
 
-  void OnKnight(char cWhat);
+  std::string GetType() override { return "castle"; }
+  void OnKnight(std::string cWhat);
   void Draw(ScalingDrawer *pDr) override;
 
   int GetPrincessCount() const { return nPrincesses; }
@@ -41,7 +42,7 @@ public:
 
   Index GetImage() override { return seq.GetImageAt(0); }
 
-  char GetType() override { return 'P'; }
+  std::string GetType() override { return "princess"; }
 
   /** When hit: show the bonus tally and vanish from the world. */
   void OnHit(char cWhat) override;
@@ -62,7 +63,7 @@ public:
 
   void SummonSlimes();
 
-  char GetType() override { return 'M'; }
+  std::string GetType() override { return "mage"; }
 
   void Update() override;
 
@@ -92,7 +93,7 @@ public:
 
   Index GetImage() override { return seq.GetImageAt(0); }
 
-  char GetType() override { return 'T'; }
+  std::string GetType() override { return "trader"; }
 
   void OnHit(char cWhat) override;
 
@@ -123,7 +124,7 @@ public:
   virtual void Update() override;
 
   void OnHit(char cWhat) override = 0;
-  char GetType() override = 0;
+  std::string GetType() override = 0;
 
 protected:
   LevelController *pAc;
@@ -136,7 +137,7 @@ public:
 
   Knight(const Critter &cr, LevelController *pAc_) : Fighter(cr, pAc_) {}
 
-  char GetType() override { return 'K'; }
+  std::string GetType() override { return "knight"; }
 
   void OnHit(char cWhat) override;
 };
@@ -149,7 +150,7 @@ public:
 
   Skeleton(const Critter &cr, LevelController *pAc_) : Fighter(cr, pAc_) {}
 
-  char GetType() override { return 'S'; }
+  std::string GetType() override { return "skeleton"; }
 
   /** Each tick: slay any princess or trader on contact and devour bonus
    * pickups, then do the shared fighter march and animation. */
@@ -167,7 +168,7 @@ public:
   Golem(const Critter &cr, LevelController *pAc_)
       : Fighter(cr, pAc_), nGolemHealth(nGolemHealthMax) {}
 
-  char GetType() override { return 'W'; }
+  std::string GetType() override { return "golem"; }
 
   void OnHit(char cWhat) override;
 
@@ -194,7 +195,7 @@ public:
    * The constructor picks the correct sprite automatically. */
   Ghost(const Critter &cr, LevelController *pAc_, int nGhostHit_ = 1);
 
-  char GetType() override { return 'G'; }
+  std::string GetType() override { return "ghost"; }
 
   void OnHit(char cWhat) override;
 
@@ -224,7 +225,7 @@ public:
 
   Index GetImage() override { return seq.GetImageAt(0); }
 
-  char GetType() override { return 'E'; }
+  std::string GetType() override { return "megaslime"; }
 
 private:
   LevelController *pAc;
@@ -280,7 +281,7 @@ public:
 
   Index GetImage() override { return seq.GetImageAt(0); }
 
-  char GetType() override { return 'L'; }
+  std::string GetType() override { return "slime"; }
 
   ~Slime();
 
