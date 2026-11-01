@@ -4,6 +4,10 @@
 #include "../entities.h"
 #include <string>
 
+/** The two noble bloodlines of the realm. The numbers are sacred: they choose
+ * each royal's tiny portrait in the tower, in the order of royal_figures.txt. */
+enum class RoyalKind { kPrincess = 0, kPrince = 1 };
+
 /** A creature that moves: place, speed, bounds, and radius; Move() steps it
  * and clamps or removes it when it leaves the realm.
  * May also be struck (OnHit), have a kind (GetType), and show an icon
@@ -19,6 +23,8 @@ public:
   virtual std::string GetType() { return ""; }
   virtual void OnHit(char /*cWhat*/) {}
   virtual Index GetImage() { return Index(); }
+  /** Which bloodline this soul belongs to; only royals truly have one. */
+  virtual RoyalKind GetRoyalKind() const { return RoyalKind::kPrincess; }
 
   fPoint GetFPos() const { return fPos; }
   fPoint GetVel() const { return fVel; }

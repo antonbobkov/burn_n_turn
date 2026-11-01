@@ -106,12 +106,9 @@ void RoyalGenerator::Update() {
 
     fPoint vel = fPoint::Normalized(fPoint(v), fRoyalSpeed);
 
-    auto pCr = std::make_unique<Royal>(
-        Critter(7, p, vel, rBound, 3,
-                vel.x < 0 ? pBc->GetGl()->GetImgSeq("princess_f")
-                           : pBc->GetGl()->GetImgSeq("princess"),
-                true),
-        pBc);
+    // The fates flip their coin, and a prince or princess sets foot on the road.
+    RoyalKind kind = RandomRoyalKind();
+    std::unique_ptr<Royal> pCr = MakeRoyal(kind, p, vel, rBound, 3, pBc);
     if (bFirst) {
       pCr->SetUnderText("capture");
       bFirst = false;
@@ -119,7 +116,9 @@ void RoyalGenerator::Update() {
     pBc->AddCritter(std::move(pCr));
     pBc->GetGl()->PlaySound("princess_arrive");
 
-    pBc->TutorialNotify(TutorialEvent::RoyalGenerate);
+    pBc->TutorialNotify(kind == RoyalKind::kPrince
+                            ? TutorialEvent::PrinceGenerate
+                            : TutorialEvent::PrincessGenerate);
   }
 }
 

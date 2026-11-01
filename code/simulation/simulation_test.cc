@@ -3,8 +3,12 @@
  * toggle sound and verify file change in CachingReadOnlyFileManager.
  */
 
+#include "../game/castle.h"
 #include "../game/controller/dragon_game_controller.h"
+#include "../game/controller/level_controller.h"
+#include "../game/critters/royal.h"
 #include "../game/dragon_game_runner.h"
+#include "../game/tutorial.h"
 #include "../game_utils/MessageWriter.h"
 #include "../game_utils/game_runner_interface.h"
 #include "../utils/exception.h"
@@ -37,7 +41,202 @@ const int kGameOverSimulationFrames = 5500;
 const int kCheatAdvancePastCutscene = 4; /* levels 0->1->2 then cutscene */
 const int kCheatAdvanceToLateLevel = 6;
 
+/* The whole game running on mocks, for tests that look inside a level. */
+class RunningGame {
+public:
+  RunningGame()
+      : mock_gr_(std::make_unique<MockGraphicalInterface>()),
+        gr_(std::make_unique<SimpleGraphicalInterface<std::string>>(
+            mock_gr_.get())),
+        mock_snd_(std::make_unique<MockSoundInterface>()),
+        snd_(std::make_unique<SimpleSoundInterface<std::string>>(
+            mock_snd_.get())),
+        underlying_(std::make_unique<StdFileManager>()),
+        fm_(std::make_unique<CachingReadOnlyFileManager>(underlying_.get(),
+                                                         ".txt")),
+        pe_(std::make_unique<SwitchEvent<bool, bool>>(exit_, true_), gr_.get(),
+            snd_.get(), std::make_unique<EmptyWriter>(),
+            Size(kScreenW, kScreenH), fm_.get()),
+        runner_(std::make_unique<DragonGameRunner>(pe_)) {}
+
+  DragonGameController *Controller() { return runner_->GetTowerController(); }
+
+  /* Press Enter through the opening screens until the first level starts. */
+  LevelController *EnterFirstLevel() {
+    for (int i = 0; i < 100; ++i) {
+      if (runner_->GetActiveControllerName() == "level")
+        return dynamic_cast<LevelController *>(
+            Controller()->GetActiveController());
+      for (int k = 0; k < kKeyPressCount; ++k)
+        if (i == kKeyPressFrames[k])
+          runner_->KeyDown(GUI_RETURN);
+      runner_->Update();
+    }
+    return nullptr;
+  }
+
+private:
+  bool exit_ = false;
+  bool true_ = true;
+  std::unique_ptr<MockGraphicalInterface> mock_gr_;
+  std::unique_ptr<SimpleGraphicalInterface<std::string>> gr_;
+  std::unique_ptr<MockSoundInterface> mock_snd_;
+  std::unique_ptr<SimpleSoundInterface<std::string>> snd_;
+  std::unique_ptr<StdFileManager> underlying_;
+  std::unique_ptr<CachingReadOnlyFileManager> fm_;
+  ProgramEngine pe_;
+  std::unique_ptr<DragonGameRunner> runner_;
+};
+
+struct DrawCall {
+  Index image;
+  Point where;
+  bool centered;
+};
+
+/* A drawer that paints nothing and writes down what it was asked to paint. */
+class RecordingDrawer : public ScalingDrawer {
+public:
+  RecordingDrawer() : ScalingDrawer(nullptr, 2) {}
+  void Draw(Index image, Point where, bool centered) override {
+    calls.push_back({image, where, centered});
+  }
+  std::vector<DrawCall> calls;
+};
+
+/* How many live royals of this kind are walking around the level. */
+int CountLiveRoyals(LevelController *level, RoyalKind kind) {
+  int count = 0;
+  for (Critter *critter : level->GetCritters())
+    if (critter->Exists() && critter->GetType() == "royal" &&
+        critter->GetRoyalKind() == kind)
+      ++count;
+  return count;
+}
+
 } // namespace
+
+TEST_CASE("Royals are princes and princesses about equally often",
+          "[royals][integration]") {
+  srand(12345);
+  int princes = 0;
+  const int kCalls = 10000;
+  for (int i = 0; i < kCalls; ++i)
+    if (RandomRoyalKind() == RoyalKind::kPrince)
+      ++princes;
+  CHECK(princes >= 4500);
+  CHECK(princes <= 5500);
+}
+
+TEST_CASE("Prince art and tower figures are loaded", "[royals][integration]") {
+  RunningGame game;
+  DragonGameController *ctrl = game.Controller();
+  REQUIRE(ctrl != nullptr);
+  CHECK(ctrl->GetImgSeq("prince").GetImageCount() == 2);
+  CHECK(ctrl->GetImgSeq("prince_f").GetImageCount() == 2);
+  CHECK(ctrl->GetImgSeq("prince_die").GetImageCount() == 7);
+  CHECK(ctrl->GetImgSeq("prince_die_f").GetImageCount() == 7);
+  CHECK(ctrl->GetImgSeq("royal_figures").GetImageCount() == 2);
+}
+
+TEST_CASE("Castle keeps royals in capture order and the newest flees first",
+          "[royals][integration]") {
+  srand(12345);
+  RunningGame game;
+  LevelController *level = game.EnterFirstLevel();
+  REQUIRE(level != nullptr);
+  Castle *castle = level->GetFirstCastle();
+  REQUIRE(castle->HasDragon());
+
+  castle->AddRoyals(
+      {RoyalKind::kPrincess, RoyalKind::kPrince, RoyalKind::kPrince});
+  castle->AddRoyals({RoyalKind::kPrincess});
+  REQUIRE(castle->GetRoyals() ==
+          std::vector<RoyalKind>{RoyalKind::kPrincess, RoyalKind::kPrince,
+                                 RoyalKind::kPrince, RoyalKind::kPrincess});
+  CHECK(castle->GetRoyalCount() == 4);
+
+  int princesses_before = CountLiveRoyals(level, RoyalKind::kPrincess);
+  castle->OnKnight("knight");
+  CHECK(castle->GetRoyals() ==
+        std::vector<RoyalKind>{RoyalKind::kPrincess, RoyalKind::kPrince,
+                               RoyalKind::kPrince});
+  CHECK(CountLiveRoyals(level, RoyalKind::kPrincess) == princesses_before + 1);
+
+  int princes_before = CountLiveRoyals(level, RoyalKind::kPrince);
+  castle->OnKnight("knight");
+  CHECK(CountLiveRoyals(level, RoyalKind::kPrince) == princes_before + 1);
+}
+
+TEST_CASE("Castle draws its first four royals in order at their windows",
+          "[royals][integration]") {
+  srand(12345);
+  RunningGame game;
+  LevelController *level = game.EnterFirstLevel();
+  REQUIRE(level != nullptr);
+  Castle *castle = level->GetFirstCastle();
+  castle->AddRoyals({RoyalKind::kPrince, RoyalKind::kPrincess,
+                     RoyalKind::kPrince, RoyalKind::kPrince,
+                     RoyalKind::kPrincess});
+
+  RecordingDrawer drawer;
+  castle->Draw(&drawer);
+
+  /* The bare tower, then one figure per window; the fifth royal stays hidden. */
+  REQUIRE(drawer.calls.size() == 5);
+  const ImageSequence &tower = game.Controller()->GetImgSeq("castle");
+  CHECK(drawer.calls[0].image == tower.GetImageAt(0));
+  CHECK(drawer.calls[0].centered);
+
+  const ImageSequence &figures = game.Controller()->GetImgSeq("royal_figures");
+  const Index princess = figures.GetImageAt(0);
+  const Index prince = figures.GetImageAt(1);
+  const Index expected[] = {prince, princess, prince, prince};
+  for (int i = 0; i < 4; ++i) {
+    const DrawCall &call = drawer.calls[i + 1];
+    CHECK(call.image == expected[i]);
+    CHECK_FALSE(call.centered);
+    CHECK(call.where == castle->GetPosition() + Point(-7 + 4 * i, -6));
+  }
+}
+
+TEST_CASE("Royals scattering from a castle keep their kinds",
+          "[royals][integration]") {
+  srand(12345);
+  RunningGame game;
+  LevelController *level = game.EnterFirstLevel();
+  REQUIRE(level != nullptr);
+  Castle *castle = level->GetFirstCastle();
+
+  /* The dragon is away, so everyone panics. */
+  castle->SetDragon(nullptr);
+  castle->AddRoyals(
+      {RoyalKind::kPrincess, RoyalKind::kPrince, RoyalKind::kPrince});
+
+  int princesses_before = CountLiveRoyals(level, RoyalKind::kPrincess);
+  int princes_before = CountLiveRoyals(level, RoyalKind::kPrince);
+  castle->OnKnight("knight");
+
+  CHECK(castle->GetRoyals().empty());
+  CHECK_FALSE(castle->IsBroken());
+  CHECK(CountLiveRoyals(level, RoyalKind::kPrincess) == princesses_before + 1);
+  CHECK(CountLiveRoyals(level, RoyalKind::kPrince) == princes_before + 2);
+}
+
+TEST_CASE("Tutorial names whichever royal spawned last",
+          "[royals][integration]") {
+  TutorialTextEntity text(0, Point(), nullptr, nullptr);
+  TutorialLevelOne tutorial(&text, false, false);
+  tutorial.Notify(TutorialEvent::KnightKilled);
+
+  tutorial.Notify(TutorialEvent::PrinceGenerate);
+  REQUIRE_FALSE(text.GetLatestText().empty());
+  CHECK(text.GetLatestText()[0] == "prince in sight!");
+
+  tutorial.Notify(TutorialEvent::PrincessGenerate);
+  REQUIRE_FALSE(text.GetLatestText().empty());
+  CHECK(text.GetLatestText()[0] == "princess in sight!");
+}
 
 TEST_CASE("Simulation reaches level and menu, sound toggle writes to file",
           "[simulation][integration]") {

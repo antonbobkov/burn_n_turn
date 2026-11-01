@@ -196,7 +196,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
               pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
               Point(), pAd_->GetBound(), 1, ImageSequence()),
-      bFly(), bCarry(false), cCarry(""), nRoyalsCarried(0), nExtraFireballs(0),
+      bFly(), bCarry(false), cCarry(""), nExtraFireballs(0),
       nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
       pAd(pAd_), pPt(pPt_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_),
@@ -275,7 +275,7 @@ void Dragon::Update() {
         bCarry = true;
         imgCarry = entity->GetImage();
         cCarry = "royal";
-        ++nRoyalsCarried;
+        vCarriedRoyals.push_back(entity->GetRoyalKind());
 
         entity->Destroy();
 
@@ -452,7 +452,7 @@ void Dragon::Toggle() {
 
     if (cCarry == "royal") {
       pAd->TutorialNotify(TutorialEvent::RoyalCaptured);
-      pC->AddRoyals(nRoyalsCarried);
+      pC->AddRoyals(vCarriedRoyals);
 
       // Win condition: every castle must hold 4 royals. The moment all are full, the level ends.
       bool bAllFull = true;
@@ -479,7 +479,7 @@ void Dragon::Toggle() {
 
     bCarry = false;
     cCarry = "";
-    nRoyalsCarried = 0;
+    vCarriedRoyals.clear();
 
     SimpleVisualEntity::dPriority = 3;
 

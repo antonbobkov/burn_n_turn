@@ -15,7 +15,7 @@ Website: http://robotbear.org/
 TOUCHPAD OR TRACKBALL REQUIRED FOR PLAYING 
 
 ## Intro
-The princesses are loose!
+The princes and princesses are loose!
 Bring them back while defending your tower before time runs out!
 
 ## Controls
@@ -23,7 +23,7 @@ Bring them back while defending your tower before time runs out!
 * SWIPE: shoot fireball (while perched), turn (while flying)
 
 ## Goal
-* You're lust for damsels in distress only ends when four princesses are in each tower.
+* You're lust for royals in distress only ends when four princes or princesses are in each tower.
 * Do so before time runs out
 * Careful, there plenty of knights, mages, slimes and skeletons out there to stop your cause!
 * Merchants drop loot for a temporary power boost.

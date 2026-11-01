@@ -1,0 +1,2 @@
+royal_figure_princess.bmp
+royal_figure_prince.bmp

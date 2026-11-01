@@ -5,11 +5,27 @@
 #include "controller/level_controller.h"
 #include "dragon_constants.h"
 #include "../utils/random_utils.h"
+#include <algorithm>
 #include <memory>
+
+namespace {
+
+// The tower has but four windows, each a few paces along from the last. These
+// paces are counted from the tower's heart, for that is where it stands.
+const int kRoyalWindowCount = 4;
+const int kFirstWindowX = -7;
+const int kWindowSpacingX = 4;
+const int kWindowY = -6;
+
+} // namespace
 
 Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->GetGl()->GetImgSeq("castle")),
-      nRoyals(0), pAv(pAv_), pDrag(), bBroken(false) {}
+      pAv(pAv_), pDrag(), bBroken(false) {}
+
+void Castle::AddRoyals(const std::vector<RoyalKind> &royals) {
+  vRoyals.insert(vRoyals.end(), royals.begin(), royals.end());
+}
 
 void Castle::OnKnight(std::string cWhat) {
   if (pAv->IsCheating())
@@ -17,7 +33,7 @@ void Castle::OnKnight(std::string cWhat) {
 
   // An empty castle struck by any knight, or any castle struck by a golem, is destroyed.
   // The golem always demolishes regardless of stored royals.
-  if (!nRoyals || cWhat == "golem") {
+  if (vRoyals.empty() || cWhat == "golem") {
     if (!bBroken) {
       pAv->GetGl()->PlaySound("destroy_castle_sound");
       pAv->StopMusic();
@@ -28,7 +44,7 @@ void Castle::OnKnight(std::string cWhat) {
     pAv->StartLoseTimer();
 
     bBroken = true;
-    nRoyals = 0;
+    vRoyals.clear();
 
     // The dragon must flee a crumbling keep immediately.
     if (pDrag != nullptr) {
@@ -40,20 +56,16 @@ void Castle::OnKnight(std::string cWhat) {
   }
 
   if (pDrag != nullptr) {
-    // Dragon is perched: only one royal flees as a live entity.
+    // Dragon is perched: only the newest captive flees, leaving their window dark.
     pAv->GetGl()->PlaySound("one_princess");
 
-    --nRoyals;
+    RoyalKind fleeing = vRoyals.back();
+    vRoyals.pop_back();
 
     if (cWhat == "knight") {
       fPoint v = fPoint::Normalized(RandomAngle(), fRoyalSpeed * 3.F);
 
-      pAv->AddCritter(std::make_unique<Royal>(
-          Critter(7, GetPosition(), v, rBound, 0,
-                  v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
-                           : pAv->GetGl()->GetImgSeq("princess"),
-                  true),
-          pAv));
+      pAv->AddCritter(MakeRoyal(fleeing, GetPosition(), v, rBound, 0, pAv));
     }
   } else {
     // Dragon is away: all stored royals panic and scatter as live entities.
@@ -62,30 +74,23 @@ void Castle::OnKnight(std::string cWhat) {
     if (cWhat == "knight") {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
-      for (int i = 0; i < nRoyals; ++i) {
-        fPoint v(sin(r + i * 2 * 3.1415F / nRoyals),
-                 cos(r + i * 2 * 3.1415F / nRoyals));
+      int nCount = GetRoyalCount();
+      for (int i = 0; i < nCount; ++i) {
+        fPoint v(sin(r + i * 2 * 3.1415F / nCount),
+                 cos(r + i * 2 * 3.1415F / nCount));
         v.Normalize(fRoyalSpeed * 3.F);
 
-        pAv->AddCritter(std::make_unique<Royal>(
-            Critter(7, GetPosition(), v, rBound, 0,
-                    v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
-                             : pAv->GetGl()->GetImgSeq("princess"),
-                    true),
-            pAv));
+        pAv->AddCritter(MakeRoyal(vRoyals[i], GetPosition(), v, rBound, 0, pAv));
       }
     }
 
-    nRoyals = 0;
+    vRoyals.clear();
   }
 }
 
 void Castle::Draw(ScalingDrawer *pDr) {
-  // Castle sprite has frames 0-4 matching royal count; cap display at 4.
-  Critter::seq.SetActive(nRoyals);
-
-  if (nRoyals > 4)
-    Critter::seq.SetActive(4);
+  // First rises the bare stone of the tower, its windows dark and waiting.
+  Critter::seq.SetActive(0);
 
   if (bBroken) {
     Critter::seq.SetActive(pAv->GetLoseTimerFrame());
@@ -94,4 +99,14 @@ void Castle::Draw(ScalingDrawer *pDr) {
   }
 
   Critter::Draw(pDr);
+
+  // Then each captive peers out, left to right, in the order they were taken.
+  // Should more than four be held, the latest wait out of sight within.
+  const ImageSequence &figures = pAv->GetGl()->GetImgSeq("royal_figures");
+  int nShown = std::min(GetRoyalCount(), kRoyalWindowCount);
+  for (int i = 0; i < nShown; ++i) {
+    Point window(kFirstWindowX + i * kWindowSpacingX, kWindowY);
+    pDr->Draw(figures.GetImageAt(static_cast<int>(vRoyals[i])),
+              GetPosition() + window, false);
+  }
 }

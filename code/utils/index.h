@@ -46,7 +46,7 @@ public:
   Index &operator=(const Index &i);
 
   /* True if both refer to the same slot. */
-  bool operator==(const Index &i) { return nI == i.nI; }
+  bool operator==(const Index &i) const { return nI == i.nI; }
 
   /* True if this index is invalid (default-constructed). */
   bool operator!() { return pCounter == 0; }

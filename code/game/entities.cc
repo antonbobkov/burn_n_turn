@@ -137,7 +137,7 @@ void SoundControls::Update() {
 
   std::vector<std::string> vText;
 
-  vText.push_back("I must bring the royal princesses back to my tower");
+  vText.push_back("I must bring the royals back to my tower");
   vText.push_back("and defend it from the knights!");
   vText.push_back("---");
   const GameConfig &cfg = pGl->GetGameConfig();

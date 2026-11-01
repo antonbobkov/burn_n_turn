@@ -81,8 +81,8 @@ std::vector<std::string> TutorialLevelOne::GetText() {
     if (!killed_knight_ || !royal_generated_) {
       text.push_back("fly back to your tower");
     } else {
-      text.push_back("fly over the princess to pick her up");
-      text.push_back("bring captured princess to the tower");
+      text.push_back("fly over princes and princesses to pick them up");
+      text.push_back("bring them back to the tower");
       if (show_flying_shoot_hint_)
         text.push_back("(you can shoot while flying!)");
     }
@@ -98,10 +98,10 @@ std::vector<std::string> TutorialLevelOne::GetText() {
 
   if (royal_generated_) {
     if (!royal_captured_) {
-      text.push_back("princess in sight!");
+      text.push_back(royal_in_sight_ + " in sight!");
       text.push_back(take_off_message_);
     } else {
-      text.push_back("capture four princesses to beat the level");
+      text.push_back("capture four princes or princesses to beat the level");
       text.push_back("don't let knights get to the tower!");
     }
   }
@@ -125,8 +125,14 @@ void TutorialLevelOne::Notify(TutorialEvent event) {
       flying_ = false;
       UpdateTutorialText();
       break;
-    case TutorialEvent::RoyalGenerate:
+    case TutorialEvent::PrinceGenerate:
       royal_generated_ = true;
+      royal_in_sight_ = "prince";
+      UpdateTutorialText();
+      break;
+    case TutorialEvent::PrincessGenerate:
+      royal_generated_ = true;
+      royal_in_sight_ = "princess";
       UpdateTutorialText();
       break;
     case TutorialEvent::RoyalCaptured:

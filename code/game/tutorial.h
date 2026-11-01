@@ -24,6 +24,11 @@ public:
    * empty. */
   void SetText(std::vector<std::string> v);
 
+  /** The words last sent to this scroll, even if still waiting their turn. */
+  const std::vector<std::string> &GetLatestText() const {
+    return nDelta == -1 ? sNewText : sText;
+  }
+
   /** Draw the lines with a vertical offset; skip if the wise one's guidance is
    * off. */
   void Draw(ScalingDrawer *pDr) override;
@@ -53,7 +58,8 @@ enum class TutorialEvent {
   FlyOn,
   FlyOff,
   RoyalCaptured,
-  RoyalGenerate,
+  PrinceGenerate,
+  PrincessGenerate,
   ShotFired,
   BonusPickUp,
   TraderKilled,
@@ -98,6 +104,8 @@ class TutorialLevelOne : public Tutorial {
   bool flying_;
   bool royal_generated_;
   bool royal_captured_;
+  /** The wise one's latest sighting on the road: "prince" or "princess". */
+  std::string royal_in_sight_;
   std::string steer_message_;
   std::string shooting_message_;
   std::string take_off_message_;

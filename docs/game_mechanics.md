@@ -1,12 +1,12 @@
 # Game Mechanics Reference
 
-Tower defense: the dragon defends castles from waves of enemies while rescuing princesses.
+Tower defense: the dragon defends castles from waves of enemies while rescuing royals.
 
 ---
 
 ## Win & Lose Conditions
 
-**Win a level:** Fill every castle with 4 princesses. The moment the last princess is delivered and all castles hit 4, the level ends immediately.
+**Win a level:** Fill every castle with 4 royals. The moment the last royal is delivered and all castles hit 4, the level ends immediately.
 
 **Win the game:** Complete all 9 levels.
 
@@ -16,7 +16,7 @@ Tower defense: the dragon defends castles from waves of enemies while rescuing p
 
 ## Dragon (Player)
 
-The player controls a dragon that flies around the map, shoots fireballs, and delivers princesses to castles.
+The player controls a dragon that flies around the map, shoots fireballs, and delivers royals to castles.
 
 **States:** Flying (airborne) or Perched (sitting on a castle tower)
 
@@ -30,8 +30,8 @@ The player controls a dragon that flies around the map, shoots fireballs, and de
 - Keyboard: q/w/e/d/c/x/z/a for 8-direction movement, space to fire/land
 
 **Carrying:**
-- Dragon picks up princesses and traders by flying into them
-- Delivering a princess to a free castle stores her there (protection against one knight hit)
+- Dragon picks up royals and traders by flying into them
+- Delivering a royal to a free castle stores them there (protection against one knight hit)
 - Delivering a trader to a castle grants a fireball bonus upgrade
 
 ---
@@ -46,7 +46,7 @@ Enemies and NPCs navigate differently:
 - Golems
 
 **Spawn on a road and follow it** (move along road direction, no castle targeting):
-- Princesses
+- Royals
 - Traders
 - Mages
 
@@ -54,7 +54,7 @@ Enemies and NPCs navigate differently:
 - Slimes
 - MegaSlimes
 
-Roads are defined per-level in `assets/levels.txt` as vertical or horizontal corridors. Princesses, traders, and mages spawn at a random position on a random road and move along it.
+Roads are defined per-level in `assets/levels.txt` as vertical or horizontal corridors. Royals, traders, and mages spawn at a random position on a random road and move along it.
 
 ---
 
@@ -66,7 +66,7 @@ Roads are defined per-level in `assets/levels.txt` as vertical or horizontal cor
 
 ### Skeleton (S)
 - Walks directly toward a random castle
-- Also kills princesses and traders on contact
+- Also kills royals and traders on contact
 - 1 hit to kill
 
 ### Golem (W)
@@ -110,11 +110,13 @@ Roads are defined per-level in `assets/levels.txt` as vertical or horizontal cor
 
 ## Friendly NPCs
 
-### Princess (P)
+### Royal (P): princess or prince
+- Each spawned royal has a 50/50 chance of being a royal or a prince; the two behave the same
 - Spawns on a road and follows it
 - Killed on contact by skeletons
-- Dragon picks her up and delivers her to a free castle
-- A princess stored in a castle absorbs one knight hit before the castle is destroyed
+- Dragon picks them up and delivers them to a free castle
+- A royal stored in a castle absorbs one knight hit before the castle is destroyed
+- The castle shows its first 4 royals in capture order, left to right; a royal who flees a perched castle is the last one captured
 
 ### Trader (T)
 - Spawns on a road and follows it
@@ -126,18 +128,18 @@ Roads are defined per-level in `assets/levels.txt` as vertical or horizontal cor
 
 ## Castles
 
-Castles store rescued princesses and are the dragon's landing pads. The win condition is filling every castle to 4 princesses.
+Castles store rescued royals and are the dragon's landing pads. The win condition is filling every castle to 4 royals.
 
 **Delivering to a castle:**
 - The dragon lands by flying into a castle
-- If carrying a princess, she is added to the castle's count
+- If carrying a royal, they are added to the castle's count
 - If carrying a trader, the dragon receives a fireball bonus upgrade
-- A castle must be free (dragon not already perched) to receive a princess
+- A castle must be free (dragon not already perched) to receive a royal
 
 **When a knight reaches a castle:**
-- Golem ('W'): always destroys the castle regardless of princess count
-- Regular knight ('K') with dragon perched: one princess is lost; she flees the castle as a live princess entity that can be recaptured
-- Regular knight ('K') with no dragon perched: all stored princesses flee at once as live entities
+- Golem ('W'): always destroys the castle regardless of royal count
+- Regular knight ('K') with dragon perched: one royal is lost (the last captured); they flee the castle as a live royal entity that can be recaptured
+- Regular knight ('K') with no dragon perched: all stored royals flee at once as live entities
 - Regular knight ('K') hitting an empty castle: castle is destroyed
 
 **Castle destruction:**
@@ -145,7 +147,7 @@ Castles store rescued princesses and are the dragon's landing pads. The win cond
 - Ejects the dragon if perched
 - Starts the 3-second lose countdown
 
-**Visuals:** The castle sprite reflects the current princess count (0–4 frames). Counts above 4 display as the 4-princess frame.
+**Visuals:** The castle shows a tiny figure for each of its first 4 royals, in capture order, left to right.
 
 ---
 
@@ -198,7 +200,7 @@ Bonus duration scales down at higher levels (~15% shorter at levels 4–6, ~30% 
 | Generator | What it spawns | Notes |
 |-----------|---------------|-------|
 | **KnightGenerator** | Knights (and Golems at higher levels) | Spawn rate increases with level-timer progress; 3× slower during Ghost Mode |
-| **RoyalGenerator** | Princesses | Fixed rate |
+| **RoyalGenerator** | Royals | Fixed rate |
 | **TraderGenerator** | Traders | Rate increases with level-timer progress |
 | **MageGenerator** | Mages | Uses a faster spawn rate once Angry Mode is active |
 | **SkellyGenerator** | Burst of 4–8 skeletons | Triggered by mage spell cast |
@@ -230,7 +232,7 @@ Triggered when a mage is killed (one-way flag; never resets within a level).
 10 levels defined in `assets/levels.txt`. Each level specifies:
 - Spawn frequencies for each enemy type
 - Castle positions
-- Road layout (paths princesses, traders, and mages travel)
+- Road layout (paths royals, traders, and mages travel)
 - Time limit
 
 **Progression:**

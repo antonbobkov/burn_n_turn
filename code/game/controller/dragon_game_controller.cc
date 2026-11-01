@@ -228,6 +228,16 @@ DragonGameController::DragonGameController(
   ForEachImage((*pr)("princess_f"), ImageFlipper(pGraph));
   ForEachImage((*pr)("princess_die_f"), ImageFlipper(pGraph));
 
+  // Hark! A prince rides out beside the princess, with mirrored twins of his
+  // own, and tiny portraits of both are readied for the tower's windows.
+  pr->LoadSeqTS("princess\\prince.txt", "prince");
+  pr->LoadSeqTS("princess\\prince_die.txt", "prince_die");
+  pr->AddSequence((*pr)("prince"), "prince_f");
+  pr->AddSequence((*pr)("prince_die"), "prince_die_f");
+  ForEachImage((*pr)("prince_f"), ImageFlipper(pGraph));
+  ForEachImage((*pr)("prince_die_f"), ImageFlipper(pGraph));
+  pr->LoadSeqTS("castle\\royal_figures.txt", "royal_figures", Color(0, 0, 0));
+
   pr->LoadSeqTS("mage\\mage.txt", "mage");
   pr->LoadSeqTS("mage\\spell.txt", "mage_spell");
   pr->LoadSeqTS("mage\\die.txt", "mage_die");
@@ -398,8 +408,8 @@ void DragonGameController::StartUp() {
   std::vector<std::string> vHints;
   vHints.push_back("you can shoot while flying");
   vHints.push_back("spooky things happen when time runs out");
-  vHints.push_back("more princesses you capture - more knights show up");
-  vHints.push_back("you can capture multiple princesses in one flight");
+  vHints.push_back("more royals you capture - more knights show up");
+  vHints.push_back("you can capture multiple royals in one flight");
   if (!game_config_.IsKeyboardControls())
     vHints.push_back("pick up traders by clicking when flying over them\nbring "
                      "them to the tower to get longer bonuses");

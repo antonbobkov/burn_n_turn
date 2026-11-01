@@ -1,7 +1,7 @@
 """
 Draws all prince animation frames, pixel by pixel, based on the princess frames.
 Output: assets/princess/prince*.bmp, plus prince.txt and prince_die.txt, the
-lists of frames the game reads.
+lists of frames the game reads. Also the tiny tower figures in assets/castle/.
 
 The two walking frames are drawn by hand below, as little text pictures that
 keep her pose: same head, same feet, same arm swing. Her long hair became a
@@ -28,6 +28,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 ASSETS = os.path.join(PROJECT_ROOT, 'assets')
 FOLDER = os.path.join(ASSETS, 'princess')
+CASTLE_FOLDER = os.path.join(ASSETS, 'castle')
 
 IMG_W, IMG_H, BPP = 16, 16, 24
 BYTES_PER_PIXEL = BPP // 8
@@ -89,6 +90,18 @@ WALK_FRAMES = [
         '.....B...B......',
     ],
 ]
+
+# The tiny figure shown on the tower for a captured prince.
+PRINCE_FIGURE = [
+    '..',
+    'YY',
+    'HS',
+    'TT',
+    'TT',
+]
+
+# Where the first figure sits in the castle pictures.
+FIGURE_LEFT, FIGURE_TOP, FIGURE_W, FIGURE_H = 8, 9, 2, 5
 
 WALK_NAMES = ['prince0000.bmp', 'prince0001.bmp']
 DIE_COUNT = 7
@@ -165,6 +178,53 @@ def make_all_frames():
         rows = make_die_frame(i, her_rows, body_rows)
         frames.append((f'prince_die{i:04d}.bmp', header, rows, her_rows))
     return frames
+
+
+def read_any_bmp(path):
+    """Gives back (width, height, rows of (r, g, b), top row first), any 24bpp size."""
+    with open(path, 'rb') as f:
+        data = f.read()
+    width, height, _, bpp = struct.unpack('<iiHH', data[18:30])
+    assert bpp == BPP, f'Unexpected format: {path}'
+    stride = ((width * BYTES_PER_PIXEL + 3) // 4) * 4
+    rows = []
+    for row in range(height):
+        start = PIXEL_OFFSET + (height - 1 - row) * stride
+        rows.append([(data[start + x * 3 + 2], data[start + x * 3 + 1], data[start + x * 3])
+                     for x in range(width)])
+    return width, height, rows
+
+
+def write_figure_bmp(path, rows):
+    """Saves a tiny tower figure, using the same plain 24bpp format as all the others."""
+    height, width = len(rows), len(rows[0])
+    stride = ((width * BYTES_PER_PIXEL + 3) // 4) * 4
+    pixel_data = bytearray()
+    for row in reversed(rows):
+        row_bytes = bytearray()
+        for r, g, b in row:
+            row_bytes += bytes((b, g, r))
+        pixel_data += row_bytes + b'\x00' * (stride - len(row_bytes))
+    header = b'BM' + struct.pack('<IHHI', PIXEL_OFFSET + len(pixel_data), 0, 0, PIXEL_OFFSET)
+    header += struct.pack('<IiiHHIIiiII', 40, width, height, 1, BPP, 0, len(pixel_data),
+                          2835, 2835, 0, 0)
+    with open(path, 'wb') as f:
+        f.write(header + pixel_data)
+
+
+def make_tower_figures():
+    """Gives back the princess and prince figures shown on the tower.
+
+    Hers is exactly what castle0001.bmp adds to castle0000.bmp, so the tower looks
+    the same as it did before for a tower of princesses.
+    """
+    _, _, empty = read_any_bmp(os.path.join(CASTLE_FOLDER, 'castle0000.bmp'))
+    _, _, one = read_any_bmp(os.path.join(CASTLE_FOLDER, 'castle0001.bmp'))
+    princess = [[one[y][x] if one[y][x] != empty[y][x] else BLACK
+                 for x in range(FIGURE_LEFT, FIGURE_LEFT + FIGURE_W)]
+                for y in range(FIGURE_TOP, FIGURE_TOP + FIGURE_H)]
+    prince = [[COLORS[ch] for ch in line] for line in PRINCE_FIGURE]
+    return princess, prince
 
 
 def write_list(path, names):
@@ -252,6 +312,14 @@ if __name__ == '__main__':
     write_list(os.path.join(args.out_dir, 'prince.txt'), frame_names[:len(WALK_NAMES)])
     write_list(os.path.join(args.out_dir, 'prince_die.txt'), frame_names[len(WALK_NAMES):])
     print(f'Written: {len(all_frames)} frames and 2 lists to {args.out_dir}')
+
+    # The list order matters: the game picks a figure by its place in this list.
+    figure_names = ['royal_figure_princess.bmp', 'royal_figure_prince.bmp']
+    figures_dir = CASTLE_FOLDER if args.out_dir == FOLDER else args.out_dir
+    for figure_name, figure_rows in zip(figure_names, make_tower_figures()):
+        write_figure_bmp(os.path.join(figures_dir, figure_name), figure_rows)
+    write_list(os.path.join(figures_dir, 'royal_figures.txt'), figure_names)
+    print(f'Written: 2 tower figures and a list to {figures_dir}')
 
     if args.preview:
         make_preview(args.preview, all_frames)

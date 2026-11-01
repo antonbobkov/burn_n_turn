@@ -10,6 +10,7 @@
 class Castle;
 #include <list>
 #include <memory>
+#include <vector>
 
 class LevelController;
 class PositionTracker;
@@ -192,8 +193,9 @@ private:
   bool bCarry;
   /** What the dragon is carrying: "royal", "trader", or "" for nothing. */
   std::string cCarry;
-  /** How many royals are stacked in the current carry (usually 1). */
-  int nRoyalsCarried;
+  /** The royals clutched in the dragon's claws, in the order they were scooped
+   * up. */
+  std::vector<RoyalKind> vCarriedRoyals;
 
   /** Extra fireballs added by one-shot bonuses or special pickups. */
   int nExtraFireballs;
