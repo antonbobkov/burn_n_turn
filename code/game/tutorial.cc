@@ -55,7 +55,7 @@ void Tutorial::UpdateTutorialText() {
 TutorialLevelOne::TutorialLevelOne(TutorialTextEntity *tutorial_text,
                                    bool is_joystick, bool is_keyboard)
     : Tutorial(tutorial_text), killed_knight_(false), flying_(false),
-      princess_generated_(false), princess_captured_(false),
+      royal_generated_(false), royal_captured_(false),
       show_flying_shoot_hint_(!is_joystick) {
   if (is_joystick) {
     steer_message_    = "steer with joystick";
@@ -78,7 +78,7 @@ std::vector<std::string> TutorialLevelOne::GetText() {
 
   if (flying_) {
     text.push_back(steer_message_);
-    if (!killed_knight_ || !princess_generated_) {
+    if (!killed_knight_ || !royal_generated_) {
       text.push_back("fly back to your tower");
     } else {
       text.push_back("fly over the princess to pick her up");
@@ -96,8 +96,8 @@ std::vector<std::string> TutorialLevelOne::GetText() {
     return text;
   }
 
-  if (princess_generated_) {
-    if (!princess_captured_) {
+  if (royal_generated_) {
+    if (!royal_captured_) {
       text.push_back("princess in sight!");
       text.push_back(take_off_message_);
     } else {
@@ -125,12 +125,12 @@ void TutorialLevelOne::Notify(TutorialEvent event) {
       flying_ = false;
       UpdateTutorialText();
       break;
-    case TutorialEvent::PrincessGenerate:
-      princess_generated_ = true;
+    case TutorialEvent::RoyalGenerate:
+      royal_generated_ = true;
       UpdateTutorialText();
       break;
-    case TutorialEvent::PrincessCaptured:
-      princess_captured_ = true;
+    case TutorialEvent::RoyalCaptured:
+      royal_captured_ = true;
       UpdateTutorialText();
       break;
     default:

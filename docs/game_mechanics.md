@@ -198,7 +198,7 @@ Bonus duration scales down at higher levels (~15% shorter at levels 4–6, ~30% 
 | Generator | What it spawns | Notes |
 |-----------|---------------|-------|
 | **KnightGenerator** | Knights (and Golems at higher levels) | Spawn rate increases with level-timer progress; 3× slower during Ghost Mode |
-| **PrincessGenerator** | Princesses | Fixed rate |
+| **RoyalGenerator** | Princesses | Fixed rate |
 | **TraderGenerator** | Traders | Rate increases with level-timer progress |
 | **MageGenerator** | Mages | Uses a faster spawn rate once Angry Mode is active |
 | **SkellyGenerator** | Burst of 4–8 skeletons | Triggered by mage spell cast |

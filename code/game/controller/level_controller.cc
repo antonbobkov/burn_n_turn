@@ -4,7 +4,7 @@
 #include "../castle.h"
 #include "../critters/fighter.h"
 #include "../critters/mage.h"
-#include "../critters/princess.h"
+#include "../critters/royal.h"
 #include "../critters/slime.h"
 #include "../critters/trader.h"
 #include "../dragon.h"
@@ -174,8 +174,8 @@ void LevelController::Init(const LevelLayout &lvl) {
   pFighterGen_ = std::make_unique<FighterGenerator>(lvl.GetFreq(0), rBound, this,
                                                   lvl.GetKnightPath());
   Register(pFighterGen_.get());
-  pPGen_ = std::make_unique<PrincessGenerator>(lvl.GetFreq(1), rBound, this);
-  Register(pPGen_.get());
+  pRoyalGen_ = std::make_unique<RoyalGenerator>(lvl.GetFreq(1), rBound, this);
+  Register(pRoyalGen_.get());
   pTGen_ = std::make_unique<TraderGenerator>(lvl.GetFreq(2), rBound, this);
   Register(pTGen_.get());
   pMGen_ = std::make_unique<MageGenerator>(lvl.GetFreq(3), lvl.GetFreq(4),
@@ -408,7 +408,7 @@ void LevelController::Fire() {
 float LevelController::GetCompletionRate() {
   float fCap = 0;
   for (int i = 0; i < (int)vCs_.size(); ++i)
-    fCap += vCs_[i]->GetPrincessCount();
+    fCap += vCs_[i]->GetRoyalCount();
 
   fCap /= (4 * vCs_.size());
 

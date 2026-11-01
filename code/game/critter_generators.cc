@@ -2,7 +2,7 @@
 #include "castle.h"
 #include "critters/fighter.h"
 #include "critters/mage.h"
-#include "critters/princess.h"
+#include "critters/royal.h"
 #include "critters/trader.h"
 #include "dragon_constants.h"
 #include "controller/dragon_game_controller.h"
@@ -85,7 +85,7 @@ void FighterGenerator::Update() {
   }
 }
 
-PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
+RoyalGenerator::RoyalGenerator(float dRate_, Rectangle rBound_,
                                      LevelController *pBc_)
     : dRate(dRate_), rBound(rBound_), pBc(pBc_),
       tm(GetRandTimeFromRate(dRate_)), bFirst(false) {
@@ -95,18 +95,18 @@ PrincessGenerator::PrincessGenerator(float dRate_, Rectangle rBound_,
     bFirst = true;
 }
 
-void PrincessGenerator::Update() {
+void RoyalGenerator::Update() {
   if (tm.Tick()) {
     tm = Timer(GetRandTimeFromRate(dRate));
 
     Point p, v;
 
-    // Princesses spawn on a road and follow it — they never aim for a castle on their own.
+    // Royals spawn on a road and follow it — they never aim for a castle on their own.
     pBc->GetRandomRoadLocation(p, v);
 
-    fPoint vel = fPoint::Normalized(fPoint(v), fPrincessSpeed);
+    fPoint vel = fPoint::Normalized(fPoint(v), fRoyalSpeed);
 
-    auto pCr = std::make_unique<Princess>(
+    auto pCr = std::make_unique<Royal>(
         Critter(7, p, vel, rBound, 3,
                 vel.x < 0 ? pBc->GetGl()->GetImgSeq("princess_f")
                            : pBc->GetGl()->GetImgSeq("princess"),
@@ -119,7 +119,7 @@ void PrincessGenerator::Update() {
     pBc->AddCritter(std::move(pCr));
     pBc->GetGl()->PlaySound("princess_arrive");
 
-    pBc->TutorialNotify(TutorialEvent::PrincessGenerate);
+    pBc->TutorialNotify(TutorialEvent::RoyalGenerate);
   }
 }
 
@@ -150,7 +150,7 @@ void MageGenerator::Update() {
 void MageGenerator::MageGenerate() {
   Point p, v;
 
-  // Mages follow roads, just like princesses and traders — they never head for castles directly.
+  // Mages follow roads, just like royals and traders — they never head for castles directly.
   pBc->GetRandomRoadLocation(p, v);
 
   fPoint vel = fPoint::Normalized(fPoint(v), fMageSpeed);

@@ -37,7 +37,7 @@ public:
   /** Deliver a game event to the active tutorial handler. */
   void TutorialNotify(TutorialEvent event);
 
-  /** Own a critter that lives in the people list (knight, princess, …). */
+  /** Own a critter that lives in the people list (knight, royal, …). */
   void AddCritter(std::unique_ptr<Critter> p);
 
   /** Pointers to all critters in the realm: people, slimes, and mega-slimes. */
@@ -136,7 +136,7 @@ public:
   TrackballTracker tr_;
 
   std::unique_ptr<FighterGenerator> pFighterGen_;
-  std::unique_ptr<PrincessGenerator> pPGen_;
+  std::unique_ptr<RoyalGenerator> pRoyalGen_;
   std::unique_ptr<TraderGenerator> pTGen_;
   std::unique_ptr<MageGenerator> pMGen_;
   FighterGenerator *pGr_;

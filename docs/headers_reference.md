@@ -10,8 +10,8 @@
 | game/controller/menu_controller.h | MenuEntry, MenuEntryManager, MenuDisplay, MenuController | OnOffString, SoundString, MusicString, TutorialString, FullTextString |
 | game/common.h | — | nSlimeMax, pWr (extern) |
 | game/core.h | TowerDataWrap, MenuController, DragonGameController, GameController | sFullScreenPath (extern) |
-| game/critter_generators.h | SkellyGenerator, KnightGenerator, PrincessGenerator, MageGenerator, TraderGenerator | — |
-| game/critters.h | Castle, Princess, Mage, Trader, Knight, MegaSlime, Ghostiness, Slime, Sliminess, MegaSliminess, FloatingSlime | RandomBonus, GetBonusImage, SummonSkeletons, GetTimeUntillSpell |
+| game/critter_generators.h | SkellyGenerator, KnightGenerator, RoyalGenerator, MageGenerator, TraderGenerator | — |
+| game/critters.h | Castle, Royal, Mage, Trader, Knight, MegaSlime, Ghostiness, Slime, Sliminess, MegaSliminess, FloatingSlime | RandomBonus, GetBonusImage, SummonSkeletons, GetTimeUntillSpell |
 | game/dragon_constants.h | — | — |
 | game/dragon.h | DragonLeash, ButtonSet, Dragon | — |
 | game/dragon_game_runner.h | TowerDataWrap, DragonGameRunner | — |

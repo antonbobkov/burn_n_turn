@@ -33,16 +33,16 @@ private:
   BrokenLine bl;
 };
 
-/** Summons princesses at a rate within the chapter bounds. */
-class PrincessGenerator : public Entity {
+/** Summons royals at a rate within the chapter bounds. */
+class RoyalGenerator : public Entity {
 public:
-  std::string get_class_name() override { return "PrincessGenerator"; }
+  std::string get_class_name() override { return "RoyalGenerator"; }
 
-  PrincessGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
+  RoyalGenerator(float dRate_, Rectangle rBound_, LevelController *pBc_);
 
   /**
-   * When the timer strikes: choose a road and summon a princess there, walking
-   * toward the castles. The first princess bears the "capture" hint. Add her to
+   * When the timer strikes: choose a road and summon a royal there, walking
+   * toward the castles. The first royal bears the "capture" hint. Add them to
    * the realm, play the arrival tune, and tell the wise one.
    */
   void Update() override;

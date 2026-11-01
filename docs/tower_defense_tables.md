@@ -63,7 +63,7 @@
 | **Castle** | Critter | Castle (tower) unit: holds princess count, dragon ref, draw/OnKnight. |
 | **Road** | VisualEntity | Level road segment: vertical/horizontal, coordinate, bounds; Draw renders gray bar. |
 | **FancyRoad** | Road | Road with tiled image; Draw renders tiled road along segment. |
-| **Princess** | Critter, ConsumableEntity | Princess unit: Critter + ConsumableEntity, captured by dragon. |
+| **Royal** | Critter, ConsumableEntity | Princess unit: Critter + ConsumableEntity, captured by dragon. |
 | **SkellyGenerator** | EventEntity | Spawns skeleton knights on a timer at a position. |
 | **Mage** | Critter, ConsumableEntity | Mage unit: can summon slimes, OnHit, GetType 'M'. |
 | **FireballBonusAnimation** | Animation, PhysicalEntity | Pick-up animation with radius; overlaps ConsumableEntity trigger collection. |
@@ -79,7 +79,7 @@
 | **BrokenLine** | — | Polyline(s): vEdges is list of point sequences; CloseLast, Add, AddLine, Join, stream I/O. |
 | **LevelLayout** | — | One level: bounds, knight spawn line, castle positions, roads, timer, spawn freqs; Convert scales coords. |
 | **KnightGenerator** | EventEntity | Spawns knights along a path on a timer. |
-| **PrincessGenerator** | EventEntity | Spawns princesses at a rate within bounds. |
+| **RoyalGenerator** | EventEntity | Spawns princesses at a rate within bounds. |
 | **MageGenerator** | EventEntity | Spawns mages at a rate (angry rate when bAngry). |
 | **TraderGenerator** | EventEntity | Spawns traders at a rate within bounds. |
 | **DragonLeash** | — | Steering state for dragon: tilt, speed, trackball scaling; ModifyTilt, GetNewVelocity. |

@@ -69,14 +69,14 @@ void Knight::OnHit(char /*cWhat*/) {
 }
 
 void Skeleton::Update() {
-  // The skeleton is especially wicked: it slays princesses and traders on
+  // The skeleton is especially wicked: it slays royals and traders on
   // contact and devours any fireball bonus pickups it walks over.
   for (Critter *entity : pAc->GetCritters()) {
     if (!entity->Exists())
       continue;
 
     if (this->HitDetection(entity)) {
-      if (entity->GetType() == "princess" || entity->GetType() == "trader") {
+      if (entity->GetType() == "royal" || entity->GetType() == "trader") {
         pAc->GetGl()->PlaySound("death");
         entity->OnHit('S');
       }

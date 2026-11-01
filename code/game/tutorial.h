@@ -52,8 +52,8 @@ enum class TutorialEvent {
   KnightKilled,
   FlyOn,
   FlyOff,
-  PrincessCaptured,
-  PrincessGenerate,
+  RoyalCaptured,
+  RoyalGenerate,
   ShotFired,
   BonusPickUp,
   TraderKilled,
@@ -86,7 +86,7 @@ class NoopTutorial : public Tutorial {
   void Notify(TutorialEvent /*event*/) override {}
 };
 
-/** First chapter tutorial: tracks knight, flight, and princess milestones. */
+/** First chapter tutorial: tracks knight, flight, and royal milestones. */
 class TutorialLevelOne : public Tutorial {
  public:
   TutorialLevelOne(TutorialTextEntity *tutorial_text, bool is_joystick,
@@ -96,8 +96,8 @@ class TutorialLevelOne : public Tutorial {
  private:
   bool killed_knight_;
   bool flying_;
-  bool princess_generated_;
-  bool princess_captured_;
+  bool royal_generated_;
+  bool royal_captured_;
   std::string steer_message_;
   std::string shooting_message_;
   std::string take_off_message_;

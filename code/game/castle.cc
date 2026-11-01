@@ -1,5 +1,5 @@
 #include "castle.h"
-#include "critters/princess.h"
+#include "critters/royal.h"
 #include "dragon.h"
 #include "controller/dragon_game_controller.h"
 #include "controller/level_controller.h"
@@ -9,15 +9,15 @@
 
 Castle::Castle(Point p, Rectangle rBound_, LevelController *pAv_)
     : Critter(15, p, Point(), rBound_, 3, pAv_->GetGl()->GetImgSeq("castle")),
-      nPrincesses(0), pAv(pAv_), pDrag(), bBroken(false) {}
+      nRoyals(0), pAv(pAv_), pDrag(), bBroken(false) {}
 
 void Castle::OnKnight(std::string cWhat) {
   if (pAv->IsCheating())
     return;
 
   // An empty castle struck by any knight, or any castle struck by a golem, is destroyed.
-  // The golem always demolishes regardless of stored princesses.
-  if (!nPrincesses || cWhat == "golem") {
+  // The golem always demolishes regardless of stored royals.
+  if (!nRoyals || cWhat == "golem") {
     if (!bBroken) {
       pAv->GetGl()->PlaySound("destroy_castle_sound");
       pAv->StopMusic();
@@ -28,7 +28,7 @@ void Castle::OnKnight(std::string cWhat) {
     pAv->StartLoseTimer();
 
     bBroken = true;
-    nPrincesses = 0;
+    nRoyals = 0;
 
     // The dragon must flee a crumbling keep immediately.
     if (pDrag != nullptr) {
@@ -40,15 +40,15 @@ void Castle::OnKnight(std::string cWhat) {
   }
 
   if (pDrag != nullptr) {
-    // Dragon is perched: only one princess flees as a live entity.
+    // Dragon is perched: only one royal flees as a live entity.
     pAv->GetGl()->PlaySound("one_princess");
 
-    --nPrincesses;
+    --nRoyals;
 
     if (cWhat == "knight") {
-      fPoint v = fPoint::Normalized(RandomAngle(), fPrincessSpeed * 3.F);
+      fPoint v = fPoint::Normalized(RandomAngle(), fRoyalSpeed * 3.F);
 
-      pAv->AddCritter(std::make_unique<Princess>(
+      pAv->AddCritter(std::make_unique<Royal>(
           Critter(7, GetPosition(), v, rBound, 0,
                   v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
                            : pAv->GetGl()->GetImgSeq("princess"),
@@ -56,18 +56,18 @@ void Castle::OnKnight(std::string cWhat) {
           pAv));
     }
   } else {
-    // Dragon is away: all stored princesses panic and scatter as live entities.
+    // Dragon is away: all stored royals panic and scatter as live entities.
     pAv->GetGl()->PlaySound("all_princess_escape");
 
     if (cWhat == "knight") {
       float r = float(rand()) / RAND_MAX * 2 * 3.1415F;
 
-      for (int i = 0; i < nPrincesses; ++i) {
-        fPoint v(sin(r + i * 2 * 3.1415F / nPrincesses),
-                 cos(r + i * 2 * 3.1415F / nPrincesses));
-        v.Normalize(fPrincessSpeed * 3.F);
+      for (int i = 0; i < nRoyals; ++i) {
+        fPoint v(sin(r + i * 2 * 3.1415F / nRoyals),
+                 cos(r + i * 2 * 3.1415F / nRoyals));
+        v.Normalize(fRoyalSpeed * 3.F);
 
-        pAv->AddCritter(std::make_unique<Princess>(
+        pAv->AddCritter(std::make_unique<Royal>(
             Critter(7, GetPosition(), v, rBound, 0,
                     v.x < 0 ? pAv->GetGl()->GetImgSeq("princess_f")
                              : pAv->GetGl()->GetImgSeq("princess"),
@@ -76,15 +76,15 @@ void Castle::OnKnight(std::string cWhat) {
       }
     }
 
-    nPrincesses = 0;
+    nRoyals = 0;
   }
 }
 
 void Castle::Draw(ScalingDrawer *pDr) {
-  // Castle sprite has frames 0-4 matching princess count; cap display at 4.
-  Critter::seq.SetActive(nPrincesses);
+  // Castle sprite has frames 0-4 matching royal count; cap display at 4.
+  Critter::seq.SetActive(nRoyals);
 
-  if (nPrincesses > 4)
+  if (nRoyals > 4)
     Critter::seq.SetActive(4);
 
   if (bBroken) {

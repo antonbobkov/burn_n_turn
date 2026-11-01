@@ -17,14 +17,14 @@ public:
   void OnKnight(std::string cWhat);
   void Draw(ScalingDrawer *pDr) override;
 
-  int GetPrincessCount() const { return nPrincesses; }
-  void AddPrincesses(int n) { nPrincesses += n; }
+  int GetRoyalCount() const { return nRoyals; }
+  void AddRoyals(int n) { nRoyals += n; }
   bool HasDragon() const { return pDrag != nullptr; }
   void SetDragon(Dragon *d) { pDrag = d; }
   bool IsBroken() const { return bBroken; }
 
 private:
-  int nPrincesses;
+  int nRoyals;
   LevelController *pAv;
   Dragon *pDrag;
   bool bBroken;

@@ -45,7 +45,7 @@ public:
   void OnHit(char cWhat) override;
 };
 
-/** The skeleton: summoned by mages, it slays princesses and traders on
+/** The skeleton: summoned by mages, it slays royals and traders on
  * contact and destroys bonus pickups it walks over. */
 class Skeleton : public Fighter {
 public:
@@ -55,7 +55,7 @@ public:
 
   std::string GetType() override { return "skeleton"; }
 
-  /** Each tick: slay any princess or trader on contact and devour bonus
+  /** Each tick: slay any royal or trader on contact and devour bonus
    * pickups, then do the shared fighter march and animation. */
   void Update() override;
 
@@ -63,7 +63,7 @@ public:
 };
 
 /** The golem: a stone giant that shrugs off fireballs and smashes castles
- * regardless of their princess count. Takes 70 hits to bring down. */
+ * regardless of their royal count. Takes 70 hits to bring down. */
 class Golem : public Fighter {
 public:
   std::string get_class_name() override { return "Golem"; }

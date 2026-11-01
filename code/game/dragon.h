@@ -83,11 +83,11 @@ private:
 };
 
 /** The player's dragon: perches on towers, flies around the level,
- * breathes fire at enemies, and carries princesses home.
+ * breathes fire at enemies, and carries royals home.
  *
  * While perched the dragon shoots fireballs at the enemy column. While
- * flying it collects princesses, picks up bonuses, and can grab traders.
- * Landing on a free tower with a princess scores a point; landing on a
+ * flying it collects royals, picks up bonuses, and can grab traders.
+ * Landing on a free tower with a royal scores a point; landing on a
  * tower with a trader grants a random upgrade. */
 class Dragon : public Critter {
 public:
@@ -124,7 +124,7 @@ public:
 
   /** Each tick: regenerate one fireball if enough time has passed (unless
    * regen is locked after a recent shot), check for landing on a free
-   * castle, pick up any princess or bonus the dragon flies over, then
+   * castle, pick up any royal or bonus the dragon flies over, then
    * run the normal critter movement. */
   void Update() override;
 
@@ -156,7 +156,7 @@ public:
   /** Toggle between perching and flying.
    *
    * If grounded: take off (play the leave-tower sound).
-   * If flying and over a free tower: land, deliver any carried princess
+   * If flying and over a free tower: land, deliver any carried royal
    * or trader reward, and switch back to the stable sprite.
    * If flying and near a trader: pick the trader up.
    * Does nothing if carrying something and no valid landing is nearby. */
@@ -188,12 +188,12 @@ private:
   /** True while the dragon is airborne; false while perched on a tower. */
   bool bFly;
 
-  /** True when the dragon is carrying something (a princess or trader). */
+  /** True when the dragon is carrying something (a royal or trader). */
   bool bCarry;
-  /** What the dragon is carrying: "princess", "trader", or "" for nothing. */
+  /** What the dragon is carrying: "royal", "trader", or "" for nothing. */
   std::string cCarry;
-  /** How many princesses are stacked in the current carry (usually 1). */
-  int nPrCr;
+  /** How many royals are stacked in the current carry (usually 1). */
+  int nRoyalsCarried;
 
   /** Extra fireballs added by one-shot bonuses or special pickups. */
   int nExtraFireballs;

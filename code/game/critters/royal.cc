@@ -1,10 +1,10 @@
-#include "princess.h"
+#include "royal.h"
 #include "../controller/dragon_game_controller.h"
 #include "../controller/level_controller.h"
 #include "../dragon_constants.h"
 #include <memory>
 
-void Princess::OnHit(char /*cWhat*/) {
+void Royal::OnHit(char /*cWhat*/) {
   pAc->AddOwnedEntity(std::make_unique<BonusScore>(pAc, GetPosition(), 250));
 
   this->Destroy();
@@ -16,7 +16,7 @@ void Princess::OnHit(char /*cWhat*/) {
       int(nFramesInSecond / 5 / fDeathMultiplier), GetPosition(), true));
 }
 
-void Princess::Draw(ScalingDrawer *pDr) {
+void Royal::Draw(ScalingDrawer *pDr) {
   Critter::Draw(pDr);
 
   Point p = GetPosition();

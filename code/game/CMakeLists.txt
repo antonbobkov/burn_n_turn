@@ -19,7 +19,7 @@ add_library(GameCore STATIC
   critters/critters.cc
   critters/fighter.cc
   critters/mage.cc
-  critters/princess.cc
+  critters/royal.cc
   critters/trader.cc
   critters/slime.cc
   critter_generators.cc

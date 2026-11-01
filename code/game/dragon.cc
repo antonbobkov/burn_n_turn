@@ -196,7 +196,7 @@ Dragon::Dragon(Castle *pCs_, LevelController *pAd_, PositionTracker *pPt_,
               pCs_ == nullptr ? pAd_->GetFirstCastle()->GetPosition()
                               : pCs_->GetPosition(),
               Point(), pAd_->GetBound(), 1, ImageSequence()),
-      bFly(), bCarry(false), cCarry(""), nPrCr(0), nExtraFireballs(0),
+      bFly(), bCarry(false), cCarry(""), nRoyalsCarried(0), nExtraFireballs(0),
       nTimer(0), bTookOff(false), nFireballCount(0), tFireballRegen(1),
       bRegenLocked(false), tRegenUnlock(nFramesInSecond * nRegenDelay / 10),
       pAd(pAd_), pPt(pPt_), pCs(pCs_), imgStable(imgStable_), imgFly(imgFly_),
@@ -265,17 +265,17 @@ void Dragon::Update() {
     }
   }
 
-  // The dragon can scoop up princesses while flying; it can carry many stacked together.
-  if (bFly && (!bCarry || cCarry == "princess")) {
+  // The dragon can scoop up royals while flying; it can carry many stacked together.
+  if (bFly && (!bCarry || cCarry == "royal")) {
     for (Critter *entity : pAd->GetCritters()) {
       if (!entity->Exists())
         continue;
 
-      if (entity->GetType() == "princess" && this->HitDetection(entity)) {
+      if (entity->GetType() == "royal" && this->HitDetection(entity)) {
         bCarry = true;
         imgCarry = entity->GetImage();
-        cCarry = "princess";
-        ++nPrCr;
+        cCarry = "royal";
+        ++nRoyalsCarried;
 
         entity->Destroy();
 
@@ -450,14 +450,14 @@ void Dragon::Toggle() {
     pCs = pC;
     pCs->SetDragon(pAd->FindDragon(this));
 
-    if (cCarry == "princess") {
-      pAd->TutorialNotify(TutorialEvent::PrincessCaptured);
-      pC->AddPrincesses(nPrCr);
+    if (cCarry == "royal") {
+      pAd->TutorialNotify(TutorialEvent::RoyalCaptured);
+      pC->AddRoyals(nRoyalsCarried);
 
-      // Win condition: every castle must hold 4 princesses. The moment all are full, the level ends.
+      // Win condition: every castle must hold 4 royals. The moment all are full, the level ends.
       bool bAllFull = true;
       for (Castle *pCs2 : pAd->GetCastlePointers()) {
-        if (pCs2->GetPrincessCount() < 4) {
+        if (pCs2->GetRoyalCount() < 4) {
           bAllFull = false;
           break;
         }
@@ -479,7 +479,7 @@ void Dragon::Toggle() {
 
     bCarry = false;
     cCarry = "";
-    nPrCr = 0;
+    nRoyalsCarried = 0;
 
     SimpleVisualEntity::dPriority = 3;
 

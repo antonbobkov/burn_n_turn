@@ -23,7 +23,7 @@ name, base types, and short description.
 | game/controller/menu_controller.h | struct | MenuEntryManager | — | Holds menu entries and current selection index. |
 | game/critter_generators.h | struct | KnightGenerator | EventEntity | Spawns knight critters. |
 | game/critter_generators.h | struct | MageGenerator | EventEntity | Spawns mage critters. |
-| game/critter_generators.h | struct | PrincessGenerator | EventEntity | Spawns princess critters. |
+| game/critter_generators.h | struct | RoyalGenerator | EventEntity | Spawns princess critters. |
 | game/critter_generators.h | struct | SkellyGenerator | EventEntity | Spawns skeleton critters. |
 | game/critter_generators.h | struct | TraderGenerator | EventEntity | Spawns trader critters. |
 | game/critters.h | struct | Castle | Critter | Castle building; holds princesses, dragon reference. |
@@ -33,7 +33,7 @@ name, base types, and short description.
 | game/critters.h | struct | Mage | Critter, ConsumableEntity | Mage unit; can summon slimes. |
 | game/critters.h | struct | MegaSliminess | EventEntity | Mega slime visual/state effect. |
 | game/critters.h | struct | MegaSlime | Critter, ConsumableEntity | Large slime enemy. |
-| game/critters.h | struct | Princess | Critter, ConsumableEntity | Princess unit; captured by dragon. |
+| game/critters.h | struct | Royal | Critter, ConsumableEntity | Princess unit; captured by dragon. |
 | game/critters.h | struct | Slime | Critter, ConsumableEntity | Slime enemy. |
 | game/critters.h | struct | Sliminess | EventEntity | Slime visual/state effect. |
 | game/critters.h | struct | Trader | Critter, ConsumableEntity | Trader unit; drops bonus. |
