@@ -47,8 +47,8 @@ public:
 
   SlimeUpdater(BuyNowController *pBuy_) : pBuy(pBuy_) {}
 
-  /*virtual*/ void Draw(ScalingDrawer *pDr);
-  /*virtual*/ float GetPriority() { return 0; }
+  void Draw(ScalingDrawer *pDr) override;
+  float GetPriority() override { return 0; }
 
 private:
   BuyNowController *pBuy;

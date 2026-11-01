@@ -214,7 +214,7 @@ public:
 
   /** Copy an existing fireball (used when splitting into multiple shots). */
   Fireball(const Fireball &f)
-      : Critter(f), pBc(f.pBc), bThrough(f.bThrough), fb(f.fb), ch(f.ch),
+      : Critter(f), pBc(f.pBc), fb(f.fb), bThrough(f.bThrough), ch(f.ch),
         nChain(f.nChain) {}
 
   /** p      — starting position

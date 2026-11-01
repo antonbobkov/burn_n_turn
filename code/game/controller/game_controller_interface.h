@@ -17,6 +17,10 @@ public:
                  Rectangle rBound_ = Rectangle())
       : pGl(pGl_), rBound(rBound_) {}
 
+  /** When a screen keeper falls, the whole of their household falls with them,
+   * down to the last slime and squire; none linger as ghosts in the castle. */
+  virtual ~GameController() = default;
+
   virtual void Update() {}
   virtual void OnKey(GuiKeyType /*c*/, bool /*bUp*/) {}
   virtual void OnMouse(Point /*pPos*/) {}

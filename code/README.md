@@ -1,8 +1,12 @@
-To build on windows:
+To build on windows, from the repository root:
 
-go to /build/ directory and then run:
+`cmake --preset debug`
 
-`cmake ../code -G "MinGW Makefiles" && mingw32-make`
+`cmake --build --preset debug -j4`
+
+To run the tests:
+
+`ctest --preset integration -j4`
 
 recursive clang
 

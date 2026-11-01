@@ -18,7 +18,7 @@
       "displayName": "Clang Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-g"
+        "CMAKE_CXX_FLAGS_DEBUG": "-g"
       }
     },
     {
@@ -27,7 +27,7 @@
       "displayName": "Clang Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
         "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "YES"
       }
     }

@@ -25,6 +25,10 @@ FetchContent_Declare(
 )
 set(CATCH_BUILD_STATIC_LIBRARY ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(Catch2)
+# Catch2's test macros use __COUNTER__, which new clang warns about under
+# -Wpedantic. That would fail every test file under -Werror, so we turn this one
+# warning off for code that uses Catch2.
+target_compile_options(Catch2 INTERFACE -Wno-c2y-extensions)
 
 enable_testing()
 

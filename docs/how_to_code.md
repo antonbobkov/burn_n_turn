@@ -1,3 +1,7 @@
+- older code does not follow all of this yet (for example names like `bExist` and `dPriority` under `code/game/`)
+  - new classes follow this guide
+  - when adding to an older class, match the names already in that class; rename only as its own change
+
 - class style guide
   - class name is CamelCase
   - function names are CamelCase

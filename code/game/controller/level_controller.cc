@@ -146,11 +146,11 @@ LevelController::LevelController(DragonGameController *pGl_, Rectangle rBound,
                                  std::unique_ptr<SoundControls> pSc)
     : EntityListController(pGl_, rBound, c),
       bFirstUpdate_(true), bGhostTime_(false), bTimerFlash_(false), bBlink_(true),
-      bLeft_(false), bCh_(false), bLeftDown_(false), bRightDown_(false),
+      bCh_(false), bLeftDown_(false), bRightDown_(false),
       nLastDir_(0), bWasDirectionalInput_(0), nLvl_(lvl.GetLevel()), nSlimeNum_(0),
-      pGr_(0), bTakeOffToggle_(false),
-      pTutorialText_(), pTutorial_(std::make_unique<NoopTutorial>()),
+      bTakeOffToggle_(false), pGr_(0),
       pSc_(std::move(pSc)),
+      pTutorialText_(), pTutorial_(std::make_unique<NoopTutorial>()),
       mc_(pGl->GetImgSeq("claw"), Point()) {
   /* The sound herald answers the call from the very first tick. */
   if (pSc_) Register(pSc_.get());

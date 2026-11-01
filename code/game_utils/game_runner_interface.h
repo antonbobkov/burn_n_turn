@@ -12,8 +12,8 @@
 class FileManager;
 struct ProgramInfo {
   ProgramInfo()
-      : bMouseCapture(false), bFullScreen(false), bFlexibleResolution(false),
-        bBlackBox(false), nFramerate(0) {}
+      : nFramerate(0), bMouseCapture(false), bFullScreen(false),
+        bFlexibleResolution(false), bBlackBox(false) {}
   ProgramInfo(Size szScreenRez_, std::string strTitle_, int nFramerate_,
               bool bMouseCapture_ = false, bool bFullScreen_ = false,
               bool bFlexibleResolution_ = false, bool bBlackBox_ = false)

@@ -124,7 +124,6 @@ public:
   Timer tBlink_;
   bool bBlink_;
   Timer tStep_;
-  bool bLeft_;
   bool bCh_;
   bool bLeftDown_, bRightDown_;
   int nLastDir_;
