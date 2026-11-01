@@ -31,7 +31,6 @@
 | game_utils/Preloader.h | ImageFlipper, ImagePainter, PreloaderException, PreloaderExceptionAccess, PreloaderExceptionLoad, Preloader | — |
 | game_utils/sound_sequence.h | SoundSequence | — |
 | game_utils/sound_utils.h | SoundInterfaceProxy, BackgroundMusicPlayer | BG_MUSIC_CHANNEL, BG_BACKGROUND, etc. (enums) |
-| simulation/simulation.h | — | RunSimulation |
 | utils/debug_log.h | — | EnableDebugLog, DebugLog |
 | utils/exception.h | MyException, SimpleException | crefString (typedef) |
 | utils/file_utils.h | OutStreamHandler, InStreamHandler, FileManager, StdFileManager, InMemoryFileManager, CachingReadOnlyFileManager, FilePath, SavableVariable | ParsePosition, ParseGrabNext, ParseGrabLine, GetFileContent, WriteContentToFile, operator<<(FilePath), BoolToggle, Separate |
